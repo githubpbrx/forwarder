@@ -33,6 +33,16 @@ class privilege extends Controller{
         return view('system::settings/privileges/user_access_list_serverside', $data);
     }
 
+    public function add(){
+        $data = array(
+            'title' => 'Daftar User Akses', 
+            'menu'  => '',
+            'group_access_data'     => modelgroup_access::all(),
+            "token" => Hash::make('ittetapsemangant')
+        );
+        return view('system::settings/privileges/user_access_formadd', $data);
+    }
+
     public function privilegedata(){
         $query = modelprivilege::with(['group_access'])
                             ->orderBy('privilege_user_nik', 'ASC')
@@ -112,8 +122,10 @@ class privilege extends Controller{
     }
 
     public function getPrivilege($nik){
+        // dd('sini');
         $privilege      = modelprivilege::where('privilege_user_nik', '=', $nik)
                         ->first();
+                        // dd($nik);
         if ($privilege){
             $role_access    = modelrole_access::where('role_access_group_access_id', '=', $privilege->privilege_group_access_id)
                                             ->get();
@@ -170,6 +182,51 @@ class privilege extends Controller{
     }
 
     public function createsave(Request $request){
+        $jenis = $request->jenis;
+        $token = $request->privilege_api_key;
+        if($jenis=='internal'){
+            $nik = $request->internalnik;
+            $nama = $request->internalnama;
+            $akses = $request->privilege_group_access_id;
+            $cekuser = modelprivilege::where('privilege_user_nik',$nik)->where('privilege_aktif','Y')->first();
+            if($cekuser!=null){
+                Session::flash('toast', 'toast("info", "User sudah ada, silahkan cek di list data user.")');
+                return redirect()->back();
+            }else{
+                $in = modelprivilege::insert(['privilege_user_nik'=>$nik, 'privilege_user_name'=>$nama, 'privilege_aktif'=>'Y', 'privilege_hrips'=>'Y', 'coc'=>'Y', 'kyc'=>'Y', 'kode_validate'=>'Y', 'privilege_group_access_id'=>$akses, 'token'=>$token, 'created_at'=>date('Y-m-d H:i:s') ]);
+                if($in){
+                    $privilegeid = $this->getLastID('privilege');
+                    \LogActivity::create('privilege', $privilegeid, $this->micro);
+                    Session::flash('toast', 'toast("success", "Berhasil disimpan.")');
+                }else{
+                    Session::flash('toast', 'toast("error", "Gagal disimpan.")');
+                }
+                return redirect()->back();
+            }
+
+        }elseif($jenis=='external'){
+            $nik = $request->externalemail;
+            $nama = $request->externalnama;
+            $akses = $request->privilege_group_access_id;
+            $cekuser = modelprivilege::where('privilege_user_nik',$nik)->where('privilege_aktif','Y')->first();
+            if($cekuser!=null){
+                Session::flash('toast', 'toast("info", "User sudah ada, silahkan cek di list data user.")');
+                return redirect()->back();
+            }else{
+                $in = modelprivilege::insert(['privilege_user_nik'=>$nik, 'privilege_user_name'=>$nama, 'privilege_aktif'=>'Y', 'privilege_hrips'=>'N', 'coc'=>'N', 'kyc'=>'N', 'kode_validate'=>'N', 'kode'=>rand(11111,99999), 'privilege_password'=>Hash::make('password123'), 'emailfinance'=>$request->emailfinance, 'nikfinance'=>$request->nikfinance, 'namafinance'=>$request->namafinance, 'privilege_group_access_id'=>$akses, 'token'=>$token, 'created_at'=>date('Y-m-d H:i:s') ]);
+                if($in){
+                    $privilegeid = $this->getLastID('privilege');
+                    \LogActivity::create('privilege', $privilegeid, $this->micro);
+                    Session::flash('toast', 'toast("success", "Berhasil disimpan.")');
+                }else{
+                    Session::flash('toast', 'toast("error", "Gagal disimpan.")');
+                }
+                return redirect()->back();
+            }
+        }else{
+            abort(401);
+        }
+        dd($request);
         $nik = $request->nik;
         $nama = $request->nama;
         $akses = $request->akses;
@@ -205,8 +262,10 @@ class privilege extends Controller{
         foreach ($detail_data_enkripsi as $key => $data_enkripsi) {
             $detail_data[$this->dekripsi($key)] = $this->dekripsi($data_enkripsi);
         }
-        $jumlahdata= array_sum($detail_data);
-        if($jumlahdata<=0){
+        // dd($detail_data);
+        $jumlahdata= count($detail_data);
+        // dd($detail_data, $jumlahdata);
+        if($jumlahdata<=1){
             $nama = '';
         }else{
             $nama = $detail_data['a'];
@@ -266,5 +325,14 @@ class privilege extends Controller{
         $str = base64_encode($str);
 
         return $str;
+    }
+    public function getLastID($table){
+        $last_ai = DB::select('
+            SELECT `AUTO_INCREMENT`
+            FROM INFORMATION_SCHEMA.TABLES
+            WHERE TABLE_SCHEMA = "'.DB::connection()->getDatabaseName().'"
+            AND TABLE_NAME = "'.$table.'"
+        ');
+        return $last_ai[0]->AUTO_INCREMENT;
     }
 }
