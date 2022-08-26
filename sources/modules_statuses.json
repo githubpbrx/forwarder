@@ -1,0 +1,11 @@
+{
+    "Car": true,
+    "Guestbook": true,
+    "System": true,
+    "Sisbook": true,
+    "Blog": true,
+    "Mobile": true,
+    "Master": true,
+    "Transaksi": true,
+    "Report": true
+}

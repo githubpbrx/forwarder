@@ -1,0 +1,25 @@
+{
+    "name": "nwidart/transaksi",
+    "description": "",
+    "authors": [
+        {
+            "name": "Nicolas Widart",
+            "email": "n.widart@gmail.com"
+        }
+    ],
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Modules\\Transaksi\\Providers\\TransaksiServiceProvider"
+            ],
+            "aliases": {
+
+            }
+        }
+    },
+    "autoload": {
+        "psr-4": {
+            "Modules\\Transaksi\\": ""
+        }
+    }
+}

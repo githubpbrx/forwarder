@@ -1,0 +1,24 @@
+<?php
+
+namespace Modules\System\Http\Middleware;
+
+use Closure, Session;
+
+class checklogin
+{
+    /**
+     * Handle an incoming request.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \Closure  $next
+     * @return mixed
+     */
+    public function handle($request, Closure $next){
+        if(!Session::get('session')){
+            Session::flash('alert', 'sweetAlert("warning", "Please login to access")');
+            return redirect('login');
+        }
+
+        return $next($request);
+    }
+}
