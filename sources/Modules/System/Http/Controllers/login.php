@@ -10,6 +10,8 @@ use GuzzleHttp\Client;
 use Illuminate\Support\Facades\Hash;
 use Modules\System\Models\modelsystem,
     Modules\System\Models\modelfactory,
+    Modules\System\Models\Privileges\modelrole_access,
+    Modules\System\Models\Privileges\modelgroup_access,
     Modules\System\Models\modelprivilege;
 
 class login extends Controller{
@@ -569,8 +571,30 @@ class login extends Controller{
 
         Session::put('system', $system_data);
         $user   = Session::get('session');
+        // dd($user['user_nik']);
+        // app()->call('Modules\System\Http\Controllers\Privileges\privilege@getPrivilege', [$user['user_nik']]);
+        
+        $nik = $user['user_nik'];
+        $privilege      = modelprivilege::where('privilege_user_nik', '=', $nik)
+                        ->first();
+                        // dd($nik);
+        if ($privilege){
+            $role_access    = modelrole_access::where('role_access_group_access_id', '=', $privilege->privilege_group_access_id)
+                                            ->get();
+            if ($role_access) {
+                $data = array(
+                    'sistem'    => ',',
+                    'location'  => explode(',', $privilege->privilege_user_location),
+                    'menu'      => $role_access,
+                );
 
-        app()->call('Modules\System\Http\Controllers\Privileges\privilege@getPrivilege', [$user['user_nik']]);
+                Session::put('privilege', $data);
+            }else{
+                Session::forget('privilege');
+            }
+        }else{
+            Session::forget('privilege');
+        }
        
         return redirect(url('dashboard'));
     }

@@ -86,6 +86,7 @@ Route::prefix('privilege')->group(function() {
     Route::get('menu/active/{menu_id}', 'Privileges\menu@active');
     
     Route::get('user_access', 'Privileges\privilege@index');
+    Route::get('user_accessadd', 'Privileges\privilege@add')->name('user_add');
     Route::get('user_access/privilegedata', 'Privileges\privilege@privilegedata');
     Route::get('user_access/update/{privilege_id}', 'Privileges\privilege@update');
     Route::post('user_access/updateaction', 'Privileges\privilege@updateaction');
@@ -100,7 +101,7 @@ Route::prefix('privilege')->group(function() {
     Route::get('group_access/delete/{group_access_id}', 'Privileges\group_access@delete');
     Route::get('group_access/checkgroupaccess', 'Privileges\group_access@checkgroupaccess');
     
-    // Route::get('get/{nik}', 'Privileges\privilege@getPrivilege');
+    Route::get('get/{nik}', 'Privileges\privilege@getPrivilege');
     // 
     
     Route::post('getnamaku', 'Privileges\privilege@getnama')->name('privileggetnama');

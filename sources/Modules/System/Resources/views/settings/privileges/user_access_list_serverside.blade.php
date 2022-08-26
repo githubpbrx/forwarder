@@ -4,9 +4,11 @@
 @section('content')
 <div class="card">
     <div class="card-body">
-        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#adduser">
-            Add User
-        </button>
+        <a href="{{route('user_add')}}"><button type="button" class="btn btn-primary">Add User
+        </button></a>
+
+
+
         <table id="serverside" class="table table-bordered table-striped">
             <thead>
                 <tr>
@@ -24,68 +26,7 @@
     </div>
 </div>
 
-<!-- Modal -->
-<div class="modal fade" id="adduser" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLongTitle">Add User</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <form action="{{route('privilegcreatesave')}}" method="post" accept-charset="utf-8">
-                    @csrf
-                    <div class="form-group">
-                        <label>NIK Karyawan</label>
-                        <input value="" name="nik" type="text" class="form-control" placeholder="Nik" required="" id="nik">
-                    </div>
 
-                    <div class="form-group">
-                        <label>Nama Karyawan</label>
-                        <input value="" name="nama" type="text" class="form-control" id="nama" placeholder="Isi field NIK Karyawan" readonly required="">
-                    </div>
-                    <div class="form-group">
-                        <label>Grup Akses</label>
-                        <select name="akses" class="form-control select2" style="width: 100%;" required="">
-                            <option value="">-- Pilih Akses --</option>
-                            @foreach ($group_access_data as $ga)
-                            <option value="{{ $ga->group_access_id }}">{{ $ga->group_access_name }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>Location</label>
-                        <select name="lokasi[]" class="select2" multiple="multiple" data-placeholder="Pilih lokasi" style="width: 100%;" required="">
-                            @foreach ($factory_data as $data)
-                            <option value="{{$data->factory_name}}">
-                                {{$data->factory_name}}
-                            </option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <div class="row align-items-center h-100">
-                        <div class="col-6">
-                            <div class="form-group">
-                                <label>API Key</label>
-                                <input id="privilege-api-key" name="privilege_api_key" type="text" class="form-control" readonly>
-                            </div>
-                        </div>
-                        <div class="col-6">
-                            <button id="btn-api" type="button" class="btn btn-primary"><i class="fas fa-key"></i> Generate Key</button>
-                        </div>
-                    </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                <button type="submit" class="btn btn-primary">Save</button>
-            </div>
-
-            </form>
-        </div>
-    </div>
-</div>
 
 
 {{-- ----------------- modal content ----------------- --}}
