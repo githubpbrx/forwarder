@@ -11,6 +11,14 @@
 |
 */
 
-Route::prefix('transaksi')->group(function() {
+Route::prefix('transaksi')->group(function () {
     Route::get('/', 'TransaksiController@index');
+
+    Route::group(['prefix' => 'allocation'], function () {
+        Route::get('/', 'AllocationForwarder@index')->name('allocationforwarder');
+    });
+
+    Route::group(['prefix' => 'approval'], function () {
+        Route::get('/', 'ApprovalConfirmation@index')->name('approvalconfirmation');
+    });
 });
