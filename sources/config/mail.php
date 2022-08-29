@@ -29,7 +29,7 @@ return [
     |
     */
 
-    'host' => 'cpanel.panbrothers.co.id',
+    'host' => env('MAIL_HOST'),
 
     /*
     |--------------------------------------------------------------------------
@@ -56,8 +56,8 @@ return [
     */
 
     'from' => [
-        'address'   => 'system@pt-pss.com',
-        'name'      => 'PBRX - GA Management System (autosender, do not reply)',
+        'address'   => env('MAIL_FROM'),
+        'name'      => env('MAIL_NAME'),
     ],
 
     /*
@@ -84,9 +84,9 @@ return [
     |
     */
 
-    'username' => 'system@pt-pss.com',
+    'username' => env('MAIL_USERNAME'),
 
-    'password' => '(hFY(WqRWk{~',
+    'password' => env('MAIL_PASSWORD'),
 
     /*
     |--------------------------------------------------------------------------

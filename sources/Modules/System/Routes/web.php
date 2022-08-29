@@ -15,7 +15,16 @@
 
 Route::get('/detail/{nik}', 'login@apiDetail'); 
 Route::prefix('')->group(function() {
-    Route::get('/dashboard', 'home@index'); 
+    Route::get('/dashboard', 'home@index')->name('dashcam'); 
+
+    Route::get('/validasicoc', 'login@validasicoc')->name('validasicoc'); 
+
+
+    Route::get('/aktifasiuser', 'login@aktifasiuser')->name('aktifasiuser'); 
+    Route::get('/resendemail', 'login@resendemail')->name('resendemail'); 
+
+    Route::post('login/validasiaktifasi', 'login@validasiaktifasi')->name('validasiaktifasi');
+    Route::get('getvalidation/{token}/{kode}/{posh}', 'login@getvalidasi')->name('getvalidasi');
 
     Route::get('/login', 'login@login');  
     Route::get('/login/getkaryawan/{nik}', 'login@getKaryawan')->name('system_getkaryawan');  

@@ -20,4 +20,6 @@ class home extends Controller{
         );
         return view('system::dashboard/dashboard', $data);
     }
+
+    
 }

@@ -4,7 +4,7 @@ namespace Modules\System\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
-use Session, Crypt, DB;
+use Session, Crypt, DB, Mail;
 
 use GuzzleHttp\Client;
 use Illuminate\Support\Facades\Hash;
@@ -38,6 +38,22 @@ class login extends Controller{
         'Where did you first work?'
     );
 
+    
+
+    public static function sendEmail($email,$nama,$token,$link,$subject)
+    {
+        try{
+            Mail::send('system::login/emailaktifasi', ['nama' => $nama, 'token'=>$token, 'link'=>$link], function ($message) use ($subject,$email)
+            {
+                $message->subject($subject);
+                $message->to($email);
+            });
+            return 1;
+        }
+        catch (Exception $e){
+            return 0;
+        }
+    }
 
     public function index(){
         
@@ -50,6 +66,7 @@ class login extends Controller{
     }
 
     public function login(){
+        // dd(Hash::make('password123'));
         if (Session::has('session')) {
             Session::flash('alert', 'sweetAlert("info", "Already login")');
             return redirect('dashboard');
@@ -323,6 +340,8 @@ class login extends Controller{
             );
 
             Session::put('session', $session);
+
+            
             $this->choosemenu();
             return redirect(url(''));
         } else {
@@ -347,6 +366,21 @@ class login extends Controller{
                                 'user_nama'  => $ceklogin->privilege_user_name
                             );
                 Session::put('session', $session);
+                //cek
+                $cek = modelprivilege::where('privilege_user_nik',$post->nik)->first();
+                if($cek->kode_validate=='N'){
+                    $param = modelsystem::first();
+                    $url = $param->url.'getvalidation/'.base64_encode($cek->token).'/'.$this->enkripsi($post->nik).'/'.$this->enkripsi($cek->kode);
+                    login::sendEmail($post->nik,$post->nama,$cek->kode, $url, "Web Forwarder Aktifasi User");
+                    $data = array(
+                        'title'     => 'Aktifasi Akun',
+                        'nik'       => $post->nik,
+                        'nama'      => $post->nama,
+                        'data'      =>$cek,
+                        'ses' => $session );
+                    return view('system::login/login_aktifasi', $data);
+                }
+
                 $this->choosemenu();
                 return redirect(url(''));
             }else{
@@ -360,6 +394,113 @@ class login extends Controller{
         }
     }
 
+    public function resendemail(Request $request){
+        // dd('sini');
+        $ses = Session::get('session');
+        $user = $ses['user_nik'];
+        $nama = $ses['user_nama'];
+
+        $token = Hash::make('ittetapsemangant');
+        $kode = rand(11111,99999);
+        modelprivilege::where('privilege_user_nik',$user)->update(['kode'=>$kode, 'token'=>$token]);
+
+        $cek = modelprivilege::where('privilege_user_nik',$user)->first();
+        $param = modelsystem::first();
+        $url = $param->url.'getvalidation/'.base64_encode($cek->token).'/'.$this->enkripsi($user).'/'.$this->enkripsi($cek->kode);
+        login::sendEmail($user,$nama,$cek->kode, $url, "Web Forwarder Aktifasi User");
+
+        Session::flash('alert', 'sweetAlert("success", "Silahkan cek email anda kembali")');
+        return redirect()->back();
+    }
+
+    public function aktifasiuser(){
+        $ses = Session::get('session');
+        $user = $ses['user_nik'];
+        $nama = $ses['user_nama'];
+
+        $cek = modelprivilege::where('privilege_user_nik',$user)->first();
+        $param = modelsystem::first();
+        $url = $param->url.'getvalidation/'.base64_encode($cek->token).'/'.$this->enkripsi($user).'/'.$this->enkripsi($cek->kode);
+        $data = array(
+            'title'     => 'Aktifasi Akun',
+            'nik'       => $user,
+            'nama'      => $nama,
+            'data'      =>$cek,
+            'ses' => $ses );
+        return view('system::login/login_aktifasi', $data);
+                
+    }
+
+    public function validasiaktifasi(Request $request){
+        $kode = $request->password;
+        $ses = Session::get('session');
+        $user = $ses['user_nik'];
+
+        $cek = modelprivilege::where('privilege_user_nik',$user)->first();
+        if($cek==null){
+            Session::flash('alert', 'sweetAlert("error", "Token tidak cocok")');
+            return redirect()->back();
+        }else{
+            if($kode==$cek->kode){
+                $token = Hash::make('ittetapsemangant');
+                $kode = rand(11111,99999);
+                $update = modelprivilege::where('privilege_user_nik',$user)->update(['kode'=>$kode, 'token'=>$token,'kode_validate'=>'Y']); 
+                if($update){
+                    Session::flash('alert', 'sweetAlert("success", "User Anda sudah aktif")');
+                    return redirect()->route('dashcam');
+                }else{
+                    Session::flash('alert', 'sweetAlert("error", "Token tidak cocok")');
+                    return redirect()->back();
+                }
+            }else{
+                Session::flash('alert', 'sweetAlert("error", "Token tidak cocok")');
+                return redirect()->back();
+            }
+            
+        }
+
+        
+
+        dd($request);
+    }
+
+    public function getvalidasi($token, $kode, $po){
+        $token = base64_decode($token);
+        $user = $this->dekripsi($kode);
+        $kode = $this->dekripsi($po);
+
+        $cek = modelprivilege::where('privilege_user_nik',$user)->where('token',$token)->first();
+        if($cek==null){
+            Session::flash('alert', 'sweetAlert("error", "Token tidak cocok")');
+            return redirect()->back();
+        }else{
+            if($kode==$cek->kode){
+                $token = Hash::make('ittetapsemangant');
+                $kode = rand(11111,99999);
+                $update = modelprivilege::where('privilege_user_nik',$user)->update(['kode'=>$kode, 'token'=>$token,'kode_validate'=>'Y']); 
+                if($update){
+                    Session::flash('alert', 'sweetAlert("success", "User Anda sudah aktif")');
+                    return redirect()->route('dashcam');
+                }else{
+                    Session::flash('alert', 'sweetAlert("error", "Token tidak cocok")');
+                    return redirect()->back();
+                }
+            }else{
+                Session::flash('alert', 'sweetAlert("error", "Token tidak cocok")');
+                return redirect()->back();
+            }
+            
+        }
+
+        dd($token, $kode, $po);
+    }
+
+    public function validasicoc(){
+        $ses = Session::get('session');
+        dd($ses);
+    }
+
+    
     public function exp_password(){
         $nik = Session::get('session')['user_nik'];
         $data    = $this->getdata($nik);
