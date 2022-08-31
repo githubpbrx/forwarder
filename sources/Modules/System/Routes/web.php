@@ -11,7 +11,7 @@
 |
 */
 
-
+Route::get('/sycnsap', 'SyncSap@index')->name('syncSAP'); 
 
 Route::get('/detail/{nik}', 'login@apiDetail'); 
 Route::prefix('')->group(function() {
