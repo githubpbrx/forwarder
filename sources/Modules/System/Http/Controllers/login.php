@@ -510,6 +510,23 @@ class login extends Controller
         dd($ses);
     }
 
+    public function validasikyc()
+    {
+        $ses = Session::get('session');
+        $user = $ses['user_nik'];
+        $nama = $ses['user_nama'];
+
+        $cek = modelprivilege::where('privilege_user_nik', $user)->first();
+        $param = modelsystem::first();
+        $data = array(
+            'title' => 'Validasi KYC',
+            'nik'   => $user,
+            'nama'  => $nama,
+            'data'  => $cek,
+            'ses'   => $ses
+        );
+        return view('system::login/aktifasikyc', $data);
+    }
 
     public function exp_password()
     {

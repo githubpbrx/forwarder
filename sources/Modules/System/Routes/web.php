@@ -18,6 +18,7 @@ Route::prefix('')->group(function () {
     Route::get('/dashboard', 'home@index')->name('dashcam');
 
     Route::get('/validasicoc', 'login@validasicoc')->name('validasicoc');
+    Route::get('/validasikyc', 'login@validasikyc')->name('validasikyc');
 
 
     Route::get('/aktifasiuser', 'login@aktifasiuser')->name('aktifasiuser');
