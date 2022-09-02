@@ -5,6 +5,13 @@ namespace Modules\Transaksi\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
+use Yajra\DataTables\DataTables;
+use Session, Crypt, DB, Mail;
+use Modules\Transaksi\Models\mastersupplier as supplier;
+use Modules\Transaksi\Models\masterforwarder as forward;
+use Modules\Transaksi\Models\modelpo as po;
+use Modules\Transaksi\Models\modelforwarder as fwd;
+use Modules\Transaksi\Models\masterbuyer as buyer;
 
 class ApprovalConfirmation extends Controller
 {
@@ -80,5 +87,39 @@ class ApprovalConfirmation extends Controller
     public function destroy($id)
     {
         //
+    }
+
+    public function getsupplier(Request $request)
+    {
+        header("Access-Control-Allow-Origin: *");
+        header("Access-Control-Allow-Headers: *");
+
+        if (!$request->ajax()) return;
+        $po = supplier::select('id', 'nama');
+        if ($request->has('q')) {
+            $search = $request->q;
+            $po = $po->whereRaw(' nama like "%' . $search . '%" ');
+        }
+
+        $po = $po->where('aktif', '=', 'Y')->orderby('nama', 'asc')->get();
+
+        return response()->json($po);
+    }
+
+    public function getbuyer(Request $request)
+    {
+        header("Access-Control-Allow-Origin: *");
+        header("Access-Control-Allow-Headers: *");
+
+        if (!$request->ajax()) return;
+        $po = buyer::select('id_buyer', 'nama_buyer');
+        if ($request->has('q')) {
+            $search = $request->q;
+            $po = $po->whereRaw(' nama_buyer like "%' . $search . '%" ');
+        }
+
+        $po = $po->where('aktif', '=', 'Y')->orderby('nama_buyer', 'asc')->get();
+
+        return response()->json($po);
     }
 }

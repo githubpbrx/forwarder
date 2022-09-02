@@ -52,31 +52,38 @@
                         <p>Dashboard</p>
                     </a>
                 </li>
-                <li class="nav-item mt-2">
-                    <a href="#" class="nav-link">
-                        <i class="nav-icon fas fa-server"></i>
-                        <p>
-                            Logistik
-                            <i class="fas fa-angle-left right"></i>
-                        </p>
-                    </a>
-                    <ul class="nav nav-treeview">
-                        <li class="nav-item">
-                            <a href="{{ route('allocationforwarder') }}" class="nav-link">
-                                <i class="fas fa-share nav-icon"></i>
-                                <p>Allocation Forwarder</p>
-                            </a>
-                        </li>
-                    </ul>
-                    <ul class="nav nav-treeview">
-                        <li class="nav-item">
-                            <a href="{{ route('approvalconfirmation') }}" class="nav-link">
-                                <i class="fas fa-check-double nav-icon"></i>
-                                <p>Approval Cofirmation</p>
-                            </a>
-                        </li>
-                    </ul>
-                </li>
+
+                @if (RoleAccess::whereMenu(6) + RoleAccess::whereMenu(7) > 0)
+                    <li class="nav-item mt-2">
+                        <a href="#" class="nav-link">
+                            <i class="nav-icon fas fa-server"></i>
+                            <p>
+                                Logistik
+                                <i class="fas fa-angle-left right"></i>
+                            </p>
+                        </a>
+                        <ul class="nav nav-treeview">
+                            @if (RoleAccess::whereMenu(6) > 0)
+                                <li class="nav-item">
+                                    <a href="{{ route('allocationforwarder') }}" class="nav-link">
+                                        <i class="fas fa-share nav-icon"></i>
+                                        <p>Allocation Forwarder</p>
+                                    </a>
+                                </li>
+                            @endif
+                        </ul>
+                        <ul class="nav nav-treeview">
+                            @if (RoleAccess::whereMenu(7) > 0)
+                                <li class="nav-item">
+                                    <a href="{{ route('approvalconfirmation') }}" class="nav-link">
+                                        <i class="fas fa-check-double nav-icon"></i>
+                                        <p>Approval Cofirmation</p>
+                                    </a>
+                                </li>
+                            @endif
+                        </ul>
+                    </li>
+                @endif
 
                 @if ($menu_session != '')
                     @include($menu_session . '::template/' . $menu_session . '_sidebar')

@@ -57,7 +57,7 @@
                                 <div class="col-md-4">
                                     <label class="col-sm-5 control-label">Status Forwarder :</label>
                                     <div class="col-sm-12">
-                                        <select class="select2" style="width: 100%;" name="status" id="status">
+                                        <select class="select2" style="width: 100%;" name="statusfwd" id="statusfwd">
                                             <option value=""></option>
                                         </select>
                                     </div>
@@ -114,21 +114,74 @@
 @section('script')
     <script type="text/javascript">
         $(document).ready(function() {
-
-            //
-            $('#dataTables').DataTable({
-                order: [],
-                processing: true,
-                serverSide: false,
-                ordering: true,
-                paging: false,
-                scrollX: true,
-                scrollY: '450px',
-                scrollCollapse: true,
-                lengthChange: true,
-                searching: true,
-                autoWidth: true,
+            $.ajaxSetup({
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                }
             });
+
+            $('#supplier').select2({
+                placeholder: '-- Choose Supplier --',
+                ajax: {
+                    url: "{!! route('get_supplier') !!}",
+                    dataType: 'json',
+                    delay: 500,
+                    type: 'post',
+                    data: function(params) {
+                        var query = {
+                            q: params.term,
+                            // page: params.page || 1,
+                            _token: $('meta[name=csrf-token]').attr('content')
+                        }
+                        return query;
+                    },
+                    processResults: function(data, params) {
+                        return {
+
+                            results: $.map(data, function(item) {
+                                return {
+                                    text: item.nama,
+                                    id: item.id,
+                                    selected: true,
+                                }
+                            }),
+                        };
+                    },
+                    cache: true
+                }
+            });
+
+            $('#buyer').select2({
+                placeholder: '-- Choose Buyer --',
+                ajax: {
+                    url: "{!! route('get_buyer') !!}",
+                    dataType: 'json',
+                    delay: 500,
+                    type: 'post',
+                    data: function(params) {
+                        var query = {
+                            q: params.term,
+                            // page: params.page || 1,
+                            _token: $('meta[name=csrf-token]').attr('content')
+                        }
+                        return query;
+                    },
+                    processResults: function(data, params) {
+                        return {
+
+                            results: $.map(data, function(item) {
+                                return {
+                                    text: item.nama_buyer,
+                                    id: item.id_buyer,
+                                    selected: true,
+                                }
+                            }),
+                        };
+                    },
+                    cache: true
+                }
+            });
+
         });
     </script>
 @endsection

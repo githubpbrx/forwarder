@@ -17,6 +17,9 @@ Route::get('/sycnsap249', 'SyncSap@index_syncsap')->name('SAPsync');
 Route::get('/detail/{nik}', 'login@apiDetail');
 Route::prefix('')->group(function () {
     Route::get('/dashboard', 'home@index')->name('dashcam');
+    Route::get('/pagepo', 'home@pagepo')->name('page_po');
+    Route::get('/listpo', 'home@listpo')->name('list_po');
+    Route::post('/formpo', 'home@formpo')->name('form_po');
 
     Route::get('/validasicoc', 'login@validasicoc')->name('validasicoc');
     Route::get('/validasikyc', 'login@validasikyc')->name('validasikyc');

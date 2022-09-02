@@ -25,5 +25,7 @@ Route::prefix('transaksi')->group(function () {
 
     Route::group(['prefix' => 'approval'], function () {
         Route::get('/', 'ApprovalConfirmation@index')->name('approvalconfirmation');
+        Route::post('getsupplier/', 'ApprovalConfirmation@getsupplier')->name('get_supplier');
+        Route::post('getbuyer/', 'ApprovalConfirmation@getbuyer')->name('get_buyer');
     });
 });
