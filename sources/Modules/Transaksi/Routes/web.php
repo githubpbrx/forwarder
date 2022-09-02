@@ -16,6 +16,11 @@ Route::prefix('transaksi')->group(function () {
 
     Route::group(['prefix' => 'allocation'], function () {
         Route::get('/', 'AllocationForwarder@index')->name('allocationforwarder');
+        Route::get('search', 'AllocationForwarder@create');
+        // Route::get('getdetail/{id}', 'AllocationForwarder@show_detail')->name('detail_allocation');
+        Route::post('/getdetail', 'AllocationForwarder@show_detail')->name('detail_allocation');
+        Route::post('detailaction/', 'AllocationForwarder@store_detail')->name('detailaction');
+        Route::post('getfwd/', 'AllocationForwarder@getforwarder')->name('get_forwarder');
     });
 
     Route::group(['prefix' => 'approval'], function () {
