@@ -8,23 +8,30 @@ use Session, Crypt, DB;
 use Yajra\Datatables\Datatables;
 
 use Modules\System\Models\modelpo as po;
+use Modules\System\Models\modelprivilege as privilege;
+use Modules\System\Models\modelformpo as formpo;
 
 class home extends Controller
 {
     public function __construct()
     {
         $this->middleware('checklogin');
+
+        header("Access-Control-Allow-Origin: *");
+        header("Access-Control-Allow-Headers: *");
     }
 
     public function index()
     {
-        $datapo = po::where('statusalokasi', 'partial_allocated')->orWhere('statusalokasi', 'full_allocated')->get();
+        $datapo = po::where('statusalokasi', 'partial_allocated')->orWhere('statusalokasi', 'full_allocated')->where('statusconfirm', '=', null)->get();
+        $datauser = privilege::where('privilege_user_nik', Session::get('session')['user_nik'])->first();
 
         $data = array(
             'title' => 'Dashboard',
             'menu'  => 'dashboard',
             'box'   => '',
-            'totalpo' => count($datapo)
+            'totalpo' => count($datapo),
+            'datauser' => $datauser,
         );
         return view('system::dashboard/dashboard', $data);
     }
@@ -41,7 +48,7 @@ class home extends Controller
 
     public function listpo()
     {
-        $query = po::where('statusalokasi', 'partial_allocated')->orWhere('statusalokasi', 'full_allocated')->get();
+        $query = po::where('statusalokasi', 'partial_allocated')->orWhere('statusalokasi', 'full_allocated')->where('statusconfirm', '=', null)->get();
 
         return Datatables::of($query)
             ->addIndexColumn()
@@ -68,5 +75,47 @@ class home extends Controller
         );
 
         return response()->json(['status' => 200, 'data' => $data, 'message' => 'Berhasil']);
+    }
+
+    public function saveformpo(Request $request)
+    {
+        // dd($request);
+
+        if ($request->shipmode == 'fcl') {
+            $submode = $request->fcl;
+        } else if ($request->shipmode == 'lcl') {
+            $submode = $request->lcl;
+        } else {
+            $submode = $request->air;
+        }
+
+        DB::beginTransaction();
+        $save1 = formpo::insert([
+            'idpo'          => $request->idpo,
+            'kode_booking'  => $request->nobooking,
+            'date_booking'  => $request->datebooking,
+            'etd'           => $request->etd,
+            'eta'           => $request->eta,
+            'shipmode'      => $request->shipmode,
+            'subshipmode'   => $submode,
+            'status'        => 'waiting',
+            'aktif'         => 'Y',
+            'created_at'    => date('Y-m-d H:i:s'),
+            'created_by'    => Session::get('session')['user_nik']
+        ]);
+
+        $save2 = po::where('id', $request->idpo)->update([
+            'statusconfirm' => 'not confirmed'
+        ]);
+
+        if ($save1 && $save2) {
+            DB::commit();
+            $status = ['title' => 'Success', 'status' => 'success', 'message' => 'Data Successfully Saved'];
+            return response()->json($status, 200);
+        } else {
+            DB::rollback();
+            $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'Data Failed Saved'];
+            return response()->json($status, 200);
+        }
     }
 }

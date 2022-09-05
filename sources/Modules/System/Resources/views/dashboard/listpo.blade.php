@@ -30,58 +30,96 @@
                 <div class="modal-body">
                     <form action="#" class="form-horizontal">
                         {{ csrf_field() }}
+                        <div class="form-group">
+                            <label class="col-sm-7 control-label">Nomor PO</label>
+                            <div class="col-sm-3">
+                                <input type="text" class="form-control" id="nomorpo" name="nomorpo" readonly>
+                            </div>
+                        </div>
                         <div class="row">
-                            <div class="form-group">
-                                <label class="col-sm-12 control-label">Nomor PO</label>
-                                <div class="col-sm-12">
-                                    <input type="text" class="form-control" id="nomorpo" name="nomorpo" readonly>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="col-sm-12 control-label">Nomor Booking</label>
+                                    <div class="col-sm-12">
+                                        <input type="text" class="form-control" id="nobook" name="nobook">
+                                    </div>
                                 </div>
                             </div>
-                            <div class="form-group">
-                                <label class="col-sm-12 control-label">Nomor Booking</label>
-                                <div class="col-sm-12">
-                                    <input type="text" class="form-control" id="booking" name="booking">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="col-sm-12 control-label">Date Booking</label>
+                                    <div class="col-sm-12">
+                                        <input type="date" class="form-control" id="datebook" name="datebook">
+                                    </div>
                                 </div>
                             </div>
-                            <div class="form-group">
-                                <label class="col-sm-12 control-label">Date Booking</label>
-                                <div class="col-sm-12">
-                                    <input type="text" class="form-control" id="booking" name="booking">
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="col-sm-12 control-label">ETD (Estimate Delivery Date)</label>
+                                    <div class="col-sm-12">
+                                        <input type="date" class="form-control" id="etd" name="etd">
+                                    </div>
                                 </div>
                             </div>
-                            <div class="form-group">
-                                <label class="col-sm-12 control-label">ETD (Estimate Delivery Date)</label>
-                                <div class="col-sm-12">
-                                    <input type="text" class="form-control" id="etd" name="etd">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="col-sm-12 control-label">ETA (Estimate Acutal Delivery Date)</label>
+                                    <div class="col-sm-12">
+                                        <input type="date" class="form-control" id="eta" name="eta">
+                                    </div>
                                 </div>
                             </div>
-                            <div class="form-group">
-                                <label class="col-sm-12 control-label">ETA (Estimate Acutal Delivery Date)</label>
-                                <div class="col-sm-12">
-                                    <input type="text" class="form-control" id="eta" name="eta">
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="col-sm-12 control-label">Ship Mode</label>
+                                    <div class="col-sm-12">
+                                        <select class="form-control select2" style="width: 100%;" name="shipmode"
+                                            id="shipmode">
+                                            <option value="-1" selected disabled>-- Choose Mode --</option>
+                                            <option value="fcl">FCL</option>
+                                            <option value="lcl">LCL</option>
+                                            <option value="air">Air</option>
+                                        </select>
+                                    </div>
                                 </div>
                             </div>
-                            <div class="form-group">
-                                <label class="col-sm-12 control-label">Ship Mode</label>
-                                <div class="col-sm-12">
-                                    <select class="select2" style="width: 100%;" name="shipmode" id="shipmode">
-                                        <option value="fcl">FCL</option>
-                                        <option value="lcl">LCL</option>
-                                        <option value="air">Air</option>
-                                    </select>
+                            <div class="col-md-6">
+                                <div class="form-group" id="datafcl" style="display: none">
+                                    <label class="col-sm-12 control-label">FCL</label>
+                                    <div class="col-sm-12">
+                                        <select class="select2" style="width: 100%;" name="fclku" id="fclku">
+                                            <option value="20">20"</option>
+                                            <option value="40">40"</option>
+                                        </select>
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="form-group d-none" id="fcl_none">
-                                <label class="col-sm-12 control-label">FCL</label>
-                                <div class="col-sm-12">
-                                    <select class="select2" style="width: 100%;" name="fclku" id="fclku">
-                                        <option value="20">20"</option>
-                                        <option value="40">40"</option>
-                                    </select>
+                                <div class="form-group" id="datalcl" style="display: none">
+                                    <label class="col-sm-12 control-label">LCL</label>
+                                    <div class="col-sm-12">
+                                        <select class="select2" style="width: 100%;" name="lclku" id="lclku">
+                                            <option value="cbm">CBM</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group" id="dataair" style="display: none">
+                                    <label class="col-sm-12 control-label">AIR</label>
+                                    <div class="col-sm-12">
+                                        <select class="select2" style="width: 100%;" name="airku" id="airku">
+                                            <option value="kg">KG</option>
+                                        </select>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-info" id="btnsubmit">Submit</button>
                 </div>
             </div>
         </div>
@@ -91,59 +129,154 @@
 
 @section('script')
     <script type="text/javascript">
-        // $('#shipmode').on("select2:select", function(e) {
-        //     console.log('object :>> ', $this.val());
-        //     console.log('object :>> ', 'klik');
-        // });
-        // $('#select2-shipmode-container').change(function(e) {
-        // });
-        var oTable = $('#serverside').DataTable({
-            order: [],
-            processing: true,
-            serverSide: true,
-            ajax: {
-                url: "{{ route('list_po') }}"
-            },
-            columns: [{
-                    data: 'listpo',
-                    name: 'listpo'
-                },
-                {
-                    data: 'action',
-                    name: 'action',
-                    orderable: false,
-                    searchable: false
-                },
-            ],
-        });
-
-        $('#serverside').on('draw.dt', function() {
-            $('[data-toggle="tooltip"]').tooltip();
-        })
-
-        $('body').on('click', '#formpo', function() {
-            // console.log('object :>> ', 'klik');
-            // $('#modal-detail').modal('show');
-            $('#formulir_po').modal({
-                show: true,
-                backdrop: 'static'
+        $(document).ready(function() {
+            $.ajaxSetup({
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                }
             });
 
-            let idku = $(this).attr('data-id');
-            $.ajax({
-                url: "{!! route('form_po') !!}",
-                type: 'POST',
-                dataType: 'json',
-                data: {
-                    _token: $('meta[name=csrf-token]').attr('content'),
-                    id: idku,
-                },
-            }).done(function(data) {
-                let dataku = data.data;
-                let poku = dataku.datapo;
+            $('#shipmode').on('change', function() {
+                let mode = $(this).val();
+                console.log('training :>> ', mode);
+                console.log('object :>> ', 'klik');
+                if (mode == 'fcl') {
+                    $('#datafcl').show()
+                    $('#datalcl').hide()
+                    $('#dataair').hide()
 
-                $('#nomorpo').val(poku.pono);
+                } else if (mode == 'lcl') {
+                    $('#datalcl').show()
+                    $('#datafcl').hide()
+                    $('#dataair').hide()
+                } else {
+                    $('#dataair').show()
+                    $('#datafcl').hide()
+                    $('#datalcl').hide()
+                }
+            });
+
+            var oTable = $('#serverside').DataTable({
+                order: [],
+                processing: true,
+                serverSide: true,
+                ajax: {
+                    url: "{{ route('list_po') }}"
+                },
+                columns: [{
+                        data: 'listpo',
+                        name: 'listpo'
+                    },
+                    {
+                        data: 'action',
+                        name: 'action',
+                        orderable: false,
+                        searchable: false
+                    },
+                ],
+            });
+
+            $('#serverside').on('draw.dt', function() {
+                $('[data-toggle="tooltip"]').tooltip();
             })
+
+            var idpo;
+            $('body').on('click', '#formpo', function() {
+                $('#formulir_po').modal({
+                    show: true,
+                    backdrop: 'static'
+                });
+
+                let idku = $(this).attr('data-id');
+                $.ajax({
+                    url: "{!! route('form_po') !!}",
+                    type: 'POST',
+                    dataType: 'json',
+                    data: {
+                        _token: $('meta[name=csrf-token]').attr('content'),
+                        id: idku,
+                    },
+                }).done(function(data) {
+                    let dataku = data.data;
+                    let poku = dataku.datapo;
+                    idpo = poku.id;
+
+                    $('#nomorpo').val(poku.pono);
+                })
+            });
+
+            $('#btnsubmit').click(function(e) {
+                let idku = idpo;
+                let nobook = $('#nobook').val();
+                let datebook = $('#datebook').val();
+                let myetd = $('#etd').val();
+                let myeta = $('#eta').val();
+                let mode = $('#shipmode').val();
+                let myfcl = $('#fclku').val();
+                let mylcl = $('#lclku').val();
+                let myair = $('#airku').val();
+
+                if (nobook == null || nobook == '') {
+                    notifalert('Nomor Booking');
+                } else if (datebook == null || datebook == '') {
+                    notifalert('Date Booking');
+                } else if (myetd == null || myetd == '') {
+                    notifalert('ETD (Estimate Delivery Date)');
+                } else if (myeta == null || myeta == '') {
+                    notifalert('ETA (Estimate Acutal Delivery Date)');
+                } else if (mode == null || mode == '') {
+                    notifalert('Ship Mode');
+                } else {
+                    $.ajax({
+                        type: "post",
+                        url: "{{ route('formposave') }}",
+                        data: {
+                            _token: $('meta[name=csrf-token]').attr('content'),
+                            'idpo': idku,
+                            'nobooking': nobook,
+                            'datebooking': datebook,
+                            'etd': myetd,
+                            'eta': myeta,
+                            'shipmode': mode,
+                            'fcl': myfcl,
+                            'lcl': mylcl,
+                            'air': myair
+                        },
+                        dataType: "json",
+                        success: function(response) {
+                            console.log('response :>> ', response);
+                            Swal.fire({
+                                title: response.title,
+                                text: response.message,
+                                type: (response.status != 'error') ? 'success' : 'error'
+                            }).then((result) => {
+                                (response.status == 'success') ? window.location
+                                    .replace("{{ route('page_po') }}"):
+                                    ''
+                            });
+                            return;
+                        },
+                        error: function(xhr, status, error) {
+                            Swal.fire({
+                                title: 'Unsuccessfully Saved Data',
+                                text: 'Check Your Data',
+                                type: 'error'
+                            });
+                            return;
+                        }
+                    });
+                }
+            });
+
+            function notifalert(params) {
+                Swal.fire({
+                    title: 'Information',
+                    text: params + ' Can not be empty',
+                    type: 'warning'
+                });
+                return;
+            }
+
         });
     </script>
 @endsection

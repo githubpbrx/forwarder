@@ -20,6 +20,7 @@ Route::prefix('')->group(function () {
     Route::get('/pagepo', 'home@pagepo')->name('page_po');
     Route::get('/listpo', 'home@listpo')->name('list_po');
     Route::post('/formpo', 'home@formpo')->name('form_po');
+    Route::post('/saveformpo', 'home@saveformpo')->name('formposave');
 
     Route::get('/validasicoc', 'login@validasicoc')->name('validasicoc');
     Route::get('/validasikyc', 'login@validasikyc')->name('validasikyc');
