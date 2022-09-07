@@ -159,7 +159,7 @@ class home extends Controller
         ]);
 
         $save2 = po::where('id', $request->idpo)->update([
-            'statusconfirm' => 'not confirmed'
+            'statusconfirm' => 'waiting'
         ]);
 
         if ($save1 && $save2) {
