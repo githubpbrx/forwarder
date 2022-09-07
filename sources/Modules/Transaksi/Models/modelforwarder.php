@@ -15,4 +15,9 @@ class modelforwarder extends Model
         'qty_allocation',
         'date_fwd',
     ];
+
+     public function masterforwarder()
+    {
+        return $this->hasOne('Modules\Transaksi\Models\masterforwarder', 'id', 'id_forwarder');
+    }
 }

@@ -46,18 +46,26 @@ class AllocationForwarder extends Controller
         header("Access-Control-Allow-Headers: *");
 
         if ($request->ajax()) {
-            // dd($request);
-            // $data = po::join('mastersupplier', 'mastersupplier.id', 'po.vendor')->where('po.vendor', $request->supplier)->get();
-            $data = po::whereRaw(' vendor="' . $request->supplier . '" AND statusalokasi="' . $request->status . '" AND (podate BETWEEN "' . $request->tanggal1 . '" AND "' . $request->tanggal2 . '") ')->get();
-            // dd($data);
-
+            if($request->supplier==null){
+                $data = array();
+            }else{
+                $where = '';
+                if($request->status!="all"){
+                    $where .= ' AND statusalokasi="' . $request->status . '" ';
+                }
+                if($request->tanggal1!= "" AND $request->tanggal2 !=""){
+                    $where .= ' AND (podate BETWEEN "' . $request->tanggal1 . '" AND "' . $request->tanggal2 . '") ';
+                }
+                $data = po::whereRaw(' vendor="' . $request->supplier . '"   '.$where.' ')->get();
+            }
+            
             return DataTables::of($data)
                 ->addIndexColumn()
                 ->addColumn('poku', function ($data) {
                     return $data->pono;
                 })
                 ->addColumn('date', function ($data) {
-                    return $data->podate;
+                    return date('d F Y', strtotime($data->podate));
                 })
                 ->addColumn('material', function ($data) {
                     return $data->itemdesc;
@@ -108,33 +116,57 @@ class AllocationForwarder extends Controller
         }
 
         DB::beginTransaction();
+
+        if($request->qtyallocation==null OR $request->qtyallocation==""){
+            DB::rollback();
+            $status = ['title' => 'Error!', 'status' => 'error', 'message' => 'Qty allocation is required, please input qty allocation'];
+            return response()->json($status, 200);
+        }
+        if($request->forwarder==null OR $request->forwarder==""){
+            DB::rollback();
+            $status = ['title' => 'Error!', 'status' => 'error', 'message' => 'Forwarder is required, please select one forwarder'];
+            return response()->json($status, 200);
+        }
+
+        $datapo = po::where('id',$request->idpo)->first();
+        if($datapo==null){
+            DB::rollback();
+            $status = ['title' => 'Error!', 'status' => 'error', 'message' => 'Data PO Not Found, please check your data'];
+            return response()->json($status, 200);
+        }
+        $qtypo = $datapo->qtypo;
+
+        $cek = fwd::where('idpo', $request->idpo)->selectRaw(' sum(qty_allocation) as jml, id_forwarder  ')->where('aktif', 'Y')->first();
+        $jumlahexist = ($cek==null) ? 0 : $cek->jml;
+        
+        $jumlahall = $request->qtyallocation+$jumlahexist;
+        if($jumlahall>$qtypo){
+            DB::rollback();
+            $status = ['title' => 'Error!', 'status' => 'error', 'message' => 'Data Quantity Allocation Over Quantity PO'];
+            return response()->json($status, 200);
+        }
+
+        if ($jumlahall==$qtypo) {
+            $status = 'full_allocated';
+        } else {
+            $status = 'partial_allocated';
+        }
+
+
+        $submit2 = fwd::insert([
+            'idpo' => $request->idpo,
+            'idmasterfwd' => $request->forwarder,
+            'qty_allocation' => $request->qtyallocation,
+            'date_fwd' => date('Y-m-d H:i:s'),
+            'aktif' => 'Y',
+            'created_at' => date('Y-m-d H:i:s'),
+            'created_by' => Session::get('session')['user_nik']
+        ]);
+        
         $submit1 = po::where('id', $request->idpo)->update([
             'statusalokasi' => $status,
             'updated_at' => date('Y-m-d H:i:s'),
         ]);
-
-        $cek = fwd::where('idpo', $request->idpo)->where('aktif', 'Y')->first();
-        if ($cek != null) {
-            $submit2 = fwd::where('id_forwarder', $cek->id_forwarder)->update([
-                'idpo' => $request->idpo,
-                'idmasterfwd' => $request->forwarder,
-                'qty_allocation' => $request->qtyallocation,
-                'date_fwd' => date('Y-m-d H:i:s'),
-                'aktif' => 'Y',
-                'updated_at' => date('Y-m-d H:i:s'),
-                'updated_by' => Session::get('session')['user_nik']
-            ]);
-        } else {
-            $submit2 = fwd::insert([
-                'idpo' => $request->idpo,
-                'idmasterfwd' => $request->forwarder,
-                'qty_allocation' => $request->qtyallocation,
-                'date_fwd' => date('Y-m-d H:i:s'),
-                'aktif' => 'Y',
-                'created_at' => date('Y-m-d H:i:s'),
-                'created_by' => Session::get('session')['user_nik']
-            ]);
-        }
 
         if ($submit1 and $submit2) {
             DB::commit();
@@ -162,12 +194,26 @@ class AllocationForwarder extends Controller
         $datasup = supplier::where('id', $mydata->vendor)->first();
         // dd($mydata);
 
+        $dd = fwd::with('masterforwarder')->where('idpo',$id)->where('aktif','Y')->get();
+        
+        if(count($dd)==0){
+            $html = '';
+        }else{
+            $html = "<b style='font-size:14pt'>Details of the data that has been Partial  Allocated</b><br><table border='1' style='width:100%' class='table table-bordered table-striped table-hover'><tr style='width:100%'><td>To forwarder</td><td>Qty Allocation</td><td>Date Allocation</td></tr>";
+            foreach($dd as $key => $r){
+                $namafw = ($r->masterforwarder==null) ? '' : $r->masterforwarder->nama;
+                $html .= "<tr><td>".$namafw."</td><td>".$r->qty_allocation."</td><td>".$r->date_fwd."</td></tr>";
+            }
+            $html .= "</table>";
+        }
+        
         $data = array(
             'title'  => 'Detail Allocation Forwarder',
             'menu'   => 'detailallocation',
             'box'    => '',
             'datapo' => $mydata,
-            'datasup' => $datasup
+            'datasup' => $datasup,
+            'detail' => $html
         );
 
         return response()->json(['status' => 200, 'data' => $data, 'message' => 'Berhasil']);
