@@ -12,4 +12,6 @@ class masterforwarder extends Model
         'id',
         'nama',
     ];
+
+   
 }

@@ -194,6 +194,13 @@
                             </div>
                             <hr
                                 style="width: 100%; color: rgb(192, 192, 192); height: 0.5px; background-color:rgb(192, 192, 192);" />
+
+                            <div id="detailhtml"></div>
+                             <hr
+                                style="width: 100%; color: rgb(192, 192, 192); height: 0.5px; background-color:rgb(192, 192, 192);" />
+                            
+                            <label class="col-sm-12 control-label">Please input allocation</label>
+                            <hr>
                             <div class="form-group">
                                 <label class="col-sm-12 control-label">Quantity Allocation</label>
                                 <div class="col-sm-12">
@@ -210,6 +217,7 @@
                                 </div>
                             </div>
                         </div>
+                        
                     </form>
                 </div>
                 <div class="modal-footer">
@@ -309,6 +317,10 @@
                     $('#price').val(poku.price);
                     $('#detailsup').val(supku.nama);
                     $('#qtypo').val(poku.qtypo);
+                    console.log(dataku.detail);
+                    $('#detailhtml').html(dataku.detail);
+                    $('#qty_allocation').val('');
+                    $('#forwarder').val('').change();
                 })
             });
 
@@ -344,6 +356,7 @@
             });
 
             $('#btnsubmit').click(function(e) {
+
                 let idku = poid;
                 let qtyall = $('#qty_allocation').val();
                 let fwd = $('#forwarder').val();
@@ -351,7 +364,7 @@
                 if (qtyall > qtypoku) {
                     Swal.fire({
                         title: 'Informasi',
-                        text: 'Data Quantity Allocation Melebihi Quantity PO',
+                        text: 'Data Quantity Allocation Over Quantity PO',
                         type: 'warning'
                     });
                 } else {
@@ -367,15 +380,27 @@
                         },
                         dataType: "json",
                         success: function(response) {
-                            console.log('response :>> ', response);
+                            if(response.status=="error"){
+                                Swal.fire({
+                                    title: response.title,
+                                    text: response.message,
+                                    type: (response.status != 'error') ? 'success' : 'error'
+                                });
+                                return;
+                            }
+
                             Swal.fire({
                                 title: response.title,
                                 text: response.message,
                                 type: (response.status != 'error') ? 'success' : 'error'
                             }).then((result) => {
-                                (response.status == 'success') ? window.location
-                                    .replace("{{ route('allocationforwarder') }}"):
-                                    ''
+
+                                $('#modal-detail').modal('hide');
+                                table.ajax.reload();
+                                // table.reload();
+                                // (response.status == 'success') ? window.location
+                                //     .replace("{{ route('allocationforwarder') }}"):
+                                //     ''
                             });
                             return;
                         },
