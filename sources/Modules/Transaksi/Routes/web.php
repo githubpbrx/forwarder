@@ -27,5 +27,10 @@ Route::prefix('transaksi')->group(function () {
         Route::get('/', 'ApprovalConfirmation@index')->name('approvalconfirmation');
         Route::post('getsupplier/', 'ApprovalConfirmation@getsupplier')->name('get_supplier');
         Route::post('getbuyer/', 'ApprovalConfirmation@getbuyer')->name('get_buyer');
+        Route::get('search', 'ApprovalConfirmation@search');
+        Route::post('/getapproval', 'ApprovalConfirmation@getdataapproval')->name('getdataapproval');
+        Route::post('/getdetail', 'ApprovalConfirmation@getdetailapproval')->name('getdetailapproval');
+        Route::get('/getkaryawan/{id}', 'ApprovalConfirmation@getkaryawan')->name('approvalgetkaryawan');
+        Route::post('statusapproval/{approval}', 'ApprovalConfirmation@statusapproval')->name('approvalstatus');
     });
 });
