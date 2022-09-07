@@ -18,9 +18,13 @@ Route::get('/detail/{nik}', 'login@apiDetail');
 Route::prefix('')->group(function () {
     Route::get('/dashboard', 'home@index')->name('dashcam');
     Route::get('/pagepo', 'home@pagepo')->name('page_po');
+    Route::get('/pageupdate', 'home@pageupdate')->name('page_update');
     Route::get('/listpo', 'home@listpo')->name('list_po');
+    Route::get('/listupdate', 'home@listupdate')->name('list_update');
     Route::post('/formpo', 'home@formpo')->name('form_po');
+    Route::post('/formupdate', 'home@formupdate')->name('form_update');
     Route::post('/saveformpo', 'home@saveformpo')->name('formposave');
+    Route::post('/saveshipment', 'home@saveshipment')->name('saveshipment');
 
     Route::get('/validasicoc', 'login@validasicoc')->name('validasicoc');
     Route::get('/validasikyc', 'login@validasikyc')->name('validasikyc');

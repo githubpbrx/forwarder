@@ -22,6 +22,12 @@
                             <a href="{{ route('page_po') }}"><button type="button"
                                     class="btn btn-primary btn-xs">Process</button></a>
                         </p>
+                        <p style="color:black">You got a new Update Shipment
+                            <span class="badge badge-info">{{ $totalconfirm }}</span>
+                            <br>
+                            <a href="{{ route('page_update') }}"><button type="button"
+                                    class="btn btn-primary btn-xs">Process</button></a>
+                        </p>
                     </div>
                 @endif
             </div>
