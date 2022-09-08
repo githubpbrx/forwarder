@@ -46,19 +46,19 @@ class AllocationForwarder extends Controller
         header("Access-Control-Allow-Headers: *");
 
         if ($request->ajax()) {
-            if($request->supplier==null){
+            if ($request->supplier == null) {
                 $data = array();
-            }else{
+            } else {
                 $where = '';
-                if($request->status!="all"){
+                if ($request->status != "all") {
                     $where .= ' AND statusalokasi="' . $request->status . '" ';
                 }
-                if($request->tanggal1!= "" AND $request->tanggal2 !=""){
+                if ($request->tanggal1 != "" and $request->tanggal2 != "") {
                     $where .= ' AND (podate BETWEEN "' . $request->tanggal1 . '" AND "' . $request->tanggal2 . '") ';
                 }
-                $data = po::whereRaw(' vendor="' . $request->supplier . '"   '.$where.' ')->get();
+                $data = po::whereRaw(' vendor="' . $request->supplier . '"   ' . $where . ' ')->get();
             }
-            
+
             return DataTables::of($data)
                 ->addIndexColumn()
                 ->addColumn('poku', function ($data) {
@@ -117,19 +117,19 @@ class AllocationForwarder extends Controller
 
         DB::beginTransaction();
 
-        if($request->qtyallocation==null OR $request->qtyallocation==""){
+        if ($request->qtyallocation == null or $request->qtyallocation == "") {
             DB::rollback();
             $status = ['title' => 'Error!', 'status' => 'error', 'message' => 'Qty allocation is required, please input qty allocation'];
             return response()->json($status, 200);
         }
-        if($request->forwarder==null OR $request->forwarder==""){
+        if ($request->forwarder == null or $request->forwarder == "") {
             DB::rollback();
             $status = ['title' => 'Error!', 'status' => 'error', 'message' => 'Forwarder is required, please select one forwarder'];
             return response()->json($status, 200);
         }
 
-        $datapo = po::where('id',$request->idpo)->first();
-        if($datapo==null){
+        $datapo = po::where('id', $request->idpo)->first();
+        if ($datapo == null) {
             DB::rollback();
             $status = ['title' => 'Error!', 'status' => 'error', 'message' => 'Data PO Not Found, please check your data'];
             return response()->json($status, 200);
@@ -137,16 +137,16 @@ class AllocationForwarder extends Controller
         $qtypo = $datapo->qtypo;
 
         $cek = fwd::where('idpo', $request->idpo)->selectRaw(' sum(qty_allocation) as jml, id_forwarder  ')->where('aktif', 'Y')->first();
-        $jumlahexist = ($cek==null) ? 0 : $cek->jml;
-        
-        $jumlahall = $request->qtyallocation+$jumlahexist;
-        if($jumlahall>$qtypo){
+        $jumlahexist = ($cek == null) ? 0 : $cek->jml;
+
+        $jumlahall = $request->qtyallocation + $jumlahexist;
+        if ($jumlahall > $qtypo) {
             DB::rollback();
             $status = ['title' => 'Error!', 'status' => 'error', 'message' => 'Data Quantity Allocation Over Quantity PO'];
             return response()->json($status, 200);
         }
 
-        if ($jumlahall==$qtypo) {
+        if ($jumlahall == $qtypo) {
             $status = 'full_allocated';
         } else {
             $status = 'partial_allocated';
@@ -162,9 +162,10 @@ class AllocationForwarder extends Controller
             'created_at' => date('Y-m-d H:i:s'),
             'created_by' => Session::get('session')['user_nik']
         ]);
-        
+
         $submit1 = po::where('id', $request->idpo)->update([
             'statusalokasi' => $status,
+            'idmasterfwd' => $request->forwarder,
             'updated_at' => date('Y-m-d H:i:s'),
         ]);
 
@@ -194,19 +195,19 @@ class AllocationForwarder extends Controller
         $datasup = supplier::where('id', $mydata->vendor)->first();
         // dd($mydata);
 
-        $dd = fwd::with('masterforwarder')->where('idpo',$id)->where('aktif','Y')->get();
-        
-        if(count($dd)==0){
+        $dd = fwd::with('masterforwarder')->where('idpo', $id)->where('aktif', 'Y')->get();
+
+        if (count($dd) == 0) {
             $html = '';
-        }else{
+        } else {
             $html = "<b style='font-size:14pt'>Details of the data that has been Partial  Allocated</b><br><table border='1' style='width:100%' class='table table-bordered table-striped table-hover'><tr style='width:100%'><td>To forwarder</td><td>Qty Allocation</td><td>Date Allocation</td></tr>";
-            foreach($dd as $key => $r){
-                $namafw = ($r->masterforwarder==null) ? '' : $r->masterforwarder->nama;
-                $html .= "<tr><td>".$namafw."</td><td>".$r->qty_allocation."</td><td>".$r->date_fwd."</td></tr>";
+            foreach ($dd as $key => $r) {
+                $namafw = ($r->masterforwarder == null) ? '' : $r->masterforwarder->nama;
+                $html .= "<tr><td>" . $namafw . "</td><td>" . $r->qty_allocation . "</td><td>" . $r->date_fwd . "</td></tr>";
             }
             $html .= "</table>";
         }
-        
+
         $data = array(
             'title'  => 'Detail Allocation Forwarder',
             'menu'   => 'detailallocation',
