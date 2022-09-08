@@ -157,6 +157,33 @@ class home extends Controller
         }
 
         DB::beginTransaction();
+
+        if ($request->nobooking == '' || $request->nobooking == null) {
+            DB::rollback();
+            $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'Nomor Booking is required, please input Nomor Booking'];
+            return response()->json($status, 200);
+        }
+        if ($request->datebooking == '' || $request->datebooking == null) {
+            DB::rollback();
+            $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'Date Booking is required, please input Date Booking'];
+            return response()->json($status, 200);
+        }
+        if ($request->etd == '' || $request->etd == null) {
+            DB::rollback();
+            $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'ETD is required, please input ETD'];
+            return response()->json($status, 200);
+        }
+        if ($request->eta == '' || $request->eta == null) {
+            DB::rollback();
+            $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'ETA is required, please input ETA'];
+            return response()->json($status, 200);
+        }
+        if ($request->shipmode == '' || $request->shipmode == null) {
+            DB::rollback();
+            $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'Ship Mode is required, please input Ship Mode'];
+            return response()->json($status, 200);
+        }
+
         $save1 = formpo::insert([
             'idpo'          => $request->idpo,
             'kode_booking'  => $request->nobooking,
@@ -195,6 +222,20 @@ class home extends Controller
         Storage::disk('local')->put($fileName, file_get_contents($request->file));
 
         // dd($request);
+        if ($file == '' || $file == null) {
+            $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'Nomor BL is required, please input Nomor BL'];
+            return response()->json($status, 200);
+        }
+
+        if ($request->nomorbl == '' || $request->nomorbl == null) {
+            $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'Nomor BL is required, please input Nomor BL'];
+            return response()->json($status, 200);
+        }
+
+        if ($request->vessel == '' || $request->vessel == null) {
+            $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'Nomor BL is required, please input Nomor BL'];
+            return response()->json($status, 200);
+        }
 
         $save1 = formpo::where('id_formpo', $request->idformpo)->update([
             'file_bl'    => $originalName,
