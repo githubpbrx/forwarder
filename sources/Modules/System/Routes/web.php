@@ -26,6 +26,8 @@ Route::prefix('')->group(function () {
     Route::post('/saveformpo', 'home@saveformpo')->name('formposave');
     Route::post('/saveshipment', 'home@saveshipment')->name('saveshipment');
 
+    Route::get('/pageapproval', 'home@pageapproval')->name('page_approval');
+
     Route::get('/validasicoc', 'login@validasicoc')->name('validasicoc');
     Route::get('/validasikyc', 'login@validasikyc')->name('validasikyc');
 

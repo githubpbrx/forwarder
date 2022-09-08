@@ -32,5 +32,6 @@ Route::prefix('transaksi')->group(function () {
         Route::post('/getdetail', 'ApprovalConfirmation@getdetailapproval')->name('getdetailapproval');
         Route::get('/getkaryawan/{id}', 'ApprovalConfirmation@getkaryawan')->name('approvalgetkaryawan');
         Route::post('statusapproval/{approval}', 'ApprovalConfirmation@statusapproval')->name('approvalstatus');
+        Route::get('listapproval', 'ApprovalConfirmation@listapproval')->name('list_approval');
     });
 });

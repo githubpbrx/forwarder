@@ -31,12 +31,15 @@ class home extends Controller
 
         $dataconfirm = formpo::where('status', 'confirm')->where('file_bl', '=', null)->where('nomor_bl', '=', null)->where('vessel', '=', null)->where('aktif', 'Y')->get();
 
+        $dataapproval = formpo::where('idapproval', '=', null)->where('status', '=', 'waiting')->where('aktif', 'Y')->get();
+
         $data = array(
             'title' => 'Dashboard',
             'menu'  => 'dashboard',
             'box'   => '',
             'totalpo' => count($datapo),
             'totalconfirm' => count($dataconfirm),
+            'totalapproval' => count($dataapproval),
             'datauser' => $datauser,
         );
         return view('system::dashboard/dashboard', $data);
@@ -60,6 +63,16 @@ class home extends Controller
             'box'   => '',
         );
         return view('system::dashboard/updateshipment', $data);
+    }
+
+    public function pageapproval()
+    {
+        $data = array(
+            'title' => 'Data List Approval',
+            'menu'  => 'listapproval',
+            'box'   => '',
+        );
+        return view('transaksi::listapproval', $data);
     }
 
     public function listpo()

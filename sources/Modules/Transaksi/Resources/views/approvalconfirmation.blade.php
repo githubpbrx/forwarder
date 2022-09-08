@@ -97,9 +97,9 @@
                                             <th>
                                                 <center>Status</center>
                                             </th>
-                                            <th>
+                                            {{-- <th>
                                                 <center>Action</center>
-                                            </th>
+                                            </th> --}}
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -205,54 +205,20 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label class="col-sm-12 control-label">User Pengaju</label>
+                                    <label class="col-sm-12 control-label">User Applicant</label>
                                     <div class="col-sm-8">
-                                        {{-- <input class="form-control" type="text" name="" id="pengajunama"
-                                            disabled> --}}
                                         <div id="pengajunama"></div>
-                                        <input class="form-control" type="text" id="pengajunik" disabled>
+                                        <input class="form-control" type="text" id="pengajunik" readonly>
                                     </div>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label class="col-sm-12 control-label">Verifikasi Pengesah</label>
+                                    <label class="col-sm-12 control-label">User Approved</label>
                                     <div class="col-sm-8">
                                         <div id="detailpengesah"></div>
-                                        <input type="text" name="nikpengesah" id="nik" class="form-control">
-                                        {{-- <input type="hidden" id="namaasli" name="namaasli"> --}}
-                                    </div>
-                                    <br>
-                                    <div class="row">
-                                        <div class="col-md-6">
-                                            <div class="form-group">
-                                                <div class="col-sm-12">
-                                                    <button type="button" class="btnapproval btnconfirm btn btn-success"
-                                                        data-value="confirm">Confirm</button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <div class="form-group">
-                                                <div class="col-sm-12">
-                                                    <button type="button" class="btnapproval btn btn-danger"
-                                                        data-value="reject">Reject</button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-md-12">
-                                            <div class="form-group">
-                                                <div class="col-sm-12">
-                                                    <div id="approvalstatus"></div>
-                                                    <br>
-                                                    <div id="approvalreject">
-                                                        Keterangan : <div id="keteranganreject"></div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
+                                        <input type="text" name="nikpengesah" id="nik" class="form-control"
+                                            readonly>
                                     </div>
                                 </div>
                             </div>
@@ -261,35 +227,6 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Cancel</button>
-                    {{-- <button type="button" class="btn btn-info" id="btnsubmit">Submit</button> --}}
-                </div>
-            </div>
-        </div>
-    </div>
-
-    {{-- Modal Tolak Approval --}}
-    <div class="modal fade" id="modal_tolak">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h4 class="modal-title"><span id="modaltitle">Tolak Pengajuan </span></h4>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <form action="#" id="form_tolak" method="GET">
-                        @csrf
-                        <div class="form-group">
-                            <label>Alasan</label>
-                            <textarea name="tolak_alasan" id="tolak_alasan" class="form-control text-bullets" rows="3"
-                                placeholder="Alasan ..." required></textarea>
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Tutup</button>
-                    <button id="submittolak" type="button" class="btn btn-danger" form="form_tolak">Tolak</button>
                 </div>
             </div>
         </div>
@@ -340,10 +277,10 @@
                         data: 'status',
                         name: 'status'
                     },
-                    {
-                        data: 'action',
-                        name: 'action'
-                    }
+                    // {
+                    //     data: 'action',
+                    //     name: 'action'
+                    // }
                 ]
             });
             // }
@@ -415,187 +352,8 @@
                 }
             });
 
-            var idpo;
-            var idformpo;
-            var usernik;
-            var usernama;
-            var tglpengajuan;
-            $('body').on('click', '#waitbtn', function() {
-                console.log('object :>> ', 'klik');
-                // $('#modal-detail').modal('show');
-                $('#approvalfwd').modal({
-                    show: true,
-                    backdrop: 'static'
-                });
-                let idku = $(this).attr('data-id');
-                $.ajax({
-                    url: "{!! route('getdataapproval') !!}",
-                    type: 'POST',
-                    dataType: 'json',
-                    data: {
-                        _token: $('meta[name=csrf-token]').attr('content'),
-                        id: idku,
-                    },
-                }).done(function(data) {
-                    console.log('data :>> ', data.data);
-                    let databook = data.data.databooking;
-                    let poku = data.data.datapo;
-                    let forward = data.data.dataforward;
-                    let privilege = data.data.privilege;
-
-                    idpo = poku.id;
-                    idformpo = databook.id_formpo;
-                    usernik = privilege.privilege_user_nik;
-                    usernama = privilege.privilege_user_name;
-                    tglpengajuan = databook.created_at;
-
-                    $('#nomorpo').val(poku.pono);
-                    $('#nobook').val(databook.kode_booking);
-                    $('#datebook').val(databook.date_booking);
-                    $('#etd').val(databook.etd);
-                    $('#eta').val(databook.eta);
-                    $('#shipmode').val(databook.shipmode);
-                    $('#submode').val(databook.subshipmode);
-                    $('#forwarder').val(forward.nama);
-                    $('#pengajunama').html(privilege.privilege_user_name);
-                    $('#pengajunik').val(privilege.privilege_user_nik);
-                })
-            });
-
-            var pengesahnik;
-            $("#nik").change(function() {
-                var nik = $("#nik").val();
-                pengesahnik = nik;
-                // $("#loading").show();
-                let url = '{!! route('approvalgetkaryawan', ['id']) !!}'
-                url = url.replace('id', nik)
-                $.ajax({
-                    url: url,
-                    type: 'GET',
-                    success: function(data) {
-                        console.log('data :>> ', data);
-                        // $("#loading").hide();
-                        if (data.status == 'no') {
-                            $("#nik").val('');
-                        }
-                        $("#detailpengesah").html(data.data);
-                        // $("#namaasli").val(data.namaasli);
-
-                    }
-                });
-            });
-
-            $('.btnapproval').click(function() {
-                console.log('objectkuu :>> ', 'klik');
-                // $('#modal-detail').modal('show');
-                $('#approvalfwd').modal({
-                    show: true,
-                    backdrop: 'static'
-                });
-                let idku = $(this).attr('data-id');
-                let val = $(this).attr('data-value');
-                console.log('val :>> ', val);
-
-                if (val == 'confirm') {
-                    confirm();
-                } else {
-                    $('#modal_tolak').modal('show');
-                }
-            });
-
-            $('#submittolak').click(function(e) {
-                let tolak = $('#tolak_alasan').val();
-                $.ajax({
-                    url: "{!! route('approvalstatus', ['ditolak']) !!}",
-                    type: 'POST',
-                    dataType: 'json',
-                    data: {
-                        _token: $('meta[name=csrf-token]').attr('content'),
-                        idpo: idpo,
-                        idformpo: idformpo,
-                        usernama: usernama,
-                        usernik: usernik,
-                        pengesahnik: pengesahnik,
-                        tglpengajuan: tglpengajuan,
-                        tolak: tolak
-                    },
-                    success: function(response) {
-                        console.log('response :>> ', response);
-                        Swal.fire({
-                            title: response.title,
-                            text: response.message,
-                            type: (response.status != 'error') ? 'success' : 'error'
-                        }).then((result) => {
-                            (response.status == 'success') ? window.location
-                                .replace("{{ route('approvalconfirmation') }}"):
-                                ''
-                        });
-                        return;
-                    },
-                    error: function(xhr, status, error) {
-                        Swal.fire({
-                            title: 'Unsuccessfully Saved Data',
-                            text: 'Check Your Data',
-                            type: 'error'
-                        });
-                        return;
-                    }
-                });
-            });
-
-            function confirm() {
-                Swal.fire({
-                        title: "Apakah anda yakin?",
-                        text: "Apakah data yang anda verifikasi/setujui sudah benar?",
-                        type: "warning"
-                    })
-                    .then((willDelete) => {
-                        if (willDelete) {
-                            // window.location.href = e.currentTarget.href;
-                            $.ajax({
-                                url: "{!! route('approvalstatus', ['disetujui']) !!}",
-                                type: 'POST',
-                                dataType: 'json',
-                                data: {
-                                    _token: $('meta[name=csrf-token]').attr('content'),
-                                    idpo: idpo,
-                                    idformpo: idformpo,
-                                    usernama: usernama,
-                                    usernik: usernik,
-                                    tglpengajuan: tglpengajuan,
-                                    pengesahnik: pengesahnik
-                                },
-                                success: function(response) {
-                                    console.log('response :>> ', response);
-                                    Swal.fire({
-                                        title: response.title,
-                                        text: response.message,
-                                        type: (response.status != 'error') ? 'success' :
-                                            'error'
-                                    }).then((result) => {
-                                        (response.status == 'success') ? window.location
-                                            .replace("{{ route('approvalconfirmation') }}"):
-                                            ''
-                                    });
-                                    return;
-                                },
-                                error: function(xhr, status, error) {
-                                    Swal.fire({
-                                        title: 'Unsuccessfully Saved Data',
-                                        text: 'Check Your Data',
-                                        type: 'error'
-                                    });
-                                    return;
-                                }
-                            });
-                        } else {
-                            return false;
-                        }
-                    });
-            }
-
             $('body').on('click', '#detailbtn', function() {
-                console.log('object :>> ', 'klik');
+                console.log('objectdetail :>> ', 'klik');
                 // $('#modal-detail').modal('show');
                 $('#approvalfwd').modal({
                     show: true,
@@ -611,6 +369,10 @@
                         id: idku,
                     },
                 }).done(function(data) {
+                    $('#approvalstatus').show();
+                    $('#approvalreject').show();
+                    $('#keteranganreject').show();
+
                     console.log('data :>> ', data.data);
                     let databook = data.data.databooking;
                     let poku = data.data.datapo;
@@ -635,13 +397,15 @@
                     $('.btnapproval').hide();
 
                     if (databook.status == 'confirm') {
-                        $('#approvalstatus').html('Disetujui Logistik');
-                        $('#approvalreject').hide();
-                    } else {
-                        $('#approvalstatus').html('Ditolak Logistik');
-                        $('#approvalreject').html(approve.ket_tolak);
+                        $('#approvalstatus').html('Approved Logistik');
                         $('#approvalreject').show();
+                        $('#keteranganreject').show();
+                    } else {
+                        $('#approvalstatus').html('Not Approved Logistik');
+                        $('#approvalreject').show();
+                        $('#keteranganreject').html(approve.ket_tolak);
                     }
+
                 })
             });
         });

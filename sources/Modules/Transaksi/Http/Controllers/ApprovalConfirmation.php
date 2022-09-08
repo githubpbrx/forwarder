@@ -78,11 +78,32 @@ class ApprovalConfirmation extends Controller
     public function search(Request $request)
     {
         if ($request->ajax()) {
-            $data = formpo::join('po', 'po.id', 'formpo.idpo')->whereRaw(' vendor="' . $request->supplier . '" AND status="' . $request->statusfwd . '" AND (date_booking BETWEEN "' . $request->tanggal1 . '" AND "' . $request->tanggal2 . '") AND kode_booking="' . $request->book . '" ')->get();
+            // $data = formpo::join('po', 'po.id', 'formpo.idpo')->whereRaw(' vendor="' . $request->supplier . '" AND status="' . $request->statusfwd . '" AND (date_booking BETWEEN "' . $request->tanggal1 . '" AND "' . $request->tanggal2 . '") AND kode_booking="' . $request->book . '" ')->get();
+
+            if ($request->supplier == null) {
+                $data = array();
+            } else {
+                $where = '';
+                if ($request->statusfwd != "all") {
+                    $where .= ' AND status="' . $request->statusfwd . '" ';
+                }
+                if ($request->tanggal1 != "" and $request->tanggal2 != "") {
+                    $where .= ' AND (date_booking BETWEEN "' . $request->tanggal1 . '" AND "' . $request->tanggal2 . '") ';
+                }
+                if ($request->buyer != "") {
+                    $where .= ' AND buyer=" ' . $request->buyer . '" ';
+                }
+                if ($request->book != "") {
+                    $where .= ' AND kode_booking=" ' . $request->book . '" ';
+                }
+                // $data = po::whereRaw(' vendor="' . $request->supplier . '"   ' . $where . ' ')->get();
+                $data = formpo::join('po', 'po.id', 'formpo.idpo')
+                    ->join('masterforwarder', 'masterforwarder.id', 'po.idmasterfwd')
+                    ->whereRaw(' vendor="' . $request->supplier . '" ' . $where . ' ')
+                    ->selectRaw(' po.id as poid, formpo.kode_booking, formpo.date_booking, masterforwarder.nama, formpo.status, formpo.idapproval')->get();
+            }
+
             // dd($data);
-            // $datafwd = fwd::join('masterforwarder', 'masterforwarder.id', 'forwarder.idmasterfwd')->where('forwarder.idpo', $data[0]['id'])->first();
-
-
             return DataTables::of($data)
                 ->addIndexColumn()
                 ->addColumn('booking', function ($data) {
@@ -93,7 +114,7 @@ class ApprovalConfirmation extends Controller
                     return $date;
                 })
                 ->addColumn('forwarder', function ($data) {
-                    return $data->forwarder;
+                    return $data->nama;
                 })
                 ->addColumn('status', function ($data) {
                     if ($data->status == 'all') {
@@ -108,34 +129,55 @@ class ApprovalConfirmation extends Controller
 
                     return $statusku;
                 })
-                ->addColumn('action', function ($data) {
-                    $button = '';
+                // ->addColumn('action', function ($data) {
+                //     $button = '';
 
-                    if ($data->status == 'all') {
-                        $button = '<a href="#" data-id="' . $data->id . '" id="detailbtn"><i data-tooltip="tooltip" title="Detail Allocation" class="fa fa-info-circle fa-lg"></i></a>';
-                    } elseif ($data->status == 'waiting') {
-                        $button = '<a href="#" data-id="' . $data->id . '" id="waitbtn"><i data-tooltip="tooltip" title="Detail Allocation" class="fa fa-angle-double-right fa-lg text-green"></i></a>';
-                    } elseif ($data->status == 'confirm') {
-                        $button = '<a href="#" data-id="' . $data->id . '" id="detailbtn"><i data-tooltip="tooltip" title="Detail Allocation" class="fa fa-info-circle fa-lg"></i></a>';
-                    } else {
-                        $button = '<a href="#" data-id="' . $data->id . '" id="detailbtn"><i data-tooltip="tooltip" title="Detail Allocation" class="fa fa-info-circle fa-lg"></i></a>';
-                    }
+                //     if ($data->status == 'all') {
+                //         $button = '<a href="#" data-id="' . $data->poid . '" id="detailbtn"><i data-tooltip="tooltip" title="Detail Allocation" class="fa fa-info-circle fa-lg"></i></a>';
+                //     } elseif ($data->status == 'waiting' && $data->idapproval == null) {
+                //         $button = '<a href="#" data-id="' . $data->poid . '" id="waitbtn"><i data-tooltip="tooltip" title="Detail Allocation" class="fa fa-angle-double-right fa-lg text-green"></i></a>';
+                //     } elseif ($data->status == 'confirm') {
+                //         $button = '<a href="#" data-id="' . $data->poid . '" id="detailbtn"><i data-tooltip="tooltip" title="Detail Allocation" class="fa fa-info-circle fa-lg"></i></a>';
+                //     } else {
+                //         $button = '<a href="#" data-id="' . $data->poid . '" id="detailbtn"><i data-tooltip="tooltip" title="Detail Allocation" class="fa fa-info-circle fa-lg"></i></a>';
+                //     }
 
-                    return $button;
-                })
+                //     return $button;
+                // })
                 // ->rawColumns(['poku', 'date', 'material', 'status', 'action'])
                 // ->rawColumns(['status'])
                 ->make(true);
         }
     }
 
+    public function listapproval()
+    {
+        $data = formpo::where('idapproval', '=', null)->where('status', '=', 'waiting')->where('aktif', 'Y')->get();
+        // dd($data);
+        return DataTables::of($data)
+            ->addIndexColumn()
+            ->addColumn('nobooking', function ($data) {
+                return $data->kode_booking;
+            })
+            ->addColumn('action', function ($data) {
+                $button = '';
+
+                $button = '<a href="#" data-id="' . $data->id_formpo . '" id="prosesapproval"><i data-tooltip="tooltip" title="Proses Approval" class="fa fa-arrow-circle-right fa-lg text-green"></i></a>';
+
+                return $button;
+            })
+            // ->rawColumns(['poku', 'date', 'material', 'status', 'action'])
+            // ->rawColumns(['status'])
+            ->make(true);
+    }
+
     public function getdataapproval(Request $request)
     {
         // dd($request);
 
-        $datapo = po::where('id', $request->id)->first();
-        $databooking = formpo::where('idpo', $request->id)->where('aktif', 'Y')->first();
-        $dataforward = fwd::join('masterforwarder', 'masterforwarder.id', 'forwarder.idmasterfwd')->where('forwarder.idpo', $request->id)->first();
+        $databooking = formpo::where('id_formpo', $request->id)->where('aktif', 'Y')->first();
+        $datapo = po::where('id', $databooking->idpo)->first();
+        $dataforward = fwd::join('masterforwarder', 'masterforwarder.id', 'forwarder.idmasterfwd')->where('forwarder.idpo', $databooking->idpo)->first();
         $privilege = privilege::where('privilege_user_nik', $databooking->created_by)->first();
 
         $data = [
@@ -179,6 +221,12 @@ class ApprovalConfirmation extends Controller
 
         if ($approval == 'disetujui') {
             DB::beginTransaction();
+            if ($request->pengesahnik == null || $request->pengesahnik == '') {
+                DB::rollback();
+                $status = ['title' => 'Error!', 'status' => 'error', 'message' => 'Data NIK is required, please input NIK'];
+                return response()->json($status, 200);
+            }
+
             $saved = approval::insert([
                 'user_pengaju' => $request->usernik,
                 'tgl_diajukan' => $request->tglpengajuan,
@@ -215,6 +263,18 @@ class ApprovalConfirmation extends Controller
             }
         } else {
             DB::beginTransaction();
+            if ($request->pengesahnik == null || $request->pengesahnik == '') {
+                DB::rollback();
+                $status = ['title' => 'Error!', 'status' => 'error', 'message' => 'Data NIK is required, please input NIK'];
+                return response()->json($status, 200);
+            }
+
+            if ($request->tolak == null || $request->tolak == '') {
+                DB::rollback();
+                $status = ['title' => 'Error!', 'status' => 'error', 'message' => 'Data Keterangan is required, please input keterangan'];
+                return response()->json($status, 200);
+            }
+
             $saved = approval::insert([
                 'user_pengaju' => $request->usernik,
                 'tgl_diajukan' => $request->tglpengajuan,
