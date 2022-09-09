@@ -53,6 +53,28 @@
                     </a>
                 </li>
 
+                @if (RoleAccess::whereMenu(8) > 0)
+                    <li class="nav-item mt-2">
+                        <a href="#" class="nav-link">
+                            <i class="nav-icon fas fa-server"></i>
+                            <p>
+                                Master
+                                <i class="fas fa-angle-left right"></i>
+                            </p>
+                        </a>
+                        <ul class="nav nav-treeview">
+                            @if (RoleAccess::whereMenu(8) > 0)
+                                <li class="nav-item">
+                                    <a href="{{ route('masterforwarder') }}" class="nav-link">
+                                        <i class="fas fa-forward nav-icon"></i>
+                                        <p>Master Forwarder</p>
+                                    </a>
+                                </li>
+                            @endif
+                        </ul>
+                    </li>
+                @endif
+
                 @if (RoleAccess::whereMenu(6) + RoleAccess::whereMenu(7) > 0)
                     <li class="nav-item mt-2">
                         <a href="#" class="nav-link">
