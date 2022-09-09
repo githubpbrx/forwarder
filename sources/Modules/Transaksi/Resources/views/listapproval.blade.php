@@ -11,6 +11,7 @@
                     <table id="serverside" class="table table-bordered table-striped">
                         <thead>
                             <tr>
+                                <th>#PO</th>
                                 <th>Nomor Booking</th>
                                 <th>Action</th>
                             </tr>
@@ -120,31 +121,26 @@
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label class="col-sm-12 control-label">User Approved</label>
-                                    <div class="col-sm-8">
-                                        <div id="detailpengesah"></div>
-                                        <input type="text" name="nikpengesah" id="nik" class="form-control">
-                                        {{-- <input type="hidden" id="namaasli" name="namaasli"> --}}
-                                    </div>
                                     <br>
-                                    <div class="row">
+                                    <br>
+                                    {{-- <div class="row">
                                         <div class="col-md-6">
                                             <div class="form-group">
-                                                <div class="col-sm-12">
-                                                    <button type="button" class="btnapproval btnconfirm btn btn-success"
-                                                        data-value="confirm">Confirm</button>
-                                                </div>
+                                                <div class="col-sm-12"> --}}
+                                    <button type="button" class="btnapproval btnconfirm btn btn-success"
+                                        data-value="confirm">Confirm</button>
+                                    {{-- </div>
                                             </div>
                                         </div>
                                         <div class="col-md-6">
                                             <div class="form-group">
-                                                <div class="col-sm-12">
-                                                    <button type="button" class="btnapproval btn btn-danger"
-                                                        data-value="reject">Reject</button>
-                                                </div>
+                                                <div class="col-sm-12"> --}}
+                                    <button type="button" class="btnapproval btn btn-danger"
+                                        data-value="reject">Reject</button>
+                                    {{-- </div>
                                             </div>
                                         </div>
-                                    </div>
+                                    </div> --}}
                                 </div>
                             </div>
                         </div>
@@ -207,6 +203,10 @@
                     url: "{{ route('list_approval') }}"
                 },
                 columns: [{
+                        data: 'nomorpo',
+                        name: 'nomorpo'
+                    },
+                    {
                         data: 'nobooking',
                         name: 'nobooking'
                     },
@@ -272,29 +272,29 @@
                 })
             });
 
-            var pengesahnik;
-            $('#nik').keyup(function(e) {
-                console.log('keyup :>> ', 'keyup');
-                var nik = $("#nik").val();
-                pengesahnik = nik;
-                // $("#loading").show();
-                let url = '{!! route('approvalgetkaryawan', ['id']) !!}'
-                url = url.replace('id', nik)
-                $.ajax({
-                    url: url,
-                    type: 'GET',
-                    success: function(data) {
-                        console.log('data :>> ', data);
-                        // $("#loading").hide();
-                        // if (data.status == 'no') {
-                        //     $("#nik").val('');
-                        // }
-                        $("#detailpengesah").html(data.data);
-                        // $("#namaasli").val(data.namaasli);
+            // var pengesahnik;
+            // $('#nik').keyup(function(e) {
+            //     console.log('keyup :>> ', 'keyup');
+            //     var nik = $("#nik").val();
+            //     pengesahnik = nik;
+            //     // $("#loading").show();
+            //     let url = '{!! route('approvalgetkaryawan', ['id']) !!}'
+            //     url = url.replace('id', nik)
+            //     $.ajax({
+            //         url: url,
+            //         type: 'GET',
+            //         success: function(data) {
+            //             console.log('data :>> ', data);
+            //             // $("#loading").hide();
+            //             // if (data.status == 'no') {
+            //             //     $("#nik").val('');
+            //             // }
+            //             $("#detailpengesah").html(data.data);
+            //             // $("#namaasli").val(data.namaasli);
 
-                    }
-                });
-            });
+            //         }
+            //     });
+            // });
 
             $('.btnapproval').click(function() {
                 console.log('objectkuu :>> ', 'klik');
@@ -305,15 +305,7 @@
                 if (val == 'confirm') {
                     confirm();
                 } else {
-                    if (pengesahnik == '' || pengesahnik == null) {
-                        Swal.fire({
-                            title: 'Informasi',
-                            text: 'Data NIK is required, please input NIK',
-                            type: 'warning'
-                        });
-                    } else {
-                        $('#modal_tolak').modal('show');
-                    }
+                    $('#modal_tolak').modal('show');
                 }
             });
 
@@ -337,7 +329,6 @@
                             idformpo: idformpo,
                             usernama: usernama,
                             usernik: usernik,
-                            pengesahnik: pengesahnik,
                             tglpengajuan: tglpengajuan,
                             tolak: tolak
                         },
@@ -370,69 +361,60 @@
             });
 
             function confirm() {
-                if (pengesahnik == '' || pengesahnik == null) {
-                    Swal.fire({
-                        title: 'Information',
-                        text: 'Data NIK is required, please input NIK',
-                        type: 'warning'
+                Swal.fire({
+                        title: "Apakah anda yakin?",
+                        text: "Apakah data yang anda verifikasi/setujui sudah benar?",
+                        type: "warning",
+                        showCancelButton: true,
+                        allowOutsideClick: false,
+                        allowEscapeKey: false
+                    })
+                    .then((result) => {
+                        console.log('willDelete :>> ', result);
+                        if (result.dismiss == 'cancel') {
+                            console.log('object :>> ', 'cancel');
+                            return;
+                        } else {
+                            console.log('object :>> ', 'ok');
+                            $.ajax({
+                                url: "{!! route('approvalstatus', ['disetujui']) !!}",
+                                type: 'POST',
+                                dataType: 'json',
+                                data: {
+                                    _token: $('meta[name=csrf-token]').attr('content'),
+                                    idpo: idpo,
+                                    idformpo: idformpo,
+                                    usernama: usernama,
+                                    usernik: usernik,
+                                    tglpengajuan: tglpengajuan
+                                },
+                                success: function(response) {
+                                    console.log('response :>> ', response);
+                                    Swal.fire({
+                                        title: response.title,
+                                        text: response.message,
+                                        type: (response.status != 'error') ? 'success' :
+                                            'error'
+                                    }).then((result) => {
+                                        // $('#approvalfwd').modal('hide');
+                                        // table.ajax.reload();
+                                        (response.status == 'success') ? window.location
+                                            .replace("{{ route('dashcam') }}"):
+                                            ''
+                                    });
+                                    return;
+                                },
+                                error: function(xhr, status, error) {
+                                    Swal.fire({
+                                        title: 'Unsuccessfully Saved Data',
+                                        text: 'Check Your Data',
+                                        type: 'error'
+                                    });
+                                    return;
+                                }
+                            });
+                        }
                     });
-                } else {
-                    Swal.fire({
-                            title: "Apakah anda yakin?",
-                            text: "Apakah data yang anda verifikasi/setujui sudah benar?",
-                            type: "warning",
-                            showCancelButton: true,
-                            allowOutsideClick: false,
-                            allowEscapeKey: false
-                        })
-                        .then((result) => {
-                            console.log('willDelete :>> ', result);
-                            if (result.dismiss == 'cancel') {
-                                console.log('object :>> ', 'cancel');
-                                return;
-                            } else {
-                                console.log('object :>> ', 'ok');
-                                $.ajax({
-                                    url: "{!! route('approvalstatus', ['disetujui']) !!}",
-                                    type: 'POST',
-                                    dataType: 'json',
-                                    data: {
-                                        _token: $('meta[name=csrf-token]').attr('content'),
-                                        idpo: idpo,
-                                        idformpo: idformpo,
-                                        usernama: usernama,
-                                        usernik: usernik,
-                                        tglpengajuan: tglpengajuan,
-                                        pengesahnik: pengesahnik
-                                    },
-                                    success: function(response) {
-                                        console.log('response :>> ', response);
-                                        Swal.fire({
-                                            title: response.title,
-                                            text: response.message,
-                                            type: (response.status != 'error') ? 'success' :
-                                                'error'
-                                        }).then((result) => {
-                                            // $('#approvalfwd').modal('hide');
-                                            // table.ajax.reload();
-                                            (response.status == 'success') ? window.location
-                                                .replace("{{ route('dashcam') }}"):
-                                                ''
-                                        });
-                                        return;
-                                    },
-                                    error: function(xhr, status, error) {
-                                        Swal.fire({
-                                            title: 'Unsuccessfully Saved Data',
-                                            text: 'Check Your Data',
-                                            type: 'error'
-                                        });
-                                        return;
-                                    }
-                                });
-                            }
-                        });
-                }
             }
 
         });

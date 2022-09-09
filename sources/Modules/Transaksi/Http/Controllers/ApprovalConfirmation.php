@@ -152,10 +152,13 @@ class ApprovalConfirmation extends Controller
 
     public function listapproval()
     {
-        $data = formpo::where('idapproval', '=', null)->where('status', '=', 'waiting')->where('aktif', 'Y')->get();
+        $data = formpo::join('po', 'po.id', 'formpo.idpo')->where('idapproval', '=', null)->where('status', '=', 'waiting')->where('aktif', 'Y')->get();
         // dd($data);
         return DataTables::of($data)
             ->addIndexColumn()
+            ->addColumn('nomorpo', function ($data) {
+                return $data->pono;
+            })
             ->addColumn('nobooking', function ($data) {
                 return $data->kode_booking;
             })
@@ -221,16 +224,11 @@ class ApprovalConfirmation extends Controller
 
         if ($approval == 'disetujui') {
             DB::beginTransaction();
-            if ($request->pengesahnik == null || $request->pengesahnik == '') {
-                DB::rollback();
-                $status = ['title' => 'Error!', 'status' => 'error', 'message' => 'Data NIK is required, please input NIK'];
-                return response()->json($status, 200);
-            }
 
             $saved = approval::insert([
                 'user_pengaju' => $request->usernik,
                 'tgl_diajukan' => $request->tglpengajuan,
-                'user_pengesah' => $request->pengesahnik,
+                'user_pengesah' => Session::get('session')['user_nik'],
                 'status_approval' => 'confirm',
                 'tgl_approval' => date('Y-m-d H:i:s'),
                 'aktif' => 'Y',
@@ -263,12 +261,6 @@ class ApprovalConfirmation extends Controller
             }
         } else {
             DB::beginTransaction();
-            if ($request->pengesahnik == null || $request->pengesahnik == '') {
-                DB::rollback();
-                $status = ['title' => 'Error!', 'status' => 'error', 'message' => 'Data NIK is required, please input NIK'];
-                return response()->json($status, 200);
-            }
-
             if ($request->tolak == null || $request->tolak == '') {
                 DB::rollback();
                 $status = ['title' => 'Error!', 'status' => 'error', 'message' => 'Data Keterangan is required, please input keterangan'];
@@ -278,7 +270,7 @@ class ApprovalConfirmation extends Controller
             $saved = approval::insert([
                 'user_pengaju' => $request->usernik,
                 'tgl_diajukan' => $request->tglpengajuan,
-                'user_pengesah' => $request->pengesahnik,
+                'user_pengesah' => Session::get('session')['user_nik'],
                 'status_approval' => 'reject',
                 'ket_tolak' => $request->tolak,
                 'tgl_approval' => date('Y-m-d H:i:s'),
