@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Storage;
 use Modules\System\Models\modelpo as po;
 use Modules\System\Models\modelprivilege as privilege;
 use Modules\System\Models\modelformpo as formpo;
+use Modules\System\Models\modelcoc as coc;
 
 class home extends Controller
 {
@@ -33,6 +34,10 @@ class home extends Controller
 
         $dataapproval = formpo::where('idapproval', '=', null)->where('status', '=', 'waiting')->where('aktif', 'Y')->get();
 
+        // $usercoc = privilege::where('nikfinance', Session::get('session')['user_nik'])->get();
+        // dd($usercoc);
+        $datacoc = coc::where('status', '=', 'waiting')->where('aktif', 'Y')->get();
+
         $data = array(
             'title' => 'Dashboard',
             'menu'  => 'dashboard',
@@ -41,6 +46,7 @@ class home extends Controller
             'totalconfirm' => count($dataconfirm),
             'totalapproval' => count($dataapproval),
             'datauser' => $datauser,
+            'totalcoc' => count($datacoc)
         );
         return view('system::dashboard/dashboard', $data);
     }
@@ -73,6 +79,16 @@ class home extends Controller
             'box'   => '',
         );
         return view('transaksi::listapproval', $data);
+    }
+
+    public function pagecoc()
+    {
+        $data = array(
+            'title' => 'Data List CoC',
+            'menu'  => 'listcoc',
+            'box'   => '',
+        );
+        return view('system::dashboard/listcoc', $data);
     }
 
     public function listpo()
@@ -119,6 +135,32 @@ class home extends Controller
             ->make(true);
     }
 
+    public function listcoc()
+    {
+        $query = coc::where('status', '=', 'waiting')->where('aktif', 'Y')->get();
+        // dd($query);
+        return Datatables::of($query)
+            ->addIndexColumn()
+            ->addColumn('name', function ($query) {
+                return  $query->name_coc;
+            })
+            ->addColumn('company', function ($query) {
+                return  $query->company_coc;
+            })
+            ->addColumn('status', function ($query) {
+                return  $query->status;
+            })
+            ->addColumn('action', function ($query) {
+                $process    = '';
+
+                $process    = '<a href="#" data-id="' . $query->id_coc . '" id="processcoc"><i class="fa fa-angle-double-right text-green"></i></a>';
+
+                return $process;
+            })
+            // ->rawColumns(['listpo', 'action'])
+            ->make(true);
+    }
+
     public function formpo(Request $request)
     {
         $mydata = po::where('id', $request->id)->first();
@@ -139,6 +181,19 @@ class home extends Controller
         $data = array(
             'datapo' => $mydata,
             'databook' => $databook
+        );
+
+        return response()->json(['status' => 200, 'data' => $data, 'message' => 'Berhasil']);
+    }
+
+
+    public function formcoc(Request $request)
+    {
+        // dd($request);
+        $datacoc = coc::where('id_coc', $request->id)->first();
+
+        $data = array(
+            'datacoc' => $datacoc
         );
 
         return response()->json(['status' => 200, 'data' => $data, 'message' => 'Berhasil']);
@@ -251,6 +306,49 @@ class home extends Controller
         } else {
             $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'Data Failed Saved'];
             return response()->json($status, 200);
+        }
+    }
+
+    public function statuscoc(Request $request, $approval)
+    {
+        // dd($request, $approval);
+        if ($approval == 'disetujui') {
+            DB::beginTransaction();
+            $statusupdate = coc::where('id_coc', $request->idcoc)->update([
+                'status' => 'confirm',
+                'updated_at' => date('Y-m-d H:i:s'),
+                'updated_by' => Session::get('session')['user_nik']
+            ]);
+
+            $cocupdate = privilege::where('idcoc', $request->idcoc)->update([
+                'coc' => 'Y',
+                'coc_date' => date('Y-m-d H:i:s'),
+            ]);
+
+            if ($statusupdate && $cocupdate) {
+                DB::commit();
+                $status = ['title' => 'Success', 'status' => 'success', 'message' => 'Data Successfully Saved'];
+                return response()->json($status, 200);
+            } else {
+                DB::rollback();
+                $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'Data Failed Saved'];
+                return response()->json($status, 200);
+            }
+        } else {
+            $statusupdate = coc::where('id_coc', $request->idcoc)->update([
+                'status' => 'reject',
+                'ket_tolak' => $request->tolak,
+                'updated_at' => date('Y-m-d H:i:s'),
+                'updated_by' => Session::get('session')['user_nik']
+            ]);
+
+            if ($statusupdate) {
+                $status = ['title' => 'Success', 'status' => 'success', 'message' => 'Data Successfully Saved'];
+                return response()->json($status, 200);
+            } else {
+                $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'Data Failed Saved'];
+                return response()->json($status, 200);
+            }
         }
     }
 }

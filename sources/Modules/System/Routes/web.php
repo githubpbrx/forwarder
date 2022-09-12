@@ -19,10 +19,14 @@ Route::prefix('')->group(function () {
     Route::get('/dashboard', 'home@index')->name('dashcam');
     Route::get('/pagepo', 'home@pagepo')->name('page_po');
     Route::get('/pageupdate', 'home@pageupdate')->name('page_update');
+    Route::get('/pagecoc', 'home@pagecoc')->name('page_coc');
     Route::get('/listpo', 'home@listpo')->name('list_po');
     Route::get('/listupdate', 'home@listupdate')->name('list_update');
+    Route::get('/listcoc', 'home@listcoc')->name('list_coc');
     Route::post('/formpo', 'home@formpo')->name('form_po');
     Route::post('/formupdate', 'home@formupdate')->name('form_update');
+    Route::post('/formcoc', 'home@formcoc')->name('form_coc');
+    Route::post('cocstatus/{approval}', 'home@statuscoc')->name('statuscoc');
     Route::post('/saveformpo', 'home@saveformpo')->name('formposave');
     Route::post('/saveshipment', 'home@saveshipment')->name('saveshipment');
 

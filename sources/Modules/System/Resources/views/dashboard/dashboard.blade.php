@@ -42,6 +42,17 @@
                             </p>
                         </div>
                     @endif
+                    @if ($totalcoc >= 1)
+                        <div class="alert alert-danger" style="background-color: rgb(247, 195, 195)">
+                            <h5><i class="icon fas fa-info"></i> Notification</h5>
+                            <p style="color:black">You got a new Approval CODE OF CONDUCT (CoC)
+                                <span class="badge badge-info">{{ $totalcoc }}</span>
+                                <br>
+                                <a href="{{ route('page_coc') }}"><button type="button"
+                                        class="btn btn-primary btn-xs">Process</button></a>
+                            </p>
+                        </div>
+                    @endif
                 @endif
             </div>
         </div>
