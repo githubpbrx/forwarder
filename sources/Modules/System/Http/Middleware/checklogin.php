@@ -37,9 +37,9 @@ class checklogin
             return redirect()->route('aktifasiuser');
         }
 
-        // if($pri->privilege_hrips=='N' AND $pri->kode_validate=='Y' AND $pri->coc=='N'){
-        //     return redirect()->route('validasicoc');
-        // }
+        if ($pri->privilege_hrips == 'N' and $pri->kode_validate == 'Y' and $pri->coc == 'N') {
+            return redirect()->route('validasicoc');
+        }
 
         if ($pri->privilege_hrips == 'N' and $pri->kode_validate == 'Y' and $pri->kyc == 'N') {
             return redirect()->route('validasikyc');

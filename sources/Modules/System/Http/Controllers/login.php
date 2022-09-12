@@ -13,7 +13,9 @@ use Modules\System\Models\modelsystem,
     Modules\System\Models\modelfactory,
     Modules\System\Models\Privileges\modelrole_access,
     Modules\System\Models\Privileges\modelgroup_access,
-    Modules\System\Models\modelprivilege;
+    Modules\System\Models\modelprivilege,
+    Modules\System\Models\masterforwarder,
+    Modules\System\Models\modelcoc;
 
 class login extends Controller
 {
@@ -45,8 +47,10 @@ class login extends Controller
 
     public static function sendEmail($email, $nama, $token, $link, $subject)
     {
+        // dd($email, $nama, $token, $link, $subject);
         try {
             Mail::send('system::login/emailaktifasi', ['nama' => $nama, 'token' => $token, 'link' => $link], function ($message) use ($subject, $email) {
+                // dd($subject, $email, $message);
                 $message->subject($subject);
                 $message->to($email);
             });
@@ -507,7 +511,67 @@ class login extends Controller
     public function validasicoc()
     {
         $ses = Session::get('session');
-        dd($ses);
+        $user = $ses['user_nik'];
+        $nama = $ses['user_nama'];
+
+        $cek = modelprivilege::where('privilege_user_nik', $user)->first();
+        $param = modelsystem::first();
+
+        $masterfwd = masterforwarder::where('id', $cek->idforwarder)->where('aktif', 'Y')->first();
+        // dd($cek, $masterfwd);
+
+        $coc = modelcoc::where('name_coc', $nama)->where('aktif', 'Y')->first();
+        // dd($coc);
+        if ($coc == null) {
+            $datacoc = '0';
+        } elseif ($coc != null && $coc->status == 'waiting') {
+            $datacoc = '1';
+        }
+        // dd($datacoc);
+        $data = array(
+            'title' => 'Validasi COC',
+            'nik'   => $user,
+            'nama'  => $nama,
+            'data'  => $cek,
+            'ses'   => $ses,
+            'datafwd' => $masterfwd,
+            'datacoc' => $datacoc
+        );
+        return view('system::login/aktifasicoc', $data);
+    }
+
+    public function validasicocaction(Request $request)
+    {
+        // dd($request);
+
+        if ($request->day == '') {
+            $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'Data Day is required, please input Day'];
+            return response()->json($status, 200);
+        } elseif ($request->date == '') {
+            $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'Data Date is required, please input Date'];
+            return response()->json($status, 200);
+        } else {
+            $submit = modelcoc::insert([
+                'name_coc' => $request->name,
+                'position_coc' => $request->position,
+                'company_coc' => $request->company,
+                'address_coc' => $request->address,
+                'day_coc' => $request->day,
+                'date_coc' => $request->date,
+                'status' => 'waiting',
+                'aktif' => 'Y',
+                'created_at'    => date('Y-m-d H:i:s'),
+                'created_by'    => Session::get('session')['user_nik']
+            ]);
+        }
+
+        if ($submit) {
+            $status = ['title' => 'Success', 'status' => 'success', 'message' => 'Data Successfully Saved'];
+            return response()->json($status, 200);
+        } else {
+            $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'Data Failed Saved'];
+            return response()->json($status, 200);
+        }
     }
 
     public function validasikyc()
