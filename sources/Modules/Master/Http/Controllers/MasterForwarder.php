@@ -46,7 +46,7 @@ class MasterForwarder extends Controller
         return DataTables::of($data)
             ->addIndexColumn()
             ->addColumn('namefwd', function ($data) {
-                return $data->nama;
+                return $data->name;
             })
             ->addColumn('action', function ($data) {
                 $button = '';
@@ -69,7 +69,7 @@ class MasterForwarder extends Controller
      */
     public function savefwd(Request $request)
     {
-        dd($request);
+        // dd($request);
         //make password
         $pass = Hash::make('password123');
 
@@ -80,14 +80,17 @@ class MasterForwarder extends Controller
         $token = Hash::make('ittetapsemangant');
 
         DB::beginTransaction();
-        if ($request->namefwd == '' || $request->emailfwd == '' || $request->namefinance == '' || $request->nikfinance == '' || $request->emailfinance == '') {
+        if ($request->namefwd == '' || $request->position == '' || $request->company == '' || $request->address == '' || $request->emailfwd == '' || $request->namefinance == '' || $request->nikfinance == '' || $request->emailfinance == '') {
             DB::rollback();
             $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'Data is required, please input data'];
             return response()->json($status, 200);
         }
 
         $savedfwd = forwarder::insert([
-            'nama'         => strtoupper($request->namefwd),
+            'name'         => strtoupper($request->namefwd),
+            'position'     => $request->position,
+            'company'      => $request->company,
+            'address'      => $request->address,
             'aktif'        => 'Y',
             'created_at'   => date('Y-m-d H:i:s'),
             'created_user' => Session::get('session')['user_nik']
@@ -143,7 +146,13 @@ class MasterForwarder extends Controller
     {
         // dd($request);
 
-        $data = forwarder::where('id', $request->id)->where('aktif', 'Y')->first();
+        $datafwd = forwarder::where('id', $request->id)->where('aktif', 'Y')->first();
+        $dataprivilege = privilege::where('idforwarder', $request->id)->first();
+
+        $data = [
+            'datafwd' => $datafwd,
+            'datapriv' => $dataprivilege,
+        ];
 
         return response()->json(['status' => 200, 'data' => $data, 'message' => 'Berhasil']);
         // return view('master::edit');
@@ -159,22 +168,37 @@ class MasterForwarder extends Controller
     {
         // dd($request);
 
-        if ($request->namefwdedit == '') {
+        DB::beginTransaction();
+        if ($request->namefwdedit == '' || $request->positionedit == '' || $request->companyedit == '' || $request->addressedit == '' || $request->emailfwdedit == '' || $request->namefinanceedit == '' || $request->nikfinanceedit == '' || $request->emailfinanceedit == '') {
+            DB::rollback();
             $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'Data is required, please input data'];
             return response()->json($status, 200);
         }
 
         $updatefwd = forwarder::where('id', $request->id)->update([
-            'nama'         => strtoupper($request->namefwdedit),
+            'name'         => strtoupper($request->namefwdedit),
+            'position'     => $request->positionedit,
+            'company'      => $request->companyedit,
+            'address'      => $request->addressedit,
             'aktif'        => 'Y',
             'updated_at'   => date('Y-m-d H:i:s'),
             'updated_user' => Session::get('session')['user_nik']
         ]);
 
-        if ($updatefwd) {
+        $updateprivilege = privilege::where('idforwarder', $request->id)->update([
+            'privilege_user_nik'        => $request->emailfwdedit,
+            'privilege_user_name'       => strtoupper($request->namefwdedit),
+            'emailfinance'              => $request->emailfinanceedit,
+            'nikfinance'                => $request->nikfinanceedit,
+            'namafinance'               => $request->namefinanceedit
+        ]);
+
+        if ($updatefwd && $updateprivilege) {
+            DB::commit();
             $status = ['title' => 'Success', 'status' => 'success', 'message' => 'Data Successfully Saved'];
             return response()->json($status, 200);
         } else {
+            DB::rollback();
             $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'Data Failed Saved'];
             return response()->json($status, 200);
         }

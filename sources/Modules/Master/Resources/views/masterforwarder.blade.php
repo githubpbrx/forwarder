@@ -62,6 +62,38 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
+                                    <label class="col-sm-12 control-label">Position</label>
+                                    <div class="col-sm-12">
+                                        <input type="text" class="form-control" id="position" name="position"
+                                            autocomplete="off">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="col-sm-12 control-label">Company</label>
+                                    <div class="col-sm-12">
+                                        <input type="email" class="form-control" id="company" name="company"
+                                            autocomplete="off">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label class="col-sm-12 control-label">Address</label>
+                                    <div class="col-sm-12">
+                                        <input type="text" class="form-control" id="address" name="address"
+                                            autocomplete="off">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
                                     <label class="col-sm-12 control-label">NIK Finance</label>
                                     <div class="col-sm-12">
                                         <input type="number" min="0" class="form-control" id="nikfinance"
@@ -114,11 +146,87 @@
                     <form action="#" class="form-horizontal">
                         {{ csrf_field() }}
                         <input type="hidden" name="idku" id="idku">
-                        <div class="form-group">
-                            <label class="col-sm-12 control-label">Name Forwarder</label>
-                            <div class="col-sm-12">
-                                <input type="text" class="form-control" id="namefwdedit" name="namefwdedit"
-                                    autocomplete="off">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="col-sm-12 control-label">Name Forwarder</label>
+                                    <div class="col-sm-12">
+                                        <input type="text" class="form-control" id="namefwdedit" name="namefwdedit"
+                                            autocomplete="off">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="col-sm-12 control-label">Email Forwarder</label>
+                                    <div class="col-sm-12">
+                                        <input type="email" class="form-control" id="emailfwdedit" name="emailfwdedit"
+                                            autocomplete="off" readonly>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="col-sm-12 control-label">Position</label>
+                                    <div class="col-sm-12">
+                                        <input type="text" class="form-control" id="positionedit" name="positionedit"
+                                            autocomplete="off">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="col-sm-12 control-label">Company</label>
+                                    <div class="col-sm-12">
+                                        <input type="email" class="form-control" id="companyedit" name="companyedit"
+                                            autocomplete="off">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label class="col-sm-12 control-label">Address</label>
+                                    <div class="col-sm-12">
+                                        <input type="text" class="form-control" id="addressedit" name="addressedit"
+                                            autocomplete="off">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="col-sm-12 control-label">NIK Finance</label>
+                                    <div class="col-sm-12">
+                                        <input type="number" min="0" class="form-control" id="nikfinanceedit"
+                                            name="nikfinanceedit" autocomplete="off">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="col-sm-12 control-label">Name Finance</label>
+                                    <div class="col-sm-12">
+                                        <input type="text" class="form-control" id="namefinanceedit"
+                                            name="namefinanceedit" readonly>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="col-sm-12 control-label">Email Finance</label>
+                                    <div class="col-sm-12">
+                                        <input type="email" class="form-control" id="emailfinanceedit"
+                                            name="emailfinanceedit" autocomplete="off">
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </form>
@@ -193,6 +301,9 @@
             $('#adddata').click(function(e) {
                 $('#idku').val('');
                 $('#namefwd').val('');
+                $('#position').val('');
+                $('#company').val('');
+                $('#address').val('');
                 $('#emailfwd').val('');
                 $('#namefinance').val('');
                 $('#nikfinance').val('');
@@ -207,6 +318,9 @@
                 console.log('objectkuu :>> ', 'klik');
                 let id = $('#idku').val();
                 let namefwd = $('#namefwd').val();
+                let position = $('#position').val();
+                let company = $('#company').val();
+                let address = $('#address').val();
                 let emailfwd = $('#emailfwd').val();
                 let namefinance = $('#namefinance').val();
                 let nikfinance = $('#nikfinance').val();
@@ -214,6 +328,12 @@
 
                 if (namefwd == '' || namefwd == null) {
                     notifalert('Name Forwarder');
+                } else if (position == '' || position == null) {
+                    notifalert('Position Forwarder');
+                } else if (company == '' || company == null) {
+                    notifalert('Company Forwarder');
+                } else if (address == '' || address == null) {
+                    notifalert('Address Forwarder');
                 } else if (emailfwd == '' || emailfwd == null) {
                     notifalert('Email Forwarder');
                 } else if (IsEmail(emailfwd) == false) {
@@ -245,6 +365,9 @@
                             _token: $('meta[name=csrf-token]').attr('content'),
                             id: id,
                             namefwd: namefwd,
+                            position: position,
+                            company: company,
+                            address: address,
                             emailfwd: emailfwd,
                             namefinance: namefinance,
                             nikfinance: nikfinance,
@@ -295,10 +418,28 @@
                     },
                 }).done(function(data) {
                     console.log('data :>> ', data.data);
-                    let datafwd = data.data;
+                    let datafwd = data.data.datafwd;
+                    let datapriv = data.data.datapriv;
 
                     $('#idku').val(datafwd.id);
-                    $('#namefwdedit').val(datafwd.nama);
+                    $('#namefwdedit').val(datafwd.name);
+                    $('#positionedit').val(datafwd.position);
+                    $('#companyedit').val(datafwd.company);
+                    $('#addressedit').val(datafwd.address);
+                    $('#emailfwdedit').val(datapriv.privilege_user_nik);
+                    let nikk = $('#nikfinanceedit').val(datapriv.nikfinance);
+                    $('#emailfinanceedit').val(datapriv.emailfinance);
+
+                    let urlnik = '{!! route('getkaryawan', ['id']) !!}'
+                    urlnik = urlnik.replace('id', nikk[0]['value'])
+                    $.ajax({
+                        url: urlnik,
+                        type: 'GET',
+                        success: function(data) {
+                            console.log('datanik :>> ', data);
+                            $("#namefinanceedit").val(data.data);
+                        }
+                    });
                 })
             });
 
@@ -306,9 +447,35 @@
                 console.log('objectkuu :>> ', 'klik');
                 let id = $('#idku').val();
                 let namefwdedit = $('#namefwdedit').val();
+                let position = $('#positionedit').val();
+                let company = $('#companyedit').val();
+                let address = $('#addressedit').val();
+                let emailfwd = $('#emailfwdedit').val();
+                let namefinance = $('#namefinanceedit').val();
+                let nikfinance = $('#nikfinanceedit').val();
+                let emailfinance = $('#emailfinanceedit').val();
 
                 if (namefwdedit == '' || namefwdedit == null) {
                     notifalert('Name Forwarder');
+                } else if (position == '' || position == null) {
+                    notifalert('Position Forwarder');
+                } else if (company == '' || company == null) {
+                    notifalert('Company Forwarder');
+                } else if (address == '' || address == null) {
+                    notifalert('Address Forwarder');
+                } else if (nikfinance == '' || nikfinance == null) {
+                    notifalert('NIK Finance');
+                } else if (namefinance == '' || namefinance == null) {
+                    notifalert('Name Finance');
+                } else if (emailfinance == '' || emailfinance == null) {
+                    notifalert('Email Finance');
+                } else if (IsEmail(emailfinance) == false) {
+                    Swal.fire({
+                        title: 'Information',
+                        text: ' Please use format email in Email Finance',
+                        type: 'warning'
+                    });
+                    return;
                 } else {
                     $.ajax({
                         url: "{!! route('masterfwd_update') !!}",
@@ -318,6 +485,13 @@
                             _token: $('meta[name=csrf-token]').attr('content'),
                             id: id,
                             namefwdedit: namefwdedit,
+                            positionedit: position,
+                            companyedit: company,
+                            addressedit: address,
+                            emailfwdedit: emailfwd,
+                            namefinanceedit: namefinance,
+                            nikfinanceedit: nikfinance,
+                            emailfinanceedit: emailfinance
                         },
                         success: function(response) {
                             console.log('response :>> ', response);
@@ -393,6 +567,7 @@
                 })
             });
 
+            //for add
             $('#nikfinance').keyup(function(e) {
                 var nik = $("#nikfinance").val();
                 let url = '{!! route('getkaryawan', ['id']) !!}'
@@ -402,6 +577,20 @@
                     type: 'GET',
                     success: function(data) {
                         $("#namefinance").val(data.data);
+                    }
+                });
+            });
+
+            //for edit
+            $('#nikfinanceedit').keyup(function(e) {
+                var nik = $("#nikfinanceedit").val();
+                let url = '{!! route('getkaryawan', ['id']) !!}'
+                url = url.replace('id', nik)
+                $.ajax({
+                    url: url,
+                    type: 'GET',
+                    success: function(data) {
+                        $("#namefinanceedit").val(data.data);
                     }
                 });
             });
