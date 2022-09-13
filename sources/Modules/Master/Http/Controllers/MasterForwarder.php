@@ -86,6 +86,27 @@ class MasterForwarder extends Controller
             return response()->json($status, 200);
         }
 
+        $cekfwd = forwarder::where('name', $request->namefwd)->first();
+        if ($cekfwd != null) {
+            DB::rollback();
+            $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'Data Name Forwarder is available, please check again'];
+            return response()->json($status, 200);
+        }
+
+        $cekprivilege = privilege::where('privilege_user_nik', $request->emailfwd)->first();
+        if ($cekprivilege != null) {
+            DB::rollback();
+            $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'Data Email Forwarder is available, please check again'];
+            return response()->json($status, 200);
+        }
+
+        $cekprivilege2 = privilege::where('privilege_user_name', strtoupper($request->namefwd))->first();
+        if ($cekprivilege2 != null) {
+            DB::rollback();
+            $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'Data Name Forwarder is available, please check again'];
+            return response()->json($status, 200);
+        }
+
         $savedfwd = forwarder::insert([
             'name'         => strtoupper($request->namefwd),
             'position'     => $request->position,
@@ -172,6 +193,20 @@ class MasterForwarder extends Controller
         if ($request->namefwdedit == '' || $request->positionedit == '' || $request->companyedit == '' || $request->addressedit == '' || $request->emailfwdedit == '' || $request->namefinanceedit == '' || $request->nikfinanceedit == '' || $request->emailfinanceedit == '') {
             DB::rollback();
             $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'Data is required, please input data'];
+            return response()->json($status, 200);
+        }
+
+        $cekfwd = forwarder::where('id', '!=', $request->id)->where('name', $request->namefwdedit)->where('aktif', 'Y')->first();
+        if ($cekfwd != null) {
+            DB::rollback();
+            $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'Data Name Forwarder is available, please check again'];
+            return response()->json($status, 200);
+        }
+
+        $cekprivilege2 = privilege::where('idforwarder', '!=', $request->id)->where('privilege_user_name', strtoupper($request->namefwd))->first();
+        if ($cekprivilege2 != null) {
+            DB::rollback();
+            $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'Data Name Forwarder is available, please check again'];
             return response()->json($status, 200);
         }
 
