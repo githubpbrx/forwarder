@@ -12,6 +12,7 @@ use Modules\System\Models\modelpo as po;
 use Modules\System\Models\modelprivilege as privilege;
 use Modules\System\Models\modelformpo as formpo;
 use Modules\System\Models\modelcoc as coc;
+use Modules\System\Models\modelkyc as kyc;
 
 class home extends Controller
 {
@@ -38,6 +39,8 @@ class home extends Controller
         // dd($usercoc);
         // $datacoc = coc::where('status', '=', 'waiting')->where('aktif', 'Y')->get();
 
+        $userkyc = privilege::join('kyc', 'kyc.idmasterfwd', 'privilege.idforwarder')->where('nikfinance', Session::get('session')['user_nik'])->where('kyc.aktif', 'Y')->where('kyc.status', 'waiting')->get();
+        // dd($userkyc);
         $data = array(
             'title' => 'Dashboard',
             'menu'  => 'dashboard',
@@ -46,7 +49,8 @@ class home extends Controller
             'totalconfirm' => count($dataconfirm),
             'totalapproval' => count($dataapproval),
             'datauser' => $datauser,
-            'totalcoc' => count($usercoc)
+            'totalcoc' => count($usercoc),
+            'totalkyc' => count($userkyc),
         );
         return view('system::dashboard/dashboard', $data);
     }
@@ -89,6 +93,16 @@ class home extends Controller
             'box'   => '',
         );
         return view('system::dashboard/listcoc', $data);
+    }
+
+    public function pagekyc()
+    {
+        $data = array(
+            'title' => 'Data List KYC',
+            'menu'  => 'listkyc',
+            'box'   => '',
+        );
+        return view('system::dashboard/listkyc', $data);
     }
 
     public function listpo()
@@ -162,6 +176,33 @@ class home extends Controller
             ->make(true);
     }
 
+    public function listkyc()
+    {
+        // $query = coc::where('status', '=', 'waiting')->where('aktif', 'Y')->get();
+        $query = privilege::join('kyc', 'kyc.idmasterfwd', 'privilege.idforwarder')->where('nikfinance', Session::get('session')['user_nik'])->where('kyc.aktif', 'Y')->where('kyc.status', 'waiting')->get();
+        // dd($query);
+        return Datatables::of($query)
+            ->addIndexColumn()
+            ->addColumn('name', function ($query) {
+                return  $query->name_kyc;
+            })
+            ->addColumn('namefile', function ($query) {
+                return  $query->file_kyc;
+            })
+            ->addColumn('status', function ($query) {
+                return  $query->status;
+            })
+            ->addColumn('action', function ($query) {
+                $process    = '';
+
+                $process    = '<a href="#" data-id="' . $query->idforwarder . '" id="processkyc"><i class="fa fa-angle-double-right text-green"></i></a>';
+
+                return $process;
+            })
+            // ->rawColumns(['listpo', 'action'])
+            ->make(true);
+    }
+
     public function formpo(Request $request)
     {
         $mydata = po::where('id', $request->id)->first();
@@ -195,6 +236,18 @@ class home extends Controller
 
         $data = array(
             'datacoc' => $datacoc
+        );
+
+        return response()->json(['status' => 200, 'data' => $data, 'message' => 'Berhasil']);
+    }
+
+    public function formkyc(Request $request)
+    {
+        // dd($request);
+        $datakyc = kyc::where('idmasterfwd', $request->id)->first();
+
+        $data = array(
+            'datakyc' => $datakyc
         );
 
         return response()->json(['status' => 200, 'data' => $data, 'message' => 'Berhasil']);
@@ -337,6 +390,49 @@ class home extends Controller
             }
         } else {
             $statusupdate = coc::where('idmasterfwd', $request->idfwd)->update([
+                'status' => 'reject',
+                'ket_tolak' => $request->tolak,
+                'updated_at' => date('Y-m-d H:i:s'),
+                'updated_by' => Session::get('session')['user_nik']
+            ]);
+
+            if ($statusupdate) {
+                $status = ['title' => 'Success', 'status' => 'success', 'message' => 'Data Successfully Saved'];
+                return response()->json($status, 200);
+            } else {
+                $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'Data Failed Saved'];
+                return response()->json($status, 200);
+            }
+        }
+    }
+
+    public function statuskyc(Request $request, $approval)
+    {
+        // dd($request, $approval);
+        if ($approval == 'disetujui') {
+            DB::beginTransaction();
+            $statusupdate = kyc::where('idmasterfwd', $request->idfwd)->update([
+                'status' => 'confirm',
+                'updated_at' => date('Y-m-d H:i:s'),
+                'updated_by' => Session::get('session')['user_nik']
+            ]);
+
+            $kycupdate = privilege::where('idforwarder', $request->idfwd)->update([
+                'kyc' => 'Y',
+                'kyc_date' => date('Y-m-d H:i:s'),
+            ]);
+
+            if ($statusupdate && $kycupdate) {
+                DB::commit();
+                $status = ['title' => 'Success', 'status' => 'success', 'message' => 'Data Successfully Saved'];
+                return response()->json($status, 200);
+            } else {
+                DB::rollback();
+                $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'Data Failed Saved'];
+                return response()->json($status, 200);
+            }
+        } else {
+            $statusupdate = kyc::where('idmasterfwd', $request->idfwd)->update([
                 'status' => 'reject',
                 'ket_tolak' => $request->tolak,
                 'updated_at' => date('Y-m-d H:i:s'),
