@@ -545,6 +545,7 @@ class login extends Controller
     public function validasicocaction(Request $request)
     {
         // dd($request);
+        $datafwd = masterforwarder::where('name', Session::get('session')['user_nama'])->where('aktif', 'Y')->first();
 
         if ($request->day == '') {
             $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'Data Day is required, please input Day'];
@@ -554,6 +555,7 @@ class login extends Controller
             return response()->json($status, 200);
         } else {
             $submit = modelcoc::insert([
+                'idmasterfwd' => $datafwd->id,
                 'name_coc' => $request->name,
                 'position_coc' => $request->position,
                 'company_coc' => $request->company,
