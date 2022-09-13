@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
 use Session, Crypt, DB, Mail;
+use Illuminate\Support\Facades\Storage;
 
 use GuzzleHttp\Client;
 use Illuminate\Support\Facades\Hash;
@@ -15,7 +16,8 @@ use Modules\System\Models\modelsystem,
     Modules\System\Models\Privileges\modelgroup_access,
     Modules\System\Models\modelprivilege,
     Modules\System\Models\masterforwarder,
-    Modules\System\Models\modelcoc;
+    Modules\System\Models\modelcoc,
+    Modules\System\Models\modelkyc;
 
 class login extends Controller
 {
@@ -582,14 +584,55 @@ class login extends Controller
 
         $cek = modelprivilege::where('privilege_user_nik', $user)->first();
         $param = modelsystem::first();
+
+        $statuskyc = modelkyc::where('name_kyc', $nama)->where('status', 'waiting')->first();
+
         $data = array(
             'title' => 'Validasi KYC',
             'nik'   => $user,
             'nama'  => $nama,
             'data'  => $cek,
-            'ses'   => $ses
+            'ses'   => $ses,
+            'statuskyc' => $statuskyc
         );
         return view('system::login/aktifasikyc', $data);
+    }
+
+    public function validasikycaction(Request $request)
+    {
+
+        $datafwd = masterforwarder::where('name', Session::get('session')['user_nama'])->where('aktif', 'Y')->first();
+        // dd($datafwd);
+
+        $file = $request->file('file');
+        $originalName = str_replace(' ', '_', $file->getClientOriginalName());
+        $fileName = time() . '_' . $originalName;
+        Storage::disk('local')->put($fileName, file_get_contents($request->file));
+
+        // dd($request);
+        if ($file == '' || $file == null) {
+            $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'Nomor BL is required, please input Nomor BL'];
+            return response()->json($status, 200);
+        }
+
+        $save1 = modelkyc::insert([
+            'idmasterfwd' => $datafwd->id,
+            'name_kyc'   => $datafwd->name,
+            'nik_kyc'  => Session::get('session')['user_nik'],
+            'file_kyc'    => $fileName,
+            'status'    => 'waiting',
+            'aktif'     => 'Y',
+            'created_at' => date('Y-m-d H:i:s'),
+            'created_by' => Session::get('session')['user_nik']
+        ]);
+
+        if ($save1) {
+            $status = ['title' => 'Success', 'status' => 'success', 'message' => 'Data Successfully Saved'];
+            return response()->json($status, 200);
+        } else {
+            $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'Data Failed Saved'];
+            return response()->json($status, 200);
+        }
     }
 
     public function exp_password()

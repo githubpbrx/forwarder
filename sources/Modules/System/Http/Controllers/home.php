@@ -34,9 +34,9 @@ class home extends Controller
 
         $dataapproval = formpo::where('idapproval', '=', null)->where('status', '=', 'waiting')->where('aktif', 'Y')->get();
 
-        // $usercoc = privilege::where('nikfinance', Session::get('session')['user_nik'])->get();
+        $usercoc = privilege::join('coc', 'coc.idmasterfwd', 'privilege.idforwarder')->where('nikfinance', Session::get('session')['user_nik'])->where('coc.aktif', 'Y')->where('coc.status', 'waiting')->get();
         // dd($usercoc);
-        $datacoc = coc::where('status', '=', 'waiting')->where('aktif', 'Y')->get();
+        // $datacoc = coc::where('status', '=', 'waiting')->where('aktif', 'Y')->get();
 
         $data = array(
             'title' => 'Dashboard',
@@ -46,7 +46,7 @@ class home extends Controller
             'totalconfirm' => count($dataconfirm),
             'totalapproval' => count($dataapproval),
             'datauser' => $datauser,
-            'totalcoc' => count($datacoc)
+            'totalcoc' => count($usercoc)
         );
         return view('system::dashboard/dashboard', $data);
     }
@@ -137,7 +137,8 @@ class home extends Controller
 
     public function listcoc()
     {
-        $query = coc::where('status', '=', 'waiting')->where('aktif', 'Y')->get();
+        // $query = coc::where('status', '=', 'waiting')->where('aktif', 'Y')->get();
+        $query = privilege::join('coc', 'coc.idmasterfwd', 'privilege.idforwarder')->where('nikfinance', Session::get('session')['user_nik'])->where('coc.aktif', 'Y')->where('coc.status', 'waiting')->get();
         // dd($query);
         return Datatables::of($query)
             ->addIndexColumn()
@@ -153,7 +154,7 @@ class home extends Controller
             ->addColumn('action', function ($query) {
                 $process    = '';
 
-                $process    = '<a href="#" data-id="' . $query->id_coc . '" id="processcoc"><i class="fa fa-angle-double-right text-green"></i></a>';
+                $process    = '<a href="#" data-id="' . $query->idforwarder . '" id="processcoc"><i class="fa fa-angle-double-right text-green"></i></a>';
 
                 return $process;
             })
@@ -190,7 +191,7 @@ class home extends Controller
     public function formcoc(Request $request)
     {
         // dd($request);
-        $datacoc = coc::where('id_coc', $request->id)->first();
+        $datacoc = coc::where('idmasterfwd', $request->id)->first();
 
         $data = array(
             'datacoc' => $datacoc
@@ -314,13 +315,13 @@ class home extends Controller
         // dd($request, $approval);
         if ($approval == 'disetujui') {
             DB::beginTransaction();
-            $statusupdate = coc::where('id_coc', $request->idcoc)->update([
+            $statusupdate = coc::where('idmasterfwd', $request->idfwd)->update([
                 'status' => 'confirm',
                 'updated_at' => date('Y-m-d H:i:s'),
                 'updated_by' => Session::get('session')['user_nik']
             ]);
 
-            $cocupdate = privilege::where('idcoc', $request->idcoc)->update([
+            $cocupdate = privilege::where('idforwarder', $request->idfwd)->update([
                 'coc' => 'Y',
                 'coc_date' => date('Y-m-d H:i:s'),
             ]);
@@ -335,7 +336,7 @@ class home extends Controller
                 return response()->json($status, 200);
             }
         } else {
-            $statusupdate = coc::where('id_coc', $request->idcoc)->update([
+            $statusupdate = coc::where('idmasterfwd', $request->idfwd)->update([
                 'status' => 'reject',
                 'ket_tolak' => $request->tolak,
                 'updated_at' => date('Y-m-d H:i:s'),

@@ -182,7 +182,7 @@
                 $('[data-toggle="tooltip"]').tooltip();
             })
 
-            var idcoc;
+            var idfwd;
             $('body').on('click', '#processcoc', function() {
                 $('#listcoc').modal({
                     show: true,
@@ -201,7 +201,7 @@
                     console.log('object :>> ', data.data);
                     let datacoc = data.data.datacoc;
 
-                    idcoc = datacoc.id_coc;
+                    idfwd = datacoc.idmasterfwd;
 
                     $('#namecoc').val(datacoc.name_coc);
                     $('#positioncoc').val(datacoc.position_coc);
@@ -241,7 +241,7 @@
                         dataType: 'json',
                         data: {
                             _token: $('meta[name=csrf-token]').attr('content'),
-                            idcoc: idcoc,
+                            idfwd: idfwd,
                             tolak: tolak
                         },
                         success: function(response) {
@@ -294,7 +294,7 @@
                                 dataType: 'json',
                                 data: {
                                     _token: $('meta[name=csrf-token]').attr('content'),
-                                    idcoc: idcoc,
+                                    idfwd: idfwd,
                                 },
                                 success: function(response) {
                                     console.log('response :>> ', response);

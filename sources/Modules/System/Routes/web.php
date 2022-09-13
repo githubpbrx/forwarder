@@ -35,6 +35,7 @@ Route::prefix('')->group(function () {
     Route::get('/validasicoc', 'login@validasicoc')->name('validasicoc');
     Route::post('/validasicocaction', 'login@validasicocaction')->name('validasicocaction');
     Route::get('/validasikyc', 'login@validasikyc')->name('validasikyc');
+    Route::post('/validasikycaction', 'login@validasikycaction')->name('validasikycaction');
 
 
     Route::get('/aktifasiuser', 'login@aktifasiuser')->name('aktifasiuser');
