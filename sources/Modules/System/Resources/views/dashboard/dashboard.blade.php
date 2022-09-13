@@ -13,22 +13,30 @@
                     <h3 class="text-center">DASHBOARD</h3>
                 </div>
                 @if ($datauser->privilege_group_access_id == '1')
-                    <div class="alert alert-danger" style="background-color: rgb(253, 181, 181)">
-                        {{-- <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button> --}}
-                        <h5><i class="icon fas fa-info"></i> Notification</h5>
-                        <p style="color:black">You got a new PO
-                            <span class="badge badge-info">{{ $totalpo }}</span>
-                            <br>
-                            <a href="{{ route('page_po') }}"><button type="button"
-                                    class="btn btn-primary btn-xs">Process</button></a>
-                        </p>
-                        <p style="color:black">You got a new Update Shipment
-                            <span class="badge badge-info">{{ $totalconfirm }}</span>
-                            <br>
-                            <a href="{{ route('page_update') }}"><button type="button"
-                                    class="btn btn-primary btn-xs">Process</button></a>
-                        </p>
-                    </div>
+                    @if ($totalpo >= 1)
+                        <div class="alert alert-danger" style="background-color: rgb(253, 181, 181)">
+                            {{-- <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button> --}}
+                            <h5><i class="icon fas fa-info"></i> Notification</h5>
+                            <p style="color:black">You got a new PO
+                                <span class="badge badge-info">{{ $totalpo }}</span>
+                                <br>
+                                <a href="{{ route('page_po') }}"><button type="button"
+                                        class="btn btn-primary btn-xs">Process</button></a>
+                            </p>
+                        </div>
+                    @endif
+                    @if ($totalconfirm >= 1)
+                        <div class="alert alert-danger" style="background-color: rgb(253, 181, 181)">
+                            {{-- <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button> --}}
+                            <h5><i class="icon fas fa-info"></i> Notification</h5>
+                            <p style="color:black">You got a new Update Shipment
+                                <span class="badge badge-info">{{ $totalconfirm }}</span>
+                                <br>
+                                <a href="{{ route('page_update') }}"><button type="button"
+                                        class="btn btn-primary btn-xs">Process</button></a>
+                            </p>
+                        </div>
+                    @endif
                 @else
                     @if ($totalapproval >= 1)
                         <div class="alert alert-danger" style="background-color: rgb(247, 195, 195)">

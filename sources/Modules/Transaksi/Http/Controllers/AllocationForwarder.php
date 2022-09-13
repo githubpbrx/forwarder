@@ -138,6 +138,7 @@ class AllocationForwarder extends Controller
 
         $cek = fwd::where('idpo', $request->idpo)->selectRaw(' sum(qty_allocation) as jml, id_forwarder  ')->where('aktif', 'Y')->first();
         $jumlahexist = ($cek == null) ? 0 : $cek->jml;
+        // dd($jumlahexist);
 
         $jumlahall = $request->qtyallocation + $jumlahexist;
         if ($jumlahall > $qtypo) {
@@ -232,13 +233,13 @@ class AllocationForwarder extends Controller
         header("Access-Control-Allow-Headers: *");
 
         if (!$request->ajax()) return;
-        $po = forward::select('id', 'nama');
+        $po = forward::select('id', 'name');
         if ($request->has('q')) {
             $search = $request->q;
-            $po = $po->whereRaw(' nama like "%' . $search . '%" ');
+            $po = $po->whereRaw(' name like "%' . $search . '%" ');
         }
 
-        $po = $po->where('aktif', '=', 'Y')->orderby('nama', 'asc')->get();
+        $po = $po->where('aktif', '=', 'Y')->orderby('name', 'asc')->get();
         // dd($po);
         return response()->json($po);
 

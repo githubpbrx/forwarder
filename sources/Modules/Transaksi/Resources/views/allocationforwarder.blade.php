@@ -196,9 +196,9 @@
                                 style="width: 100%; color: rgb(192, 192, 192); height: 0.5px; background-color:rgb(192, 192, 192);" />
 
                             <div id="detailhtml"></div>
-                             <hr
+                            <hr
                                 style="width: 100%; color: rgb(192, 192, 192); height: 0.5px; background-color:rgb(192, 192, 192);" />
-                            
+
                             <label class="col-sm-12 control-label">Please input allocation</label>
                             <hr>
                             <div class="form-group">
@@ -217,7 +217,7 @@
                                 </div>
                             </div>
                         </div>
-                        
+
                     </form>
                 </div>
                 <div class="modal-footer">
@@ -344,7 +344,7 @@
 
                             results: $.map(data, function(item) {
                                 return {
-                                    text: item.nama,
+                                    text: item.name,
                                     id: item.id,
                                     selected: true,
                                 }
@@ -380,11 +380,12 @@
                         },
                         dataType: "json",
                         success: function(response) {
-                            if(response.status=="error"){
+                            if (response.status == "error") {
                                 Swal.fire({
                                     title: response.title,
                                     text: response.message,
-                                    type: (response.status != 'error') ? 'success' : 'error'
+                                    type: (response.status != 'error') ? 'success' :
+                                        'error'
                                 });
                                 return;
                             }

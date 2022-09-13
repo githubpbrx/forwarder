@@ -9,6 +9,7 @@
                 <thead>
                     <tr>
                         <th>List PO#</th>
+                        <th>Item PO</th>
                         <th>Status</th>
                         <th>Action</th>
                     </tr>
@@ -155,6 +156,10 @@
                         name: 'listpo'
                     },
                     {
+                        data: 'listitem',
+                        name: 'listitem'
+                    },
+                    {
                         data: 'status',
                         name: 'status'
                     },
@@ -208,7 +213,6 @@
             $('#btnsubmit').click(function(e) {
                 let idku = idpo;
                 let formpo = idformpo;
-                let filebl = $('#bl').val();
                 let nomorbl = $('#nobl').val();
                 let vessel = $('#vessel').val();
                 let file = $('#bl').prop('files')[0];
@@ -221,7 +225,7 @@
 
                 console.log('form :>> ', form_data);
 
-                if (filebl == null || filebl == '') {
+                if (file == null || file == '') {
                     notifalert('File BL');
                 } else if (nomorbl == null || nomorbl == '') {
                     notifalert('Nomor BL');

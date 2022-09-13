@@ -9,6 +9,7 @@
                 <thead>
                     <tr>
                         <th>List PO#</th>
+                        <th>Items PO</th>
                         <th>Action</th>
                     </tr>
                 </thead>
@@ -168,6 +169,10 @@
                         name: 'listpo'
                     },
                     {
+                        data: 'itempo',
+                        name: 'itempo'
+                    },
+                    {
                         data: 'action',
                         name: 'action',
                         orderable: false,
@@ -181,6 +186,7 @@
             })
 
             var idpo;
+            var idfwd;
             $('body').on('click', '#formpo', function() {
                 $('#formulir_po').modal({
                     show: true,
@@ -197,9 +203,10 @@
                         id: idku,
                     },
                 }).done(function(data) {
-                    let dataku = data.data;
-                    let poku = dataku.datapo;
+                    let poku = data.data.datapo;
+
                     idpo = poku.id;
+                    idfwd = poku.idmasterfwd;
 
                     $('#nomorpo').val(poku.pono);
                 })
@@ -233,6 +240,7 @@
                         data: {
                             _token: $('meta[name=csrf-token]').attr('content'),
                             'idpo': idku,
+                            'idfwd': idfwd,
                             'nobooking': nobook,
                             'datebooking': datebook,
                             'etd': myetd,

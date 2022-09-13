@@ -266,35 +266,11 @@
                     $('#eta').val(databook.eta);
                     $('#shipmode').val(databook.shipmode);
                     $('#submode').val(databook.subshipmode);
-                    $('#forwarder').val(forward.nama);
+                    $('#forwarder').val(forward.name);
                     $('#pengajunama').html(privilege.privilege_user_name);
                     $('#pengajunik').val(privilege.privilege_user_nik);
                 })
             });
-
-            // var pengesahnik;
-            // $('#nik').keyup(function(e) {
-            //     console.log('keyup :>> ', 'keyup');
-            //     var nik = $("#nik").val();
-            //     pengesahnik = nik;
-            //     // $("#loading").show();
-            //     let url = '{!! route('approvalgetkaryawan', ['id']) !!}'
-            //     url = url.replace('id', nik)
-            //     $.ajax({
-            //         url: url,
-            //         type: 'GET',
-            //         success: function(data) {
-            //             console.log('data :>> ', data);
-            //             // $("#loading").hide();
-            //             // if (data.status == 'no') {
-            //             //     $("#nik").val('');
-            //             // }
-            //             $("#detailpengesah").html(data.data);
-            //             // $("#namaasli").val(data.namaasli);
-
-            //         }
-            //     });
-            // });
 
             $('.btnapproval').click(function() {
                 console.log('objectkuu :>> ', 'klik');
@@ -327,9 +303,6 @@
                             _token: $('meta[name=csrf-token]').attr('content'),
                             idpo: idpo,
                             idformpo: idformpo,
-                            usernama: usernama,
-                            usernik: usernik,
-                            tglpengajuan: tglpengajuan,
                             tolak: tolak
                         },
                         success: function(response) {
@@ -362,8 +335,8 @@
 
             function confirm() {
                 Swal.fire({
-                        title: "Apakah anda yakin?",
-                        text: "Apakah data yang anda verifikasi/setujui sudah benar?",
+                        title: "Are You Sure?",
+                        text: "Is the data you verified/approved correct",
                         type: "warning",
                         showCancelButton: true,
                         allowOutsideClick: false,
@@ -384,9 +357,6 @@
                                     _token: $('meta[name=csrf-token]').attr('content'),
                                     idpo: idpo,
                                     idformpo: idformpo,
-                                    usernama: usernama,
-                                    usernik: usernik,
-                                    tglpengajuan: tglpengajuan
                                 },
                                 success: function(response) {
                                     console.log('response :>> ', response);
