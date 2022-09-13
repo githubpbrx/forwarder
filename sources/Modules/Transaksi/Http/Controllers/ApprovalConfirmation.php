@@ -99,9 +99,9 @@ class ApprovalConfirmation extends Controller
                 }
                 // $data = po::whereRaw(' vendor="' . $request->supplier . '"   ' . $where . ' ')->get();
                 $data = formpo::join('po', 'po.id', 'formpo.idpo')
-                    ->join('masterforwarder', 'masterforwarder.id', 'po.idmasterfwd')
+                    ->join('masterforwarder', 'masterforwarder.id', 'formpo.idmasterfwd')
                     ->whereRaw(' vendor="' . $request->supplier . '" ' . $where . ' ')
-                    ->selectRaw(' po.id as poid, formpo.kode_booking, formpo.date_booking, masterforwarder.nama, formpo.status, formpo.idapproval')->get();
+                    ->get();
             }
 
             // dd($data);
@@ -115,7 +115,7 @@ class ApprovalConfirmation extends Controller
                     return $date;
                 })
                 ->addColumn('forwarder', function ($data) {
-                    return $data->nama;
+                    return $data->name;
                 })
                 ->addColumn('status', function ($data) {
                     if ($data->status == 'all') {
