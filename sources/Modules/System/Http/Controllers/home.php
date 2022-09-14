@@ -29,7 +29,7 @@ class home extends Controller
 
     public function index()
     {
-        $datapo = po::join('privilege', 'privilege.idforwarder', 'po.idmasterfwd')->where('privilege_user_nik', Session::get('session')['user_nik'])->where('statusalokasi', 'full_allocated')->where('statusconfirm', '=', null)->get();
+        $datapo = po::join('privilege', 'privilege.idforwarder', 'po.idmasterfwd')->where('privilege_user_nik', Session::get('session')['user_nik'])->where('statusalokasi', 'full_allocated')->orWhere('statusalokasi', 'partial_allocated')->where('statusconfirm', '=', null)->get();
         // $datapo = po::whereRaw(' (statusalokasi="partial_allocated" OR statusalokasi="full_allocated") AND statusconfirm="' . null . '" ')->get();
         // dd($datapo);
         $datauser = privilege::where('privilege_user_nik', Session::get('session')['user_nik'])->first();
