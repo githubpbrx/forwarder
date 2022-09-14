@@ -268,13 +268,12 @@ class home extends Controller
         if ($request->shipmode == 'fcl') {
             $submode = $request->fcl;
         } else if ($request->shipmode == 'lcl') {
-            $submode = $request->lcl;
+            $submode = $request->lcl . ' ' . 'CBM';
         } else {
-            $submode = $request->air;
+            $submode = $request->air . ' ' . 'KG';
         }
 
         DB::beginTransaction();
-
         if ($request->nobooking == '' || $request->nobooking == null) {
             DB::rollback();
             $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'Nomor Booking is required, please input Nomor Booking'];
@@ -298,6 +297,16 @@ class home extends Controller
         if ($request->shipmode == '' || $request->shipmode == null) {
             DB::rollback();
             $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'Ship Mode is required, please input Ship Mode'];
+            return response()->json($status, 200);
+        }
+        if ($request->shipmode == 'lcl' && $request->lcl == null) {
+            DB::rollback();
+            $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'LCL is required, please input LCL'];
+            return response()->json($status, 200);
+        }
+        if ($request->shipmode == 'air' && $request->air == null) {
+            DB::rollback();
+            $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'AIR is required, please input AIR'];
             return response()->json($status, 200);
         }
 

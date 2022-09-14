@@ -42,7 +42,8 @@
                                 <div class="form-group">
                                     <label class="col-sm-12 control-label">Nomor Booking</label>
                                     <div class="col-sm-12">
-                                        <input type="text" class="form-control" id="nobook" name="nobook">
+                                        <input type="text" class="form-control" id="nobook" name="nobook"
+                                            autocomplete="off">
                                     </div>
                                 </div>
                             </div>
@@ -101,17 +102,31 @@
                                 <div class="form-group" id="datalcl" style="display: none">
                                     <label class="col-sm-12 control-label">LCL</label>
                                     <div class="col-sm-12">
-                                        <select class="select2" style="width: 100%;" name="lclku" id="lclku">
+                                        {{-- <select class="select2" style="width: 100%;" name="lclku" id="lclku">
                                             <option value="cbm">CBM</option>
-                                        </select>
+                                        </select> --}}
+                                        <div class="input-group">
+                                            <input type="number" min="0" class="form-control" name="lclku"
+                                                id="lclku" autocomplete="off">
+                                            <div class="input-group-append">
+                                                <span class="input-group-text">CBM</span>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="form-group" id="dataair" style="display: none">
                                     <label class="col-sm-12 control-label">AIR</label>
                                     <div class="col-sm-12">
-                                        <select class="select2" style="width: 100%;" name="airku" id="airku">
+                                        {{-- <select class="select2" style="width: 100%;" name="airku" id="airku">
                                             <option value="kg">KG</option>
-                                        </select>
+                                        </select> --}}
+                                        <div class="input-group">
+                                            <input type="number" min="0" class="form-control" name="airku"
+                                                id="airku" autocomplete="off">
+                                            <div class="input-group-append">
+                                                <span class="input-group-text">KG</span>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -222,6 +237,9 @@
                 let myfcl = $('#fclku').val();
                 let mylcl = $('#lclku').val();
                 let myair = $('#airku').val();
+                console.log('mode :>> ', mode);
+                console.log('mylcl :>> ', mylcl);
+                console.log('myair :>> ', myair);
 
                 if (nobook == null || nobook == '') {
                     notifalert('Nomor Booking');
@@ -233,6 +251,10 @@
                     notifalert('ETA (Estimate Acutal Delivery Date)');
                 } else if (mode == null || mode == '') {
                     notifalert('Ship Mode');
+                } else if (mode == 'lcl' && mylcl == '') {
+                    notifalert('LCL');
+                } else if (mode == 'air' && myair == '') {
+                    notifalert('AIR');
                 } else {
                     $.ajax({
                         type: "post",
