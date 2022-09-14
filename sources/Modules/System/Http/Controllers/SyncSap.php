@@ -112,10 +112,10 @@ class SyncSap extends Controller
         $this->logsap($mode, "", $fname, "Start Process...");
         $root = "//192.168.11.249";
 
-        if ($mode == 'prd') {
+        if ($mode == '0') {
             // $filesdir = $root."/sapint/PRD/WEBSUPPLIER/PO/PROCESSED/";
             $filesdir = storage_path('public/WEBSUPPLIER/PO/PROCESSED/');
-        } else if ($mode == 'dev' or $mode == 'qas') {
+        } else if ($mode == '1') {
             $filesdir = $root . "/Web_Sup/Dev/Archive/";
             // $filesdir = $root."/sapint/DEV/WEBSUPPLIER/PO/PROCESSED/";
             // $filesdir = storage_path('public/WEBSUPPLIER/PO/PROCESSED/');
