@@ -397,7 +397,9 @@
             $('#domicili').val(datafwd.address);
             $('#namepartner').val(datafwd.name);
             $('#positionpartner').val(datafwd.position);
-            $('#deskripsi').val(datacoc.ket_tolak);
+            if (datacoc != null) {
+                $('#deskripsi').val(datacoc.ket_tolak);
+            }
 
             $('#cekbok').change(function(e) {
                 if (this.checked) {
