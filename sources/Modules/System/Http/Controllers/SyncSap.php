@@ -106,7 +106,7 @@ class SyncSap extends Controller
 
     public function index_syncsap()
     {
-        $mode = $_GET['envir'];
+        $mode = $_GET['mode'];
         $fname = $_GET['fname'];
         $tgl_input = date("Y-m-d H:i:s");
         $this->logsap($mode, "", $fname, "Start Process...");
