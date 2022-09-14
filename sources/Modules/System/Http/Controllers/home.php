@@ -385,8 +385,9 @@ class home extends Controller
         // dd($request, $approval);
         if ($approval == 'disetujui') {
             DB::beginTransaction();
-            $statusupdate = coc::where('idmasterfwd', $request->idfwd)->update([
+            $statusupdate = coc::where('idmasterfwd', $request->idfwd)->where('aktif', 'Y')->update([
                 'status' => 'confirm',
+                'user_approval' => Session::get('session')['user_nik'],
                 'updated_at' => date('Y-m-d H:i:s'),
                 'updated_by' => Session::get('session')['user_nik']
             ]);
@@ -409,6 +410,7 @@ class home extends Controller
             $statusupdate = coc::where('idmasterfwd', $request->idfwd)->update([
                 'status' => 'reject',
                 'ket_tolak' => $request->tolak,
+                'user_approval' => Session::get('session')['user_nik'],
                 'updated_at' => date('Y-m-d H:i:s'),
                 'updated_by' => Session::get('session')['user_nik']
             ]);
@@ -430,6 +432,7 @@ class home extends Controller
             DB::beginTransaction();
             $statusupdate = kyc::where('idmasterfwd', $request->idfwd)->update([
                 'status' => 'confirm',
+                'user_approval' => Session::get('session')['user_nik'],
                 'updated_at' => date('Y-m-d H:i:s'),
                 'updated_by' => Session::get('session')['user_nik']
             ]);
@@ -451,6 +454,7 @@ class home extends Controller
         } else {
             $statusupdate = kyc::where('idmasterfwd', $request->idfwd)->update([
                 'status' => 'reject',
+                'user_approval' => Session::get('session')['user_nik'],
                 'ket_tolak' => $request->tolak,
                 'updated_at' => date('Y-m-d H:i:s'),
                 'updated_by' => Session::get('session')['user_nik']

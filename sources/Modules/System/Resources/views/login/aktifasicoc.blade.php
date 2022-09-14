@@ -47,15 +47,7 @@
                     Associate of PT Pan Brothers Tbk and Group
                 </div>
                 <div class="card-body" style="height: 500px; overflow-y: auto; background-color: #A5F1E9">
-                    @if ($datacoc != '0')
-                        <center>
-                            <h3>
-                                PLEASE WAIT!
-                                <br>
-                                YOUR DATA IS CURRENTLY PROCESSING
-                            </h3>
-                        </center>
-                    @else
+                    @if ($datacoc == '0')
                         <div>
                             <p class="text-center">
                                 <b>COMMITMENT Code of Conduct (CODE OF CONDUCT)</b>
@@ -329,6 +321,29 @@
                                 </div>
                             </div>
                         </div>
+                    @elseif($datacoc == '1')
+                        <center>
+                            <h3>
+                                PLEASE WAIT!
+                                <br>
+                                YOUR DATA IS CURRENTLY PROCESSING
+                            </h3>
+                        </center>
+                    @else
+                        <center>
+                            <h3>
+                                YOUR DATA IS REJECTED
+                                <br>
+                                PLEASE CHECK AGAIN
+                            </h3>
+                            <br>
+                            <h5>
+                                DESCRIPTION : <input type="text" class="no-outline" id="deskripsi" readonly>
+                            </h5>
+                            <br>
+                            <a href="{{ route('validasicocreject') }}" class="btn btn-success">Try Again</a>
+
+                        </center>
                     @endif
                 </div>
                 @if ($datacoc == '0')
@@ -372,6 +387,7 @@
             $('#btnagree').prop('disabled', true);
 
             var datafwd = @JSON($datafwd);
+            var datacoc = @JSON($coc);
 
             $('#name').val(datafwd.name);
             $('#position').val(datafwd.position);
@@ -381,6 +397,7 @@
             $('#domicili').val(datafwd.address);
             $('#namepartner').val(datafwd.name);
             $('#positionpartner').val(datafwd.position);
+            $('#deskripsi').val(datacoc.ket_tolak);
 
             $('#cekbok').change(function(e) {
                 if (this.checked) {

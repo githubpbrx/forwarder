@@ -37,8 +37,10 @@ Route::prefix('')->group(function () {
     Route::get('/pageapproval', 'home@pageapproval')->name('page_approval');
 
     Route::get('/validasicoc', 'login@validasicoc')->name('validasicoc');
+    Route::get('/validasicocreject', 'login@validasicocreject')->name('validasicocreject');
     Route::post('/validasicocaction', 'login@validasicocaction')->name('validasicocaction');
     Route::get('/validasikyc', 'login@validasikyc')->name('validasikyc');
+    Route::get('/validasikycreject', 'login@validasikycreject')->name('validasikycreject');
     Route::post('/validasikycaction', 'login@validasikycaction')->name('validasikycaction');
 
 

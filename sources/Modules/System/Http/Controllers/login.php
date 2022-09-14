@@ -528,6 +528,8 @@ class login extends Controller
             $datacoc = '0';
         } elseif ($coc != null && $coc->status == 'waiting') {
             $datacoc = '1';
+        } else {
+            $datacoc = '2';
         }
         // dd($datacoc);
         $data = array(
@@ -537,6 +539,47 @@ class login extends Controller
             'data'  => $cek,
             'ses'   => $ses,
             'datafwd' => $masterfwd,
+            'coc'     => $coc,
+            'datacoc' => $datacoc
+        );
+        return view('system::login/aktifasicoc', $data);
+    }
+
+    public function validasicocreject()
+    {
+
+        $ses = Session::get('session');
+        $user = $ses['user_nik'];
+        $nama = $ses['user_nama'];
+        // dd($ses);
+        $cek = modelprivilege::where('privilege_user_nik', $user)->first();
+
+        $masterfwd = masterforwarder::where('id', $cek->idforwarder)->where('aktif', 'Y')->first();
+
+        $coc = modelcoc::where('name_coc', $nama)->where('status', 'reject')->where('aktif', 'Y')->first();
+        $updatecoc = modelcoc::where('id_coc', $coc->id_coc)->update([
+            'aktif' => 'N'
+        ]);
+
+        $cocdata = modelcoc::where('name_coc', $nama)->where('aktif', 'Y')->first();
+        // dd($cocdata);
+
+        if ($cocdata == null) {
+            $datacoc = '0';
+        } elseif ($cocdata != null && $cocdata->status == 'waiting') {
+            $datacoc = '1';
+        } else {
+            $datacoc = '2';
+        }
+        // dd($datacoc);
+        $data = array(
+            'title' => 'Validasi COC',
+            'nik'   => $user,
+            'nama'  => $nama,
+            'data'  => $cek,
+            'ses'   => $ses,
+            'datafwd' => $masterfwd,
+            'coc'     => $coc,
             'datacoc' => $datacoc
         );
         return view('system::login/aktifasicoc', $data);
@@ -587,15 +630,58 @@ class login extends Controller
         $cek = modelprivilege::where('privilege_user_nik', $user)->first();
         $param = modelsystem::first();
 
-        $statuskyc = modelkyc::where('name_kyc', $nama)->where('status', 'waiting')->first();
-
+        $statuskyc = modelkyc::where('name_kyc', $nama)->where('aktif', 'Y')->first();
+        if ($statuskyc == null) {
+            $datakyc = '0';
+        } elseif ($statuskyc != null && $statuskyc->status == 'waiting') {
+            $datakyc = '1';
+        } else {
+            $datakyc = '2';
+        }
+        // dd($datakyc);
         $data = array(
             'title' => 'Validasi KYC',
             'nik'   => $user,
             'nama'  => $nama,
             'data'  => $cek,
             'ses'   => $ses,
-            'statuskyc' => $statuskyc
+            'statuskyc' => $datakyc,
+            'kycku'    => $statuskyc
+        );
+        return view('system::login/aktifasikyc', $data);
+    }
+
+    public function validasikycreject()
+    {
+        $ses = Session::get('session');
+        $user = $ses['user_nik'];
+        $nama = $ses['user_nama'];
+
+        $cek = modelprivilege::where('privilege_user_nik', $user)->first();
+
+        $rejectkyc = modelkyc::where('name_kyc', $nama)->where('nik_kyc', $user)->where('aktif', 'Y')->where('status', 'reject')->first();
+        // dd($rejectkyc);
+        $rejectaction = modelkyc::where('id_kyc', $rejectkyc->id_kyc)->update([
+            'aktif' => 'N'
+        ]);
+
+        $statuskyc = modelkyc::where('name_kyc', $nama)->where('aktif', 'Y')->first();
+        if ($statuskyc == null) {
+            $datakyc = '0';
+        } elseif ($statuskyc != null && $statuskyc->status == 'waiting') {
+            $datakyc = '1';
+        } else {
+            $datakyc = '2';
+        }
+        // dd($datakyc);
+        $data = array(
+            'title' => 'Validasi KYC',
+            'nik'   => $user,
+            'nama'  => $nama,
+            'data'  => $cek,
+            'ses'   => $ses,
+            'statuskyc' => $datakyc,
+            'kycku'    => $statuskyc
         );
         return view('system::login/aktifasikyc', $data);
     }
