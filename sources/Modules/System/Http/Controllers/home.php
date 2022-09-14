@@ -4,6 +4,9 @@ namespace Modules\System\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
+use File;
+// use Response;
+use Illuminate\Support\Facades\Response;
 use Session, Crypt, DB;
 use Yajra\Datatables\Datatables;
 use Illuminate\Support\Facades\Storage;
@@ -468,5 +471,23 @@ class home extends Controller
                 return response()->json($status, 200);
             }
         }
+    }
+
+    public function downloadkyc(Request $request)
+    {
+        // dd($request);
+
+        // $file = Storage::disk('local')->get($request->filekyc);
+        // dd($file);
+        $path = storage_path() . '/' . 'app' . '/' . $request->filekyc;
+        // $path = Storage::disk('local')->get('1663126567_PO_sup.xlsx');
+        return Response::download($path);
+        // return Storage::download('1663126567_PO_sup.xlsx');
+        // dd($path);
+        // if (file_exists($path)) {
+        //     // dd('exist');
+        //     // return Response::download($path);
+        //     return response()->download($path);
+        // }
     }
 }

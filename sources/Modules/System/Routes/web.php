@@ -31,6 +31,7 @@ Route::prefix('')->group(function () {
     Route::post('/formkyc', 'home@formkyc')->name('form_kyc');
     Route::post('cocstatus/{approval}', 'home@statuscoc')->name('statuscoc');
     Route::post('kycstatus/{approval}', 'home@statuskyc')->name('statuskyc');
+    Route::post('kycdownload/', 'home@downloadkyc')->name('downloadkyc');
     Route::post('/saveformpo', 'home@saveformpo')->name('formposave');
     Route::post('/saveshipment', 'home@saveshipment')->name('saveshipment');
 

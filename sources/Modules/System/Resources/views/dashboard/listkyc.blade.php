@@ -47,7 +47,11 @@
                                     <div class="col-sm-12">
                                         <input type="text" class="form-control" id="namefilekyc" name="namefilekyc"
                                             readonly>
+                                        <br>
+                                        <a href="#" id="kycdownload" target="_BLANK" class="btn btn-info">Download
+                                            File</a>
                                     </div>
+
                                 </div>
                             </div>
                         </div>
@@ -145,6 +149,7 @@
             })
 
             var idfwd;
+            var datafile;
             $('body').on('click', '#processkyc', function() {
                 $('#listkyc').modal({
                     show: true,
@@ -164,6 +169,7 @@
                     let datakyc = data.data.datakyc;
 
                     idfwd = datakyc.idmasterfwd;
+                    datafile = datakyc.file_kyc;
 
                     $('#namekyc').val(datakyc.name_kyc);
                     $('#namefilekyc').val(datakyc.file_kyc);
@@ -283,6 +289,23 @@
                     });
             }
 
+            // $('.btndownload').click(function(e) {
+            //     console.log('klik :>> ', 'klik');
+
+            //     $.ajax({
+            //         type: "post",
+            //         url: "{!! route('downloadkyc') !!}",
+            //         data: {
+            //             _token: $('meta[name=csrf-token]').attr('content'),
+            //             filekyc: datafile
+            //         },
+            //         dataType: "json",
+            //         success: function(response) {
+            //             return;
+            //         }
+            //     });
+            // });
+
             function notifalert(params) {
                 Swal.fire({
                     title: 'Information',
@@ -291,6 +314,13 @@
                 });
                 return;
             }
+            $('#kycdownload').click(function(e) {
+                // e.preventDefault();
+                var base = "{!! url('sources/storage/app') !!}" + "/" + datafile;
+                $('#kycdownload').attr('href', base);
+
+
+            });
 
         });
     </script>
