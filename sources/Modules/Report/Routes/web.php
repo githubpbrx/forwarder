@@ -11,6 +11,12 @@
 |
 */
 
-Route::prefix('report')->group(function() {
+Route::prefix('report')->group(function () {
     Route::get('/', 'ReportController@index');
+
+    Route::group(['prefix' => 'forwarder'], function () {
+        Route::get('/', 'ReportForwarder@index')->name('reportforwarder');
+        Route::post('/getfwd/', 'ReportForwarder@getforwarder')->name('report_getfwd');
+        Route::get('search', 'ReportForwarder@datatablefwd');
+    });
 });

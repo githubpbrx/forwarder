@@ -107,6 +107,28 @@
                     </li>
                 @endif
 
+                @if (RoleAccess::whereMenu(9) > 0)
+                    <li class="nav-item mt-2">
+                        <a href="#" class="nav-link">
+                            <i class="nav-icon fas fa-server"></i>
+                            <p>
+                                Report
+                                <i class="fas fa-angle-left right"></i>
+                            </p>
+                        </a>
+                        <ul class="nav nav-treeview">
+                            @if (RoleAccess::whereMenu(9) > 0)
+                                <li class="nav-item">
+                                    <a href="{{ route('reportforwarder') }}" class="nav-link">
+                                        <i class="fa fa-file nav-icon"></i>
+                                        <p>Report Forwarder</p>
+                                    </a>
+                                </li>
+                            @endif
+                        </ul>
+                    </li>
+                @endif
+
                 @if ($menu_session != '')
                     @include($menu_session . '::template/' . $menu_session . '_sidebar')
                 @endif
