@@ -19,17 +19,13 @@ Route::prefix('')->group(function () {
     Route::get('/dashboard', 'home@index')->name('dashcam');
     Route::get('/pagepo', 'home@pagepo')->name('page_po');
     Route::get('/pageupdate', 'home@pageupdate')->name('page_update');
-    Route::get('/pagecoc', 'home@pagecoc')->name('page_coc');
     Route::get('/pagekyc', 'home@pagekyc')->name('page_kyc');
     Route::get('/listpo', 'home@listpo')->name('list_po');
     Route::get('/listupdate', 'home@listupdate')->name('list_update');
-    Route::get('/listcoc', 'home@listcoc')->name('list_coc');
     Route::get('/listkyc', 'home@listkyc')->name('list_kyc');
     Route::post('/formpo', 'home@formpo')->name('form_po');
     Route::post('/formupdate', 'home@formupdate')->name('form_update');
-    Route::post('/formcoc', 'home@formcoc')->name('form_coc');
     Route::post('/formkyc', 'home@formkyc')->name('form_kyc');
-    Route::post('cocstatus/{approval}', 'home@statuscoc')->name('statuscoc');
     Route::post('kycstatus/{approval}', 'home@statuskyc')->name('statuskyc');
     Route::post('kycdownload/', 'home@downloadkyc')->name('downloadkyc');
     Route::post('/saveformpo', 'home@saveformpo')->name('formposave');
@@ -38,7 +34,6 @@ Route::prefix('')->group(function () {
     Route::get('/pageapproval', 'home@pageapproval')->name('page_approval');
 
     Route::get('/validasicoc', 'login@validasicoc')->name('validasicoc');
-    Route::get('/validasicocreject', 'login@validasicocreject')->name('validasicocreject');
     Route::post('/validasicocaction', 'login@validasicocaction')->name('validasicocaction');
     Route::get('/validasikyc', 'login@validasikyc')->name('validasikyc');
     Route::get('/validasikycreject', 'login@validasikycreject')->name('validasikycreject');

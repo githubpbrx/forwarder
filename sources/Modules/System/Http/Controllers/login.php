@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Storage;
 
 use GuzzleHttp\Client;
 use Illuminate\Support\Facades\Hash;
+use Modules\System\Http\Controllers\Privileges\privilege;
 use Modules\System\Models\modelsystem,
     Modules\System\Models\modelfactory,
     Modules\System\Models\Privileges\modelrole_access,
@@ -517,21 +518,8 @@ class login extends Controller
         $nama = $ses['user_nama'];
 
         $cek = modelprivilege::where('privilege_user_nik', $user)->first();
-        $param = modelsystem::first();
 
         $masterfwd = masterforwarder::where('id', $cek->idforwarder)->where('aktif', 'Y')->first();
-        // dd($cek, $masterfwd);
-
-        $coc = modelcoc::where('name_coc', $nama)->where('aktif', 'Y')->first();
-        // dd($coc);
-        if ($coc == null) {
-            $datacoc = '0';
-        } elseif ($coc != null && $coc->status == 'waiting') {
-            $datacoc = '1';
-        } else {
-            $datacoc = '2';
-        }
-        // dd($datacoc);
         $data = array(
             'title' => 'Validasi COC',
             'nik'   => $user,
@@ -539,48 +527,6 @@ class login extends Controller
             'data'  => $cek,
             'ses'   => $ses,
             'datafwd' => $masterfwd,
-            'coc'     => $coc,
-            'datacoc' => $datacoc
-        );
-        return view('system::login/aktifasicoc', $data);
-    }
-
-    public function validasicocreject()
-    {
-
-        $ses = Session::get('session');
-        $user = $ses['user_nik'];
-        $nama = $ses['user_nama'];
-        // dd($ses);
-        $cek = modelprivilege::where('privilege_user_nik', $user)->first();
-
-        $masterfwd = masterforwarder::where('id', $cek->idforwarder)->where('aktif', 'Y')->first();
-
-        $coc = modelcoc::where('name_coc', $nama)->where('status', 'reject')->where('aktif', 'Y')->first();
-        $updatecoc = modelcoc::where('id_coc', $coc->id_coc)->update([
-            'aktif' => 'N'
-        ]);
-
-        $cocdata = modelcoc::where('name_coc', $nama)->where('aktif', 'Y')->first();
-        // dd($cocdata);
-
-        if ($cocdata == null) {
-            $datacoc = '0';
-        } elseif ($cocdata != null && $cocdata->status == 'waiting') {
-            $datacoc = '1';
-        } else {
-            $datacoc = '2';
-        }
-        // dd($datacoc);
-        $data = array(
-            'title' => 'Validasi COC',
-            'nik'   => $user,
-            'nama'  => $nama,
-            'data'  => $cek,
-            'ses'   => $ses,
-            'datafwd' => $masterfwd,
-            'coc'     => $coc,
-            'datacoc' => $datacoc
         );
         return view('system::login/aktifasicoc', $data);
     }
@@ -588,34 +534,42 @@ class login extends Controller
     public function validasicocaction(Request $request)
     {
         // dd($request);
-        $datafwd = masterforwarder::where('name', Session::get('session')['user_nama'])->where('aktif', 'Y')->first();
+        DB::beginTransaction();
 
         if ($request->day == '') {
+            DB::rollback();
             $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'Data Day is required, please input Day'];
             return response()->json($status, 200);
         } elseif ($request->date == '') {
+            DB::rollback();
             $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'Data Date is required, please input Date'];
             return response()->json($status, 200);
         } else {
             $submit = modelcoc::insert([
-                'idmasterfwd' => $datafwd->id,
+                'idmasterfwd' => $request->idfwd,
                 'name_coc' => $request->name,
                 'position_coc' => $request->position,
                 'company_coc' => $request->company,
                 'address_coc' => $request->address,
                 'day_coc' => $request->day,
                 'date_coc' => $request->date,
-                'status' => 'waiting',
                 'aktif' => 'Y',
                 'created_at'    => date('Y-m-d H:i:s'),
                 'created_by'    => Session::get('session')['user_nik']
             ]);
+
+            $cocupdate = modelprivilege::where('idforwarder', $request->idfwd)->update([
+                'coc' => 'Y',
+                'coc_date' => date('Y-m-d H:i:s'),
+            ]);
         }
 
-        if ($submit) {
+        if ($submit && $cocupdate) {
+            DB::commit();
             $status = ['title' => 'Success', 'status' => 'success', 'message' => 'Data Successfully Saved'];
             return response()->json($status, 200);
         } else {
+            DB::rollback();
             $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'Data Failed Saved'];
             return response()->json($status, 200);
         }

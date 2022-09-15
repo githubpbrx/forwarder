@@ -36,11 +36,9 @@ class home extends Controller
 
         $dataconfirm = formpo::join('privilege', 'privilege.idforwarder', 'formpo.idmasterfwd')->where('privilege_user_nik', Session::get('session')['user_nik'])->where('status', '=', 'confirm')->where('file_bl', '=', null)->where('nomor_bl', '=', null)->where('vessel', '=', null)->where('aktif', 'Y')->get();
         // dd($dataconfirm);
+
         $dataapproval = formpo::join('privilege', 'privilege.idforwarder', 'formpo.idmasterfwd')->where('nikfinance', Session::get('session')['user_nik'])->where('status', '=', 'waiting')->where('aktif', 'Y')->get();
         // dd($dataapproval);
-        $usercoc = privilege::join('coc', 'coc.idmasterfwd', 'privilege.idforwarder')->where('nikfinance', Session::get('session')['user_nik'])->where('coc.aktif', 'Y')->where('coc.status', 'waiting')->get();
-        // dd($usercoc);
-        // $datacoc = coc::where('status', '=', 'waiting')->where('aktif', 'Y')->get();
 
         $userkyc = privilege::join('kyc', 'kyc.idmasterfwd', 'privilege.idforwarder')->where('nikfinance', Session::get('session')['user_nik'])->where('kyc.aktif', 'Y')->where('kyc.status', 'waiting')->get();
         // dd($userkyc);
@@ -52,7 +50,6 @@ class home extends Controller
             'totalconfirm' => count($dataconfirm),
             'totalapproval' => count($dataapproval),
             'datauser' => $datauser,
-            'totalcoc' => count($usercoc),
             'totalkyc' => count($userkyc),
         );
         return view('system::dashboard/dashboard', $data);
@@ -86,16 +83,6 @@ class home extends Controller
             'box'   => '',
         );
         return view('transaksi::listapproval', $data);
-    }
-
-    public function pagecoc()
-    {
-        $data = array(
-            'title' => 'Data List CoC',
-            'menu'  => 'listcoc',
-            'box'   => '',
-        );
-        return view('system::dashboard/listcoc', $data);
     }
 
     public function pagekyc()
@@ -160,33 +147,6 @@ class home extends Controller
             ->make(true);
     }
 
-    public function listcoc()
-    {
-        // $query = coc::where('status', '=', 'waiting')->where('aktif', 'Y')->get();
-        $query = privilege::join('coc', 'coc.idmasterfwd', 'privilege.idforwarder')->where('nikfinance', Session::get('session')['user_nik'])->where('coc.aktif', 'Y')->where('coc.status', 'waiting')->get();
-        // dd($query);
-        return Datatables::of($query)
-            ->addIndexColumn()
-            ->addColumn('name', function ($query) {
-                return  $query->name_coc;
-            })
-            ->addColumn('company', function ($query) {
-                return  $query->company_coc;
-            })
-            ->addColumn('status', function ($query) {
-                return  $query->status;
-            })
-            ->addColumn('action', function ($query) {
-                $process    = '';
-
-                $process    = '<a href="#" data-id="' . $query->idforwarder . '" id="processcoc"><i class="fa fa-angle-double-right text-green"></i></a>';
-
-                return $process;
-            })
-            // ->rawColumns(['listpo', 'action'])
-            ->make(true);
-    }
-
     public function listkyc()
     {
         // $query = coc::where('status', '=', 'waiting')->where('aktif', 'Y')->get();
@@ -234,19 +194,6 @@ class home extends Controller
         $data = array(
             'datapo' => $mydata,
             'databook' => $databook
-        );
-
-        return response()->json(['status' => 200, 'data' => $data, 'message' => 'Berhasil']);
-    }
-
-
-    public function formcoc(Request $request)
-    {
-        // dd($request);
-        $datacoc = coc::where('idmasterfwd', $request->id)->first();
-
-        $data = array(
-            'datacoc' => $datacoc
         );
 
         return response()->json(['status' => 200, 'data' => $data, 'message' => 'Berhasil']);
@@ -383,51 +330,6 @@ class home extends Controller
         }
     }
 
-    public function statuscoc(Request $request, $approval)
-    {
-        // dd($request, $approval);
-        if ($approval == 'disetujui') {
-            DB::beginTransaction();
-            $statusupdate = coc::where('idmasterfwd', $request->idfwd)->where('aktif', 'Y')->update([
-                'status' => 'confirm',
-                'user_approval' => Session::get('session')['user_nik'],
-                'updated_at' => date('Y-m-d H:i:s'),
-                'updated_by' => Session::get('session')['user_nik']
-            ]);
-
-            $cocupdate = privilege::where('idforwarder', $request->idfwd)->update([
-                'coc' => 'Y',
-                'coc_date' => date('Y-m-d H:i:s'),
-            ]);
-
-            if ($statusupdate && $cocupdate) {
-                DB::commit();
-                $status = ['title' => 'Success', 'status' => 'success', 'message' => 'Data Successfully Saved'];
-                return response()->json($status, 200);
-            } else {
-                DB::rollback();
-                $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'Data Failed Saved'];
-                return response()->json($status, 200);
-            }
-        } else {
-            $statusupdate = coc::where('idmasterfwd', $request->idfwd)->update([
-                'status' => 'reject',
-                'ket_tolak' => $request->tolak,
-                'user_approval' => Session::get('session')['user_nik'],
-                'updated_at' => date('Y-m-d H:i:s'),
-                'updated_by' => Session::get('session')['user_nik']
-            ]);
-
-            if ($statusupdate) {
-                $status = ['title' => 'Success', 'status' => 'success', 'message' => 'Data Successfully Saved'];
-                return response()->json($status, 200);
-            } else {
-                $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'Data Failed Saved'];
-                return response()->json($status, 200);
-            }
-        }
-    }
-
     public function statuskyc(Request $request, $approval)
     {
         // dd($request, $approval);
@@ -471,23 +373,5 @@ class home extends Controller
                 return response()->json($status, 200);
             }
         }
-    }
-
-    public function downloadkyc(Request $request)
-    {
-        // dd($request);
-
-        // $file = Storage::disk('local')->get($request->filekyc);
-        // dd($file);
-        $path = storage_path() . '/' . 'app' . '/' . $request->filekyc;
-        // $path = Storage::disk('local')->get('1663126567_PO_sup.xlsx');
-        return Response::download($path);
-        // return Storage::download('1663126567_PO_sup.xlsx');
-        // dd($path);
-        // if (file_exists($path)) {
-        //     // dd('exist');
-        //     // return Response::download($path);
-        //     return response()->download($path);
-        // }
     }
 }
