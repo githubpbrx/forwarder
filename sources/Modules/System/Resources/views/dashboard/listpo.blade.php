@@ -1,5 +1,8 @@
 @extends('system::template/master')
 @section('title', $title)
+@section('link_href')
+    <link href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/themes/smoothness/jquery-ui.css" rel="stylesheet" />
+@endsection
 
 @section('content')
     <div class="card">
@@ -10,6 +13,8 @@
                     <tr>
                         <th>List PO#</th>
                         <th>Items PO</th>
+                        <th>Status Allocation</th>
+                        <th>Status</th>
                         <th>Action</th>
                     </tr>
                 </thead>
@@ -51,7 +56,8 @@
                                 <div class="form-group">
                                     <label class="col-sm-12 control-label">Date Booking</label>
                                     <div class="col-sm-12">
-                                        <input type="date" class="form-control" id="datebook" name="datebook">
+                                        <input type="text" class="form-control" id="datebook" name="datebook"
+                                            autocomplete="off">
                                     </div>
                                 </div>
                             </div>
@@ -61,7 +67,8 @@
                                 <div class="form-group">
                                     <label class="col-sm-12 control-label">ETD (Estimate Delivery Date)</label>
                                     <div class="col-sm-12">
-                                        <input type="date" class="form-control" id="etd" name="etd">
+                                        <input type="text" class="form-control" id="etd" name="etd"
+                                            autocomplete="off">
                                     </div>
                                 </div>
                             </div>
@@ -69,7 +76,8 @@
                                 <div class="form-group">
                                     <label class="col-sm-12 control-label">ETA (Estimate Acutal Delivery Date)</label>
                                     <div class="col-sm-12">
-                                        <input type="date" class="form-control" id="eta" name="eta">
+                                        <input type="text" class="form-control" id="eta" name="eta"
+                                            autocomplete="off">
                                     </div>
                                 </div>
                             </div>
@@ -144,12 +152,54 @@
 @endsection
 
 @section('script')
+    <script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js"></script>
     <script type="text/javascript">
         $(document).ready(function() {
             $.ajaxSetup({
                 headers: {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                 }
+            });
+
+            $('#etd').prop('disabled', true);
+            $('#eta').prop('disabled', true);
+            $('#datebook').datepicker({
+                changeYear: true,
+                changeMonth: true,
+                minDate: 0,
+                dateFormat: "yy-m-dd",
+                yearRange: "-100:+20",
+            });
+
+            $('#datebook').change(function() {
+                date1 = $('#datebook').val();
+                $('#etd').prop('disabled', false);
+
+                $('#etd').datepicker({
+                    changeYear: true,
+                    changeMonth: true,
+                    minDate: date1,
+                    dateFormat: "yy-m-dd",
+                    yearRange: "-100:+20",
+                });
+
+                $('#etd').change(function(e) {
+                    date2 = $('#etd').val();
+                    $('#eta').prop('disabled', false);
+
+                    $('#eta').datepicker({
+                        changeYear: true,
+                        changeMonth: true,
+                        minDate: date2,
+                        dateFormat: "yy-m-dd",
+                        yearRange: "-100:+20",
+                    });
+
+                    $('#eta').change(function(e) {
+                        date3 = $('#eta').val();
+                    });
+
+                });
             });
 
             $('#shipmode').on('change', function() {
@@ -186,6 +236,14 @@
                     {
                         data: 'itempo',
                         name: 'itempo'
+                    },
+                    {
+                        data: 'statusalokasi',
+                        name: 'statusalokasi'
+                    },
+                    {
+                        data: 'status',
+                        name: 'status'
                     },
                     {
                         data: 'action',

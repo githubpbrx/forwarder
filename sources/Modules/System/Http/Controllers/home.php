@@ -29,10 +29,20 @@ class home extends Controller
 
     public function index()
     {
-        $datapo = po::join('privilege', 'privilege.idforwarder', 'po.idmasterfwd')->where('privilege_user_nik', Session::get('session')['user_nik'])->where('statusalokasi', 'full_allocated')->orWhere('statusalokasi', 'partial_allocated')->where('statusconfirm', '=', null)->get();
-        // $datapo = po::whereRaw(' (statusalokasi="partial_allocated" OR statusalokasi="full_allocated") AND statusconfirm="' . null . '" ')->get();
-        // dd($datapo);
         $datauser = privilege::where('privilege_user_nik', Session::get('session')['user_nik'])->first();
+
+        $datapo = po::join('privilege', 'privilege.idforwarder', 'po.idmasterfwd')->where('privilege.privilege_user_nik', Session::get('session')['user_nik'])->where(function ($qq) {
+            $qq->where('po.statusalokasi', 'partial_allocated')->orWhere('po.statusalokasi', 'full_allocated');
+        })->where('po.statusconfirm', '=', null)->get();
+        // dd($datapo);
+
+        $datareject = formpo::join('privilege', 'privilege.idforwarder', 'formpo.idmasterfwd')
+            ->join('po', 'po.id', 'formpo.idpo')
+            ->where('privilege.privilege_user_nik', Session::get('session')['user_nik'])->where('formpo.status', '=', 'reject')
+            ->where('formpo.file_bl', '=', null)->where('formpo.nomor_bl', '=', null)->where('formpo.vessel', '=', null)->where('aktif', 'Y')
+            ->selectRaw(' po.pono, formpo.kode_booking, formpo.date_booking, formpo.etd, formpo.eta, formpo.shipmode, formpo.subshipmode, formpo.ket_tolak ')
+            ->get();
+        // dd($datareject);
 
         $dataconfirm = formpo::join('privilege', 'privilege.idforwarder', 'formpo.idmasterfwd')->where('privilege_user_nik', Session::get('session')['user_nik'])->where('status', '=', 'confirm')->where('file_bl', '=', null)->where('nomor_bl', '=', null)->where('vessel', '=', null)->where('aktif', 'Y')->get();
         // dd($dataconfirm);
@@ -42,15 +52,18 @@ class home extends Controller
 
         $userkyc = privilege::join('kyc', 'kyc.idmasterfwd', 'privilege.idforwarder')->where('nikfinance', Session::get('session')['user_nik'])->where('kyc.aktif', 'Y')->where('kyc.status', 'waiting')->get();
         // dd($userkyc);
+
         $data = array(
-            'title' => 'Dashboard',
-            'menu'  => 'dashboard',
-            'box'   => '',
-            'totalpo' => count($datapo),
-            'totalconfirm' => count($dataconfirm),
+            'title'         => 'Dashboard',
+            'menu'          => 'dashboard',
+            'box'           => '',
+            'totalpo'       => count($datapo),
+            'totalconfirm'  => count($dataconfirm),
+            'totalreject'   => count($datareject),
+            'datareject'    => $datareject,
             'totalapproval' => count($dataapproval),
-            'datauser' => $datauser,
-            'totalkyc' => count($userkyc),
+            'datauser'      => $datauser,
+            'totalkyc'      => count($userkyc),
         );
         return view('system::dashboard/dashboard', $data);
     }
@@ -97,7 +110,15 @@ class home extends Controller
 
     public function listpo()
     {
-        $query = po::join('privilege', 'privilege.idforwarder', 'po.idmasterfwd')->where('privilege_user_nik', Session::get('session')['user_nik'])->where('statusalokasi', 'full_allocated')->where('statusconfirm', '=', null)->get();
+        $query = po::join('privilege', 'privilege.idforwarder', 'po.idmasterfwd')
+            ->where('privilege.privilege_user_nik', Session::get('session')['user_nik'])
+            ->where(function ($kuy) {
+                $kuy->where('po.statusalokasi', 'partial_allocated')->orWhere('po.statusalokasi', 'full_allocated');
+            })
+            ->where(function ($kus) {
+                $kus->where('po.statusconfirm', null)->orWhere('po.statusconfirm', 'reject');
+            })
+            ->get();
 
         return Datatables::of($query)
             ->addIndexColumn()
@@ -106,6 +127,22 @@ class home extends Controller
             })
             ->addColumn('itempo', function ($query) {
                 return  $query->itemdesc;
+            })
+            ->addColumn('statusalokasi', function ($query) {
+                if ($query->statusalokasi == 'full_allocated') {
+                    $alokasi = 'Full Allocation';
+                } else {
+                    $alokasi = 'Partial Allocation';
+                }
+                return  $alokasi;
+            })
+            ->addColumn('status', function ($query) {
+                if ($query->statusconfirm == 'confirm') {
+                    $stat = 'Confirmed';
+                } else {
+                    $stat = 'Rejected';
+                }
+                return  $stat;
             })
             ->addColumn('action', function ($query) {
                 $process    = '';
@@ -258,6 +295,12 @@ class home extends Controller
             DB::rollback();
             $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'AIR is required, please input AIR'];
             return response()->json($status, 200);
+        }
+
+        $cekformpo = formpo::where('idpo', $request->idpo)->where('idmasterfwd', $request->idfwd)->where('status', 'reject')->where('aktif', 'Y')->first();
+        // dd($cekformpo);
+        if ($cekformpo != null) {
+            $del = formpo::where('id_formpo', $cekformpo->id_formpo)->update(['aktif' => 'N']);
         }
 
         $save1 = formpo::insert([
