@@ -16,7 +16,7 @@ Route::prefix('report')->group(function () {
 
     Route::group(['prefix' => 'forwarder'], function () {
         Route::get('/', 'ReportForwarder@index')->name('reportforwarder');
-        Route::post('/getfwd/', 'ReportForwarder@getforwarder')->name('report_getfwd');
-        Route::get('search', 'ReportForwarder@datatablefwd');
+        Route::post('/getpo/', 'ReportForwarder@getpo')->name('report_getpo');
+        Route::get('search', 'ReportForwarder@datatable');
     });
 });

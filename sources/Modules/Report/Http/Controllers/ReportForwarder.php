@@ -9,6 +9,7 @@ use Yajra\DataTables\DataTables;
 use Session, Crypt, DB, Mail;
 
 use Modules\Report\Models\modelprivilege;
+use Modules\Report\Models\modelpo;
 
 class ReportForwarder extends Controller
 {
@@ -29,7 +30,7 @@ class ReportForwarder extends Controller
         return view('report::reportforwarder', $data);
     }
 
-    public function datatablefwd(Request $request)
+    public function datatable(Request $request)
     {
 
         if ($request->ajax()) {
@@ -38,45 +39,45 @@ class ReportForwarder extends Controller
             $user = $ses['user_nik'];
             $nama = $ses['user_nama'];
 
-            if ($request->forwarder == null) {
-                $data = modelprivilege::with(['to_masterfwd', 'to_kyc', 'to_formpo'])
-                    ->where('nikfinance', $user)->where('namafinance', $nama)
-                    ->get();
+            if ($request->po == null) {
+                $data = modelpo::get();
             } else {
-                $data = modelprivilege::with(['to_masterfwd', 'to_kyc', 'to_formpo'])
-                    ->where('nikfinance', $user)->where('namafinance', $nama)
-                    ->where('idforwarder', $request->forwarder)
-                    ->get();
+                $data = modelpo::where('id', $request->po)->get();
             }
 
             // dd($data);
             return DataTables::of($data)
                 ->addIndexColumn()
-                ->addColumn('fwd', function ($data) {
-                    return $data->to_masterfwd->name;
+                ->addColumn('po', function ($data) {
+                    return $data->pono;
                 })
-                ->addColumn('kyc', function ($data) {
-                    return $data->to_kyc->status;
+                ->addColumn('material', function ($data) {
+                    return $data->matcontents;
+                })
+                ->addColumn('plant', function ($data) {
+                    return $data->plant;
                 })
                 ->addColumn('allocation', function ($data) {
-                    if ($data->to_formpo == null) {
-                        $formpo = 'Forwarder Has Not Entered Data Shipment';
+                    if ($data->statusalokasi == 'full_allocated') {
+                        $statuspo = 'Full Allocated';
+                    } elseif ($data->statusalokasi == 'partial_allocated') {
+                        $statuspo = 'Partial Allocation';
                     } else {
-                        $formpo = $data->to_formpo->status;
+                        $statuspo = 'Waiting';
                     }
 
-                    return $formpo;
+                    return $statuspo;
                 })
-                ->addColumn('shipment', function ($data) {
-                    if ($data->to_formpo == null) {
-                        $datashipment = 'Forwarder Has Not Entered Data';
-                    } elseif ($data->to_formpo != null && $data->to_formpo->file_bl == null && $data->to_formpo->nomor_bl == null && $data->to_formpo->vessel == null) {
-                        $datashipment = 'Forwarder Has Not Entered Data Shipment';
+                ->addColumn('status', function ($data) {
+                    if ($data->statusconfirm == 'confirm') {
+                        $status = 'Confirmed';
+                    } elseif ($data->statusconfirm == 'reject') {
+                        $status = 'Rejected';
                     } else {
-                        $datashipment = 'Data Shipment is Done';
+                        $status = 'Unprocessed';
                     }
 
-                    return $datashipment;
+                    return $status;
                 })
                 ->rawColumns(['allocation'])
                 ->make(true);
@@ -84,25 +85,25 @@ class ReportForwarder extends Controller
         // return view('transaksi::create');
     }
 
-    public function getforwarder(Request $request)
+    public function getpo(Request $request)
     {
         header("Access-Control-Allow-Origin: *");
         header("Access-Control-Allow-Headers: *");
 
-        $ses = Session::get('session');
-        $user = $ses['user_nik'];
-        $nama = $ses['user_nama'];
+        // $ses = Session::get('session');
+        // $user = $ses['user_nik'];
+        // $nama = $ses['user_nama'];
 
         if (!$request->ajax()) return;
-        $priv = modelprivilege::join('masterforwarder', 'masterforwarder.id', 'privilege.idforwarder')->where('nikfinance', $user)->where('namafinance', $nama)->select('id', 'name');
+        $po = modelpo::select('id', 'pono');
 
         if ($request->has('q')) {
             $search = $request->q;
-            $priv = $priv->whereRaw(' name like "%' . $search . '%" ');
+            $po = $po->whereRaw(' pono like "%' . $search . '%" ');
         }
 
-        $priv = $priv->where('aktif', 'Y')->orderby('name', 'asc')->get();
+        $po = $po->orderby('pono', 'asc')->get();
 
-        return response()->json($priv);
+        return response()->json($po);
     }
 }

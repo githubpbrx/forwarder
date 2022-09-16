@@ -18,9 +18,9 @@
                         <div id="fullscreen-container" class="card-body" style="overflow-y: auto;">
                             <div class="row">
                                 <div class="col-md-6">
-                                    <label class="col-sm-5 control-label">Choose Forwarder :</label>
+                                    <label class="col-sm-5 control-label">Choose PO :</label>
                                     <div class="col-sm-12">
-                                        <select class="select2" style="width: 100%;" name="forwarder" id="forwarder">
+                                        <select class="select2" style="width: 100%;" name="datapo" id="datapo">
                                             <option value=""></option>
                                         </select>
                                     </div>
@@ -40,16 +40,19 @@
                                     <thead>
                                         <tr>
                                             <th>
-                                                <center>Forwarder</center>
+                                                <center>PO</center>
                                             </th>
                                             <th>
-                                                <center>Status KYC</center>
+                                                <center>Material</center>
                                             </th>
                                             <th>
-                                                <center>Status Allocation Forwarder</center>
+                                                <center>Plant</center>
                                             </th>
                                             <th>
-                                                <center>Status Update Shipment</center>
+                                                <center>Status Allocation</center>
+                                            </th>
+                                            <th>
+                                                <center>Status</center>
                                             </th>
                                         </tr>
                                     </thead>
@@ -86,24 +89,28 @@
                 ajax: {
                     url: "{{ url('report/forwarder/search') }}",
                     data: function(d) {
-                        d.forwarder = $('#forwarder').val()
+                        d.po = $('#datapo').val()
                     }
                 },
                 columns: [{
-                        data: 'fwd',
-                        name: 'fwd'
+                        data: 'po',
+                        name: 'po'
                     },
                     {
-                        data: 'kyc',
-                        name: 'kyc'
+                        data: 'material',
+                        name: 'material'
+                    },
+                    {
+                        data: 'plant',
+                        name: 'plant'
                     },
                     {
                         data: 'allocation',
                         name: 'allocation'
                     },
                     {
-                        data: 'shipment',
-                        name: 'shipment'
+                        data: 'status',
+                        name: 'status'
                     },
                 ]
                 // ,
@@ -127,10 +134,10 @@
                 // table.ajax.reload();
             });
 
-            $('#forwarder').select2({
-                placeholder: '-- Choose Forwarder --',
+            $('#datapo').select2({
+                placeholder: '-- Choose PO --',
                 ajax: {
-                    url: "{!! route('report_getfwd') !!}",
+                    url: "{!! route('report_getpo') !!}",
                     dataType: 'json',
                     delay: 500,
                     type: 'post',
@@ -147,7 +154,7 @@
 
                             results: $.map(data, function(item) {
                                 return {
-                                    text: item.name,
+                                    text: item.pono,
                                     id: item.id,
                                     selected: true,
                                 }
