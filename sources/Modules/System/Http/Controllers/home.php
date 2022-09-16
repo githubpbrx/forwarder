@@ -16,6 +16,7 @@ use Modules\System\Models\modelprivilege as privilege;
 use Modules\System\Models\modelformpo as formpo;
 use Modules\System\Models\modelcoc as coc;
 use Modules\System\Models\modelkyc as kyc;
+use Modules\System\Models\modelforwarder as forwarder;
 
 class home extends Controller
 {
@@ -31,9 +32,13 @@ class home extends Controller
     {
         $datauser = privilege::where('privilege_user_nik', Session::get('session')['user_nik'])->first();
 
-        $datapo = po::join('privilege', 'privilege.idforwarder', 'po.idmasterfwd')->where('privilege.privilege_user_nik', Session::get('session')['user_nik'])->where(function ($qq) {
-            $qq->where('po.statusalokasi', 'partial_allocated')->orWhere('po.statusalokasi', 'full_allocated');
-        })->where('po.statusconfirm', '=', null)->get();
+        $datapo = forwarder::join('privilege', 'privilege.idforwarder', 'forwarder.idmasterfwd')
+            ->join('po', 'po.id', 'forwarder.idpo')
+            ->where('privilege.privilege_user_nik', Session::get('session')['user_nik'])
+            ->where(function ($qq) {
+                $qq->where('po.statusalokasi', 'partial_allocated')->orWhere('po.statusalokasi', 'full_allocated');
+            })->where('po.statusconfirm', '=', null)
+            ->get();
         // dd($datapo);
 
         $datareject = formpo::join('privilege', 'privilege.idforwarder', 'formpo.idmasterfwd')
@@ -110,15 +115,26 @@ class home extends Controller
 
     public function listpo()
     {
-        $query = po::join('privilege', 'privilege.idforwarder', 'po.idmasterfwd')
+        $query = forwarder::join('privilege', 'privilege.idforwarder', 'forwarder.idmasterfwd')
+            ->join('po', 'po.id', 'forwarder.idpo')
             ->where('privilege.privilege_user_nik', Session::get('session')['user_nik'])
-            ->where(function ($kuy) {
-                $kuy->where('po.statusalokasi', 'partial_allocated')->orWhere('po.statusalokasi', 'full_allocated');
+            ->where(function ($qq) {
+                $qq->where('po.statusalokasi', 'partial_allocated')->orWhere('po.statusalokasi', 'full_allocated');
             })
             ->where(function ($kus) {
                 $kus->where('po.statusconfirm', null)->orWhere('po.statusconfirm', 'reject');
             })
             ->get();
+
+        // $query = po::join('privilege', 'privilege.idforwarder', 'po.idmasterfwd')
+        //     ->where('privilege.privilege_user_nik', Session::get('session')['user_nik'])
+        //     ->where(function ($kuy) {
+        //         $kuy->where('po.statusalokasi', 'partial_allocated')->orWhere('po.statusalokasi', 'full_allocated');
+        //     })
+        //     ->where(function ($kus) {
+        //         $kus->where('po.statusconfirm', null)->orWhere('po.statusconfirm', 'reject');
+        //     })
+        //     ->get();
 
         return Datatables::of($query)
             ->addIndexColumn()
@@ -137,12 +153,12 @@ class home extends Controller
                 return  $alokasi;
             })
             ->addColumn('status', function ($query) {
-                if ($query->statusconfirm == 'confirm') {
-                    $stat = 'Confirmed';
-                } else {
-                    $stat = 'Rejected';
-                }
-                return  $stat;
+                // if ($query->statusconfirm == 'confirm') {
+                //     $stat = 'Confirmed';
+                // } else {
+                //     $stat = 'Rejected';
+                // }
+                return  $query->statusconfirm;
             })
             ->addColumn('action', function ($query) {
                 $process    = '';

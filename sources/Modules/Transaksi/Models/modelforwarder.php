@@ -16,8 +16,8 @@ class modelforwarder extends Model
         'date_fwd',
     ];
 
-     public function masterforwarder()
+    public function masterforwarder()
     {
-        return $this->hasOne('Modules\Transaksi\Models\masterforwarder', 'id', 'id_forwarder');
+        return $this->hasOne('Modules\Transaksi\Models\masterforwarder', 'id', 'idmasterfwd');
     }
 }

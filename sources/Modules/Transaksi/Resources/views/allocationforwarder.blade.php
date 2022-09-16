@@ -230,9 +230,6 @@
 
 @endsection
 
-@section('script_src')
-@endsection
-
 @section('script')
     <script type="text/javascript">
         $(document).ready(function() {
@@ -284,6 +281,7 @@
 
             var qtypoku;
             var poid;
+            var ponumb;
             $('body').on('click', '#detailbtn', function() {
                 console.log('object :>> ', 'klik');
                 // $('#modal-detail').modal('show');
@@ -301,11 +299,14 @@
                         id: idku,
                     },
                 }).done(function(data) {
+                    console.log('data :>> ', data.data);
                     let dataku = data.data;
                     let poku = dataku.datapo;
                     let supku = dataku.datasup;
+
                     qtypoku = poku.qtypo;
                     poid = poku.id;
+                    ponumb = poku.pono;
 
                     $('#po').val(poku.pono);
                     $('#kp').val(poku.kpno);
@@ -317,7 +318,6 @@
                     $('#price').val(poku.price);
                     $('#detailsup').val(supku.nama);
                     $('#qtypo').val(poku.qtypo);
-                    console.log(dataku.detail);
                     $('#detailhtml').html(dataku.detail);
                     $('#qty_allocation').val('');
                     $('#forwarder').val('').change();
@@ -376,7 +376,8 @@
                             'idpo': idku,
                             'qtyallocation': qtyall,
                             'forwarder': fwd,
-                            'data_qtypo': qtypoku
+                            'data_qtypo': qtypoku,
+                            'no_po': ponumb
                         },
                         dataType: "json",
                         success: function(response) {

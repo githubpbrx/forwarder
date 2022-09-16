@@ -153,10 +153,10 @@ class AllocationForwarder extends Controller
             $status = 'partial_allocated';
         }
 
-
         $submit2 = fwd::insert([
             'idpo' => $request->idpo,
             'idmasterfwd' => $request->forwarder,
+            'po_nomor'    => $request->no_po,
             'qty_allocation' => $request->qtyallocation,
             'date_fwd' => date('Y-m-d H:i:s'),
             'aktif' => 'Y',
@@ -166,7 +166,6 @@ class AllocationForwarder extends Controller
 
         $submit1 = po::where('id', $request->idpo)->update([
             'statusalokasi' => $status,
-            'idmasterfwd' => $request->forwarder,
             'updated_at' => date('Y-m-d H:i:s'),
         ]);
 
@@ -194,7 +193,9 @@ class AllocationForwarder extends Controller
         $id = $request->id;
         $mydata = po::where('id', $id)->first();
         $datasup = supplier::where('id', $mydata->vendor)->first();
-        // dd($mydata);
+
+        // $getpo = po::where('pono', $mydata->pono)->get();
+        // dd($getpo);
 
         $dd = fwd::with('masterforwarder')->where('idpo', $id)->where('aktif', 'Y')->get();
 
@@ -203,7 +204,7 @@ class AllocationForwarder extends Controller
         } else {
             $html = "<b style='font-size:14pt'>Details of the data that has been Partial  Allocated</b><br><table border='1' style='width:100%' class='table table-bordered table-striped table-hover'><tr style='width:100%'><td>To forwarder</td><td>Qty Allocation</td><td>Date Allocation</td></tr>";
             foreach ($dd as $key => $r) {
-                $namafw = ($r->masterforwarder == null) ? '' : $r->masterforwarder->nama;
+                $namafw = ($r->masterforwarder == null) ? '' : $r->masterforwarder->name;
                 $html .= "<tr><td>" . $namafw . "</td><td>" . $r->qty_allocation . "</td><td>" . $r->date_fwd . "</td></tr>";
             }
             $html .= "</table>";
