@@ -38,6 +38,7 @@ class home extends Controller
             ->where(function ($qq) {
                 $qq->where('po.statusalokasi', 'partial_allocated')->orWhere('po.statusalokasi', 'full_allocated');
             })->where('po.statusconfirm', '=', null)
+            ->groupby('po.pono')
             ->get();
         // dd($datapo);
 
@@ -124,6 +125,7 @@ class home extends Controller
             ->where(function ($kus) {
                 $kus->where('po.statusconfirm', null)->orWhere('po.statusconfirm', 'reject');
             })
+            ->groupby('po.pono')
             ->get();
 
         // $query = po::join('privilege', 'privilege.idforwarder', 'po.idmasterfwd')
@@ -163,7 +165,7 @@ class home extends Controller
             ->addColumn('action', function ($query) {
                 $process    = '';
 
-                $process    = '<a href="#" data-id="' . $query->id . '" id="formpo"><i class="fa fa-angle-double-right text-orange"></i></a>';
+                $process    = '<a href="#" data-id="' . $query->pono . '" id="formpo"><i class="fa fa-angle-double-right text-orange"></i></a>';
 
                 return $process;
             })
@@ -229,10 +231,13 @@ class home extends Controller
 
     public function formpo(Request $request)
     {
-        $mydata = po::where('id', $request->id)->first();
+        // dd($request);
+        $mydata = po::where('pono', $request->id)->get();
+        $dataforwarder = forwarder::where('po_nomor', $request->id)->where('aktif', 'Y')->get();
 
         $data = array(
-            'datapo' => $mydata
+            'datapo' => $mydata,
+            'dataforwarder' => $dataforwarder
         );
 
         return response()->json(['status' => 200, 'data' => $data, 'message' => 'Berhasil']);
@@ -267,6 +272,7 @@ class home extends Controller
     public function saveformpo(Request $request)
     {
         // dd($request);
+        DB::beginTransaction();
 
         if ($request->shipmode == 'fcl') {
             $submode = $request->fcl;
@@ -276,69 +282,80 @@ class home extends Controller
             $submode = $request->air . ' ' . 'KG';
         }
 
-        DB::beginTransaction();
-        if ($request->nobooking == '' || $request->nobooking == null) {
-            DB::rollback();
-            $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'Nomor Booking is required, please input Nomor Booking'];
-            return response()->json($status, 200);
-        }
-        if ($request->datebooking == '' || $request->datebooking == null) {
-            DB::rollback();
-            $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'Date Booking is required, please input Date Booking'];
-            return response()->json($status, 200);
-        }
-        if ($request->etd == '' || $request->etd == null) {
-            DB::rollback();
-            $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'ETD is required, please input ETD'];
-            return response()->json($status, 200);
-        }
-        if ($request->eta == '' || $request->eta == null) {
-            DB::rollback();
-            $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'ETA is required, please input ETA'];
-            return response()->json($status, 200);
-        }
-        if ($request->shipmode == '' || $request->shipmode == null) {
-            DB::rollback();
-            $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'Ship Mode is required, please input Ship Mode'];
-            return response()->json($status, 200);
-        }
-        if ($request->shipmode == 'lcl' && $request->lcl == null) {
-            DB::rollback();
-            $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'LCL is required, please input LCL'];
-            return response()->json($status, 200);
-        }
-        if ($request->shipmode == 'air' && $request->air == null) {
-            DB::rollback();
-            $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'AIR is required, please input AIR'];
-            return response()->json($status, 200);
+        foreach ($request->dataid as $key => $val) {
+
+            if ($request->nobooking == '' || $request->nobooking == null) {
+                DB::rollback();
+                $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'Nomor Booking is required, please input Nomor Booking'];
+                return response()->json($status, 200);
+            }
+            if ($request->datebooking == '' || $request->datebooking == null) {
+                DB::rollback();
+                $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'Date Booking is required, please input Date Booking'];
+                return response()->json($status, 200);
+            }
+            if ($request->etd == '' || $request->etd == null) {
+                DB::rollback();
+                $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'ETD is required, please input ETD'];
+                return response()->json($status, 200);
+            }
+            if ($request->eta == '' || $request->eta == null) {
+                DB::rollback();
+                $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'ETA is required, please input ETA'];
+                return response()->json($status, 200);
+            }
+            if ($request->shipmode == '' || $request->shipmode == null) {
+                DB::rollback();
+                $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'Ship Mode is required, please input Ship Mode'];
+                return response()->json($status, 200);
+            }
+            if ($request->shipmode == 'lcl' && $request->lcl == null) {
+                DB::rollback();
+                $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'LCL is required, please input LCL'];
+                return response()->json($status, 200);
+            }
+            if ($request->shipmode == 'air' && $request->air == null) {
+                DB::rollback();
+                $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'AIR is required, please input AIR'];
+                return response()->json($status, 200);
+            }
+
+            $cekformpo = formpo::where('idpo', $val['idpo'])->where('idmasterfwd', $val['idfwd'])->where('status', 'reject')->where('aktif', 'Y')->first();
+            // dd($cekformpo);
+            if ($cekformpo != null) {
+                $del = formpo::where('id_formpo', $cekformpo->id_formpo)->update(['aktif' => 'N']);
+            }
+
+            $save1 = formpo::insert([
+                'idpo'          => $val['idpo'],
+                'idmasterfwd'   => $val['idmasterfwd'],
+                'idforwarder'   => $val['idfwd'],
+                'noinv'         => $request->invoice,
+                'kode_booking'  => $request->nobooking,
+                'date_booking'  => $request->datebooking,
+                'etd'           => $request->etd,
+                'eta'           => $request->eta,
+                'shipmode'      => $request->shipmode,
+                'subshipmode'   => $submode,
+                'status'        => 'waiting',
+                'aktif'         => 'Y',
+                'created_at'    => date('Y-m-d H:i:s'),
+                'created_by'    => Session::get('session')['user_nik']
+            ]);
+
+            $save2 = po::where('id', $val['idpo'])->update([
+                'statusconfirm' => 'waiting'
+            ]);
+
+            if ($save1 && $save2) {
+                $sukses[] = "OK";
+            } else {
+                $gagal[] = "OK";
+            }
         }
 
-        $cekformpo = formpo::where('idpo', $request->idpo)->where('idmasterfwd', $request->idfwd)->where('status', 'reject')->where('aktif', 'Y')->first();
-        // dd($cekformpo);
-        if ($cekformpo != null) {
-            $del = formpo::where('id_formpo', $cekformpo->id_formpo)->update(['aktif' => 'N']);
-        }
 
-        $save1 = formpo::insert([
-            'idpo'          => $request->idpo,
-            'idmasterfwd'   => $request->idfwd,
-            'kode_booking'  => $request->nobooking,
-            'date_booking'  => $request->datebooking,
-            'etd'           => $request->etd,
-            'eta'           => $request->eta,
-            'shipmode'      => $request->shipmode,
-            'subshipmode'   => $submode,
-            'status'        => 'waiting',
-            'aktif'         => 'Y',
-            'created_at'    => date('Y-m-d H:i:s'),
-            'created_by'    => Session::get('session')['user_nik']
-        ]);
-
-        $save2 = po::where('id', $request->idpo)->update([
-            'statusconfirm' => 'waiting'
-        ]);
-
-        if ($save1 && $save2) {
+        if (empty($gagal)) {
             DB::commit();
             $status = ['title' => 'Success', 'status' => 'success', 'message' => 'Data Successfully Saved'];
             return response()->json($status, 200);

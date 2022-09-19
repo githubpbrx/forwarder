@@ -36,12 +36,20 @@
                 <div class="modal-body">
                     <form action="#" class="form-horizontal">
                         {{ csrf_field() }}
-                        <div class="form-group">
-                            <label class="col-sm-7 control-label">Nomor PO</label>
-                            <div class="col-sm-3">
-                                <input type="text" class="form-control" id="nomorpo" name="nomorpo" readonly>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="col-sm-12 control-label">Nomor PO</label>
+                                    <div class="col-sm-12">
+                                        <input type="text" class="form-control" id="nomorpo" name="nomorpo" readonly>
+                                    </div>
+                                </div>
                             </div>
+                            {{-- <input type="text" class="form-control" id="nomorpo" name="nomorpo" readonly> --}}
                         </div>
+
+                        <div id="detailitem"></div>
+
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
@@ -135,6 +143,17 @@
                                                 <span class="input-group-text">KG</span>
                                             </div>
                                         </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="col-sm-12 control-label">Invoice</label>
+                                    <div class="col-sm-12">
+                                        <input type="text" class="form-control" id="invoice" name="invoice"
+                                            autocomplete="off">
                                     </div>
                                 </div>
                             </div>
@@ -260,6 +279,8 @@
 
             var idpo;
             var idfwd;
+            var idforwarder;
+            var length;
             $('body').on('click', '#formpo', function() {
                 $('#formulir_po').modal({
                     show: true,
@@ -277,11 +298,32 @@
                     },
                 }).done(function(data) {
                     let poku = data.data.datapo;
+                    let forwarderku = data.data.dataforwarder;
+                    console.log('poku :>> ', data.data);
+                    length = poku.length;
+
+                    $('#detailitem').empty();
+
+                    for (let index = 0; index < poku.length; index++) {
+
+                        $('#detailitem').append(`<div class="row">
+                            <input type="hidden" id="idall-` + index + `" data-id="` + poku[index].id +
+                            `" data-idfwd="` +
+                            forwarderku[index]
+                            .id_forwarder + `" data-idmasterfwd="` + forwarderku[index]
+                            .idmasterfwd +
+                            `">
+                            <div class="col-md-6"><div class="form-group"><label class="col-sm-12 control-label">Item PO</label><div class="col-sm-12">
+                                        <label><i>` + poku[index].matcontents +
+                            `</i></label></div></div></div></div>
+                            `);
+                    }
 
                     idpo = poku.id;
-                    idfwd = poku.idmasterfwd;
+                    idfwd = forwarderku.idmasterfwd;
+                    idforwarder = forwarderku.id_forwarder;
 
-                    $('#nomorpo').val(poku.pono);
+                    $('#nomorpo').val(poku[0].pono);
                 })
             });
 
@@ -295,9 +337,21 @@
                 let myfcl = $('#fclku').val();
                 let mylcl = $('#lclku').val();
                 let myair = $('#airku').val();
+                let invoice = $('#invoice').val();
                 console.log('mode :>> ', mode);
                 console.log('mylcl :>> ', mylcl);
                 console.log('myair :>> ', myair);
+
+                var dataid = [];
+                for (let index = 0; index < Number(length); index++) {
+                    let idall = {
+                        'idpo': $('#idall-' + index).attr('data-id'),
+                        'idfwd': $('#idall-' + index).attr('data-idfwd'),
+                        'idmasterfwd': $('#idall-' + index).attr('data-idmasterfwd'),
+                    };
+
+                    dataid.push(idall);
+                }
 
                 if (nobook == null || nobook == '') {
                     notifalert('Nomor Booking');
@@ -319,8 +373,7 @@
                         url: "{{ route('formposave') }}",
                         data: {
                             _token: $('meta[name=csrf-token]').attr('content'),
-                            'idpo': idku,
-                            'idfwd': idfwd,
+                            'dataid': dataid,
                             'nobooking': nobook,
                             'datebooking': datebook,
                             'etd': myetd,
@@ -328,7 +381,8 @@
                             'shipmode': mode,
                             'fcl': myfcl,
                             'lcl': mylcl,
-                            'air': myair
+                            'air': myair,
+                            'invoice': invoice
                         },
                         dataType: "json",
                         success: function(response) {
