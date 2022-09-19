@@ -87,12 +87,6 @@
                                                 <center>Date</center>
                                             </th>
                                             <th>
-                                                <center>Material</center>
-                                            </th>
-                                            <th>
-                                                <center>Status</center>
-                                            </th>
-                                            <th>
                                                 <center>Action</center>
                                             </th>
                                         </tr>
@@ -122,102 +116,82 @@
                     <form class="form-horizontal" id="form-detail">
                         {{ csrf_field() }}
                         <div class="row">
-                            <div class="form-group">
-                                <label class="col-sm-12 control-label">PO</label>
-                                <div class="col-sm-12">
-                                    <input type="text" class="form-control" value="#" id="po" name="po"
-                                        readonly>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label class="col-sm-12 control-label">PO</label>
+                                    <div class="col-sm-12">
+                                        <input type="text" class="form-control" value="#" id="po"
+                                            name="po" readonly>
+                                    </div>
                                 </div>
                             </div>
-                            <div class="form-group">
-                                <label class="col-sm-12 control-label">KP</label>
-                                <div class="col-sm-12">
-                                    <input type="text" class="form-control" value="#" id="kp" name="kp"
-                                        readonly>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label class="col-sm-12 control-label">Description</label>
-                                <div class="col-sm-12">
-                                    <input type="text" class="form-control" value="#" id="deskripsi"
-                                        name="deskripsi" readonly>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label class="col-sm-12 control-label">Color</label>
-                                <div class="col-sm-12">
-                                    <input type="text" class="form-control" value="#" id="color"
-                                        name="color" readonly>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label class="col-sm-12 control-label">Size</label>
-                                <div class="col-sm-12">
-                                    <input type="text" class="form-control" value="#" id="size"
-                                        name="size" readonly>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label class="col-sm-12 control-label">Unit</label>
-                                <div class="col-sm-12">
-                                    <input type="text" class="form-control" value="#" id="unit"
-                                        name="unit" readonly>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label class="col-sm-8 control-label">Quantity PO</label>
-                                <div class="col-sm-12">
-                                    <input type="text" class="form-control" value="#" id="qtypo"
-                                        name="qtypo" readonly>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label class="col-sm-12 control-label">Currency</label>
-                                <div class="col-sm-12">
-                                    <input type="text" class="form-control" value="#" id="curr"
-                                        name="curr" readonly>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label class="col-sm-12 control-label">Price</label>
-                                <div class="col-sm-12">
-                                    <input type="text" class="form-control" value="#" id="price"
-                                        name="price" readonly>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label class="col-sm-12 control-label">Supplier</label>
-                                <div class="col-sm-12">
-                                    <input type="text" class="form-control" value="#" id="detailsup"
-                                        name="detailsup" readonly>
-                                </div>
-                            </div>
-                            <hr
-                                style="width: 100%; color: rgb(192, 192, 192); height: 0.5px; background-color:rgb(192, 192, 192);" />
+                            <div class="col-md-4">
 
-                            <div id="detailhtml"></div>
-                            <hr
-                                style="width: 100%; color: rgb(192, 192, 192); height: 0.5px; background-color:rgb(192, 192, 192);" />
-
-                            <label class="col-sm-12 control-label">Please input allocation</label>
-                            <hr>
-                            <div class="form-group">
-                                <label class="col-sm-12 control-label">Quantity Allocation</label>
-                                <div class="col-sm-12">
-                                    <input type="text" class="form-control" id="qty_allocation" name="qty_allocation"
-                                        autocomplete="off">
+                                <div class="form-group">
+                                    <label class="col-sm-8 control-label">Quantity PO</label>
+                                    <div class="col-sm-12">
+                                        <input type="text" class="form-control" value="#" id="qtypo"
+                                            name="qtypo" readonly>
+                                    </div>
                                 </div>
                             </div>
-                            <div class="form-group">
-                                <label class="col-sm-12 control-label">Forwarder</label>
-                                <div class="col-sm-12">
-                                    <select class="select2" style="width: 100%;" name="forwarder" id="forwarder">
-                                        <option value=""></option>
-                                    </select>
+                            <div class="col-md-4">
+
+                                <div class="form-group">
+                                    <label class="col-sm-12 control-label">Supplier</label>
+                                    <div class="col-sm-12">
+                                        <input type="text" class="form-control" value="#" id="detailsup"
+                                            name="detailsup" readonly>
+                                    </div>
                                 </div>
                             </div>
                         </div>
+                        <hr
+                            style="width: 100%; color: rgb(192, 192, 192); height: 0.5px; background-color:rgb(192, 192, 192);" />
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div id="detailhtml"></div>
+                            </div>
+                            {{-- <div class="col-md-4">
+                                <div id="detailstyle"></div>
+                            </div> --}}
+                        </div>
+                        <hr
+                            style="width: 100%; color: rgb(192, 192, 192); height: 0.5px; background-color:rgb(192, 192, 192);" />
 
+                        {{-- <label class="col-sm-12 control-label">Please input allocation</label>
+                        <hr> --}}
+                        <div class="row">
+                            {{-- <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="col-sm-12 control-label">Quantity Allocation</label>
+                                    <div class="col-sm-12">
+                                        <div class="row">
+                                            <div class="col-sm-6">
+                                                <input type="checkbox" class="" name="" id="">
+                                            </div>
+                                            <div class="col-sm-6">
+                                                <input type="text" class="form-control" id="qty_allocation"
+                                                    name="qty_allocation" autocomplete="off">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-12">
+                                        <div id="qtyall"></div>
+                                    </div>
+                                </div>
+                            </div> --}}
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="col-sm-12 control-label">Forwarder</label>
+                                    <div class="col-sm-12">
+                                        <select class="select2" style="width: 100%;" name="forwarder" id="forwarder">
+                                            <option value=""></option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </form>
                 </div>
                 <div class="modal-footer">
@@ -260,14 +234,6 @@
                         name: 'date'
                     },
                     {
-                        data: 'material',
-                        name: 'material'
-                    },
-                    {
-                        data: 'status',
-                        name: 'status'
-                    },
-                    {
                         data: 'action',
                         name: 'action'
                     }
@@ -282,9 +248,8 @@
             var qtypoku;
             var poid;
             var ponumb;
+            var length;
             $('body').on('click', '#detailbtn', function() {
-                console.log('object :>> ', 'klik');
-                // $('#modal-detail').modal('show');
                 $('#modal-detail').modal({
                     show: true,
                     backdrop: 'static'
@@ -302,27 +267,74 @@
                     console.log('data :>> ', data.data);
                     let dataku = data.data;
                     let poku = dataku.datapo;
-                    let supku = dataku.datasup;
+
+                    $('#detailhtml').empty();
+                    $('#detailstyle').empty();
+
+                    var tot = 0;
+                    length = poku.length;
+                    for (let index = 0; index < poku.length; index++) {
+
+                        // $('#qtypo').val();
+                        console.log('poku.qtypo :>> ', poku.qtypo);
+                        tot = tot + Number(poku[index].qtypo);
+                        // $('#detailhtml').append(
+                        //     `<div class="form-group"><label class="col-sm-12 control-label">Material</label><div class="col-sm-12"><input class="form-control" value="` +
+                        //     poku[index].matcontents + `"></div></div>`
+                        // );
+
+                        // $('#detailstyle').append(
+                        //     `<div class="form-group"><label class="col-sm-12 control-label">Style</label><div class="col-sm-12"><input class="form-control" value="` +
+                        //     poku[index].style + `"></div></div>`
+                        // );
+
+                        // $('#qtyall').append(
+                        //     `<table style="width:100%"><tr style="width:100%"><td><input type="checkbox" class="check-` +
+                        //     index +
+                        //     `"></td><td><input type="number" min="0" id="qty_allocation" name="qty_allocation" class="form-control cekinput-` +
+                        //     index + `" data-id="` + poku[index].id +
+                        //     `" data-pono="` + poku[index].pono + `" data-qty="` + poku[index]
+                        //     .qtypo + `" disabled></td></tr></table>`
+                        // );
+
+                        $('#detailhtml').append(
+                            `<table style="width:100%"><tr style="width:100%"><td><input type="checkbox" class="check-` +
+                            index + `"></td><td>
+                                <label>Material</label><h5><i>` + poku[index].matcontents +
+                            `</i></h5></td><td><label>Style</label><h5><i>` + poku[index]
+                            .style +
+                            `</i></h5></td><td><input type="number" min="0" id="qty_allocation" name="qty_allocation" class="form-control cekinput-` +
+                            index + `" data-id="` + poku[index].id + `" data-pono="` + poku[
+                                index].pono + `" data-qty="` + poku[index].qtypo +
+                            `" disabled></td></tr></table>`
+                        );
+                    }
+                    checkqtyall();
 
                     qtypoku = poku.qtypo;
                     poid = poku.id;
                     ponumb = poku.pono;
 
-                    $('#po').val(poku.pono);
-                    $('#kp').val(poku.kpno);
-                    $('#deskripsi').val(poku.itemdesc);
-                    $('#color').val(poku.colorcode);
-                    $('#size').val(poku.size);
-                    $('#unit').val(poku.unit);
-                    $('#curr').val(poku.curr);
-                    $('#price').val(poku.price);
-                    $('#detailsup').val(supku.nama);
-                    $('#qtypo').val(poku.qtypo);
-                    $('#detailhtml').html(dataku.detail);
-                    $('#qty_allocation').val('');
-                    $('#forwarder').val('').change();
+                    $('#po').val(poku[0].pono);
+                    $('#qtypo').val(tot);
+                    $('#detailsup').val(poku[0].nama);
                 })
             });
+
+            function checkqtyall() {
+                for (let index = 0; index < Number(length); index++) {
+                    $('.check-' + index).change(function(e) {
+                        if (this.checked) {
+                            console.log('objectsijine :>> ', 'isChecked');
+                            $('.cekinput-' + index).prop('disabled', false);
+                            // }
+                        } else {
+                            console.log('objectsijine :>> ', 'notChecked');
+                            $('.cekinput-' + index).prop('disabled', true);
+                        }
+                    });
+                }
+            }
 
             $('#forwarder').select2({
                 placeholder: '-- Choose Forwarder --',
@@ -356,68 +368,74 @@
             });
 
             $('#btnsubmit').click(function(e) {
-
                 let idku = poid;
-                let qtyall = $('#qty_allocation').val();
                 let fwd = $('#forwarder').val();
 
-                if (qtyall > qtypoku) {
-                    Swal.fire({
-                        title: 'Informasi',
-                        text: 'Data Quantity Allocation Over Quantity PO',
-                        type: 'warning'
-                    });
-                } else {
-                    $.ajax({
-                        type: "post",
-                        url: "{{ route('detailaction') }}",
-                        data: {
-                            _token: $('meta[name=csrf-token]').attr('content'),
-                            'idpo': idku,
-                            'qtyallocation': qtyall,
-                            'forwarder': fwd,
-                            'data_qtypo': qtypoku,
-                            'no_po': ponumb
-                        },
-                        dataType: "json",
-                        success: function(response) {
-                            if (response.status == "error") {
-                                Swal.fire({
-                                    title: response.title,
-                                    text: response.message,
-                                    type: (response.status != 'error') ? 'success' :
-                                        'error'
-                                });
-                                return;
-                            }
+                var arrayqty = [];
+                for (let index = 0; index < Number(length); index++) {
+                    let dataqtypo = $('.cekinput-' + index).attr('data-qty');
+                    let val = $('.cekinput-' + index).val();
 
+                    if (Number(dataqtypo) < Number(val)) {
+                        Swal.fire({
+                            title: 'Informasi',
+                            text: 'Data Quantity Allocation Over Quantity PO',
+                            type: 'warning'
+                        });
+                    }
+
+                    if (val) {
+                        let data = {
+                            'id': $('.cekinput-' + index).attr('data-id'),
+                            'pono': $('.cekinput-' + index).attr('data-pono'),
+                            'value': val,
+                        };
+
+                        arrayqty.push(data)
+                    }
+                }
+                console.log('dataaray :>> ', arrayqty);
+
+                $.ajax({
+                    type: "post",
+                    url: "{{ route('detailaction') }}",
+                    data: {
+                        _token: $('meta[name=csrf-token]').attr('content'),
+                        forwarder: fwd,
+                        arrayqty: arrayqty
+                    },
+                    dataType: "json",
+                    success: function(response) {
+                        if (response.status == "error") {
                             Swal.fire({
                                 title: response.title,
                                 text: response.message,
                                 type: (response.status != 'error') ? 'success' : 'error'
-                            }).then((result) => {
-
-                                $('#modal-detail').modal('hide');
-                                table.ajax.reload();
-                                // table.reload();
-                                // (response.status == 'success') ? window.location
-                                //     .replace("{{ route('allocationforwarder') }}"):
-                                //     ''
-                            });
-                            return;
-                        },
-                        error: function(xhr, status, error) {
-                            Swal.fire({
-                                title: 'Unsuccessfully Saved Data',
-                                text: 'Check Your Data',
-                                type: 'error'
                             });
                             return;
                         }
-                    });
-                }
-            });
 
+                        Swal.fire({
+                            title: response.title,
+                            text: response.message,
+                            type: (response.status != 'error') ? 'success' : 'error'
+                        }).then((result) => {
+
+                            $('#modal-detail').modal('hide');
+                            table.ajax.reload();
+                        });
+                        return;
+                    },
+                    error: function(xhr, status, error) {
+                        Swal.fire({
+                            title: 'Unsuccessfully Saved Data',
+                            text: 'Check Your Data',
+                            type: 'error'
+                        });
+                        return;
+                    }
+                });
+            });
         });
     </script>
 @endsection
