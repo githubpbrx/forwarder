@@ -6,36 +6,30 @@
 
 @section('content')
 
-    <div class="row">
+    <div class="row" style="font-size: 10pt;">
         <div class="col-lg-12">
             <div class="card card-primary">
-                <div class="card-header">
-                    {{-- <h3 class="text-center">ALLOCATION FORWARDER</h3> --}}
-                    <h4>ALLOCATION FORWARDER</h4>
-                    <h5 style="color: grey">List PO To Forwarder</h5>
-
-                </div>
                 <div class="row">
                     <div class="col-md-12">
                         <div id="fullscreen-container" class="card-body" style="overflow-y: auto;">
                             <form action="#" class="form-horizontal" enctype="multipart/form-data" method="post">
                                 {{ csrf_field() }}
                                 <div class="row">
-                                    <div class="col-md-4">
-                                        <label class="col-sm-5 control-label">Choose Suplier :</label>
+                                    <div class="col-md-3">
+                                        <label class="col-sm-12 control-label">Choose Suplier :</label>
                                         <div class="col-sm-12">
                                             <select class="select2" style="width: 100%;" name="supplier" id="supplier">
-                                                <option value="" disabled selected>--Choose Supplier--</option>
+                                                <option value="" disabled selected >--Choose Supplier--</option>
                                                 <?php
                                                 foreach ($sup as $key => $val) {
-                                                    echo '<option value="' . $val->id . '">' . $val->nama . '</option>';
+                                                    echo '<option value="' . $val->id . '" style="font-size:10pt">' . $val->nama . '</option>';
                                                 }
                                                 ?>
                                             </select>
                                         </div>
                                     </div>
                                     <div class="col-md-4">
-                                        <label class="col-sm-5 control-label">Periode</label>
+                                        <label class="col-sm-12 control-label">Periode</label>
                                         <div class="col-sm-12">
                                             <div class="row">
                                                 <div class="col-sm-5">
@@ -52,8 +46,8 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="col-md-4">
-                                        <label class="col-sm-5 control-label">Status Forwarder :</label>
+                                    <div class="col-md-2">
+                                        <label class="col-sm-12 control-label">Status Forwarder :</label>
                                         <div class="col-sm-12">
                                             <select class="select2" style="width: 100%;" name="status" id="status">
                                                 <option value="all">All</option>
@@ -63,19 +57,18 @@
                                             </select>
                                         </div>
                                     </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-md-4">
-                                        <label class="col-sm-5 control-label">&nbsp;</label>
+                                    <div class="col-md-3">
+                                        <label class="col-sm-12 control-label">&nbsp;</label>
                                         <div class="col-sm-12">
                                             <button type="button" class="btn btn-info form-control"
                                                 id="searchdata">Search</button>
                                         </div>
                                     </div>
                                 </div>
+                                
                             </form>
 
-                            <div class="table-responsive">
+                            <div class="table-responsive" style="padding-top: 20px;">
                                 <table id="dataTables" class="table table-bordered table-striped table-hover"
                                     style="width:100%">
                                     <thead>
@@ -112,7 +105,7 @@
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
-                <div class="modal-body">
+                <div class="modal-body" style="font-size: 10pt">
                     <form class="form-horizontal" id="form-detail">
                         {{ csrf_field() }}
                         <div class="row">
@@ -273,48 +266,34 @@
 
                     var tot = 0;
                     length = poku.length;
+                    html = '<table border="0" style="width:100%"><tr><th style="text-align:center"><input type="checkbox" class="checkall" style="height:18px;width:18px"></th><th>Material</th><th>Style</th><th>Qty Item</th><th>Qty Allocation</th></tr>';
                     for (let index = 0; index < poku.length; index++) {
 
                         // $('#qtypo').val();
                         console.log('poku.qtypo :>> ', poku.qtypo);
                         tot = tot + Number(poku[index].qtypo);
+                        html += '<tr><td style="text-align:center"><input type="checkbox" class="check-'+
+                            index + '" style="height:18px;width:18px"></td><td>'+ poku[index].matcontents+'</td><td>'+ poku[index]
+                            .style +'</td><td>'+poku[index].qtypo+'</td><td><input type="number" min="0" id="qty_allocation" name="qty_allocation" class="form-control trigerinput cekinput-' +
+                            index + '" data-id="'+ poku[index].id + '" data-pono="' + poku[index].pono + '" data-qty="' + poku[index].qtypo +'" disabled></td></tr>';
+
                         // $('#detailhtml').append(
-                        //     `<div class="form-group"><label class="col-sm-12 control-label">Material</label><div class="col-sm-12"><input class="form-control" value="` +
-                        //     poku[index].matcontents + `"></div></div>`
+                        //     `<table style="width:100%" border="1"><tr style="width:100%"><td></td><td>
+                        //         <label>Material</label><i>` + poku[index].matcontents +
+                        //     `</i></td><td><label>Style</label><i>` + poku[index]
+                        //     .style +
+                        //     `</i></td><td></td></tr></table>`
                         // );
 
-                        // $('#detailstyle').append(
-                        //     `<div class="form-group"><label class="col-sm-12 control-label">Style</label><div class="col-sm-12"><input class="form-control" value="` +
-                        //     poku[index].style + `"></div></div>`
-                        // );
-
-                        // $('#qtyall').append(
-                        //     `<table style="width:100%"><tr style="width:100%"><td><input type="checkbox" class="check-` +
-                        //     index +
-                        //     `"></td><td><input type="number" min="0" id="qty_allocation" name="qty_allocation" class="form-control cekinput-` +
-                        //     index + `" data-id="` + poku[index].id +
-                        //     `" data-pono="` + poku[index].pono + `" data-qty="` + poku[index]
-                        //     .qtypo + `" disabled></td></tr></table>`
-                        // );
-
-                        $('#detailhtml').append(
-                            `<table style="width:100%"><tr style="width:100%"><td><input type="checkbox" class="check-` +
-                            index + `"></td><td>
-                                <label>Material</label><h5><i>` + poku[index].matcontents +
-                            `</i></h5></td><td><label>Style</label><h5><i>` + poku[index]
-                            .style +
-                            `</i></h5></td><td><input type="number" min="0" id="qty_allocation" name="qty_allocation" class="form-control cekinput-` +
-                            index + `" data-id="` + poku[index].id + `" data-pono="` + poku[
-                                index].pono + `" data-qty="` + poku[index].qtypo +
-                            `" disabled></td></tr></table>`
-                        );
                     }
+                    html += "</table>";
+                    $('#detailhtml').html(html);
                     checkqtyall();
 
                     qtypoku = poku.qtypo;
                     poid = poku.id;
                     ponumb = poku.pono;
-
+                    
                     $('#po').val(poku[0].pono);
                     $('#qtypo').val(tot);
                     $('#detailsup').val(poku[0].nama);
@@ -322,6 +301,18 @@
             });
 
             function checkqtyall() {
+
+                $('.checkall').change(function(e) {
+                    if (this.checked) {
+                        $('.trigerinput').prop('disabled', false);
+                        $('input[type="checkbox"]').prop('checked', true);
+                    } else {
+                        $('.trigerinput').val('');
+                        $('.trigerinput').prop('disabled', true);
+                        $('input[type="checkbox"]').prop('checked', false);
+                    }
+                });
+
                 for (let index = 0; index < Number(length); index++) {
                     $('.check-' + index).change(function(e) {
                         if (this.checked) {
@@ -330,6 +321,7 @@
                             // }
                         } else {
                             console.log('objectsijine :>> ', 'notChecked');
+                            $('.cekinput-' + index).val('');
                             $('.cekinput-' + index).prop('disabled', true);
                         }
                     });
