@@ -93,7 +93,7 @@ class AllocationForwarder extends Controller
         header("Access-Control-Allow-Origin: *");
         header("Access-Control-Allow-Headers: *");
 
-        dd($request->arrayqty);
+        // dd($request->arrayqty);
 
         DB::beginTransaction();
         if ($request->forwarder == null or $request->forwarder == "") {
