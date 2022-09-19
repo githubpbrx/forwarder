@@ -13,6 +13,7 @@ use Illuminate\Http\Request;
 |
 */
 
-Route::middleware('auth:api')->get('/transaksi', function (Request $request) {
-    return $request->user();
+Route::group(['prefix' => 'websupplier'], function () {
+    Route::post('/shipping', 'api\WebsupplierServices@shipping');
+    Route::post('/shippingconfirm', 'api\WebsupplierServices@shippingconfirm');
 });
