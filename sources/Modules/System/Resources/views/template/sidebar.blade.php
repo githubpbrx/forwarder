@@ -107,7 +107,7 @@
                     </li>
                 @endif
 
-                @if (RoleAccess::whereMenu(9) > 0)
+                @if (RoleAccess::whereMenu(9) + RoleAccess::whereMenu(10) > 0)
                     <li class="nav-item mt-2">
                         <a href="#" class="nav-link">
                             <i class="nav-icon fas fa-server"></i>
@@ -119,9 +119,19 @@
                         <ul class="nav nav-treeview">
                             @if (RoleAccess::whereMenu(9) > 0)
                                 <li class="nav-item">
-                                    <a href="{{ route('reportforwarder') }}" class="nav-link">
+                                    <a href="{{ route('reportpo') }}" class="nav-link">
                                         <i class="fa fa-file nav-icon"></i>
-                                        <p>Report Forwarder</p>
+                                        <p>Report PO</p>
+                                    </a>
+                                </li>
+                            @endif
+                        </ul>
+                        <ul class="nav nav-treeview">
+                            @if (RoleAccess::whereMenu(10) > 0)
+                                <li class="nav-item">
+                                    <a href="{{ route('reportalokasi') }}" class="nav-link">
+                                        <i class="fa fa-file nav-icon"></i>
+                                        <p>Report Allocation</p>
                                     </a>
                                 </li>
                             @endif
