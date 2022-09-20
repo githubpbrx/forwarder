@@ -4,16 +4,23 @@
 @endsection
 
 @section('content')
-    <div class="row">
+    <div class="row" style="font-size: 10pt;">
         <div class="col-lg-12">
             <div class="card card-primary">
                 <div class="card-body">
                     <table id="serverside" class="table table-bordered table-striped">
                         <thead>
                             <tr>
-                                <th>#PO</th>
-                                <th>Nomor Booking</th>
-                                <th>Action</th>
+
+                                <th>
+                                    <center>#PO</center>
+                                </th>
+                                <th>
+                                    <center>Nomor Booking</center>
+                                </th>
+                                <th>
+                                    <center>Action</center>
+                                </th>
                             </tr>
                         </thead>
                     </table>
@@ -33,7 +40,7 @@
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
-                <div class="modal-body">
+                <div class="modal-body" style="font-size: 10pt;">
                     <form action="#" class="form-horizontal">
                         {{ csrf_field() }}
                         <div class="row">
@@ -43,6 +50,17 @@
                                     <input type="text" class="form-control" id="nomorpo" name="nomorpo" readonly>
                                 </div>
                             </div>
+                        </div>
+                        <hr
+                            style="width: 100%; color: rgb(192, 192, 192); height: 0.5px; background-color:rgb(192, 192, 192);" />
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div id="detailitem"></div>
+                            </div>
+                        </div>
+                        <hr
+                            style="width: 100%; color: rgb(192, 192, 192); height: 0.5px; background-color:rgb(192, 192, 192);" />
+                        <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label class="col-sm-12 control-label">Nomor Booking</label>
@@ -51,8 +69,6 @@
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label class="col-sm-12 control-label">Date Booking</label>
@@ -61,6 +77,8 @@
                                     </div>
                                 </div>
                             </div>
+                        </div>
+                        <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label class="col-sm-12 control-label">ETD (Estimate Delivery Date)</label>
@@ -69,8 +87,6 @@
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label class="col-sm-12 control-label">ETA (Estimate Acutal Delivery Date)</label>
@@ -79,6 +95,8 @@
                                     </div>
                                 </div>
                             </div>
+                        </div>
+                        <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label class="col-sm-12 control-label">Ship Mode</label>
@@ -96,8 +114,6 @@
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label class="col-sm-12 control-label">Forwarder</label>
@@ -225,9 +241,7 @@
 
             var idpo;
             var idformpo;
-            var usernik;
-            var usernama;
-            var tglpengajuan;
+            var length;
             $('body').on('click', '#prosesapproval', function() {
                 console.log('objectproses :>> ', 'klik');
                 $('#nik').val('');
@@ -248,27 +262,49 @@
                     },
                 }).done(function(data) {
                     console.log('data :>> ', data.data);
-                    let databook = data.data.databooking;
-                    let poku = data.data.datapo;
-                    let forward = data.data.dataforward;
-                    let privilege = data.data.privilege;
+                    // let databook = data.data.databooking;
+                    // let poku = data.data.datapo;
+                    // let forward = data.data.dataforward;
+                    // let privilege = data.data.privilege;
 
-                    idpo = poku.id;
-                    idformpo = databook.id_formpo;
-                    usernik = privilege.privilege_user_nik;
-                    usernama = privilege.privilege_user_name;
-                    tglpengajuan = databook.created_at;
+                    let mydata = data.data.dataku;
 
-                    $('#nomorpo').val(poku.pono);
-                    $('#nobook').val(databook.kode_booking);
-                    $('#datebook').val(databook.date_booking);
-                    $('#etd').val(databook.etd);
-                    $('#eta').val(databook.eta);
-                    $('#shipmode').val(databook.shipmode);
-                    $('#submode').val(databook.subshipmode);
-                    $('#forwarder').val(forward.name);
-                    $('#pengajunama').html(privilege.privilege_user_name);
-                    $('#pengajunik').val(privilege.privilege_user_nik);
+                    length = mydata.length;
+                    $('#detailitem').empty();
+
+                    html =
+                        '<table border="0" style="width:100%"><tr><th>Material</th><th>Qty Item</th><th>Qty Allocation</th><th>Status Allocation</th></tr>';
+                    for (let index = 0; index < mydata.length; index++) {
+
+                        html +=
+                            '<tr><td>' +
+                            mydata[index].matcontents + '</td><td>' +
+                            mydata[index].qtypo + '</td><td>' + mydata[index].qty_allocation +
+                            '</td><td>' + mydata[index].statusalokasi +
+                            '</td><td><input type="hidden" id="dataid-' + index + '" data-idpo="' +
+                            mydata[index].id + '" data-idformpo="' + mydata[index].id_formpo +
+                            '"></td></tr>';
+                    }
+
+                    html += "</table>";
+                    $('#detailitem').html(html);
+
+                    // idpo = mydata[].id;
+                    // idformpo = databook.id_formpo;
+                    // usernik = privilege.privilege_user_nik;
+                    // usernama = privilege.privilege_user_name;
+                    // tglpengajuan = databook.created_at;
+
+                    $('#nomorpo').val(mydata[0].pono);
+                    $('#nobook').val(mydata[0].kode_booking);
+                    $('#datebook').val(mydata[0].date_booking);
+                    $('#etd').val(mydata[0].etd);
+                    $('#eta').val(mydata[0].eta);
+                    $('#shipmode').val(mydata[0].shipmode);
+                    $('#submode').val(mydata[0].subshipmode);
+                    $('#forwarder').val(mydata[0].name);
+                    $('#pengajunama').html(mydata[0].privilege_user_name);
+                    $('#pengajunik').val(mydata[0].privilege_user_nik);
                 })
             });
 
@@ -288,6 +324,16 @@
             $('#submittolak').click(function(e) {
                 let tolak = $('#tolak_alasan').val();
 
+                var arrayku = [];
+                for (let index = 0; index < Number(length); index++) {
+                    let data = {
+                        'idpo': $('#dataid-' + index).attr('data-idpo'),
+                        'idformpo': $('#dataid-' + index).attr('data-idformpo'),
+                    };
+
+                    arrayku.push(data);
+                }
+
                 if (tolak == '' || tolak == null) {
                     Swal.fire({
                         title: 'Information',
@@ -301,8 +347,7 @@
                         dataType: 'json',
                         data: {
                             _token: $('meta[name=csrf-token]').attr('content'),
-                            idpo: idpo,
-                            idformpo: idformpo,
+                            dataid: arrayku,
                             tolak: tolak
                         },
                         success: function(response) {
@@ -349,14 +394,22 @@
                             return;
                         } else {
                             console.log('object :>> ', 'ok');
+                            var arrayku = [];
+                            for (let index = 0; index < Number(length); index++) {
+                                let data = {
+                                    'idpo': $('#dataid-' + index).attr('data-idpo'),
+                                    'idformpo': $('#dataid-' + index).attr('data-idformpo'),
+                                };
+
+                                arrayku.push(data);
+                            }
                             $.ajax({
                                 url: "{!! route('approvalstatus', ['disetujui']) !!}",
                                 type: 'POST',
                                 dataType: 'json',
                                 data: {
                                     _token: $('meta[name=csrf-token]').attr('content'),
-                                    idpo: idpo,
-                                    idformpo: idformpo,
+                                    dataid: arrayku,
                                 },
                                 success: function(response) {
                                     console.log('response :>> ', response);

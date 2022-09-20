@@ -88,7 +88,7 @@
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
-                <div class="modal-body">
+                <div class="modal-body" style="font-size: 10pt;">
                     <form action="#" class="form-horizontal">
                         {{ csrf_field() }}
                         <div class="row">
@@ -100,6 +100,17 @@
                                     </div>
                                 </div>
                             </div>
+                        </div>
+                        <hr
+                            style="width: 100%; color: rgb(192, 192, 192); height: 0.5px; background-color:rgb(192, 192, 192);" />
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div id="detailitem"></div>
+                            </div>
+                        </div>
+                        <hr
+                            style="width: 100%; color: rgb(192, 192, 192); height: 0.5px; background-color:rgb(192, 192, 192);" />
+                        <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label class="col-sm-12 control-label">Nomor Booking</label>
@@ -109,8 +120,6 @@
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label class="col-sm-12 control-label">Date Booking</label>
@@ -120,6 +129,8 @@
                                     </div>
                                 </div>
                             </div>
+                        </div>
+                        <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label class="col-sm-12 control-label">ETD (Estimate Delivery Date)</label>
@@ -129,8 +140,6 @@
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label class="col-sm-12 control-label">ETA (Estimate Acutal Delivery Date)</label>
@@ -184,14 +193,26 @@
         $(document).ready(function() {
 
             var poreject = @JSON($datareject);
-
+            console.log('poreject :>> ', poreject);
             $('#detailreject').click(function(e) {
                 console.log('object :>> ', poreject);
-
                 $('#formreject').modal({
                     show: true,
                     backdrop: 'static'
                 });
+
+                html =
+                    '<table border="0" style="width:100%"><tr><th>Material Contents</th><th>Item Description</th></tr>';
+                for (let index = 0; index < poreject.length; index++) {
+
+                    html +=
+                        '<tr><td>' +
+                        poreject[index].matcontents + '</td><td>' +
+                        poreject[index].itemdesc + '</td></tr>';
+                }
+
+                html += "</table>";
+                $('#detailitem').html(html);
 
                 $('#nomorpo').val(poreject[0].pono);
                 $('#nobook').val(poreject[0].kode_booking);

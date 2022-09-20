@@ -5,17 +5,26 @@
 @endsection
 
 @section('content')
-    <div class="card">
+    <div class="card" style="font-size: 10pt;">
         <div class="card-body">
-
             <table id="serverside" class="table table-bordered table-striped">
                 <thead>
                     <tr>
-                        <th>List PO#</th>
-                        <th>Items PO</th>
-                        <th>Status Allocation</th>
-                        <th>Status</th>
-                        <th>Action</th>
+                        <th>
+                            <center>List PO#</center>
+                        </th>
+                        <th>
+                            <center>Items PO</center>
+                        </th>
+                        <th>
+                            <center>Status Allocation</center>
+                        </th>
+                        <th>
+                            <center>Status</center>
+                        </th>
+                        <th>
+                            <center>Action</center>
+                        </th>
                     </tr>
                 </thead>
             </table>
@@ -33,7 +42,7 @@
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
-                <div class="modal-body">
+                <div class="modal-body" style="font-size: 10pt;">
                     <form action="#" class="form-horizontal">
                         {{ csrf_field() }}
                         <div class="row">
@@ -47,9 +56,15 @@
                             </div>
                             {{-- <input type="text" class="form-control" id="nomorpo" name="nomorpo" readonly> --}}
                         </div>
-
-                        <div id="detailitem"></div>
-
+                        <hr
+                            style="width: 100%; color: rgb(192, 192, 192); height: 0.5px; background-color:rgb(192, 192, 192);" />
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div id="detailitem"></div>
+                            </div>
+                        </div>
+                        <hr
+                            style="width: 100%; color: rgb(192, 192, 192); height: 0.5px; background-color:rgb(192, 192, 192);" />
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
@@ -277,9 +292,6 @@
                 $('[data-toggle="tooltip"]').tooltip();
             })
 
-            var idpo;
-            var idfwd;
-            var idforwarder;
             var length;
             $('body').on('click', '#formpo', function() {
                 $('#formulir_po').modal({
@@ -299,36 +311,32 @@
                 }).done(function(data) {
                     let poku = data.data.datapo;
                     let forwarderku = data.data.dataforwarder;
-                    console.log('poku :>> ', data.data);
                     length = poku.length;
 
                     $('#detailitem').empty();
 
+                    html =
+                        '<table border="0" style="width:100%"><tr><th>Material Contents</th><th>Item Description</th></tr>';
                     for (let index = 0; index < poku.length; index++) {
 
-                        $('#detailitem').append(`<div class="row">
-                            <input type="hidden" id="idall-` + index + `" data-id="` + poku[index].id +
-                            `" data-idfwd="` +
-                            forwarderku[index]
-                            .id_forwarder + `" data-idmasterfwd="` + forwarderku[index]
-                            .idmasterfwd +
-                            `">
-                            <div class="col-md-6"><div class="form-group"><label class="col-sm-12 control-label">Item PO</label><div class="col-sm-12">
-                                        <label><i>` + poku[index].matcontents +
-                            `</i></label></div></div></div></div>
-                            `);
+                        html +=
+                            '<tr><td>' +
+                            poku[index].matcontents + '</td><td>' +
+                            poku[index].itemdesc + '</td><td><input type="hidden" id="idall-' +
+                            index + '" data-id="' +
+                            poku[index].id + '" data-idfwd="' + forwarderku[index].id_forwarder +
+                            '" data-idmasterfwd="' + forwarderku[index].idmasterfwd +
+                            '"></td></tr>';
                     }
 
-                    idpo = poku.id;
-                    idfwd = forwarderku.idmasterfwd;
-                    idforwarder = forwarderku.id_forwarder;
+                    html += "</table>";
+                    $('#detailitem').html(html);
 
                     $('#nomorpo').val(poku[0].pono);
                 })
             });
 
             $('#btnsubmit').click(function(e) {
-                let idku = idpo;
                 let nobook = $('#nobook').val();
                 let datebook = $('#datebook').val();
                 let myetd = $('#etd').val();

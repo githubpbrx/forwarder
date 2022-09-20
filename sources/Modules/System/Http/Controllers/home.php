@@ -32,6 +32,7 @@ class home extends Controller
     {
         $datauser = privilege::where('privilege_user_nik', Session::get('session')['user_nik'])->first();
 
+        // Start For Forwarder
         $datapo = forwarder::join('privilege', 'privilege.idforwarder', 'forwarder.idmasterfwd')
             ->join('po', 'po.id', 'forwarder.idpo')
             ->where('privilege.privilege_user_nik', Session::get('session')['user_nik'])
@@ -42,22 +43,58 @@ class home extends Controller
             ->get();
         // dd($datapo);
 
+        $totalreject = formpo::join('privilege', 'privilege.idforwarder', 'formpo.idmasterfwd')
+            ->join('po', 'po.id', 'formpo.idpo')
+            ->where('privilege.privilege_user_nik', Session::get('session')['user_nik'])
+            ->where('formpo.status', '=', 'reject')
+            ->where('formpo.file_bl', '=', null)
+            ->where('formpo.nomor_bl', '=', null)
+            ->where('formpo.vessel', '=', null)
+            ->where('aktif', 'Y')
+            ->selectRaw(' po.pono, formpo.kode_booking, formpo.date_booking, formpo.etd, formpo.eta, formpo.shipmode, formpo.subshipmode, formpo.ket_tolak ')
+            ->groupby('po.pono')
+            ->get();
+
         $datareject = formpo::join('privilege', 'privilege.idforwarder', 'formpo.idmasterfwd')
             ->join('po', 'po.id', 'formpo.idpo')
-            ->where('privilege.privilege_user_nik', Session::get('session')['user_nik'])->where('formpo.status', '=', 'reject')
-            ->where('formpo.file_bl', '=', null)->where('formpo.nomor_bl', '=', null)->where('formpo.vessel', '=', null)->where('aktif', 'Y')
-            ->selectRaw(' po.pono, formpo.kode_booking, formpo.date_booking, formpo.etd, formpo.eta, formpo.shipmode, formpo.subshipmode, formpo.ket_tolak ')
+            ->where('privilege.privilege_user_nik', Session::get('session')['user_nik'])
+            ->where('formpo.status', '=', 'reject')
+            ->where('formpo.file_bl', '=', null)
+            ->where('formpo.nomor_bl', '=', null)
+            ->where('formpo.vessel', '=', null)
+            ->where('aktif', 'Y')
+            ->selectRaw(' po.pono, po.matcontents, po.itemdesc, formpo.kode_booking, formpo.date_booking, formpo.etd, formpo.eta, formpo.shipmode, formpo.subshipmode, formpo.ket_tolak ')
             ->get();
         // dd($datareject);
 
-        $dataconfirm = formpo::join('privilege', 'privilege.idforwarder', 'formpo.idmasterfwd')->where('privilege_user_nik', Session::get('session')['user_nik'])->where('status', '=', 'confirm')->where('file_bl', '=', null)->where('nomor_bl', '=', null)->where('vessel', '=', null)->where('aktif', 'Y')->get();
+        $dataconfirm = formpo::join('privilege', 'privilege.idforwarder', 'formpo.idmasterfwd')
+            ->join('po', 'po.id', 'formpo.idpo')
+            ->where('privilege.privilege_user_nik', Session::get('session')['user_nik'])
+            ->where('formpo.status', '=', 'confirm')
+            ->where('formpo.file_bl', '=', null)
+            ->where('formpo.nomor_bl', '=', null)
+            ->where('formpo.vessel', '=', null)
+            ->where('formpo.aktif', 'Y')
+            ->groupby('po.pono')
+            ->get();
         // dd($dataconfirm);
 
-        $dataapproval = formpo::join('privilege', 'privilege.idforwarder', 'formpo.idmasterfwd')->where('nikfinance', Session::get('session')['user_nik'])->where('status', '=', 'waiting')->where('aktif', 'Y')->get();
-        // dd($dataapproval);
-
-        $userkyc = privilege::join('kyc', 'kyc.idmasterfwd', 'privilege.idforwarder')->where('nikfinance', Session::get('session')['user_nik'])->where('kyc.aktif', 'Y')->where('kyc.status', 'waiting')->get();
+        $userkyc = privilege::join('kyc', 'kyc.idmasterfwd', 'privilege.idforwarder')
+            ->where('nikfinance', Session::get('session')['user_nik'])
+            ->where('kyc.aktif', 'Y')
+            ->where('kyc.status', 'waiting')
+            ->get();
         // dd($userkyc);
+        // End For Forwarder
+
+        $dataapproval = formpo::join('privilege', 'privilege.idforwarder', 'formpo.idmasterfwd')
+            ->join('po', 'po.id', 'formpo.idpo')
+            ->where('privilege.nikfinance', Session::get('session')['user_nik'])
+            ->where('formpo.status', '=', 'waiting')
+            ->where('formpo.aktif', 'Y')
+            ->groupby('po.pono')
+            ->get();
+        // dd($dataapproval);
 
         $data = array(
             'title'         => 'Dashboard',
@@ -65,7 +102,7 @@ class home extends Controller
             'box'           => '',
             'totalpo'       => count($datapo),
             'totalconfirm'  => count($dataconfirm),
-            'totalreject'   => count($datareject),
+            'totalreject'   => count($totalreject),
             'datareject'    => $datareject,
             'totalapproval' => count($dataapproval),
             'datauser'      => $datauser,
@@ -178,7 +215,14 @@ class home extends Controller
         // $query = formpo::where('status', 'confirm')->where('file_bl', '=', null)->where('nomor_bl', '=', null)->where('vessel', '=', null)->where('aktif', 'Y')->get();
         $query = formpo::join('privilege', 'privilege.idforwarder', 'formpo.idmasterfwd')
             ->join('po', 'po.id', 'formpo.idpo')
-            ->where('privilege_user_nik', Session::get('session')['user_nik'])->where('status', '=', 'confirm')->where('file_bl', '=', null)->where('nomor_bl', '=', null)->where('vessel', '=', null)->where('aktif', 'Y')->get();
+            ->where('privilege.privilege_user_nik', Session::get('session')['user_nik'])
+            ->where('formpo.status', '=', 'confirm')
+            ->where('formpo.file_bl', '=', null)
+            ->where('formpo.nomor_bl', '=', null)
+            ->where('formpo.vessel', '=', null)
+            ->where('formpo.aktif', 'Y')
+            ->groupby('po.pono')
+            ->get();
         // dd($query);
         return Datatables::of($query)
             ->addIndexColumn()
@@ -194,7 +238,7 @@ class home extends Controller
             ->addColumn('action', function ($query) {
                 $process    = '';
 
-                $process    = '<a href="#" data-id="' . $query->id_formpo . '" id="updateship"><i class="fa fa-angle-double-right text-green"></i></a>';
+                $process    = '<a href="#" data-id="' . $query->pono . '" id="updateship"><i class="fa fa-angle-double-right text-green"></i></a>';
 
                 return $process;
             })
@@ -246,12 +290,17 @@ class home extends Controller
     public function formupdate(Request $request)
     {
         // dd($request);
-        $databook = formpo::where('id_formpo', $request->id)->first();
-        $mydata = po::where('id', $databook->idpo)->first();
+        // $databook = formpo::where('id_formpo', $request->id)->first();
+        // $mydata = po::where('id', $databook->idpo)->first();
 
+        $mydata = po::join('formpo', 'formpo.idpo', 'po.id')
+            ->where('po.pono', $request->id)
+            ->where('formpo.aktif', 'Y')
+            ->get();
+        // dd($mydata);
         $data = array(
-            'datapo' => $mydata,
-            'databook' => $databook
+            'dataku' => $mydata,
+            // 'databook' => $databook
         );
 
         return response()->json(['status' => 200, 'data' => $data, 'message' => 'Berhasil']);
@@ -320,7 +369,7 @@ class home extends Controller
                 return response()->json($status, 200);
             }
 
-            $cekformpo = formpo::where('idpo', $val['idpo'])->where('idmasterfwd', $val['idfwd'])->where('status', 'reject')->where('aktif', 'Y')->first();
+            $cekformpo = formpo::where('idpo', $val['idpo'])->where('idforwarder', $val['idfwd'])->where('idmasterfwd', $val['idmasterfwd'])->where('status', 'reject')->where('aktif', 'Y')->first();
             // dd($cekformpo);
             if ($cekformpo != null) {
                 $del = formpo::where('id_formpo', $cekformpo->id_formpo)->update(['aktif' => 'N']);
@@ -368,36 +417,45 @@ class home extends Controller
 
     public function saveshipment(Request $request)
     {
+        $decode = json_decode($request->dataid);
+        // dd($request, $decode);
+
         $file = $request->file('file');
         $originalName = str_replace(' ', '_', $file->getClientOriginalName());
         $fileName = time() . '_' . $originalName;
         Storage::disk('local')->put($fileName, file_get_contents($request->file));
 
-        // dd($request);
-        if ($file == '' || $file == null) {
-            $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'File BL is required, please input File BL'];
-            return response()->json($status, 200);
+        foreach ($decode as $key => $value) {
+            if ($file == '' || $file == null) {
+                $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'File BL is required, please input File BL'];
+                return response()->json($status, 200);
+            }
+
+            if ($request->nomorbl == '' || $request->nomorbl == null) {
+                $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'Nomor BL is required, please input Nomor BL'];
+                return response()->json($status, 200);
+            }
+
+            if ($request->vessel == '' || $request->vessel == null) {
+                $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'Vessel is required, please input Vessel'];
+                return response()->json($status, 200);
+            }
+
+            $save1 = formpo::where('id_formpo', $value->idformpo)->update([
+                'file_bl'    => $fileName,
+                'nomor_bl'   => $request->nomorbl,
+                'vessel'     => $request->vessel,
+                'updated_at' => date('Y-m-d H:i:s'),
+                'updated_by' => Session::get('session')['user_nik']
+            ]);
+
+            if ($save1) {
+                $sukses[] = "OK";
+            } else {
+                $gagal[] = "OK";
+            }
         }
-
-        if ($request->nomorbl == '' || $request->nomorbl == null) {
-            $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'Nomor BL is required, please input Nomor BL'];
-            return response()->json($status, 200);
-        }
-
-        if ($request->vessel == '' || $request->vessel == null) {
-            $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'Vessel is required, please input Vessel'];
-            return response()->json($status, 200);
-        }
-
-        $save1 = formpo::where('id_formpo', $request->idformpo)->update([
-            'file_bl'    => $fileName,
-            'nomor_bl'   => $request->nomorbl,
-            'vessel'     => $request->vessel,
-            'updated_at' => date('Y-m-d H:i:s'),
-            'updated_by' => Session::get('session')['user_nik']
-        ]);
-
-        if ($save1) {
+        if (empty($gagal)) {
             $status = ['title' => 'Success', 'status' => 'success', 'message' => 'Data Successfully Saved'];
             return response()->json($status, 200);
         } else {

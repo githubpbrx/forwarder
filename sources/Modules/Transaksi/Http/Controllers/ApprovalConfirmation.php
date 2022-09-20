@@ -155,7 +155,10 @@ class ApprovalConfirmation extends Controller
     {
         $data = formpo::join('privilege', 'privilege.idforwarder', 'formpo.idmasterfwd')
             ->join('po', 'po.id', 'formpo.idpo')
-            ->where('nikfinance', Session::get('session')['user_nik'])->where('status', 'waiting')
+            ->where('privilege.nikfinance', Session::get('session')['user_nik'])
+            ->where('formpo.status', 'waiting')
+            ->where('formpo.aktif', 'Y')
+            ->groupby('po.pono')
             ->get();
         // dd($data);
         return DataTables::of($data)
@@ -169,7 +172,7 @@ class ApprovalConfirmation extends Controller
             ->addColumn('action', function ($data) {
                 $button = '';
 
-                $button = '<a href="#" data-id="' . $data->id_formpo . '" id="prosesapproval"><i data-tooltip="tooltip" title="Proses Approval" class="fa fa-arrow-circle-right fa-lg text-green"></i></a>';
+                $button = '<a href="#" data-id="' . $data->pono . '" id="prosesapproval"><i data-tooltip="tooltip" title="Proses Approval" class="fa fa-arrow-circle-right fa-lg text-green"></i></a>';
 
                 return $button;
             })
@@ -182,17 +185,16 @@ class ApprovalConfirmation extends Controller
     {
         // dd($request);
 
-        $databooking = formpo::where('id_formpo', $request->id)->where('aktif', 'Y')->first();
-        $datapo = po::where('id', $databooking->idpo)->first();
-        $dataforwarder = forwarder::where('id', $databooking->idmasterfwd)->where('aktif', 'Y')->first();
-        $privilege = privilege::where('privilege_user_nik', $databooking->created_by)->first();
+        $dataku = po::join('forwarder', 'forwarder.idpo', 'po.id')->where('forwarder.aktif', 'Y')
+            ->join('formpo', 'formpo.idforwarder', 'forwarder.id_forwarder')->where('formpo.aktif', 'Y')
+            ->join('masterforwarder', 'masterforwarder.id', 'formpo.idmasterfwd')->where('masterforwarder.aktif', 'Y')
+            ->join('privilege', 'privilege.privilege_user_nik', 'formpo.created_by')
+            ->where('po.pono', $request->id)
+            ->selectRaw(' po.id, po.pono, po.matcontents, po.qtypo, po.statusalokasi, forwarder.qty_allocation, formpo.id_formpo, formpo.kode_booking, formpo.date_booking, formpo.noinv, formpo.etd, formpo.eta, formpo.shipmode, formpo.subshipmode, masterforwarder.name, privilege.privilege_user_name, privilege.privilege_user_nik')
+            ->get();
 
         $data = [
-            'datapo' => $datapo,
-            'databooking' => $databooking,
-            'dataforward' => $dataforwarder,
-            'privilege' => $privilege,
-            'jenis' => 'proses'
+            'dataku' => $dataku
         ];
 
         return response()->json(['status' => 200, 'data' => $data, 'message' => 'Berhasil']);
@@ -228,20 +230,28 @@ class ApprovalConfirmation extends Controller
 
         if ($approval == 'disetujui') {
             DB::beginTransaction();
-            $updateformpo = formpo::where('id_formpo', $request->idformpo)->update([
-                'status' => 'confirm',
-                'user_approval' => Session::get('session')['user_nik'],
-                'updated_at' => date('Y-m-d H:i:s'),
-                'updated_by' => Session::get('session')['user_nik']
-            ]);
+            foreach ($request->dataid as $key => $val) {
+                $updateformpo = formpo::where('id_formpo', $val['idformpo'])->update([
+                    'status' => 'confirm',
+                    'user_approval' => Session::get('session')['user_nik'],
+                    'updated_at' => date('Y-m-d H:i:s'),
+                    'updated_by' => Session::get('session')['user_nik']
+                ]);
 
-            $updatepo = po::where('id', $request->idpo)->update([
-                'statusconfirm' => 'confirm',
-                'updated_at' => date('Y-m-d H:i:s'),
-                'updated_user' => Session::get('session')['user_nik']
-            ]);
+                $updatepo = po::where('id', $val['idpo'])->update([
+                    'statusconfirm' => 'confirm',
+                    'updated_at' => date('Y-m-d H:i:s'),
+                    'updated_user' => Session::get('session')['user_nik']
+                ]);
 
-            if ($updateformpo && $updatepo) {
+                if ($updateformpo && $updatepo) {
+                    $sukses[] = "OK";
+                } else {
+                    $gagal[] = "OK";
+                }
+            }
+
+            if (empty($gagal)) {
                 DB::commit();
                 $status = ['title' => 'Success', 'status' => 'success', 'message' => 'Data Successfully Saved'];
                 return response()->json($status, 200);
@@ -252,26 +262,33 @@ class ApprovalConfirmation extends Controller
             }
         } else {
             DB::beginTransaction();
-            if ($request->tolak == null || $request->tolak == '') {
-                DB::rollback();
-                $status = ['title' => 'Error!', 'status' => 'error', 'message' => 'Data Keterangan is required, please input keterangan'];
-                return response()->json($status, 200);
+            foreach ($request->dataid as $key => $val) {
+                if ($request->tolak == null || $request->tolak == '') {
+                    DB::rollback();
+                    $status = ['title' => 'Error!', 'status' => 'error', 'message' => 'Data Keterangan is required, please input keterangan'];
+                    return response()->json($status, 200);
+                }
+                $updateformpo = formpo::where('id_formpo', $val['idformpo'])->update([
+                    'status' => 'reject',
+                    'ket_tolak' => $request->tolak,
+                    'user_approval' => Session::get('session')['user_nik'],
+                    'updated_at' => date('Y-m-d H:i:s'),
+                    'updated_by' => Session::get('session')['user_nik']
+                ]);
+
+                $updatepo = po::where('id', $val['idpo'])->update([
+                    'statusconfirm' => 'reject',
+                    'updated_at' => date('Y-m-d H:i:s'),
+                    'updated_user' => Session::get('session')['user_nik']
+                ]);
+
+                if ($updateformpo && $updatepo) {
+                    $sukses[] = "OK";
+                } else {
+                    $gagal[] = "OK";
+                }
             }
-            $updateformpo = formpo::where('id_formpo', $request->idformpo)->update([
-                'status' => 'reject',
-                'ket_tolak' => $request->tolak,
-                'user_approval' => Session::get('session')['user_nik'],
-                'updated_at' => date('Y-m-d H:i:s'),
-                'updated_by' => Session::get('session')['user_nik']
-            ]);
-
-            $updatepo = po::where('id', $request->idpo)->update([
-                'statusconfirm' => 'reject',
-                'updated_at' => date('Y-m-d H:i:s'),
-                'updated_user' => Session::get('session')['user_nik']
-            ]);
-
-            if ($updateformpo && $updatepo) {
+            if (empty($gagal)) {
                 DB::commit();
                 $status = ['title' => 'Success', 'status' => 'success', 'message' => 'Data Successfully Saved'];
                 return response()->json($status, 200);
