@@ -297,10 +297,12 @@ class home extends Controller
             ->where('po.pono', $request->id)
             ->where('formpo.aktif', 'Y')
             ->get();
+        $dataforwarder = forwarder::where('po_nomor', $request->id)->where('aktif', 'Y')->get();
+
         // dd($mydata);
         $data = array(
             'dataku' => $mydata,
-            // 'databook' => $databook
+            'dataforwarder' => $dataforwarder
         );
 
         return response()->json(['status' => 200, 'data' => $data, 'message' => 'Berhasil']);
@@ -452,10 +454,28 @@ class home extends Controller
                 return response()->json($status, 200);
             }
 
+            if ($request->invoice == '' || $request->invoice == null) {
+                $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'Invoice is required, please input Invoice'];
+                return response()->json($status, 200);
+            }
+
+            if ($request->etdfix == '' || $request->etdfix == null) {
+                $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'ETD Fix is required, please input ETD Fix'];
+                return response()->json($status, 200);
+            }
+
+            if ($request->etafix == '' || $request->etafix == null) {
+                $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'ETA Fix is required, please input ETA Fix'];
+                return response()->json($status, 200);
+            }
+
             $save1 = formpo::where('id_formpo', $value->idformpo)->update([
                 'file_bl'    => $fileName,
                 'nomor_bl'   => $request->nomorbl,
                 'vessel'     => $request->vessel,
+                'noinv'    => $request->invoice,
+                'etdfix'     => $request->etdfix,
+                'etafix'     => $request->etafix,
                 'updated_at' => date('Y-m-d H:i:s'),
                 'updated_by' => Session::get('session')['user_nik']
             ]);

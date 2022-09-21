@@ -1,5 +1,8 @@
 @extends('system::template/master')
 @section('title', $title)
+@section('link_href')
+    <link href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/themes/smoothness/jquery-ui.css" rel="stylesheet" />
+@endsection
 
 @section('content')
     <div class="card" style="font-size: 10pt;">
@@ -59,7 +62,7 @@
                         <hr
                             style="width: 100%; color: rgb(192, 192, 192); height: 0.5px; background-color:rgb(192, 192, 192);" />
                         <div class="row">
-                            <div class="col-md-6">
+                            <div class="col-md-4">
                                 <div class="form-group">
                                     <label class="col-sm-12 control-label">Nomor Booking</label>
                                     <div class="col-sm-12">
@@ -67,7 +70,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-md-6">
+                            <div class="col-md-4">
                                 <div class="form-group">
                                     <label class="col-sm-12 control-label">Date Booking</label>
                                     <div class="col-sm-12">
@@ -75,9 +78,7 @@
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-6">
+                            <div class="col-md-4">
                                 <div class="form-group">
                                     <label class="col-sm-12 control-label">ETD (Estimate Delivery Date)</label>
                                     <div class="col-sm-12">
@@ -85,17 +86,17 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-md-6">
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4">
                                 <div class="form-group">
-                                    <label class="col-sm-12 control-label">ETA (Estimate Acutal Delivery Date)</label>
+                                    <label class="col-sm-12 control-label">ETA (Estimate Actual Delivery Date)</label>
                                     <div class="col-sm-12">
                                         <input type="text" class="form-control" id="eta" name="eta" readonly>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-6">
+                            <div class="col-md-4">
                                 <div class="form-group">
                                     <label class="col-sm-12 control-label">Ship Mode</label>
                                     <div class="col-sm-12">
@@ -112,7 +113,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-md-6">
+                            <div class="col-md-4">
                                 <div class="form-group">
                                     <label class="col-sm-12 control-label">BL</label>
                                     <div class="col-sm-12">
@@ -122,7 +123,7 @@
                             </div>
                         </div>
                         <div class="row">
-                            <div class="col-md-6">
+                            <div class="col-md-4">
                                 <div class="form-group">
                                     <label class="col-sm-12 control-label">Nomor BL</label>
                                     <div class="col-sm-12">
@@ -131,11 +132,40 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-md-6">
+                            <div class="col-md-4">
                                 <div class="form-group">
                                     <label class="col-sm-12 control-label">Vessel</label>
                                     <div class="col-sm-12">
                                         <input type="text" class="form-control" id="vessel" name="vessel"
+                                            autocomplete="off">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label class="col-sm-12 control-label">Invoice</label>
+                                    <div class="col-sm-12">
+                                        <input type="text" class="form-control" id="invoice" name="invoice"
+                                            autocomplete="off">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label class="col-sm-12 control-label">ETD (Estimate Delivery Date) Fix</label>
+                                    <div class="col-sm-12">
+                                        <input type="text" class="form-control" id="etdfix" name="etdfix"
+                                            autocomplete="off">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label class="col-sm-12 control-label">ETA (Estimate Actual Delivery Date) Fix</label>
+                                    <div class="col-sm-12">
+                                        <input type="text" class="form-control" id="etafix" name="etafix"
                                             autocomplete="off">
                                     </div>
                                 </div>
@@ -154,12 +184,27 @@
 @endsection
 
 @section('script')
+    <script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js"></script>
     <script type="text/javascript">
         $(document).ready(function() {
             $.ajaxSetup({
                 headers: {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                 }
+            });
+
+            $('#etdfix').datepicker({
+                changeYear: true,
+                changeMonth: true,
+                dateFormat: "yy-m-dd",
+                yearRange: "-100:+20",
+            });
+
+            $('#etafix').datepicker({
+                changeYear: true,
+                changeMonth: true,
+                dateFormat: "yy-m-dd",
+                yearRange: "-100:+20",
             });
 
             var oTable = $('#serverside').DataTable({
@@ -212,18 +257,22 @@
                 }).done(function(data) {
                     console.log('object :>> ', data.data);
                     let dataku = data.data.dataku;
+                    let forwarderku = data.data.dataforwarder;
 
                     length = dataku.length;
                     $('#detailitem').empty();
 
                     html =
-                        '<table border="0" style="width:100%"><tr><th>Material Contents</th><th>Item Description</th></tr>';
+                        '<table border="0" style="width:100%"><tr><th>Material Contents</th><th>Color Code</th><th>Size</th><th>Quantity PO</th><th>Quantity Allocation</th><th>Status</th></tr>';
                     for (let index = 0; index < dataku.length; index++) {
 
                         html +=
                             '<tr><td>' +
                             dataku[index].matcontents + '</td><td>' +
-                            dataku[index].itemdesc + '</td><td><input type="hidden" id="dataid-' +
+                            dataku[index].colorcode + '</td><td>' + dataku[index].size +
+                            '</td><td>' + dataku[index].qtypo + '</td><td>' + forwarderku[index]
+                            .qty_allocation + '</td><td>' + dataku[index].statusalokasi +
+                            '</td><td><input type="hidden" id="dataid-' +
                             index + '" data-idpo="' +
                             dataku[index].id + '" data-idformpo="' + dataku[index].id_formpo +
                             '"></td></tr>';
@@ -247,6 +296,9 @@
                 let nomorbl = $('#nobl').val();
                 let vessel = $('#vessel').val();
                 let file = $('#bl').prop('files')[0];
+                let inv = $('#invoice').val();
+                let etdfix = $('#etdfix').val();
+                let etafix = $('#etafix').val();
 
                 var arrayku = [];
                 for (let index = 0; index < length; index++) {
@@ -262,6 +314,9 @@
                 form_data.append('nomorbl', nomorbl);
                 form_data.append('vessel', vessel);
                 form_data.append('file', file);
+                form_data.append('invoice', inv);
+                form_data.append('etdfix', etdfix);
+                form_data.append('etafix', etafix);
 
                 console.log('form :>> ', form_data);
 
@@ -271,6 +326,12 @@
                     notifalert('Nomor BL');
                 } else if (vessel == null || vessel == '') {
                     notifalert('Vessel');
+                } else if (inv == null || inv == '') {
+                    notifalert('Invoice');
+                } else if (etdfix == null || etdfix == '') {
+                    notifalert('ETD Fix');
+                } else if (etafix == null || etafix == '') {
+                    notifalert('ETA Fix');
                 } else {
                     $.ajax({
                         type: "post",
