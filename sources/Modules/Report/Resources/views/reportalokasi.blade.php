@@ -77,7 +77,7 @@
         <div class="modal-dialog" style="max-width: 80%;">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h4 class="modal-title"><span id="modaltitle">Detail Data Reject PO</span></h4>
+                    <h4 class="modal-title"><span id="modaltitle">Detail Allocation</span></h4>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -86,7 +86,7 @@
                     <form action="#" class="form-horizontal">
                         {{ csrf_field() }}
                         <div class="row">
-                            <div class="col-md-6">
+                            <div class="col-md-4">
                                 <div class="form-group">
                                     <label class="col-sm-12 control-label">PO</label>
                                     <div class="col-sm-12">
@@ -94,11 +94,20 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-md-6">
+                            <div class="col-md-4">
                                 <div class="form-group">
                                     <label class="col-sm-12 control-label">Material</label>
                                     <div class="col-sm-12">
                                         <input type="text" class="form-control" id="material" name="material" readonly>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label class="col-sm-12 control-label">Material Desc</label>
+                                    <div class="col-sm-12">
+                                        <input type="text" class="form-control" id="matdesc" name="matdesc"
+                                            autocomplete="off" readonly>
                                     </div>
                                 </div>
                             </div>
@@ -113,16 +122,7 @@
                         <hr
                             style="width: 100%; color: rgb(192, 192, 192); height: 0.5px; background-color:rgb(192, 192, 192);" /> --}}
                         <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label class="col-sm-12 control-label">Material Desc</label>
-                                    <div class="col-sm-12">
-                                        <input type="text" class="form-control" id="matdesc" name="matdesc"
-                                            autocomplete="off" readonly>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
+                            <div class="col-md-4">
                                 <div class="form-group">
                                     <label class="col-sm-12 control-label">Quantity PO</label>
                                     <div class="col-sm-12">
@@ -131,9 +131,16 @@
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-6">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label class="col-sm-12 control-label">Quantity Allocation</label>
+                                    <div class="col-sm-12">
+                                        <input type="text" class="form-control" id="qtyall" name="qtyall"
+                                            autocomplete="off" readonly>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
                                 <div class="form-group">
                                     <label class="col-sm-12 control-label">Plant</label>
                                     <div class="col-sm-12">
@@ -142,7 +149,9 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-md-6">
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4">
                                 <div class="form-group">
                                     <label class="col-sm-12 control-label">Style</label>
                                     <div class="col-sm-12">
@@ -151,30 +160,41 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-md-6">
+                            <div class="col-md-4">
                                 <div class="form-group">
-                                    <label class="col-sm-12 control-label">Ship Mode</label>
+                                    <label class="col-sm-12 control-label">Invoice</label>
                                     <div class="col-sm-12">
-                                        <div class="row">
-                                            <div class="col-sm-6">
-                                                <input type="text" class="form-control" id="shipmode" readonly>
-                                            </div>
-                                            <div class="col-sm-6">
-                                                <input type="text" class="form-control" id="subshipmode" readonly>
-                                            </div>
-                                        </div>
+                                        <input type="text" class="form-control" id="invoice" name="invoice"
+                                            autocomplete="off" readonly>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label class="col-sm-12 control-label">Booking</label>
+                                    <div class="col-sm-12">
+                                        <input type="text" class="form-control" id="booking" name="booking"
+                                            autocomplete="off" readonly>
                                     </div>
                                 </div>
                             </div>
                         </div>
                         <div class="row">
-                            <div class="col-md-12">
+                            <div class="col-md-4">
                                 <div class="form-group">
-                                    <label class="col-sm-12 control-label">Description</label>
+                                    <label class="col-sm-12 control-label">Forwarder</label>
                                     <div class="col-sm-12">
-                                        {{-- <input type="text" class="form-control" id="deskripsi" name="deskripsi"
-                                            autocomplete="off" readonly> --}}
-                                        <textarea name="deskripsi" id="deskripsi" cols="104" rows="2" disabled></textarea>
+                                        <input type="text" class="form-control" id="forwarder" name="forwarder"
+                                            autocomplete="off" readonly>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label class="col-sm-12 control-label">Supplier</label>
+                                    <div class="col-sm-12">
+                                        <input type="text" class="form-control" id="supplier" name="supplier"
+                                            autocomplete="off" readonly>
                                     </div>
                                 </div>
                             </div>
@@ -315,41 +335,18 @@
                 }).done(function(data) {
                     console.log('data :>> ', data.data);
                     let dataku = data.data;
-                    let poku = dataku.datapo;
 
-                    $('#detailhtml').empty();
-                    $('#detailstyle').empty();
-
-                    var tot = 0;
-                    length = poku.length;
-                    html =
-                        '<table border="0" style="width:100%"><tr><th style="text-align:center"><input type="checkbox" class="checkall" style="height:18px;width:18px"></th><th>Material</th><th>Style</th><th>Qty Item</th><th>Qty Allocation</th></tr>';
-                    for (let index = 0; index < poku.length; index++) {
-
-                        // $('#qtypo').val();
-                        console.log('poku.qtypo :>> ', poku.qtypo);
-                        tot = tot + Number(poku[index].qtypo);
-                        html +=
-                            '<tr><td style="text-align:center"><input type="checkbox" class="check-' +
-                            index + '" style="height:18px;width:18px"></td><td>' + poku[index]
-                            .matcontents + '</td><td>' + poku[index]
-                            .style + '</td><td>' + poku[index].qtypo +
-                            '</td><td><input type="number" min="0" id="qty_allocation" name="qty_allocation" class="form-control trigerinput cekinput-' +
-                            index + '" data-id="' + poku[index].id + '" data-pono="' + poku[index]
-                            .pono + '" data-qty="' + poku[index].qtypo + '" disabled></td></tr>';
-
-                    }
-                    html += "</table>";
-                    $('#detailhtml').html(html);
-                    checkqtyall();
-
-                    qtypoku = poku.qtypo;
-                    poid = poku.id;
-                    ponumb = poku.pono;
-
-                    $('#po').val(poku[0].pono);
-                    $('#qtypo').val(tot);
-                    $('#detailsup').val(poku[0].nama);
+                    $('#nomorpo').val(dataku.pono);
+                    $('#material').val(dataku.matcontents);
+                    $('#matdesc').val(dataku.itemdesc);
+                    $('#qtypo').val(dataku.qtypo);
+                    $('#qtyall').val(dataku.qty_allocation);
+                    $('#plant').val(dataku.plant);
+                    $('#style').val(dataku.style);
+                    $('#invoice').val(dataku.noinv);
+                    $('#booking').val(dataku.kode_booking);
+                    $('#forwarder').val(dataku.name);
+                    $('#supplier').val(dataku.nama);
                 })
             });
 

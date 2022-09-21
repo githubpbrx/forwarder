@@ -126,6 +126,18 @@ class ReportAlokasi extends Controller
 
     function detailalokasi(Request $request)
     {
-        dd($request);
+        // dd($request);
+
+        $data = modelpo::join('forwarder', 'forwarder.idpo', 'po.id')
+            ->join('formpo', 'formpo.idforwarder', 'forwarder.id_forwarder')
+            ->join('masterforwarder', 'masterforwarder.id', 'formpo.idmasterfwd')
+            ->join('mastersupplier', 'mastersupplier.id', 'po.vendor')
+            ->where('forwarder.aktif', 'Y')->where('formpo.aktif', 'Y')->where('masterforwarder.aktif', 'Y')
+            ->where('po.id', $request->id)
+            ->selectRaw(' po.*, forwarder.qty_allocation, forwarder.status, formpo.kode_booking, formpo.noinv, formpo.nomor_bl, formpo.vessel, masterforwarder.name, mastersupplier.nama ')
+            ->first();
+
+        // dd($data);
+        return response()->json(['status' => 200, 'data' => $data, 'message' => 'Berhasil']);
     }
 }
