@@ -34,15 +34,10 @@ class ReportPo extends Controller
     {
 
         if ($request->ajax()) {
-            // dd($request);
-            $ses = Session::get('session');
-            $user = $ses['user_nik'];
-            $nama = $ses['user_nama'];
-
             if ($request->po == null) {
                 $data = modelpo::get();
             } else {
-                $data = modelpo::where('id', $request->po)->get();
+                $data = modelpo::where('pono', $request->po)->get();
             }
 
             // dd($data);
@@ -53,9 +48,6 @@ class ReportPo extends Controller
                 })
                 ->addColumn('material', function ($data) {
                     return $data->matcontents;
-                })
-                ->addColumn('plant', function ($data) {
-                    return $data->plant;
                 })
                 ->addColumn('allocation', function ($data) {
                     if ($data->statusalokasi == 'full_allocated') {
@@ -79,7 +71,14 @@ class ReportPo extends Controller
 
                     return $status;
                 })
-                ->rawColumns(['allocation'])
+                ->addColumn('action', function ($data) {
+                    $button = '';
+
+                    $button = '<a href="#" data-id="' . $data->id . '" id="detailpo"><i class="fa fa-info-circle"></i></a>';
+
+                    return $button;
+                })
+                ->rawColumns(['action'])
                 ->make(true);
         }
         // return view('transaksi::create');
@@ -90,20 +89,32 @@ class ReportPo extends Controller
         header("Access-Control-Allow-Origin: *");
         header("Access-Control-Allow-Headers: *");
 
-        // $ses = Session::get('session');
-        // $user = $ses['user_nik'];
-        // $nama = $ses['user_nama'];
-
         if (!$request->ajax()) return;
-        $po = modelpo::select('id', 'pono');
+        $po = modelpo::select('pono');
 
         if ($request->has('q')) {
             $search = $request->q;
             $po = $po->whereRaw(' pono like "%' . $search . '%" ');
         }
 
-        $po = $po->orderby('pono', 'asc')->get();
+        $po = $po->orderby('pono', 'asc')->groupby('pono')->get();
 
         return response()->json($po);
+    }
+
+    public function detailpo(Request $request)
+    {
+        // dd($request);
+
+        $datapo = modelpo::join('mastersupplier', 'mastersupplier.id', 'po.vendor')
+            ->where('po.id', $request->id)
+            ->selectRaw(' po.*, mastersupplier.nama')
+            ->first();
+        // dd($datapo);
+        $data = array(
+            'dataku' => $datapo,
+        );
+
+        return response()->json(['status' => 200, 'data' => $data, 'message' => 'Berhasil']);
     }
 }

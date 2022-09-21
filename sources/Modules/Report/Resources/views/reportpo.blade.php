@@ -5,19 +5,14 @@
 @endsection
 
 @section('content')
-
-    <div class="row">
+    <div class="row" style="font-size: 10pt;">
         <div class="col-lg-12">
             <div class="card card-primary">
-                <div class="card-header">
-                    {{-- <h3 class="text-center">ALLOCATION FORWARDER</h3> --}}
-                    <h4>REPORT PO</h4>
-                </div>
                 <div class="row">
                     <div class="col-md-12">
                         <div id="fullscreen-container" class="card-body" style="overflow-y: auto;">
                             <div class="row">
-                                <div class="col-md-6">
+                                <div class="col-md-3">
                                     <label class="col-sm-5 control-label">Choose PO :</label>
                                     <div class="col-sm-12">
                                         <select class="select2" style="width: 100%;" name="datapo" id="datapo">
@@ -25,7 +20,7 @@
                                         </select>
                                     </div>
                                 </div>
-                                <div class="col-md-6">
+                                <div class="col-md-1">
                                     <label class="col-sm-5 control-label"> &nbsp; </label>
                                     <div class="col-sm-12">
                                         <a href="#" type="button" id="search" class="btn btn-info form-control"
@@ -46,13 +41,13 @@
                                                 <center>Material</center>
                                             </th>
                                             <th>
-                                                <center>Plant</center>
-                                            </th>
-                                            <th>
                                                 <center>Status Allocation</center>
                                             </th>
                                             <th>
                                                 <center>Status</center>
+                                            </th>
+                                            <th>
+                                                <center>Action</center>
                                             </th>
                                         </tr>
                                     </thead>
@@ -67,6 +62,104 @@
         </div>
     </div>
 
+    {{-- ----------------- modal content ----------------- --}}
+    <div class="modal fade" id="detailpomodal">
+        <div class="modal-dialog" style="max-width: 80%;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title"><span id="modaltitle">Detail PO</span></h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body" style="font-size: 10pt;">
+                    <form action="#" class="form-horizontal">
+                        {{ csrf_field() }}
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label class="col-sm-12 control-label">PO</label>
+                                    <div class="col-sm-12">
+                                        <input type="text" class="form-control" id="nomorpo" name="nomorpo" readonly>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label class="col-sm-12 control-label">Material</label>
+                                    <div class="col-sm-12">
+                                        <input type="text" class="form-control" id="material" name="material" readonly>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label class="col-sm-12 control-label">Material Desc</label>
+                                    <div class="col-sm-12">
+                                        <input type="text" class="form-control" id="matdesc" name="matdesc"
+                                            autocomplete="off" readonly>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label class="col-sm-12 control-label">Quantity PO</label>
+                                    <div class="col-sm-12">
+                                        <input type="text" class="form-control" id="qtypo" name="qtypo"
+                                            autocomplete="off" readonly>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label class="col-sm-12 control-label">Price</label>
+                                    <div class="col-sm-12">
+                                        <input type="text" class="form-control" id="price" name="price"
+                                            autocomplete="off" readonly>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label class="col-sm-12 control-label">Supplier</label>
+                                    <div class="col-sm-12">
+                                        <input type="text" class="form-control" id="supplier" name="supplier"
+                                            autocomplete="off" readonly>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label class="col-sm-12 control-label">Plant</label>
+                                    <div class="col-sm-12">
+                                        <input type="text" class="form-control" id="plant" name="plant"
+                                            autocomplete="off" readonly>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label class="col-sm-12 control-label">Style</label>
+                                    <div class="col-sm-12">
+                                        <input type="text" class="form-control" id="style" name="style"
+                                            autocomplete="off" readonly>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    {{-- ----------------- /.modal content ----------------- --}}
 @endsection
 
 @section('script_src')
@@ -87,7 +180,7 @@
                 processing: true,
                 serverSide: true,
                 ajax: {
-                    url: "{{ url('report/forwarder/search') }}",
+                    url: "{{ url('report/po/search') }}",
                     data: function(d) {
                         d.po = $('#datapo').val()
                     }
@@ -101,16 +194,16 @@
                         name: 'material'
                     },
                     {
-                        data: 'plant',
-                        name: 'plant'
-                    },
-                    {
                         data: 'allocation',
                         name: 'allocation'
                     },
                     {
                         data: 'status',
                         name: 'status'
+                    },
+                    {
+                        data: 'action',
+                        name: 'action'
                     },
                 ]
                 // ,
@@ -155,7 +248,7 @@
                             results: $.map(data, function(item) {
                                 return {
                                     text: item.pono,
-                                    id: item.id,
+                                    id: item.pono,
                                     selected: true,
                                 }
                             }),
@@ -165,6 +258,36 @@
                 }
             });
 
+            $('body').on('click', '#detailpo', function() {
+                $('#detailpomodal').modal({
+                    show: true,
+                    backdrop: 'static'
+                });
+                let idku = $(this).attr('data-id');
+                $.ajax({
+                    url: "{!! route('report_detailpo') !!}",
+                    type: 'POST',
+                    dataType: 'json',
+                    data: {
+                        _token: $('meta[name=csrf-token]').attr('content'),
+                        id: idku,
+                    },
+                }).done(function(data) {
+                    console.log('data :>> ', data.data);
+                    let datapo = data.data.dataku;
+
+                    $('#nomorpo').val(datapo.pono);
+                    $('#material').val(datapo.matcontents);
+                    $('#matdesc').val(datapo.itemdesc);
+                    $('#qtypo').val(datapo.qtypo);
+                    let curr = datapo.curr;
+                    let pr = datapo.price;
+                    $('#price').val(pr + ' ' + curr);
+                    $('#supplier').val(datapo.nama);
+                    $('#plant').val(datapo.plant);
+                    $('#style').val(datapo.style);
+                })
+            });
         });
     </script>
 @endsection
