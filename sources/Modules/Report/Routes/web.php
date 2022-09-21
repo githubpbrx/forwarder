@@ -14,9 +14,16 @@
 Route::prefix('report')->group(function () {
     Route::get('/', 'ReportController@index');
 
-    Route::group(['prefix' => 'forwarder'], function () {
-        Route::get('/', 'ReportForwarder@index')->name('reportforwarder');
-        Route::post('/getpo/', 'ReportForwarder@getpo')->name('report_getpo');
-        Route::get('search', 'ReportForwarder@datatable');
+    Route::group(['prefix' => 'po'], function () {
+        Route::get('/', 'ReportPo@index')->name('reportpo');
+        Route::post('/getpo/', 'ReportPo@getpo')->name('report_getpo');
+        Route::get('search', 'ReportPo@datatable');
+    });
+
+    Route::group(['prefix' => 'alokasi'], function () {
+        Route::get('/', 'ReportAlokasi@index')->name('reportalokasi');
+        Route::post('/getpo/', 'ReportAlokasi@getpo')->name('report_getpo');
+        Route::get('search', 'ReportAlokasi@datatable');
+        Route::post('/getdetailalokasi/', 'ReportAlokasi@detailalokasi')->name('report_detailalokasi');
     });
 });

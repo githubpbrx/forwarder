@@ -11,7 +11,7 @@ use Session, Crypt, DB, Mail;
 use Modules\Report\Models\modelprivilege;
 use Modules\Report\Models\modelpo;
 
-class ReportForwarder extends Controller
+class ReportPo extends Controller
 {
     public function __construct()
     {
@@ -22,12 +22,12 @@ class ReportForwarder extends Controller
     public function index()
     {
         $data = array(
-            'title' => 'Report Forwarder',
-            'menu'  => 'reportforwarder',
+            'title' => 'Report PO',
+            'menu'  => 'reportpo',
             'box'   => '',
         );
 
-        return view('report::reportforwarder', $data);
+        return view('report::reportpo', $data);
     }
 
     public function datatable(Request $request)

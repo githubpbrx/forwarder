@@ -11,7 +11,7 @@
             <div class="card card-primary">
                 <div class="card-header">
                     {{-- <h3 class="text-center">ALLOCATION FORWARDER</h3> --}}
-                    <h4>REPORT FORWARDER</h4>
+                    <h4>REPORT PO</h4>
                 </div>
                 <div class="row">
                     <div class="col-md-12">
