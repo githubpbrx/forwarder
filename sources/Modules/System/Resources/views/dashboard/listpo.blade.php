@@ -162,17 +162,6 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label class="col-sm-12 control-label">Invoice</label>
-                                    <div class="col-sm-12">
-                                        <input type="text" class="form-control" id="invoice" name="invoice"
-                                            autocomplete="off">
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
                     </form>
                 </div>
                 <div class="modal-footer">
@@ -316,13 +305,14 @@
                     $('#detailitem').empty();
 
                     html =
-                        '<table border="0" style="width:100%"><tr><th>Material Contents</th><th>Item Description</th></tr>';
+                        '<table border="0" style="width:100%"><tr><th>Material Contents</th><th>Color Code</th><th>Size</th><th>Quantity PO</th><th>Quantity Allocation</th><th>Status</th></tr>';
                     for (let index = 0; index < poku.length; index++) {
-
                         html +=
-                            '<tr><td>' +
-                            poku[index].matcontents + '</td><td>' +
-                            poku[index].itemdesc + '</td><td><input type="hidden" id="idall-' +
+                            '<tr><td>' + poku[index].matcontents + '</td><td>' +
+                            poku[index].colorcode + '</td><td>' + poku[index].size + '</td><td>' +
+                            poku[index].qtypo + '</td><td>' + forwarderku[index].qty_allocation +
+                            '</td><td>' + forwarderku[index].status +
+                            '</td><td><input type="hidden" id="idall-' +
                             index + '" data-id="' +
                             poku[index].id + '" data-idfwd="' + forwarderku[index].id_forwarder +
                             '" data-idmasterfwd="' + forwarderku[index].idmasterfwd +
@@ -345,10 +335,6 @@
                 let myfcl = $('#fclku').val();
                 let mylcl = $('#lclku').val();
                 let myair = $('#airku').val();
-                let invoice = $('#invoice').val();
-                console.log('mode :>> ', mode);
-                console.log('mylcl :>> ', mylcl);
-                console.log('myair :>> ', myair);
 
                 var dataid = [];
                 for (let index = 0; index < Number(length); index++) {
@@ -390,7 +376,6 @@
                             'fcl': myfcl,
                             'lcl': mylcl,
                             'air': myair,
-                            'invoice': invoice
                         },
                         dataType: "json",
                         success: function(response) {

@@ -369,6 +369,18 @@ class home extends Controller
                 return response()->json($status, 200);
             }
 
+            $cekpino = po::where('id', $val['idpo'])
+                ->where(function ($var) {
+                    $var->where('pino', '=', " ")->orWhere('pino', '=', null);
+                })
+                ->first();
+            if ($cekpino != null) {
+                DB::rollback();
+                $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'Please contact the supplier for the pino input validation process'];
+                return response()->json($status, 200);
+            }
+            // dd($cekpino);
+
             $cekformpo = formpo::where('idpo', $val['idpo'])->where('idforwarder', $val['idfwd'])->where('idmasterfwd', $val['idmasterfwd'])->where('status', 'reject')->where('aktif', 'Y')->first();
             // dd($cekformpo);
             if ($cekformpo != null) {
@@ -379,7 +391,6 @@ class home extends Controller
                 'idpo'          => $val['idpo'],
                 'idmasterfwd'   => $val['idmasterfwd'],
                 'idforwarder'   => $val['idfwd'],
-                'noinv'         => $request->invoice,
                 'kode_booking'  => $request->nobooking,
                 'date_booking'  => $request->datebooking,
                 'etd'           => $request->etd,

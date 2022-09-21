@@ -115,18 +115,18 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label class="col-sm-12 control-label">Nomor Booking</label>
+                                    <label class="col-sm-12 control-label">Material Desc</label>
                                     <div class="col-sm-12">
-                                        <input type="text" class="form-control" id="nobook" name="nobook"
+                                        <input type="text" class="form-control" id="matdesc" name="matdesc"
                                             autocomplete="off" readonly>
                                     </div>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label class="col-sm-12 control-label">Date Booking</label>
+                                    <label class="col-sm-12 control-label">Quantity PO</label>
                                     <div class="col-sm-12">
-                                        <input type="text" class="form-control" id="datebook" name="datebook"
+                                        <input type="text" class="form-control" id="qtypo" name="qtypo"
                                             autocomplete="off" readonly>
                                     </div>
                                 </div>
@@ -135,18 +135,18 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label class="col-sm-12 control-label">ETD (Estimate Delivery Date)</label>
+                                    <label class="col-sm-12 control-label">Plant</label>
                                     <div class="col-sm-12">
-                                        <input type="text" class="form-control" id="etd" name="etd"
+                                        <input type="text" class="form-control" id="plant" name="plant"
                                             autocomplete="off" readonly>
                                     </div>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label class="col-sm-12 control-label">ETA (Estimate Acutal Delivery Date)</label>
+                                    <label class="col-sm-12 control-label">Style</label>
                                     <div class="col-sm-12">
-                                        <input type="text" class="form-control" id="eta" name="eta"
+                                        <input type="text" class="form-control" id="style" name="style"
                                             autocomplete="off" readonly>
                                     </div>
                                 </div>
