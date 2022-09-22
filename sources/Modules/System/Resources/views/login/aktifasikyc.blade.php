@@ -41,6 +41,8 @@
                                     <br>
                                     YOUR DATA IS CURRENTLY PROCESSING
                                 </h3>
+                                {{-- <br>
+                                <a href="#" id="sendemail" class="btn btn-Info">Send Email to Finance</a> --}}
                             </center>
                         </div>
                     @else
@@ -150,6 +152,40 @@
                         }
                     });
                 }
+            });
+
+            $('#sendemail').click(function(e) {
+                console.log('klik :>> ', 'klik');
+
+                $.ajax({
+                    type: "POST",
+                    url: "{{ url('validasikycaction') }}",
+                    processData: false,
+                    contentType: false,
+                    data: form_data,
+                    dataType: "json",
+                    success: function(response) {
+                        console.log('response :>> ', response);
+                        Swal.fire({
+                            title: response.title,
+                            text: response.message,
+                            type: (response.status != 'error') ? 'success' : 'error'
+                        }).then((result) => {
+                            (response.status == 'success') ? window.location
+                                .replace("{{ route('dashcam') }}"):
+                                ''
+                        });
+                        return;
+                    },
+                    error: function(xhr, status, error) {
+                        Swal.fire({
+                            title: 'Unsuccessfully Saved Data',
+                            text: 'Check Your Data',
+                            type: 'error'
+                        });
+                        return;
+                    }
+                });
             });
 
         });

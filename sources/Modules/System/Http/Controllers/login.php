@@ -615,9 +615,11 @@ class login extends Controller
 
         $rejectkyc = modelkyc::where('name_kyc', $nama)->where('nik_kyc', $user)->where('aktif', 'Y')->where('status', 'reject')->first();
         // dd($rejectkyc);
-        $rejectaction = modelkyc::where('id_kyc', $rejectkyc->id_kyc)->update([
-            'aktif' => 'N'
-        ]);
+        if ($rejectkyc != null) {
+            $rejectaction = modelkyc::where('id_kyc', $rejectkyc->id_kyc)->update([
+                'aktif' => 'N'
+            ]);
+        }
 
         $statuskyc = modelkyc::where('name_kyc', $nama)->where('aktif', 'Y')->first();
         if ($statuskyc == null) {
@@ -675,6 +677,26 @@ class login extends Controller
             $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'Data Failed Saved'];
             return response()->json($status, 200);
         }
+    }
+
+    public function sendemailfinance(Request $request)
+    {
+        // dd('sini');
+        $ses = Session::get('session');
+        $user = $ses['user_nik'];
+        $nama = $ses['user_nama'];
+
+        $token = Hash::make('ittetapsemangant');
+        $kode = rand(11111, 99999);
+        modelprivilege::where('privilege_user_nik', $user)->update(['kode' => $kode, 'token' => $token]);
+
+        $cek = modelprivilege::where('privilege_user_nik', $user)->first();
+        $param = modelsystem::first();
+        $url = $param->url . 'getvalidation/' . base64_encode($cek->token) . '/' . $this->enkripsi($user) . '/' . $this->enkripsi($cek->kode);
+        login::sendEmail($user, $nama, $cek->kode, $url, "Web Forwarder Aktifasi User");
+
+        Session::flash('alert', 'sweetAlert("success", "Silahkan cek email anda kembali")');
+        return redirect()->back();
     }
 
     public function exp_password()
