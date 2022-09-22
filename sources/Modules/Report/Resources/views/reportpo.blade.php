@@ -86,12 +86,23 @@
                             </div>
                             <div class="col-md-4">
                                 <div class="form-group">
-                                    <label class="col-sm-12 control-label">Material</label>
+                                    <label class="col-sm-12 control-label">Supplier</label>
                                     <div class="col-sm-12">
-                                        <input type="text" class="form-control" id="material" name="material" readonly>
+                                        <input type="text" class="form-control" id="supplier" name="supplier" readonly>
                                     </div>
                                 </div>
                             </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label class="col-sm-12 control-label">Material</label>
+                                    <div class="col-sm-12">
+                                        <input type="text" class="form-control" id="material" name="material"
+                                            autocomplete="off" readonly>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
                             <div class="col-md-4">
                                 <div class="form-group">
                                     <label class="col-sm-12 control-label">Material Desc</label>
@@ -101,8 +112,15 @@
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label class="col-sm-12 control-label">Style</label>
+                                    <div class="col-sm-12">
+                                        <input type="text" class="form-control" id="style" name="style"
+                                            autocomplete="off" readonly>
+                                    </div>
+                                </div>
+                            </div>
                             <div class="col-md-4">
                                 <div class="form-group">
                                     <label class="col-sm-12 control-label">Quantity PO</label>
@@ -112,6 +130,8 @@
                                     </div>
                                 </div>
                             </div>
+                        </div>
+                        <div class="row">
                             <div class="col-md-4">
                                 <div class="form-group">
                                     <label class="col-sm-12 control-label">Price</label>
@@ -123,29 +143,9 @@
                             </div>
                             <div class="col-md-4">
                                 <div class="form-group">
-                                    <label class="col-sm-12 control-label">Supplier</label>
-                                    <div class="col-sm-12">
-                                        <input type="text" class="form-control" id="supplier" name="supplier"
-                                            autocomplete="off" readonly>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-4">
-                                <div class="form-group">
                                     <label class="col-sm-12 control-label">Plant</label>
                                     <div class="col-sm-12">
                                         <input type="text" class="form-control" id="plant" name="plant"
-                                            autocomplete="off" readonly>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="form-group">
-                                    <label class="col-sm-12 control-label">Style</label>
-                                    <div class="col-sm-12">
-                                        <input type="text" class="form-control" id="style" name="style"
                                             autocomplete="off" readonly>
                                     </div>
                                 </div>

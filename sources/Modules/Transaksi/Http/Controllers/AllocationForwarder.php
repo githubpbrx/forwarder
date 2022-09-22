@@ -143,6 +143,7 @@ class AllocationForwarder extends Controller
                 'idmasterfwd' => $request->forwarder,
                 'po_nomor'    => $val['pono'],
                 'qty_allocation' => $val['value'],
+                'status'        => $status,
                 'date_fwd' => date('Y-m-d H:i:s'),
                 'aktif' => 'Y',
                 'created_at' => date('Y-m-d H:i:s'),
