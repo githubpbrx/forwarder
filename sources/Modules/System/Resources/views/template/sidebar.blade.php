@@ -139,6 +139,15 @@
                     </li>
                 @endif
 
+                {{-- @if (RoleAccess::whereMenu(11) > 0)
+                    <li class="nav-item">
+                        <a href="{{ route('report_forwarder') }}" class="nav-link">
+                            <i class="fa fa-file nav-icon"></i>
+                            <p>Report Forwarder</p>
+                        </a>
+                    </li>
+                @endif --}}
+
                 @if ($menu_session != '')
                     @include($menu_session . '::template/' . $menu_session . '_sidebar')
                 @endif
