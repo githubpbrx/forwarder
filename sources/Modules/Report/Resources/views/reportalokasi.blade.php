@@ -29,6 +29,14 @@
                                     </div>
                                 </div>
                             </div>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="col-sm-2 float-right">
+                                        <a href="{{ url('report/alokasi/getexcelalokasiall') }}" type="button"
+                                            class="btn btn-warning form-control">Download Data Excel</a>
+                                    </div>
+                                </div>
+                            </div>
                             <br>
                             <div class="table-responsive">
                                 <table id="dataTables" class="table table-bordered table-striped table-hover"
@@ -96,17 +104,17 @@
                             </div>
                             <div class="col-md-4">
                                 <div class="form-group">
-                                    <label class="col-sm-12 control-label">Material</label>
+                                    <label class="col-sm-12 control-label">Supplier</label>
                                     <div class="col-sm-12">
-                                        <input type="text" class="form-control" id="material" name="material" readonly>
+                                        <input type="text" class="form-control" id="supplier" name="supplier" readonly>
                                     </div>
                                 </div>
                             </div>
                             <div class="col-md-4">
                                 <div class="form-group">
-                                    <label class="col-sm-12 control-label">Material Desc</label>
+                                    <label class="col-sm-12 control-label">Material</label>
                                     <div class="col-sm-12">
-                                        <input type="text" class="form-control" id="matdesc" name="matdesc"
+                                        <input type="text" class="form-control" id="material" name="material"
                                             autocomplete="off" readonly>
                                     </div>
                                 </div>
@@ -124,6 +132,24 @@
                         <div class="row">
                             <div class="col-md-4">
                                 <div class="form-group">
+                                    <label class="col-sm-12 control-label">Material Desc</label>
+                                    <div class="col-sm-12">
+                                        <input type="text" class="form-control" id="matdesc" name="matdesc"
+                                            autocomplete="off" readonly>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label class="col-sm-12 control-label">Style</label>
+                                    <div class="col-sm-12">
+                                        <input type="text" class="form-control" id="style" name="style"
+                                            autocomplete="off" readonly>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
                                     <label class="col-sm-12 control-label">Quantity PO</label>
                                     <div class="col-sm-12">
                                         <input type="text" class="form-control" id="qtypo" name="qtypo"
@@ -131,6 +157,8 @@
                                     </div>
                                 </div>
                             </div>
+                        </div>
+                        <div class="row">
                             <div class="col-md-4">
                                 <div class="form-group">
                                     <label class="col-sm-12 control-label">Quantity Allocation</label>
@@ -145,26 +173,6 @@
                                     <label class="col-sm-12 control-label">Plant</label>
                                     <div class="col-sm-12">
                                         <input type="text" class="form-control" id="plant" name="plant"
-                                            autocomplete="off" readonly>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-4">
-                                <div class="form-group">
-                                    <label class="col-sm-12 control-label">Style</label>
-                                    <div class="col-sm-12">
-                                        <input type="text" class="form-control" id="style" name="style"
-                                            autocomplete="off" readonly>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="form-group">
-                                    <label class="col-sm-12 control-label">Invoice</label>
-                                    <div class="col-sm-12">
-                                        <input type="text" class="form-control" id="invoice" name="invoice"
                                             autocomplete="off" readonly>
                                     </div>
                                 </div>
@@ -191,10 +199,86 @@
                             </div>
                             <div class="col-md-4">
                                 <div class="form-group">
-                                    <label class="col-sm-12 control-label">Supplier</label>
+                                    <label class="col-sm-12 control-label">Invoice</label>
                                     <div class="col-sm-12">
-                                        <input type="text" class="form-control" id="supplier" name="supplier"
+                                        <input type="text" class="form-control" id="invoice" name="invoice"
                                             autocomplete="off" readonly>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label class="col-sm-12 control-label">ETD</label>
+                                    <div class="col-sm-12">
+                                        <input type="text" class="form-control" id="etd" name="etd"
+                                            autocomplete="off" readonly>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label class="col-sm-12 control-label">ETA</label>
+                                    <div class="col-sm-12">
+                                        <input type="text" class="form-control" id="eta" name="eta"
+                                            autocomplete="off" readonly>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label class="col-sm-12 control-label">Shipmode</label>
+                                    <div class="col-sm-12">
+
+                                        <div class="row">
+                                            <div class="col-sm-6">
+                                                <input type="text" class="form-control" id="shipmode"
+                                                    name="shipmode" autocomplete="off" readonly>
+                                            </div>
+                                            <div class="col-sm-6">
+                                                <input type="text" class="form-control" id="subshipmode"
+                                                    name="subshipmode" autocomplete="off" readonly>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label class="col-sm-12 control-label">No BL</label>
+                                    <div class="col-sm-12">
+                                        <input type="text" class="form-control" id="nobl" name="nobl"
+                                            autocomplete="off" readonly>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label class="col-sm-12 control-label">Vessel</label>
+                                    <div class="col-sm-12">
+                                        <input type="text" class="form-control" id="vessel" name="vessel"
+                                            autocomplete="off" readonly>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label class="col-sm-12 control-label">File BL</label>
+                                    <div class="col-sm-12">
+                                        <div class="row">
+                                            <div class="col-sm-6">
+                                                <input type="text" class="form-control" id="filebl" name="filebl"
+                                                    autocomplete="off" readonly>
+                                            </div>
+                                            <div class="col-sm-6">
+                                                <a href="#" id="downloadfile" target="_BLANK"
+                                                    class="btn btn-info">Download
+                                                    File</a>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -318,6 +402,7 @@
                 }
             });
 
+            var namefile;
             $('body').on('click', '#detailalokasi', function() {
                 $('#detailall').modal({
                     show: true,
@@ -336,6 +421,8 @@
                     console.log('data :>> ', data.data);
                     let dataku = data.data;
 
+                    namefile = dataku.file_bl;
+
                     $('#nomorpo').val(dataku.pono);
                     $('#material').val(dataku.matcontents);
                     $('#matdesc').val(dataku.itemdesc);
@@ -346,8 +433,22 @@
                     $('#invoice').val(dataku.noinv);
                     $('#booking').val(dataku.kode_booking);
                     $('#forwarder').val(dataku.name);
+                    $('#etd').val(dataku.etd);
+                    $('#eta').val(dataku.eta);
+                    $('#shipmode').val(dataku.shipmode);
+                    $('#subshipmode').val(dataku.subshipmode);
+                    $('#nobl').val(dataku.nomor_bl);
+                    $('#vessel').val(dataku.vessel);
+                    $('#filebl').val(dataku.file_bl);
                     $('#supplier').val(dataku.nama);
                 })
+            });
+
+            $('#downloadfile').click(function(e) {
+                // e.preventDefault();
+                // console.log('klik :>> ', 'klik');
+                var base = "{!! url('sources/storage/app') !!}" + "/" + namefile;
+                $('#downloadfile').attr('href', base);
             });
 
         });

@@ -27,5 +27,7 @@ Route::prefix('report')->group(function () {
         Route::post('/getpo/', 'ReportAlokasi@getpo')->name('report_getpoalokasi');
         Route::get('search', 'ReportAlokasi@datatable');
         Route::post('/getdetailalokasi/', 'ReportAlokasi@detailalokasi')->name('report_detailalokasi');
+        Route::get('/getexcelalokasi/{id}', 'ReportAlokasi@excelalokasi')->name('report_excelalokasi');
+        Route::get('/getexcelalokasiall/', 'ReportAlokasi@excelalokasiall')->name('report_excelalokasiall');
     });
 });
