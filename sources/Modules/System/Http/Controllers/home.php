@@ -38,7 +38,8 @@ class home extends Controller
             ->where('privilege.privilege_user_nik', Session::get('session')['user_nik'])
             ->where(function ($qq) {
                 $qq->where('po.statusalokasi', 'partial_allocated')->orWhere('po.statusalokasi', 'full_allocated');
-            })->where('po.statusconfirm', '=', null)
+            })
+            ->where('forwarder.statusapproval', '=', null)
             ->groupby('po.pono')
             ->get();
         // dd($datapo);
@@ -46,7 +47,7 @@ class home extends Controller
         $totalreject = formpo::join('privilege', 'privilege.idforwarder', 'formpo.idmasterfwd')
             ->join('po', 'po.id', 'formpo.idpo')
             ->where('privilege.privilege_user_nik', Session::get('session')['user_nik'])
-            ->where('formpo.status', '=', 'reject')
+            ->where('formpo.statusformpo', '=', 'reject')
             ->where('formpo.file_bl', '=', null)
             ->where('formpo.nomor_bl', '=', null)
             ->where('formpo.vessel', '=', null)
@@ -58,7 +59,7 @@ class home extends Controller
         $datareject = formpo::join('privilege', 'privilege.idforwarder', 'formpo.idmasterfwd')
             ->join('po', 'po.id', 'formpo.idpo')
             ->where('privilege.privilege_user_nik', Session::get('session')['user_nik'])
-            ->where('formpo.status', '=', 'reject')
+            ->where('formpo.statusformpo', '=', 'reject')
             ->where('formpo.file_bl', '=', null)
             ->where('formpo.nomor_bl', '=', null)
             ->where('formpo.vessel', '=', null)
@@ -70,7 +71,7 @@ class home extends Controller
         $dataconfirm = formpo::join('privilege', 'privilege.idforwarder', 'formpo.idmasterfwd')
             ->join('po', 'po.id', 'formpo.idpo')
             ->where('privilege.privilege_user_nik', Session::get('session')['user_nik'])
-            ->where('formpo.status', '=', 'confirm')
+            ->where('formpo.statusformpo', '=', 'confirm')
             ->where('formpo.file_bl', '=', null)
             ->where('formpo.nomor_bl', '=', null)
             ->where('formpo.vessel', '=', null)
@@ -90,7 +91,7 @@ class home extends Controller
         $dataapproval = formpo::join('privilege', 'privilege.idforwarder', 'formpo.idmasterfwd')
             ->join('po', 'po.id', 'formpo.idpo')
             ->where('privilege.nikfinance', Session::get('session')['user_nik'])
-            ->where('formpo.status', '=', 'waiting')
+            ->where('formpo.statusformpo', '=', 'waiting')
             ->where('formpo.aktif', 'Y')
             ->groupby('po.pono')
             ->get();
@@ -156,24 +157,17 @@ class home extends Controller
         $query = forwarder::join('privilege', 'privilege.idforwarder', 'forwarder.idmasterfwd')
             ->join('po', 'po.id', 'forwarder.idpo')
             ->where('privilege.privilege_user_nik', Session::get('session')['user_nik'])
-            ->where(function ($qq) {
-                $qq->where('po.statusalokasi', 'partial_allocated')->orWhere('po.statusalokasi', 'full_allocated');
-            })
+            // ->where('forwarder.statusapproval', '=', null)
+            // ->where(function ($qq) {
+            //     $qq->where('po.statusalokasi', 'partial_allocated')->orWhere('po.statusalokasi', 'full_allocated');
+            // })
             ->where(function ($kus) {
-                $kus->where('po.statusconfirm', null)->orWhere('po.statusconfirm', 'reject');
+                $kus->where('forwarder.statusapproval', null)->orWhere('forwarder.statusapproval', 'reject');
             })
+            ->selectRaw(' forwarder.statusforwarder, forwarder.statusapproval, po.id, po.pono, po.itemdesc ')
             ->groupby('po.pono')
             ->get();
-
-        // $query = po::join('privilege', 'privilege.idforwarder', 'po.idmasterfwd')
-        //     ->where('privilege.privilege_user_nik', Session::get('session')['user_nik'])
-        //     ->where(function ($kuy) {
-        //         $kuy->where('po.statusalokasi', 'partial_allocated')->orWhere('po.statusalokasi', 'full_allocated');
-        //     })
-        //     ->where(function ($kus) {
-        //         $kus->where('po.statusconfirm', null)->orWhere('po.statusconfirm', 'reject');
-        //     })
-        //     ->get();
+        // dd($query);
 
         return Datatables::of($query)
             ->addIndexColumn()
@@ -184,7 +178,7 @@ class home extends Controller
                 return  $query->itemdesc;
             })
             ->addColumn('statusalokasi', function ($query) {
-                if ($query->statusalokasi == 'full_allocated') {
+                if ($query->statusforwarder == 'full_allocated') {
                     $alokasi = 'Full Allocation';
                 } else {
                     $alokasi = 'Partial Allocation';
@@ -197,12 +191,12 @@ class home extends Controller
                 // } else {
                 //     $stat = 'Rejected';
                 // }
-                return  $query->statusconfirm;
+                return  $query->statusapproval;
             })
             ->addColumn('action', function ($query) {
                 $process    = '';
 
-                $process    = '<a href="#" data-id="' . $query->pono . '" id="formpo"><i class="fa fa-angle-double-right text-orange"></i></a>';
+                $process    = '<a href="#" data-id="' . $query->id . '" id="formpo"><i class="fa fa-angle-double-right text-orange"></i></a>';
 
                 return $process;
             })
@@ -216,7 +210,7 @@ class home extends Controller
         $query = formpo::join('privilege', 'privilege.idforwarder', 'formpo.idmasterfwd')
             ->join('po', 'po.id', 'formpo.idpo')
             ->where('privilege.privilege_user_nik', Session::get('session')['user_nik'])
-            ->where('formpo.status', '=', 'confirm')
+            ->where('formpo.statusformpo', '=', 'confirm')
             ->where('formpo.file_bl', '=', null)
             ->where('formpo.nomor_bl', '=', null)
             ->where('formpo.vessel', '=', null)
@@ -232,13 +226,13 @@ class home extends Controller
             ->addColumn('listitem', function ($query) {
                 return  $query->itemdesc;
             })
-            ->addColumn('status', function ($query) {
-                return  $query->status;
-            })
+            // ->addColumn('status', function ($query) {
+            //     return  $query->status;
+            // })
             ->addColumn('action', function ($query) {
                 $process    = '';
 
-                $process    = '<a href="#" data-id="' . $query->pono . '" id="updateship"><i class="fa fa-angle-double-right text-green"></i></a>';
+                $process    = '<a href="#" data-id="' . $query->id . '" id="updateship"><i class="fa fa-angle-double-right text-green"></i></a>';
 
                 return $process;
             })
@@ -276,9 +270,11 @@ class home extends Controller
     public function formpo(Request $request)
     {
         // dd($request);
-        $mydata = po::where('pono', $request->id)->get();
-        $dataforwarder = forwarder::where('po_nomor', $request->id)->where('aktif', 'Y')->get();
-
+        $mydata = po::where('id', $request->id)->first();
+        $dataforwarder = forwarder::join('privilege', 'privilege.idforwarder', 'forwarder.idmasterfwd')
+            ->where('privilege.privilege_user_nik', Session::get('session')['user_nik'])
+            ->where('idpo', $request->id)->where('aktif', 'Y')->first();
+        // dd($dataforwarder);
         $data = array(
             'datapo' => $mydata,
             'dataforwarder' => $dataforwarder
@@ -294,10 +290,15 @@ class home extends Controller
         // $mydata = po::where('id', $databook->idpo)->first();
 
         $mydata = po::join('formpo', 'formpo.idpo', 'po.id')
-            ->where('po.pono', $request->id)
+            ->where('po.id', $request->id)
             ->where('formpo.aktif', 'Y')
-            ->get();
-        $dataforwarder = forwarder::where('po_nomor', $request->id)->where('aktif', 'Y')->get();
+            ->first();
+
+        $dataforwarder = forwarder::join('privilege', 'privilege.idforwarder', 'forwarder.idmasterfwd')
+            ->where('privilege.privilege_user_nik', Session::get('session')['user_nik'])
+            ->where('idpo', $request->id)->where('aktif', 'Y')->first();
+        // dd($dataforwarder);
+
 
         // dd($mydata);
         $data = array(
@@ -333,91 +334,95 @@ class home extends Controller
             $submode = $request->air . ' ' . 'KG';
         }
 
-        foreach ($request->dataid as $key => $val) {
+        // foreach ($request->dataid as $key => $val) {
 
-            if ($request->nobooking == '' || $request->nobooking == null) {
-                DB::rollback();
-                $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'Nomor Booking is required, please input Nomor Booking'];
-                return response()->json($status, 200);
-            }
-            if ($request->datebooking == '' || $request->datebooking == null) {
-                DB::rollback();
-                $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'Date Booking is required, please input Date Booking'];
-                return response()->json($status, 200);
-            }
-            if ($request->etd == '' || $request->etd == null) {
-                DB::rollback();
-                $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'ETD is required, please input ETD'];
-                return response()->json($status, 200);
-            }
-            if ($request->eta == '' || $request->eta == null) {
-                DB::rollback();
-                $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'ETA is required, please input ETA'];
-                return response()->json($status, 200);
-            }
-            if ($request->shipmode == '' || $request->shipmode == null) {
-                DB::rollback();
-                $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'Ship Mode is required, please input Ship Mode'];
-                return response()->json($status, 200);
-            }
-            if ($request->shipmode == 'lcl' && $request->lcl == null) {
-                DB::rollback();
-                $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'LCL is required, please input LCL'];
-                return response()->json($status, 200);
-            }
-            if ($request->shipmode == 'air' && $request->air == null) {
-                DB::rollback();
-                $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'AIR is required, please input AIR'];
-                return response()->json($status, 200);
-            }
-
-            $cekpino = po::where('id', $val['idpo'])
-                ->where(function ($var) {
-                    $var->where('pino', '=', " ")->orWhere('pino', '=', null);
-                })
-                ->first();
-            if ($cekpino != null) {
-                DB::rollback();
-                $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'Please contact the supplier for the pino input validation process'];
-                return response()->json($status, 200);
-            }
-            // dd($cekpino);
-
-            $cekformpo = formpo::where('idpo', $val['idpo'])->where('idforwarder', $val['idfwd'])->where('idmasterfwd', $val['idmasterfwd'])->where('status', 'reject')->where('aktif', 'Y')->first();
-            // dd($cekformpo);
-            if ($cekformpo != null) {
-                $del = formpo::where('id_formpo', $cekformpo->id_formpo)->update(['aktif' => 'N']);
-            }
-
-            $save1 = formpo::insert([
-                'idpo'          => $val['idpo'],
-                'idmasterfwd'   => $val['idmasterfwd'],
-                'idforwarder'   => $val['idfwd'],
-                'kode_booking'  => $request->nobooking,
-                'date_booking'  => $request->datebooking,
-                'etd'           => $request->etd,
-                'eta'           => $request->eta,
-                'shipmode'      => $request->shipmode,
-                'subshipmode'   => $submode,
-                'status'        => 'waiting',
-                'aktif'         => 'Y',
-                'created_at'    => date('Y-m-d H:i:s'),
-                'created_by'    => Session::get('session')['user_nik']
-            ]);
-
-            $save2 = po::where('id', $val['idpo'])->update([
-                'statusconfirm' => 'waiting'
-            ]);
-
-            if ($save1 && $save2) {
-                $sukses[] = "OK";
-            } else {
-                $gagal[] = "OK";
-            }
+        if ($request->nobooking == '' || $request->nobooking == null) {
+            DB::rollback();
+            $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'Nomor Booking is required, please input Nomor Booking'];
+            return response()->json($status, 200);
+        }
+        if ($request->datebooking == '' || $request->datebooking == null) {
+            DB::rollback();
+            $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'Date Booking is required, please input Date Booking'];
+            return response()->json($status, 200);
+        }
+        if ($request->etd == '' || $request->etd == null) {
+            DB::rollback();
+            $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'ETD is required, please input ETD'];
+            return response()->json($status, 200);
+        }
+        if ($request->eta == '' || $request->eta == null) {
+            DB::rollback();
+            $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'ETA is required, please input ETA'];
+            return response()->json($status, 200);
+        }
+        if ($request->shipmode == '' || $request->shipmode == null) {
+            DB::rollback();
+            $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'Ship Mode is required, please input Ship Mode'];
+            return response()->json($status, 200);
+        }
+        if ($request->shipmode == 'lcl' && $request->lcl == null) {
+            DB::rollback();
+            $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'LCL is required, please input LCL'];
+            return response()->json($status, 200);
+        }
+        if ($request->shipmode == 'air' && $request->air == null) {
+            DB::rollback();
+            $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'AIR is required, please input AIR'];
+            return response()->json($status, 200);
         }
 
+        $cekpino = po::where('id', $request->idpo)
+            ->where(function ($var) {
+                $var->where('pino', '=', " ")->orWhere('pino', '=', null);
+            })
+            ->first();
+        if ($cekpino != null) {
+            DB::rollback();
+            $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'Please contact the supplier for the pino input validation process'];
+            return response()->json($status, 200);
+        }
+        // dd($cekpino);
 
-        if (empty($gagal)) {
+        $cekformpo = formpo::where('idpo', $request->idpo)->where('idforwarder', $request->idfwd)->where('idmasterfwd', $request->idmasterfwd)->where('statusformpo', 'reject')->where('aktif', 'Y')->first();
+        // dd($cekformpo);
+        if ($cekformpo != null) {
+            $del = formpo::where('id_formpo', $cekformpo->id_formpo)->update(['aktif' => 'N']);
+        }
+
+        $save1 = formpo::insert([
+            'idpo'          => $request->idpo,
+            'idmasterfwd'   => $request->idmasterfwd,
+            'idforwarder'   => $request->idfwd,
+            'kode_booking'  => $request->nobooking,
+            'date_booking'  => $request->datebooking,
+            'etd'           => $request->etd,
+            'eta'           => $request->eta,
+            'shipmode'      => $request->shipmode,
+            'subshipmode'   => $submode,
+            'statusformpo'  => 'waiting',
+            'aktif'         => 'Y',
+            'created_at'    => date('Y-m-d H:i:s'),
+            'created_by'    => Session::get('session')['user_nik']
+        ]);
+
+        $save2 = po::where('id', $request->idpo)->update([
+            'statusconfirm' => 'waiting'
+        ]);
+
+        $save3 = forwarder::where('id_forwarder', $request->idfwd)->update([
+            'statusapproval' => 'waiting'
+        ]);
+
+        //     if ($save1 && $save2) {
+        //         $sukses[] = "OK";
+        //     } else {
+        //         $gagal[] = "OK";
+        //     }
+        // }
+
+
+        if ($save1 && $save2 && $save3) {
             DB::commit();
             $status = ['title' => 'Success', 'status' => 'success', 'message' => 'Data Successfully Saved'];
             return response()->json($status, 200);
@@ -430,63 +435,64 @@ class home extends Controller
 
     public function saveshipment(Request $request)
     {
-        $decode = json_decode($request->dataid);
-        // dd($request, $decode);
+        // $decode = json_decode($request->dataid);
+        // dd($request);
 
         $file = $request->file('file');
         $originalName = str_replace(' ', '_', $file->getClientOriginalName());
         $fileName = time() . '_' . $originalName;
         Storage::disk('local')->put($fileName, file_get_contents($request->file));
 
-        foreach ($decode as $key => $value) {
-            if ($file == '' || $file == null) {
-                $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'File BL is required, please input File BL'];
-                return response()->json($status, 200);
-            }
-
-            if ($request->nomorbl == '' || $request->nomorbl == null) {
-                $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'Nomor BL is required, please input Nomor BL'];
-                return response()->json($status, 200);
-            }
-
-            if ($request->vessel == '' || $request->vessel == null) {
-                $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'Vessel is required, please input Vessel'];
-                return response()->json($status, 200);
-            }
-
-            if ($request->invoice == '' || $request->invoice == null) {
-                $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'Invoice is required, please input Invoice'];
-                return response()->json($status, 200);
-            }
-
-            if ($request->etdfix == '' || $request->etdfix == null) {
-                $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'ETD Fix is required, please input ETD Fix'];
-                return response()->json($status, 200);
-            }
-
-            if ($request->etafix == '' || $request->etafix == null) {
-                $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'ETA Fix is required, please input ETA Fix'];
-                return response()->json($status, 200);
-            }
-
-            $save1 = formpo::where('id_formpo', $value->idformpo)->update([
-                'file_bl'    => $fileName,
-                'nomor_bl'   => $request->nomorbl,
-                'vessel'     => $request->vessel,
-                'noinv'    => $request->invoice,
-                'etdfix'     => $request->etdfix,
-                'etafix'     => $request->etafix,
-                'updated_at' => date('Y-m-d H:i:s'),
-                'updated_by' => Session::get('session')['user_nik']
-            ]);
-
-            if ($save1) {
-                $sukses[] = "OK";
-            } else {
-                $gagal[] = "OK";
-            }
+        // foreach ($decode as $key => $value) {
+        if ($file == '' || $file == null) {
+            $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'File BL is required, please input File BL'];
+            return response()->json($status, 200);
         }
-        if (empty($gagal)) {
+
+        if ($request->nomorbl == '' || $request->nomorbl == null) {
+            $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'Nomor BL is required, please input Nomor BL'];
+            return response()->json($status, 200);
+        }
+
+        if ($request->vessel == '' || $request->vessel == null) {
+            $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'Vessel is required, please input Vessel'];
+            return response()->json($status, 200);
+        }
+
+        if ($request->invoice == '' || $request->invoice == null) {
+            $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'Invoice is required, please input Invoice'];
+            return response()->json($status, 200);
+        }
+
+        if ($request->etdfix == '' || $request->etdfix == null) {
+            $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'ETD Fix is required, please input ETD Fix'];
+            return response()->json($status, 200);
+        }
+
+        if ($request->etafix == '' || $request->etafix == null) {
+            $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'ETA Fix is required, please input ETA Fix'];
+            return response()->json($status, 200);
+        }
+
+        $save1 = formpo::where('id_formpo', $request->idformpo)->update([
+            'file_bl'    => $fileName,
+            'nomor_bl'   => $request->nomorbl,
+            'vessel'     => $request->vessel,
+            'noinv'      => $request->invoice,
+            'etdfix'     => $request->etdfix,
+            'etafix'     => $request->etafix,
+            'updated_at' => date('Y-m-d H:i:s'),
+            'updated_by' => Session::get('session')['user_nik']
+        ]);
+
+        //     if ($save1) {
+        //         $sukses[] = "OK";
+        //     } else {
+        //         $gagal[] = "OK";
+        //     }
+        // }
+
+        if ($save1) {
             $status = ['title' => 'Success', 'status' => 'success', 'message' => 'Data Successfully Saved'];
             return response()->json($status, 200);
         } else {

@@ -241,7 +241,7 @@
 
             var idpo;
             var idformpo;
-            var length;
+            // var length;
             $('body').on('click', '#prosesapproval', function() {
                 console.log('objectproses :>> ', 'klik');
                 $('#nik').val('');
@@ -262,29 +262,26 @@
                     },
                 }).done(function(data) {
                     console.log('data :>> ', data.data);
-                    // let databook = data.data.databooking;
-                    // let poku = data.data.datapo;
-                    // let forward = data.data.dataforward;
-                    // let privilege = data.data.privilege;
 
                     let mydata = data.data.dataku;
 
-                    length = mydata.length;
+                    // length = mydata.length;
                     $('#detailitem').empty();
 
                     html =
                         '<table border="0" style="width:100%"><tr><th>Material</th><th>Qty Item</th><th>Qty Allocation</th><th>Status Allocation</th></tr>';
-                    for (let index = 0; index < mydata.length; index++) {
+                    // for (let index = 0; index < mydata.length; index++) {
 
-                        html +=
-                            '<tr><td>' +
-                            mydata[index].matcontents + '</td><td>' +
-                            mydata[index].qtypo + '</td><td>' + mydata[index].qty_allocation +
-                            '</td><td>' + mydata[index].statusalokasi +
-                            '</td><td><input type="hidden" id="dataid-' + index + '" data-idpo="' +
-                            mydata[index].id + '" data-idformpo="' + mydata[index].id_formpo +
-                            '"></td></tr>';
-                    }
+                    html +=
+                        '<tr><td>' +
+                        mydata.matcontents + '</td><td>' +
+                        mydata.qtypo + '</td><td>' + mydata.qty_allocation +
+                        '</td><td>' + mydata.statusforwarder +
+                        '</td><td><input type="hidden" id="dataid" data-idpo="' +
+                        mydata.id + '" data-idfwd="' + mydata.id_forwarder + '" data-idformpo="' +
+                        mydata.id_formpo +
+                        '"></td></tr>';
+                    // }
 
                     html += "</table>";
                     $('#detailitem').html(html);
@@ -295,16 +292,16 @@
                     // usernama = privilege.privilege_user_name;
                     // tglpengajuan = databook.created_at;
 
-                    $('#nomorpo').val(mydata[0].pono);
-                    $('#nobook').val(mydata[0].kode_booking);
-                    $('#datebook').val(mydata[0].date_booking);
-                    $('#etd').val(mydata[0].etd);
-                    $('#eta').val(mydata[0].eta);
-                    $('#shipmode').val(mydata[0].shipmode);
-                    $('#submode').val(mydata[0].subshipmode);
-                    $('#forwarder').val(mydata[0].name);
-                    $('#pengajunama').html(mydata[0].privilege_user_name);
-                    $('#pengajunik').val(mydata[0].privilege_user_nik);
+                    $('#nomorpo').val(mydata.pono);
+                    $('#nobook').val(mydata.kode_booking);
+                    $('#datebook').val(mydata.date_booking);
+                    $('#etd').val(mydata.etd);
+                    $('#eta').val(mydata.eta);
+                    $('#shipmode').val(mydata.shipmode);
+                    $('#submode').val(mydata.subshipmode);
+                    $('#forwarder').val(mydata.name);
+                    $('#pengajunama').html(mydata.privilege_user_name);
+                    $('#pengajunik').val(mydata.privilege_user_nik);
                 })
             });
 
@@ -323,16 +320,19 @@
 
             $('#submittolak').click(function(e) {
                 let tolak = $('#tolak_alasan').val();
+                let idpo = $('#dataid').attr('data-idpo');
+                let idfwd = $('#dataid').attr('data-idfwd');
+                let idformpo = $('#dataid').attr('data-idformpo');
 
-                var arrayku = [];
-                for (let index = 0; index < Number(length); index++) {
-                    let data = {
-                        'idpo': $('#dataid-' + index).attr('data-idpo'),
-                        'idformpo': $('#dataid-' + index).attr('data-idformpo'),
-                    };
+                // var arrayku = [];
+                // for (let index = 0; index < Number(length); index++) {
+                //     let data = {
+                //         'idpo': $('#dataid-' + index).attr('data-idpo'),
+                //         'idformpo': $('#dataid-' + index).attr('data-idformpo'),
+                //     };
 
-                    arrayku.push(data);
-                }
+                //     arrayku.push(data);
+                // }
 
                 if (tolak == '' || tolak == null) {
                     Swal.fire({
@@ -347,7 +347,9 @@
                         dataType: 'json',
                         data: {
                             _token: $('meta[name=csrf-token]').attr('content'),
-                            dataid: arrayku,
+                            idpo: idpo,
+                            idfwd: idfwd,
+                            idformpo: idformpo,
                             tolak: tolak
                         },
                         success: function(response) {
@@ -361,7 +363,7 @@
                                 // $('#approvalfwd').modal('hide');
                                 // table.ajax.reload();
                                 (response.status == 'success') ? window.location
-                                    .replace("{{ route('dashcam') }}"):
+                                    .replace("{{ route('page_approval') }}"):
                                     ''
                             });
                             return;
@@ -394,22 +396,27 @@
                             return;
                         } else {
                             console.log('object :>> ', 'ok');
-                            var arrayku = [];
-                            for (let index = 0; index < Number(length); index++) {
-                                let data = {
-                                    'idpo': $('#dataid-' + index).attr('data-idpo'),
-                                    'idformpo': $('#dataid-' + index).attr('data-idformpo'),
-                                };
+                            let idpo = $('#dataid').attr('data-idpo');
+                            let idfwd = $('#dataid').attr('data-idfwd');
+                            let idformpo = $('#dataid').attr('data-idformpo');
+                            // var arrayku = [];
+                            // for (let index = 0; index < Number(length); index++) {
+                            //     let data = {
+                            //         'idpo': $('#dataid-' + index).attr('data-idpo'),
+                            //         'idformpo': $('#dataid-' + index).attr('data-idformpo'),
+                            //     };
 
-                                arrayku.push(data);
-                            }
+                            //     arrayku.push(data);
+                            // }
                             $.ajax({
                                 url: "{!! route('approvalstatus', ['disetujui']) !!}",
                                 type: 'POST',
                                 dataType: 'json',
                                 data: {
                                     _token: $('meta[name=csrf-token]').attr('content'),
-                                    dataid: arrayku,
+                                    idpo: idpo,
+                                    idfwd: idfwd,
+                                    idformpo: idformpo,
                                 },
                                 success: function(response) {
                                     console.log('response :>> ', response);
@@ -422,7 +429,7 @@
                                         // $('#approvalfwd').modal('hide');
                                         // table.ajax.reload();
                                         (response.status == 'success') ? window.location
-                                            .replace("{{ route('dashcam') }}"):
+                                            .replace("{{ route('page_approval') }}"):
                                             ''
                                     });
                                     return;
