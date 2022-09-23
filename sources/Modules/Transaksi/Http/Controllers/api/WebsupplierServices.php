@@ -189,7 +189,7 @@ class WebsupplierServices extends Controller
         if($update){
             modellogproses::insert(['typelog'=>'prosesupdatepi', 'activity'=>'=== SUCCESS UPDATE PI NUMBER ===', 'status'=>true, 'datetime'=>date('Y-m-d H:i:s'), 'from'=>'api_updatepi', 'created_at'=>date('Y-m-d H:i:s')]);
             $failed['message'] = "Data Pi Number Successfully Updated";
-            $failed['success'] = false;
+            $failed['success'] = true;
             $failed['title'] = "Success!";
             $failed['type'] = "success";
             return response()->json($failed, Response::HTTP_OK);
