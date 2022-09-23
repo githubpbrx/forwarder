@@ -12,6 +12,7 @@ use Modules\Selfservice\Http\Controllers\CutiController;
 use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Support\Facades\Hash;
 use Modules\System\Models\modelsystem;
+use Modules\System\Models\modellogproses;
 use Modules\Transaksi\Models\mastersupplier as supplier;
 use Modules\Transaksi\Models\masterforwarder as forward;
 use Modules\Transaksi\Models\modelpo as po;
@@ -61,73 +62,65 @@ class WebsupplierServices extends Controller
             return response()->json($auth, Response::HTTP_UNAUTHORIZED);
         }
 
-        $po = $req->pono;
+        $noinv = $req->noinv;
 
-        $data = po::where('pono',$po)->get();
+        modellogproses::insert(['typelog'=>'api', 'activity'=>'==== START CHECKING get data Shipping, inv no => '.$noinv, 'status'=>true, 'datetime'=>date('Y-m-d H:i:s'), 'from'=>'api_shipping', 'created_at'=>date('Y-m-d H:i:s')]);
+        $data = formpo::where('noinv',$noinv)->where('status','confirm')->where('aktif','Y')->get();
         $datapo = array();
+
+        if(count($data)==0){
+            modellogproses::insert(['typelog'=>'api', 'activity'=>'failed alert : Data Not found', 'status'=>false, 'datetime'=>date('Y-m-d H:i:s'), 'from'=>'api_shipping', 'created_at'=>date('Y-m-d H:i:s')]);
+            $datasend['message'] = 'Data Not Found';
+            $datasend['success'] = false;
+            $datasend['title'] = "WARNING!";
+            $datasend['type'] = "error";
+            return response()->json($datasend, Response::HTTP_NOT_FOUND);
+        }
+
         foreach($data as $key => $r){
-            $lp['pono'] = $r->pono;
-            $lp['podate'] = $r->podate;
-            $lp['matcontents'] = $r->matcontents;
-            $lp['item'] = $r->itemdesc;
-            $lp['style'] = $r->style;
-            $lp['color'] = $r->colorcode;
+            $po = po::where('id',$r->idpo)->first();
+
+            $lp['pono'] = $po->pono;
+            $lp['matcontents'] = $po->matcontents;
+            $lp['colorcode'] = $po->colorcode;
             $lp['size'] = $r->size;
-            $lp['kpno'] = $r->kpno;
-            $lp['qtypo'] = $r->qtypo;
 
-            $fwd = fwd::with('masterforwarder')->where('idpo',$r->id)->where('aktif','Y')->get();
-            $arfwd = array();
-            foreach($fwd as $key => $rf){
-                $af['qtyallocation'] = $rf->qty_allocation;
-                $af['forwarder'] = ($rf->masterforwarder==null) ? '' : $rf->masterforwarder->name;
+            $fw = forward::where('id',$r->idforwarder)->first();
+            $lp['forwardername'] = $fw->name;
 
-                //cekfwe
-                $frm = formpo::where('idforwarder',$rf->id_forwarder)->first();
-                if($frm==null){
-                    $af['status'] = "";
-                    $af['bookingcode'] = "";
-                    $af['bookingdate'] = "";
-                    $af['etd'] = "";
-                    $af['eta'] = "";
-                    $af['shipmode'] = "";
-                    $af['shipdetail'] = "";
-                    $af['file_bl'] = "";
-                    $af['nomor_bl'] = "";
-                    $af['vessel'] = "";
-                }else{
-                    $af['status'] = $frm->status;
-                    $af['bookingcode'] = $frm->kode_booking;
-                    $af['bookingdate'] = $frm->kode_booking;
-                    $af['etd'] = $frm->etd;
-                    $af['eta'] = $frm->eta;
-                    $af['shipmode'] = $frm->shipmode;
-                    $af['shipdetail'] = $frm->subshipmode;
-                    if($frm->file_bl!=""){
-                        $urlku = $this->baseurl.'sources/storage/app'.$frm->file_bl;
-                    }else{
-                        $urlku = '';
-                    }
-                    $af['file_bl'] = $urlku;
-                    $af['nomor_bl'] = $frm->nomor_bl;
-                    $af['vessel'] = $frm->vessel;
-                }
-                array_push($arfwd, $af);
-                unset($af);
-            }
-            $lp['forwarder'] = $arfwd;
+            $all = fwd::where('id_forwarder',$r->idmasterfwd)->first();
+            $lp['qtyallocation'] = $all->qty_allocation;
+            $lp['statusallocation'] = $all->status;
+
+            $lp['kodebooking'] = $r->kode_booking;
+            $lp['datebooking'] = $r->date_booking;
+            $lp['estimasietd'] = $r->etd;
+            $lp['estimasieta'] = $r->eta;
+            $lp['shipmode'] = $r->shipmode;
+            $lp['subshipmode'] = $r->subshipmode;
+            $lp['etd'] = $r->etdfix;
+            $lp['eta'] = $r->etafix;
+            $lp['nomor_bl'] = $r->nomor_bl;
+            $lp['vessel'] = $r->vessel;
+            $sys = modelsystem::first();
+            $url = $sys->url.'sources/storage/app/'.$r->file_bl;
+            $lp['file_bl'] = $url;
+           
+            modellogproses::insert(['typelog'=>'api', 'activity'=>json_encode($lp), 'status'=>true, 'datetime'=>date('Y-m-d H:i:s'), 'from'=>'api_shipping', 'created_at'=>date('Y-m-d H:i:s')]);
             array_push($datapo,$lp);
             unset($lp);
         }
 
 
         if(count($datapo)==0){
+            modellogproses::insert(['typelog'=>'api', 'activity'=>'failed alert : Data Not found (array null)', 'status'=>false, 'datetime'=>date('Y-m-d H:i:s'), 'from'=>'api_shipping', 'created_at'=>date('Y-m-d H:i:s')]);
             $datasend['message'] = 'Data Not Found';
             $datasend['success'] = false;
             $datasend['title'] = "WARNING!";
             $datasend['type'] = "error";
             return response()->json($datasend, Response::HTTP_NOT_FOUND);
         }else{
+            modellogproses::insert(['typelog'=>'api', 'activity'=>'=== SUCCESSS ===', 'status'=>true, 'datetime'=>date('Y-m-d H:i:s'), 'from'=>'api_shipping', 'created_at'=>date('Y-m-d H:i:s')]);
             $datasend['message'] = 'Data Found';
             $datasend['success'] = true;
             $datasend['title'] = "SUCCESS!";
@@ -136,97 +129,79 @@ class WebsupplierServices extends Controller
             return response()->json($datasend, Response::HTTP_OK);
         }
 
-        dd($datapo, Hash::make('bismillahsemangatbekerja'));
     }
 
-    function shippingconfirm(Request $req){
+   
+
+    public function updatepi(Request $req){
+        // $2y$10$gpwr15S9I67MHEx0gCD0jeIYovjwl6ymv7zfu4QaaZjVEufbXItl6
         $auth = $this->authorization($req);
         if (isset($auth['failed'])) {
             return response()->json($auth, Response::HTTP_UNAUTHORIZED);
         }
-
-        $po = $req->pono;
-
-        $dataid = po::where('pono',$po)->pluck('id');
-
-
-        $fwd = formpo::wherein('idpo',$dataid)->where('status','confirm')->get();
-        dd($dataid, $fwd);
-
-
-
-        $datapo = array();
-        foreach($data as $key => $r){
-            $lp['pono'] = $r->pono;
-            $lp['podate'] = $r->podate;
-            $lp['matcontents'] = $r->matcontents;
-            $lp['item'] = $r->itemdesc;
-            $lp['style'] = $r->style;
-            $lp['color'] = $r->colorcode;
-            $lp['size'] = $r->size;
-            $lp['kpno'] = $r->kpno;
-            $lp['qtypo'] = $r->qtypo;
-
-            $fwd = fwd::with('masterforwarder')->join('formpo as a', 'a.idforwarder','forwarder.forwarder_id')->where('forwarder.idpo',$r->id)->where('forwarder.aktif','Y')->get();
-            $arfwd = array();
-            foreach($fwd as $key => $rf){
-                $af['qtyallocation'] = $rf->qty_allocation;
-                $af['forwarder'] = ($rf->masterforwarder==null) ? '' : $rf->masterforwarder->name;
-
-                //cekfwe
-                $frm = formpo::where('idforwarder',$rf->id_forwarder)->first();
-                if($frm==null){
-                    $af['status'] = "";
-                    $af['bookingcode'] = "";
-                    $af['bookingdate'] = "";
-                    $af['etd'] = "";
-                    $af['eta'] = "";
-                    $af['shipmode'] = "";
-                    $af['shipdetail'] = "";
-                    $af['file_bl'] = "";
-                    $af['nomor_bl'] = "";
-                    $af['vessel'] = "";
-                }else{
-                    $af['status'] = $frm->status;
-                    $af['bookingcode'] = $frm->kode_booking;
-                    $af['bookingdate'] = $frm->kode_booking;
-                    $af['etd'] = $frm->etd;
-                    $af['eta'] = $frm->eta;
-                    $af['shipmode'] = $frm->shipmode;
-                    $af['shipdetail'] = $frm->subshipmode;
-                    if($frm->file_bl!=""){
-                        $urlku = $this->baseurl.'sources/storage/app'.$frm->file_bl;
-                    }else{
-                        $urlku = '';
-                    }
-                    $af['file_bl'] = $urlku;
-                    $af['nomor_bl'] = $frm->nomor_bl;
-                    $af['vessel'] = $frm->vessel;
-                }
-                array_push($arfwd, $af);
-                unset($af);
-            }
-            $lp['forwarder'] = $arfwd;
-            array_push($datapo,$lp);
-            unset($lp);
+        $pono = $req->pono;
+        $matcontents = $req->matcontents;
+        $colorcode = $req->colorcode;
+        $size = $req->size;
+        $pino = $req->pino;
+        $pirecdate = $req->pirecdate;
+        $pideldate = $req->pideldate;
+        modellogproses::insert(['typelog'=>'prosesupdatepi', 'activity'=>'==== START CHECKING Update PI po => '.$pono.'; matcontents => '.$matcontents.'; colorcode=>'.$colorcode.'; size=>'.$size.'; pino =>'.$pino.'; pirecdate=>'.$pirecdate.'; pideldate=>'.$pideldate, 'status'=>true, 'datetime'=>date('Y-m-d H:i:s'), 'from'=>'api_updatepi', 'created_at'=>date('Y-m-d H:i:s')]);
+        if($pono==""){
+            modellogproses::insert(['typelog'=>'prosesupdatepi', 'activity'=>'FAILED alert => The PO your send cannot be empty', 'status'=>false, 'datetime'=>date('Y-m-d H:i:s'), 'from'=>'api_updatepi', 'created_at'=>date('Y-m-d H:i:s')]);
+            modellogproses::insert(['typelog'=>'prosesupdatepi', 'activity'=>'=== END PROSES => ROLLBACK ===', 'status'=>false, 'datetime'=>date('Y-m-d H:i:s'), 'from'=>'api_updatepi', 'created_at'=>date('Y-m-d H:i:s')]);
+            $failed['message'] = "The PO your send cannot be empty";
+            $failed['success'] = false;
+            $failed['title'] = "Warning!";
+            $failed['type'] = "warning";
+            return response()->json($failed, Response::HTTP_UNPROCESSABLE_ENTITY);
+        }
+        if($matcontents==""){
+            modellogproses::insert(['typelog'=>'prosesupdatepi', 'activity'=>'FAILED alert => The Items your send cannot be empty', 'status'=>false, 'datetime'=>date('Y-m-d H:i:s'), 'from'=>'api_updatepi', 'created_at'=>date('Y-m-d H:i:s')]);
+            modellogproses::insert(['typelog'=>'prosesupdatepi', 'activity'=>'=== END PROSES => ROLLBACK ===', 'status'=>false, 'datetime'=>date('Y-m-d H:i:s'), 'from'=>'api_updatepi', 'created_at'=>date('Y-m-d H:i:s')]);
+            $failed['message'] = "The Items your send cannot be empty";
+            $failed['success'] = false;
+            $failed['title'] = "Warning!";
+            $failed['type'] = "warning";
+            return response()->json($failed, Response::HTTP_UNPROCESSABLE_ENTITY);
         }
 
+        if($pino==""){
+            modellogproses::insert(['typelog'=>'prosesupdatepi', 'activity'=>'FAILED alert => The PI Number your send cannot be empty', 'status'=>false, 'datetime'=>date('Y-m-d H:i:s'), 'from'=>'api_updatepi', 'created_at'=>date('Y-m-d H:i:s')]);
+            modellogproses::insert(['typelog'=>'prosesupdatepi', 'activity'=>'=== END PROSES => ROLLBACK ===', 'status'=>false, 'datetime'=>date('Y-m-d H:i:s'), 'from'=>'api_updatepi', 'created_at'=>date('Y-m-d H:i:s')]);
+            $failed['message'] = "The PI Number your send cannot be empty";
+            $failed['success'] = false;
+            $failed['title'] = "Warning!";
+            $failed['type'] = "warning";
+            return response()->json($failed, Response::HTTP_UNPROCESSABLE_ENTITY);
+        }
+        if($pirecdate=="" || $pideldate==""){
+            modellogproses::insert(['typelog'=>'prosesupdatepi', 'activity'=>'FAILED alert => The PI Rec Date/PI Delivery Date your send cannot be empty', 'status'=>false, 'datetime'=>date('Y-m-d H:i:s'), 'from'=>'api_updatepi', 'created_at'=>date('Y-m-d H:i:s')]);
+            modellogproses::insert(['typelog'=>'prosesupdatepi', 'activity'=>'=== END PROSES => ROLLBACK ===', 'status'=>false, 'datetime'=>date('Y-m-d H:i:s'), 'from'=>'api_updatepi', 'created_at'=>date('Y-m-d H:i:s')]);
+            $failed['message'] = "The PI Rec Date/PI Delivery Date your send cannot be empty";
+            $failed['success'] = false;
+            $failed['title'] = "Warning!";
+            $failed['type'] = "warning";
+            return response()->json($failed, Response::HTTP_UNPROCESSABLE_ENTITY);
+        }
 
-        if(count($datapo)==0){
-            $datasend['message'] = 'Data Not Found';
-            $datasend['success'] = false;
-            $datasend['title'] = "WARNING!";
-            $datasend['type'] = "error";
-            return response()->json($datasend, Response::HTTP_NOT_FOUND);
+        $update = po::where('pono',$pono)->where('matcontents',$matcontents)->where('colorcode',$colorcode)->where('size',$size)->update(['pino'=>$pino, 'pirecdate'=>$pirecdate, 'pideldate'=>$pideldate]);
+        if($update){
+            modellogproses::insert(['typelog'=>'prosesupdatepi', 'activity'=>'=== SUCCESS UPDATE PI NUMBER ===', 'status'=>true, 'datetime'=>date('Y-m-d H:i:s'), 'from'=>'api_updatepi', 'created_at'=>date('Y-m-d H:i:s')]);
+            $failed['message'] = "Data Pi Number Successfully Updated";
+            $failed['success'] = false;
+            $failed['title'] = "Success!";
+            $failed['type'] = "success";
+            return response()->json($failed, Response::HTTP_OK);
         }else{
-            $datasend['message'] = 'Data Found';
-            $datasend['success'] = true;
-            $datasend['title'] = "SUCCESS!";
-            $datasend['type'] = "success";
-            $datasend['data'] = $datapo;
-            return response()->json($datasend, Response::HTTP_OK);
+            modellogproses::insert(['typelog'=>'prosesupdatepi', 'activity'=>'FAILED alert => Data Pi Number failed update', 'status'=>false, 'datetime'=>date('Y-m-d H:i:s'), 'from'=>'api_updatepi', 'created_at'=>date('Y-m-d H:i:s')]);
+            modellogproses::insert(['typelog'=>'prosesupdatepi', 'activity'=>'=== END PROSES => ROLLBACK ===', 'status'=>false, 'datetime'=>date('Y-m-d H:i:s'), 'from'=>'api_updatepi', 'created_at'=>date('Y-m-d H:i:s')]);
+            $failed['message'] = "Data Pi Number failed update";
+            $failed['success'] = false;
+            $failed['title'] = "Warning!";
+            $failed['type'] = "warning";
+            return response()->json($failed, Response::HTTP_UNPROCESSABLE_ENTITY);
         }
-
-        dd($datapo, Hash::make('bismillahsemangatbekerja'));
+        dd($req);
     }
 }
