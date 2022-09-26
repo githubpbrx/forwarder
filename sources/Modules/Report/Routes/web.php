@@ -30,4 +30,12 @@ Route::prefix('report')->group(function () {
         Route::get('/getexcelalokasi/{id}', 'ReportAlokasi@excelalokasi')->name('report_excelalokasi');
         Route::get('/getexcelalokasiall/', 'ReportAlokasi@excelalokasiall')->name('report_excelalokasiall');
     });
+
+    Route::group(['prefix' => 'forwarder'], function () {
+        Route::get('/', 'ReportForwarder@index')->name('reportforwarder');
+        Route::post('/getpo/', 'ReportForwarder@getpo')->name('report_getpo');
+        Route::get('search', 'ReportForwarder@datatable');
+        Route::post('/getdetailforwarder/', 'ReportForwarder@detailforwarder')->name('report_detailforwarder');
+        Route::get('/getexcelpo/{id}', 'ReportForwarder@excelpo')->name('report_excelpo');
+    });
 });
