@@ -56,7 +56,8 @@ class WebsupplierServices extends Controller
         }
     }
 
-    function shipping(Request $req){
+    function shipping(Request $req)
+    {
         $auth = $this->authorization($req);
         if (isset($auth['failed'])) {
             return response()->json($auth, Response::HTTP_UNAUTHORIZED);
@@ -64,12 +65,12 @@ class WebsupplierServices extends Controller
 
         $noinv = $req->noinv;
 
-        modellogproses::insert(['typelog'=>'api', 'activity'=>'==== START CHECKING get data Shipping, inv no => '.$noinv, 'status'=>true, 'datetime'=>date('Y-m-d H:i:s'), 'from'=>'api_shipping', 'created_at'=>date('Y-m-d H:i:s')]);
-        $data = formpo::where('noinv',$noinv)->where('status','confirm')->where('aktif','Y')->get();
+        modellogproses::insert(['typelog' => 'api', 'activity' => '==== START CHECKING get data Shipping, inv no => ' . $noinv, 'status' => true, 'datetime' => date('Y-m-d H:i:s'), 'from' => 'api_shipping', 'created_at' => date('Y-m-d H:i:s')]);
+        $data = formpo::where('noinv', $noinv)->where('statusformpo', 'confirm')->where('aktif', 'Y')->get();
         $datapo = array();
 
-        if(count($data)==0){
-            modellogproses::insert(['typelog'=>'api', 'activity'=>'failed alert : Data Not found', 'status'=>false, 'datetime'=>date('Y-m-d H:i:s'), 'from'=>'api_shipping', 'created_at'=>date('Y-m-d H:i:s')]);
+        if (count($data) == 0) {
+            modellogproses::insert(['typelog' => 'api', 'activity' => 'failed alert : Data Not found', 'status' => false, 'datetime' => date('Y-m-d H:i:s'), 'from' => 'api_shipping', 'created_at' => date('Y-m-d H:i:s')]);
             $datasend['message'] = 'Data Not Found';
             $datasend['success'] = false;
             $datasend['title'] = "WARNING!";
@@ -77,18 +78,18 @@ class WebsupplierServices extends Controller
             return response()->json($datasend, Response::HTTP_NOT_FOUND);
         }
 
-        foreach($data as $key => $r){
-            $po = po::where('id',$r->idpo)->first();
+        foreach ($data as $key => $r) {
+            $po = po::where('id', $r->idpo)->first();
 
             $lp['pono'] = $po->pono;
             $lp['matcontents'] = $po->matcontents;
             $lp['colorcode'] = $po->colorcode;
             $lp['size'] = $r->size;
 
-            $fw = forward::where('id',$r->idforwarder)->first();
+            $fw = forward::where('id', $r->idforwarder)->first();
             $lp['forwardername'] = $fw->name;
 
-            $all = fwd::where('id_forwarder',$r->idmasterfwd)->first();
+            $all = fwd::where('id_forwarder', $r->idmasterfwd)->first();
             $lp['qtyallocation'] = $all->qty_allocation;
             $lp['statusallocation'] = $all->status;
 
@@ -103,24 +104,24 @@ class WebsupplierServices extends Controller
             $lp['nomor_bl'] = $r->nomor_bl;
             $lp['vessel'] = $r->vessel;
             $sys = modelsystem::first();
-            $url = $sys->url.'sources/storage/app/'.$r->file_bl;
+            $url = $sys->url . 'sources/storage/app/' . $r->file_bl;
             $lp['file_bl'] = $url;
-           
-            modellogproses::insert(['typelog'=>'api', 'activity'=>json_encode($lp), 'status'=>true, 'datetime'=>date('Y-m-d H:i:s'), 'from'=>'api_shipping', 'created_at'=>date('Y-m-d H:i:s')]);
-            array_push($datapo,$lp);
+
+            modellogproses::insert(['typelog' => 'api', 'activity' => json_encode($lp), 'status' => true, 'datetime' => date('Y-m-d H:i:s'), 'from' => 'api_shipping', 'created_at' => date('Y-m-d H:i:s')]);
+            array_push($datapo, $lp);
             unset($lp);
         }
 
 
-        if(count($datapo)==0){
-            modellogproses::insert(['typelog'=>'api', 'activity'=>'failed alert : Data Not found (array null)', 'status'=>false, 'datetime'=>date('Y-m-d H:i:s'), 'from'=>'api_shipping', 'created_at'=>date('Y-m-d H:i:s')]);
+        if (count($datapo) == 0) {
+            modellogproses::insert(['typelog' => 'api', 'activity' => 'failed alert : Data Not found (array null)', 'status' => false, 'datetime' => date('Y-m-d H:i:s'), 'from' => 'api_shipping', 'created_at' => date('Y-m-d H:i:s')]);
             $datasend['message'] = 'Data Not Found';
             $datasend['success'] = false;
             $datasend['title'] = "WARNING!";
             $datasend['type'] = "error";
             return response()->json($datasend, Response::HTTP_NOT_FOUND);
-        }else{
-            modellogproses::insert(['typelog'=>'api', 'activity'=>'=== SUCCESSS ===', 'status'=>true, 'datetime'=>date('Y-m-d H:i:s'), 'from'=>'api_shipping', 'created_at'=>date('Y-m-d H:i:s')]);
+        } else {
+            modellogproses::insert(['typelog' => 'api', 'activity' => '=== SUCCESSS ===', 'status' => true, 'datetime' => date('Y-m-d H:i:s'), 'from' => 'api_shipping', 'created_at' => date('Y-m-d H:i:s')]);
             $datasend['message'] = 'Data Found';
             $datasend['success'] = true;
             $datasend['title'] = "SUCCESS!";
@@ -128,12 +129,12 @@ class WebsupplierServices extends Controller
             $datasend['data'] = $datapo;
             return response()->json($datasend, Response::HTTP_OK);
         }
-
     }
 
-   
 
-    public function updatepi(Request $req){
+
+    public function updatepi(Request $req)
+    {
         // $2y$10$gpwr15S9I67MHEx0gCD0jeIYovjwl6ymv7zfu4QaaZjVEufbXItl6
         $auth = $this->authorization($req);
         if (isset($auth['failed'])) {
@@ -146,19 +147,19 @@ class WebsupplierServices extends Controller
         $pino = $req->pino;
         $pirecdate = $req->pirecdate;
         $pideldate = $req->pideldate;
-        modellogproses::insert(['typelog'=>'prosesupdatepi', 'activity'=>'==== START CHECKING Update PI po => '.$pono.'; matcontents => '.$matcontents.'; colorcode=>'.$colorcode.'; size=>'.$size.'; pino =>'.$pino.'; pirecdate=>'.$pirecdate.'; pideldate=>'.$pideldate, 'status'=>true, 'datetime'=>date('Y-m-d H:i:s'), 'from'=>'api_updatepi', 'created_at'=>date('Y-m-d H:i:s')]);
-        if($pono==""){
-            modellogproses::insert(['typelog'=>'prosesupdatepi', 'activity'=>'FAILED alert => The PO your send cannot be empty', 'status'=>false, 'datetime'=>date('Y-m-d H:i:s'), 'from'=>'api_updatepi', 'created_at'=>date('Y-m-d H:i:s')]);
-            modellogproses::insert(['typelog'=>'prosesupdatepi', 'activity'=>'=== END PROSES => ROLLBACK ===', 'status'=>false, 'datetime'=>date('Y-m-d H:i:s'), 'from'=>'api_updatepi', 'created_at'=>date('Y-m-d H:i:s')]);
+        modellogproses::insert(['typelog' => 'prosesupdatepi', 'activity' => '==== START CHECKING Update PI po => ' . $pono . '; matcontents => ' . $matcontents . '; colorcode=>' . $colorcode . '; size=>' . $size . '; pino =>' . $pino . '; pirecdate=>' . $pirecdate . '; pideldate=>' . $pideldate, 'status' => true, 'datetime' => date('Y-m-d H:i:s'), 'from' => 'api_updatepi', 'created_at' => date('Y-m-d H:i:s')]);
+        if ($pono == "") {
+            modellogproses::insert(['typelog' => 'prosesupdatepi', 'activity' => 'FAILED alert => The PO your send cannot be empty', 'status' => false, 'datetime' => date('Y-m-d H:i:s'), 'from' => 'api_updatepi', 'created_at' => date('Y-m-d H:i:s')]);
+            modellogproses::insert(['typelog' => 'prosesupdatepi', 'activity' => '=== END PROSES => ROLLBACK ===', 'status' => false, 'datetime' => date('Y-m-d H:i:s'), 'from' => 'api_updatepi', 'created_at' => date('Y-m-d H:i:s')]);
             $failed['message'] = "The PO your send cannot be empty";
             $failed['success'] = false;
             $failed['title'] = "Warning!";
             $failed['type'] = "warning";
             return response()->json($failed, Response::HTTP_UNPROCESSABLE_ENTITY);
         }
-        if($matcontents==""){
-            modellogproses::insert(['typelog'=>'prosesupdatepi', 'activity'=>'FAILED alert => The Items your send cannot be empty', 'status'=>false, 'datetime'=>date('Y-m-d H:i:s'), 'from'=>'api_updatepi', 'created_at'=>date('Y-m-d H:i:s')]);
-            modellogproses::insert(['typelog'=>'prosesupdatepi', 'activity'=>'=== END PROSES => ROLLBACK ===', 'status'=>false, 'datetime'=>date('Y-m-d H:i:s'), 'from'=>'api_updatepi', 'created_at'=>date('Y-m-d H:i:s')]);
+        if ($matcontents == "") {
+            modellogproses::insert(['typelog' => 'prosesupdatepi', 'activity' => 'FAILED alert => The Items your send cannot be empty', 'status' => false, 'datetime' => date('Y-m-d H:i:s'), 'from' => 'api_updatepi', 'created_at' => date('Y-m-d H:i:s')]);
+            modellogproses::insert(['typelog' => 'prosesupdatepi', 'activity' => '=== END PROSES => ROLLBACK ===', 'status' => false, 'datetime' => date('Y-m-d H:i:s'), 'from' => 'api_updatepi', 'created_at' => date('Y-m-d H:i:s')]);
             $failed['message'] = "The Items your send cannot be empty";
             $failed['success'] = false;
             $failed['title'] = "Warning!";
@@ -166,18 +167,18 @@ class WebsupplierServices extends Controller
             return response()->json($failed, Response::HTTP_UNPROCESSABLE_ENTITY);
         }
 
-        if($pino==""){
-            modellogproses::insert(['typelog'=>'prosesupdatepi', 'activity'=>'FAILED alert => The PI Number your send cannot be empty', 'status'=>false, 'datetime'=>date('Y-m-d H:i:s'), 'from'=>'api_updatepi', 'created_at'=>date('Y-m-d H:i:s')]);
-            modellogproses::insert(['typelog'=>'prosesupdatepi', 'activity'=>'=== END PROSES => ROLLBACK ===', 'status'=>false, 'datetime'=>date('Y-m-d H:i:s'), 'from'=>'api_updatepi', 'created_at'=>date('Y-m-d H:i:s')]);
+        if ($pino == "") {
+            modellogproses::insert(['typelog' => 'prosesupdatepi', 'activity' => 'FAILED alert => The PI Number your send cannot be empty', 'status' => false, 'datetime' => date('Y-m-d H:i:s'), 'from' => 'api_updatepi', 'created_at' => date('Y-m-d H:i:s')]);
+            modellogproses::insert(['typelog' => 'prosesupdatepi', 'activity' => '=== END PROSES => ROLLBACK ===', 'status' => false, 'datetime' => date('Y-m-d H:i:s'), 'from' => 'api_updatepi', 'created_at' => date('Y-m-d H:i:s')]);
             $failed['message'] = "The PI Number your send cannot be empty";
             $failed['success'] = false;
             $failed['title'] = "Warning!";
             $failed['type'] = "warning";
             return response()->json($failed, Response::HTTP_UNPROCESSABLE_ENTITY);
         }
-        if($pirecdate=="" || $pideldate==""){
-            modellogproses::insert(['typelog'=>'prosesupdatepi', 'activity'=>'FAILED alert => The PI Rec Date/PI Delivery Date your send cannot be empty', 'status'=>false, 'datetime'=>date('Y-m-d H:i:s'), 'from'=>'api_updatepi', 'created_at'=>date('Y-m-d H:i:s')]);
-            modellogproses::insert(['typelog'=>'prosesupdatepi', 'activity'=>'=== END PROSES => ROLLBACK ===', 'status'=>false, 'datetime'=>date('Y-m-d H:i:s'), 'from'=>'api_updatepi', 'created_at'=>date('Y-m-d H:i:s')]);
+        if ($pirecdate == "" || $pideldate == "") {
+            modellogproses::insert(['typelog' => 'prosesupdatepi', 'activity' => 'FAILED alert => The PI Rec Date/PI Delivery Date your send cannot be empty', 'status' => false, 'datetime' => date('Y-m-d H:i:s'), 'from' => 'api_updatepi', 'created_at' => date('Y-m-d H:i:s')]);
+            modellogproses::insert(['typelog' => 'prosesupdatepi', 'activity' => '=== END PROSES => ROLLBACK ===', 'status' => false, 'datetime' => date('Y-m-d H:i:s'), 'from' => 'api_updatepi', 'created_at' => date('Y-m-d H:i:s')]);
             $failed['message'] = "The PI Rec Date/PI Delivery Date your send cannot be empty";
             $failed['success'] = false;
             $failed['title'] = "Warning!";
@@ -185,17 +186,17 @@ class WebsupplierServices extends Controller
             return response()->json($failed, Response::HTTP_UNPROCESSABLE_ENTITY);
         }
 
-        $update = po::where('pono',$pono)->where('matcontents',$matcontents)->where('colorcode',$colorcode)->where('size',$size)->update(['pino'=>$pino, 'pirecdate'=>$pirecdate, 'pideldate'=>$pideldate]);
-        if($update){
-            modellogproses::insert(['typelog'=>'prosesupdatepi', 'activity'=>'=== SUCCESS UPDATE PI NUMBER ===', 'status'=>true, 'datetime'=>date('Y-m-d H:i:s'), 'from'=>'api_updatepi', 'created_at'=>date('Y-m-d H:i:s')]);
+        $update = po::where('pono', $pono)->where('matcontents', $matcontents)->where('colorcode', $colorcode)->where('size', $size)->update(['pino' => $pino, 'pirecdate' => $pirecdate, 'pideldate' => $pideldate]);
+        if ($update) {
+            modellogproses::insert(['typelog' => 'prosesupdatepi', 'activity' => '=== SUCCESS UPDATE PI NUMBER ===', 'status' => true, 'datetime' => date('Y-m-d H:i:s'), 'from' => 'api_updatepi', 'created_at' => date('Y-m-d H:i:s')]);
             $failed['message'] = "Data Pi Number Successfully Updated";
             $failed['success'] = true;
             $failed['title'] = "Success!";
             $failed['type'] = "success";
             return response()->json($failed, Response::HTTP_OK);
-        }else{
-            modellogproses::insert(['typelog'=>'prosesupdatepi', 'activity'=>'FAILED alert => Data Pi Number failed update', 'status'=>false, 'datetime'=>date('Y-m-d H:i:s'), 'from'=>'api_updatepi', 'created_at'=>date('Y-m-d H:i:s')]);
-            modellogproses::insert(['typelog'=>'prosesupdatepi', 'activity'=>'=== END PROSES => ROLLBACK ===', 'status'=>false, 'datetime'=>date('Y-m-d H:i:s'), 'from'=>'api_updatepi', 'created_at'=>date('Y-m-d H:i:s')]);
+        } else {
+            modellogproses::insert(['typelog' => 'prosesupdatepi', 'activity' => 'FAILED alert => Data Pi Number failed update', 'status' => false, 'datetime' => date('Y-m-d H:i:s'), 'from' => 'api_updatepi', 'created_at' => date('Y-m-d H:i:s')]);
+            modellogproses::insert(['typelog' => 'prosesupdatepi', 'activity' => '=== END PROSES => ROLLBACK ===', 'status' => false, 'datetime' => date('Y-m-d H:i:s'), 'from' => 'api_updatepi', 'created_at' => date('Y-m-d H:i:s')]);
             $failed['message'] = "Data Pi Number failed update";
             $failed['success'] = false;
             $failed['title'] = "Warning!";
