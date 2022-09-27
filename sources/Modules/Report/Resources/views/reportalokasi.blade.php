@@ -12,29 +12,21 @@
                 <div class="row">
                     <div class="col-md-12">
                         <div id="fullscreen-container" class="card-body" style="overflow-y: auto;">
-                            <div class="row">
-                                <div class="col-md-3">
-                                    <label class="col-sm-5 control-label">Choose PO :</label>
-                                    <div class="col-sm-12">
-                                        <select class="select2" style="width: 100%;" name="datapo" id="datapo">
-                                            <option value=""></option>
-                                        </select>
-                                    </div>
+                            <div class="d-flex">
+                                <div class="p-2">
+                                    <label class="control-label">Choose PO :</label>
+                                    <select class="select2" style="width: 100%;" name="datapo" id="datapo">
+                                        <option value=""></option>
+                                    </select>
                                 </div>
-                                <div class="col-md-1">
-                                    <label class="col-sm-5 control-label"> &nbsp; </label>
-                                    <div class="col-sm-12">
-                                        <a href="#" type="button" id="search" class="btn btn-info form-control"
-                                            data-value="klik">Search</a>
-                                    </div>
+                                <div class="p-2">
+                                    <label class="control-label"> &nbsp; </label>
+                                    <a href="#" type="button" id="search" class="btn btn-info form-control"
+                                        data-value="klik">Search</a>
                                 </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-md-12">
-                                    <div class="col-sm-2 float-right">
-                                        <a href="{{ url('report/alokasi/getexcelalokasiall') }}" type="button"
-                                            class="btn btn-warning form-control">Download Data Excel</a>
-                                    </div>
+                                <div class="ml-auto p-2">
+                                    <a href="{{ url('report/alokasi/getexcelalokasiall') }}" type="button"
+                                        class="btn btn-warning form-control">Download Data Excel</a>
                                 </div>
                             </div>
                             <br>

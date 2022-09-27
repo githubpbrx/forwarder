@@ -139,7 +139,7 @@ class ReportAlokasi extends Controller
             ->join('mastersupplier', 'mastersupplier.id', 'po.vendor')
             ->where('forwarder.aktif', 'Y')->where('formpo.aktif', 'Y')->where('masterforwarder.aktif', 'Y')
             ->where('po.id', $request->id)
-            ->selectRaw(' po.*, forwarder.qty_allocation, forwarder.status, formpo.*, masterforwarder.name, mastersupplier.nama ')
+            ->selectRaw(' po.*, forwarder.qty_allocation, forwarder.statusforwarder, formpo.*, masterforwarder.name, mastersupplier.nama ')
             ->first();
 
         // dd($data);
@@ -154,55 +154,86 @@ class ReportAlokasi extends Controller
             ->join('mastersupplier', 'mastersupplier.id', 'po.vendor')
             ->where('forwarder.aktif', 'Y')->where('formpo.aktif', 'Y')->where('masterforwarder.aktif', 'Y')
             ->where('po.id', $id)
-            ->selectRaw(' po.*, forwarder.qty_allocation, forwarder.status, formpo.*, masterforwarder.name, mastersupplier.nama ')
+            ->selectRaw(' po.*, forwarder.qty_allocation, forwarder.statusforwarder, formpo.*, masterforwarder.name, mastersupplier.nama ')
             ->first();
         // dd($getdata);
 
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
-        $cell = 'A1:Q1';
-        $sheet->setCellValue('A1', 'PO');
-        $sheet->getColumnDimension('A')->setWidth(20);
-        $sheet->setCellValue('B1', 'Supplier');
-        $sheet->getColumnDimension('B')->setWidth(20);
-        $sheet->setCellValue('C1', 'Material');
-        $sheet->getColumnDimension('C')->setWidth(40);
-        $sheet->setCellValue('D1', 'Material Desc');
-        $sheet->getColumnDimension('D')->setWidth(40);
-        $sheet->setCellValue('E1', 'Style');
-        $sheet->getColumnDimension('E')->setWidth(20);
-        $sheet->setCellValue('F1', 'Quantity PO');
-        $sheet->getColumnDimension('F')->setWidth(10);
-        $sheet->setCellValue('G1', 'Quantity Allocation');
-        $sheet->getColumnDimension('G')->setWidth(10);
-        $sheet->setCellValue('H1', 'Plant');
-        $sheet->getColumnDimension('H')->setWidth(10);
-        $sheet->setCellValue('I1', 'Booking');
-        $sheet->getColumnDimension('I')->setWidth(15);
-        $sheet->setCellValue('J1', 'Forwarder');
-        $sheet->getColumnDimension('J')->setWidth(20);
-        $sheet->setCellValue('K1', 'Invoice');
-        $sheet->getColumnDimension('K')->setWidth(25);
-        $sheet->setCellValue('L1', 'ETD');
-        $sheet->getColumnDimension('L')->setWidth(30);
-        $sheet->setCellValue('M1', 'ETA');
-        $sheet->getColumnDimension('M')->setWidth(30);
-        $sheet->setCellValue('N1', 'Shipmode');
-        $sheet->getColumnDimension('N')->setWidth(10);
-        $sheet->setCellValue('O1', 'Sub Shipmode');
-        $sheet->getColumnDimension('O')->setWidth(10);
-        $sheet->setCellValue('P1', 'No BL');
-        $sheet->getColumnDimension('P')->setWidth(20);
-        $sheet->setCellValue('Q1', 'Vessel');
-        $sheet->getColumnDimension('Q')->setWidth(30);
-        $sheet->getStyle($cell)->getAlignment()->setWrapText(true);
-        $sheet->getStyle($cell)->getFont()->setBold(true);
-        $sheet->getStyle($cell)->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID);
-        $sheet->getStyle($cell)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
-        $sheet->getStyle($cell)->getAlignment()->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER);
-        $sheet->getStyle($cell)->getFill()->getStartColor()->setARGB('ff8400');
 
-        $rows = 2;
+        $sheet->mergeCells('A2:H2');
+        $sheet->getStyle('A2:H2')->getFont()->setBold(true);
+
+        //for supplier
+        $cellsupplier = 'A5:H5';
+        $sheet->setCellValue('A4', 'SUPPLIER');
+        $sheet->setCellValue('A5', 'PO');
+        $sheet->getColumnDimension('A')->setWidth(20);
+        $sheet->setCellValue('B5', 'Supplier');
+        $sheet->getColumnDimension('B')->setWidth(40);
+        $sheet->setCellValue('C5', 'Material');
+        $sheet->getColumnDimension('C')->setWidth(40);
+        $sheet->setCellValue('D5', 'Material Desc');
+        $sheet->getColumnDimension('D')->setWidth(40);
+        $sheet->setCellValue('E5', 'Style');
+        $sheet->getColumnDimension('E')->setWidth(20);
+        $sheet->setCellValue('F5', 'Quantity PO');
+        $sheet->getColumnDimension('F')->setWidth(10);
+        $sheet->setCellValue('G5', 'Quantity Allocation');
+        $sheet->getColumnDimension('G')->setWidth(10);
+        $sheet->setCellValue('H5', 'Plant');
+        $sheet->getColumnDimension('H')->setWidth(10);
+        $sheet->getStyle($cellsupplier)->getAlignment()->setWrapText(true);
+        $sheet->getStyle($cellsupplier)->getFont()->setBold(true);
+        $sheet->getStyle('A4')->getFont()->setBold(true);
+        $sheet->getStyle($cellsupplier)->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID);
+        $sheet->getStyle($cellsupplier)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+        $sheet->getStyle($cellsupplier)->getAlignment()->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER);
+        $sheet->getStyle($cellsupplier)->getFill()->getStartColor()->setARGB('ff8400');
+
+        //for forwarder
+        $cellforwarder = 'A9:G9';
+        $sheet->setCellValue('A8', 'FORWARDER');
+        $sheet->setCellValue('A9', 'Code Booking');
+        $sheet->getColumnDimension('A')->setWidth(20);
+        $sheet->setCellValue('B9', 'Forwarder');
+        $sheet->getColumnDimension('B')->setWidth(25);
+        $sheet->setCellValue('C9', 'Invoice');
+        $sheet->getColumnDimension('C')->setWidth(30);
+        $sheet->setCellValue('D9', 'ETD');
+        $sheet->getColumnDimension('D')->setWidth(30);
+        $sheet->setCellValue('E9', 'ETA');
+        $sheet->getColumnDimension('E')->setWidth(20);
+        $sheet->setCellValue('F9', 'Shipmode');
+        $sheet->getColumnDimension('F')->setWidth(10);
+        $sheet->setCellValue('G9', 'Sub Shipmode');
+        $sheet->getColumnDimension('G')->setWidth(10);
+        $sheet->getStyle($cellforwarder)->getAlignment()->setWrapText(true);
+        $sheet->getStyle($cellforwarder)->getFont()->setBold(true);
+        $sheet->getStyle('A8')->getFont()->setBold(true);
+        $sheet->getStyle($cellforwarder)->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID);
+        $sheet->getStyle($cellforwarder)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+        $sheet->getStyle($cellforwarder)->getAlignment()->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER);
+        $sheet->getStyle($cellforwarder)->getFill()->getStartColor()->setARGB('ff8400');
+
+        //for shipment
+        $cellshipment = 'A13:B13';
+        $sheet->setCellValue('A12', 'SHIPMENT');
+        $sheet->setCellValue('A13', 'No BL');
+        $sheet->getColumnDimension('A')->setWidth(20);
+        $sheet->setCellValue('B13', 'Vessel');
+        $sheet->getColumnDimension('B')->setWidth(30);
+        $sheet->getStyle($cellshipment)->getAlignment()->setWrapText(true);
+        $sheet->getStyle($cellshipment)->getFont()->setBold(true);
+        $sheet->getStyle('A12')->getFont()->setBold(true);
+        $sheet->getStyle($cellshipment)->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID);
+        $sheet->getStyle($cellshipment)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+        $sheet->getStyle($cellshipment)->getAlignment()->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER);
+        $sheet->getStyle($cellshipment)->getFill()->getStartColor()->setARGB('ff8400');
+
+        $rows_sup = 6;
+        $rows_fwd = 10;
+        $rows_ship = 14;
         // BORDER STYLE
         $styleArray = [
             'borders' => [
@@ -212,30 +243,53 @@ class ReportAlokasi extends Controller
             ],
         ];
 
-        $sheet->setCellValue('A' . $rows, $getdata->pono);
-        $sheet->setCellValue('B' . $rows, $getdata->nama);
-        $sheet->setCellValue('C' . $rows, $getdata->matcontents);
-        $sheet->setCellValue('D' . $rows, $getdata->itemdesc);
-        $sheet->setCellValue('E' . $rows, $getdata->style);
-        $sheet->setCellValue('F' . $rows, $getdata->qtypo);
-        $sheet->setCellValue('G' . $rows, $getdata->qty_allocation);
-        $sheet->setCellValue('H' . $rows, $getdata->plant);
-        $sheet->setCellValue('I' . $rows, $getdata->kode_booking);
-        $sheet->setCellValue('J' . $rows, $getdata->name);
-        $sheet->setCellValue('K' . $rows, $getdata->noinv);
-        $sheet->setCellValue('L' . $rows, $getdata->etdfix);
-        $sheet->setCellValue('M' . $rows, $getdata->etafix);
-        $sheet->setCellValue('N' . $rows, $getdata->shipmode);
-        $sheet->setCellValue('O' . $rows, $getdata->subshipmode);
-        $sheet->setCellValue('P' . $rows, $getdata->nomor_bl);
-        $sheet->setCellValue('Q' . $rows, $getdata->vessel);
-        $rows++;
+        $styleArraytitle = [
+            'alignment' => [
+                'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER,
+            ],
+        ];
 
-        $cell = 'A1:Q' . ($rows - 1);
-        $sheet->getStyle($cell)->applyFromArray($styleArray);
-        $sheet->getStyle($cell)->getAlignment()->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER);
+        //title
+        $sheet->setCellValue('A' . '2', strtoupper('Detail Allocation'));
 
-        $fileName = "Detail_ALLOCATION_" . $getdata->pono . ".xlsx";
+        //supplier
+        $sheet->setCellValue('A' . $rows_sup, $getdata->pono);
+        $sheet->setCellValue('B' . $rows_sup, $getdata->nama);
+        $sheet->setCellValue('C' . $rows_sup, $getdata->matcontents);
+        $sheet->setCellValue('D' . $rows_sup, $getdata->itemdesc);
+        $sheet->setCellValue('E' . $rows_sup, $getdata->style);
+        $sheet->setCellValue('F' . $rows_sup, $getdata->qtypo);
+        $sheet->setCellValue('G' . $rows_sup, $getdata->qty_allocation);
+        $sheet->setCellValue('H' . $rows_sup, $getdata->plant);
+        $rows_sup++;
+
+        //forwarder
+        $sheet->setCellValue('A' . $rows_fwd, $getdata->kode_booking);
+        $sheet->setCellValue('B' . $rows_fwd, $getdata->name);
+        $sheet->setCellValue('C' . $rows_fwd, $getdata->noinv);
+        $sheet->setCellValue('D' . $rows_fwd, $getdata->etdfix);
+        $sheet->setCellValue('E' . $rows_fwd, $getdata->etafix);
+        $sheet->setCellValue('F' . $rows_fwd, $getdata->shipmode);
+        $sheet->setCellValue('G' . $rows_fwd, $getdata->subshipmode);
+        $rows_fwd++;
+
+        //forwarder
+        $sheet->setCellValue('A' . $rows_ship, $getdata->nomor_bl);
+        $sheet->setCellValue('B' . $rows_ship, $getdata->vessel);
+        $rows_ship++;
+
+        $cellsupplier = 'A5:H' . ($rows_sup - 1);
+        $cellforwarder = 'A9:G' . ($rows_fwd - 1);
+        $cellshipment = 'A13:B' . ($rows_ship - 1);
+        $sheet->getStyle('A2:H2')->applyFromArray($styleArraytitle);
+        $sheet->getStyle($cellsupplier)->applyFromArray($styleArray);
+        $sheet->getStyle($cellforwarder)->applyFromArray($styleArray);
+        $sheet->getStyle($cellshipment)->applyFromArray($styleArray);
+        $sheet->getStyle($cellsupplier)->getAlignment()->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER);
+        $sheet->getStyle($cellforwarder)->getAlignment()->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER);
+        $sheet->getStyle($cellshipment)->getAlignment()->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER);
+
+        $fileName = "Detail_Allocation_" . $getdata->pono . ".xlsx";
 
         $writer = new Xlsx($spreadsheet);
         header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
@@ -257,30 +311,32 @@ class ReportAlokasi extends Controller
 
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
-        $cell = 'A1:G1';
-        $sheet->setCellValue('A1', 'PO');
+        $cell = 'A4:G4';
+        $sheet->mergeCells('A2:G2');
+        $sheet->setCellValue('A4', 'PO');
         $sheet->getColumnDimension('A')->setWidth(20);
-        $sheet->setCellValue('B1', 'Quantity PO');
+        $sheet->setCellValue('B4', 'Quantity PO');
         $sheet->getColumnDimension('B')->setWidth(15);
-        $sheet->setCellValue('C1', 'Quantity Allocation');
+        $sheet->setCellValue('C4', 'Quantity Allocation');
         $sheet->getColumnDimension('C')->setWidth(15);
-        $sheet->setCellValue('D1', 'Invoice');
+        $sheet->setCellValue('D4', 'Invoice');
         $sheet->getColumnDimension('D')->setWidth(15);
-        $sheet->setCellValue('E1', 'Forwarder');
+        $sheet->setCellValue('E4', 'Forwarder');
         $sheet->getColumnDimension('E')->setWidth(20);
-        $sheet->setCellValue('F1', 'Status Allocation');
+        $sheet->setCellValue('F4', 'Status Allocation');
         $sheet->getColumnDimension('F')->setWidth(20);
-        $sheet->setCellValue('G1', 'Status Confirm');
+        $sheet->setCellValue('G4', 'Status Confirm');
         $sheet->getColumnDimension('G')->setWidth(20);
 
         $sheet->getStyle($cell)->getAlignment()->setWrapText(true);
         $sheet->getStyle($cell)->getFont()->setBold(true);
+        $sheet->getStyle('A2:G2')->getFont()->setBold(true);
         $sheet->getStyle($cell)->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID);
         $sheet->getStyle($cell)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
         $sheet->getStyle($cell)->getAlignment()->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER);
         $sheet->getStyle($cell)->getFill()->getStartColor()->setARGB('ff8400');
 
-        $rows = 2;
+        $rows = 5;
         // BORDER STYLE
         $styleArray = [
             'borders' => [
@@ -289,6 +345,14 @@ class ReportAlokasi extends Controller
                 ],
             ],
         ];
+
+        $styleArraytitle = [
+            'alignment' => [
+                'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER,
+            ],
+        ];
+
+        $sheet->setCellValue('A' . '2', strtoupper('Data Allocation'));
 
         foreach ($getdata as $key => $val) {
             $sheet->setCellValue('A' . $rows, $val->pono);
@@ -301,7 +365,8 @@ class ReportAlokasi extends Controller
             $rows++;
         }
 
-        $cell = 'A1:G' . ($rows - 1);
+        $cell = 'A4:G' . ($rows - 1);
+        $sheet->getStyle('A2:G2')->applyFromArray($styleArraytitle);
         $sheet->getStyle($cell)->applyFromArray($styleArray);
         $sheet->getStyle($cell)->getAlignment()->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER);
 
