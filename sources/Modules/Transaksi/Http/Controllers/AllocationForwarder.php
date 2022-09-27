@@ -184,12 +184,14 @@ class AllocationForwarder extends Controller
     {
         header("Access-Control-Allow-Origin: *");
         header("Access-Control-Allow-Headers: *");
-        // dd($request, $id);
-        // $id = $request->id;
-        // $mydata = po::where('id', $id)->first();
-        // $datasup = supplier::where('id', $mydata->vendor)->first();
 
-        $getpo = po::join('mastersupplier', 'mastersupplier.id', 'po.vendor')->where('po.pono', $request->id)->selectRaw(' po.id, po.pono, po.qtypo, po.matcontents, po.style, mastersupplier.nama ')->get();
+        $getpo = po::join('mastersupplier', 'mastersupplier.id', 'po.vendor')
+            ->join('forwarder', 'forwarder.idpo', 'po.id')
+            ->where('po.pono', $request->id)
+            ->where('forwarder.aktif', 'Y')
+            ->selectRaw(' po.id, po.pono, po.qtypo, po.matcontents, po.style, mastersupplier.nama, sum(forwarder.qty_allocation) as qty_allocation ')
+            ->groupby('forwarder.idpo')
+            ->get();
         // dd($getpo);
 
         // $dd = fwd::with('masterforwarder')->where('idpo', $id)->where('aktif', 'Y')->get();
@@ -208,9 +210,7 @@ class AllocationForwarder extends Controller
             'title'  => 'Detail Allocation Forwarder',
             'menu'   => 'detailallocation',
             'box'    => '',
-            'datapo' => $getpo,
-            // 'datasup' => $datasup,
-            // 'detail' => $html
+            'datapo' => $getpo
         );
 
         return response()->json(['status' => 200, 'data' => $data, 'message' => 'Berhasil']);
@@ -241,24 +241,20 @@ class AllocationForwarder extends Controller
         // return view('transaksi::edit');
     }
 
-    /**
-     * Update the specified resource in storage.
-     * @param Request $request
-     * @param int $id
-     * @return Response
-     */
-    public function update(Request $request, $id)
+    public function getsupplier(Request $request)
     {
-        //
-    }
+        header("Access-Control-Allow-Origin: *");
+        header("Access-Control-Allow-Headers: *");
 
-    /**
-     * Remove the specified resource from storage.
-     * @param int $id
-     * @return Response
-     */
-    public function destroy($id)
-    {
-        //
+        if (!$request->ajax()) return;
+        $po = supplier::select('id', 'nama');
+        if ($request->has('q')) {
+            $search = $request->q;
+            $po = $po->whereRaw(' nama like "%' . $search . '%" ');
+        }
+
+        $po = $po->where('aktif', '=', 'Y')->orderby('nama', 'asc')->get();
+
+        return response()->json($po);
     }
 }

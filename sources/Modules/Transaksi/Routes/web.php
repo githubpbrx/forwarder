@@ -17,6 +17,8 @@ Route::prefix('transaksi')->group(function () {
     Route::group(['prefix' => 'allocation'], function () {
         Route::get('/', 'AllocationForwarder@index')->name('allocationforwarder');
         Route::get('search', 'AllocationForwarder@create');
+        Route::post('getsupplier/', 'AllocationForwarder@getsupplier')->name('allocation_getsupplier');
+
         // Route::get('getdetail/{id}', 'AllocationForwarder@show_detail')->name('detail_allocation');
         Route::post('/getdetail', 'AllocationForwarder@show_detail')->name('detail_allocation');
         Route::post('detailaction/', 'AllocationForwarder@store_detail')->name('detailaction');

@@ -19,12 +19,7 @@
                                         <label class="col-sm-12 control-label">Choose Suplier :</label>
                                         <div class="col-sm-12">
                                             <select class="select2" style="width: 100%;" name="supplier" id="supplier">
-                                                <option value="" disabled selected >--Choose Supplier--</option>
-                                                <?php
-                                                foreach ($sup as $key => $val) {
-                                                    echo '<option value="' . $val->id . '" style="font-size:10pt">' . $val->nama . '</option>';
-                                                }
-                                                ?>
+                                                <option value=""></option>
                                             </select>
                                         </div>
                                     </div>
@@ -65,7 +60,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                
+
                             </form>
 
                             <div class="table-responsive" style="padding-top: 20px;">
@@ -238,6 +233,37 @@
                 table.draw();
             });
 
+            $('#supplier').select2({
+                placeholder: '-- Choose Supplier --',
+                ajax: {
+                    url: "{!! route('allocation_getsupplier') !!}",
+                    dataType: 'json',
+                    delay: 500,
+                    type: 'post',
+                    data: function(params) {
+                        var query = {
+                            q: params.term,
+                            // page: params.page || 1,
+                            _token: $('meta[name=csrf-token]').attr('content')
+                        }
+                        return query;
+                    },
+                    processResults: function(data, params) {
+                        return {
+
+                            results: $.map(data, function(item) {
+                                return {
+                                    text: item.nama,
+                                    id: item.id,
+                                    selected: true,
+                                }
+                            }),
+                        };
+                    },
+                    cache: true
+                }
+            });
+
             var qtypoku;
             var poid;
             var ponumb;
@@ -266,20 +292,26 @@
 
                     var tot = 0;
                     length = poku.length;
-                    html = '<table border="0" style="width:100%"><tr><th style="text-align:center"><input type="checkbox" class="checkall" style="height:18px;width:18px"></th><th>Material</th><th>Style</th><th>Qty Item</th><th>Qty Allocation</th></tr>';
+                    html =
+                        '<table border="0" style="width:100%"><tr><th style="text-align:center"><input type="checkbox" class="checkall" style="height:18px;width:18px"></th><th>Material</th><th>Style</th><th>Qty Item</th><th>Remaining Qty</th><th>Qty Allocation</th></tr>';
                     for (let index = 0; index < poku.length; index++) {
 
                         // $('#qtypo').val();
                         console.log('poku.qtypo :>> ', poku.qtypo);
                         tot = tot + Number(poku[index].qtypo);
-                        html += '<tr><td style="text-align:center"><input type="checkbox" class="check-'+
-                            index + '" style="height:18px;width:18px"></td><td>'+ poku[index].matcontents+'</td><td>'+ poku[index]
-                            .style +'</td><td>'+poku[index].qtypo+'</td><td><input type="number" min="0" id="qty_allocation" name="qty_allocation" class="form-control trigerinput cekinput-' +
-                            index + '" data-id="'+ poku[index].id + '" data-pono="' + poku[index].pono + '" data-qty="' + poku[index].qtypo +'" disabled></td></tr>';
+                        html +=
+                            '<tr><td style="text-align:center"><input type="checkbox" class="check-' +
+                            index + '" style="height:18px;width:18px"></td><td>' + poku[index]
+                            .matcontents + '</td><td>' + poku[index]
+                            .style + '</td><td>' + poku[index].qtypo +
+                            '</td><td>' + poku[index].qty_allocation +
+                            '</td><td><input type="number" min="0" id="qty_allocation" name="qty_allocation" class="form-control trigerinput cekinput-' +
+                            index + '" data-id="' + poku[index].id + '" data-pono="' + poku[index]
+                            .pono + '" data-qty="' + poku[index].qtypo + '" disabled></td></tr>';
 
                         // $('#detailhtml').append(
                         //     `<table style="width:100%" border="1"><tr style="width:100%"><td></td><td>
-                        //         <label>Material</label><i>` + poku[index].matcontents +
+                    //         <label>Material</label><i>` + poku[index].matcontents +
                         //     `</i></td><td><label>Style</label><i>` + poku[index]
                         //     .style +
                         //     `</i></td><td></td></tr></table>`
@@ -293,7 +325,7 @@
                     qtypoku = poku.qtypo;
                     poid = poku.id;
                     ponumb = poku.pono;
-                    
+
                     $('#po').val(poku[0].pono);
                     $('#qtypo').val(tot);
                     $('#detailsup').val(poku[0].nama);
