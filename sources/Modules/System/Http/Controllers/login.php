@@ -46,8 +46,6 @@ class login extends Controller
         'Where did you first work?'
     );
 
-
-
     public static function sendEmail($email, $nama, $token, $link, $subject)
     {
         // dd($email, $nama, $token, $link, $subject);
@@ -110,12 +108,12 @@ class login extends Controller
         $ceklogin = modelprivilege::where('privilege_user_nik', $nik)->first();
         if ($ceklogin == null) {
             $this->loginChance();
-            Session::flash('alert', 'sweetAlert("error", "Akses ditolak", "Kesempatan : ' . $this->loginChance() . ' kali")');
+            Session::flash('alert', 'sweetAlert("error", "Access Denied", "Chance : ' . $this->loginChance() . ' time")');
             return redirect('login');
         } else {
             if ($ceklogin->privilege_aktif == 'N') {
                 $this->loginChance();
-                Session::flash('alert', 'sweetAlert("error", "User akses ditolak", "Kesempatan : ' . $this->loginChance() . ' kali")');
+                Session::flash('alert', 'sweetAlert("error", "User Access Denied/User Not Found", "Chance : ' . $this->loginChance() . ' time")');
                 return redirect('login');
             }
 
@@ -138,12 +136,12 @@ class login extends Controller
                         );
                         Session::put('session', $session);
                         $this->choosemenu();
-                        Session::flash('alert', 'sweetAlert("success", "Berhasil Login")');
+                        Session::flash('alert', 'sweetAlert("success", "Successfully Login")');
                         return redirect('dashboard');
                     }
                 } else {
                     $this->loginChance();
-                    Session::flash('alert', 'sweetAlert("error", "Username atau Password salah", "Kesempatan : ' . $this->loginChance() . ' kali")');
+                    Session::flash('alert', 'sweetAlert("error", "Username or Password wrong", "Chance : ' . $this->loginChance() . ' time")');
                     return redirect('login');
                 }
             } else {
@@ -212,17 +210,17 @@ class login extends Controller
                             Session::put('session', $session);
 
                             $this->createPrivilege($this->dekripsi($login_data['a']), $this->dekripsi($login_data['b']));
-                            Session::flash('toast', 'sweetAlert("success", "Berhasil Login")');
+                            Session::flash('toast', 'sweetAlert("success", "Successfully Login")');
                             $this->choosemenu();
                             return redirect('dashboard');
                         }
                     } else {
                         $this->loginChance();
-                        Session::flash('alert', 'sweetAlert("error", "Username atau Password salah", "Kesempatan : ' . $this->loginChance() . ' kali")');
+                        Session::flash('alert', 'sweetAlert("error", "Username or Password wrong", "Chance : ' . $this->loginChance() . ' time")');
                         return redirect('login');
                     }
                 } else {
-                    Session::flash('alert', 'sweetAlert("error", "Akun tidak ditemukan", "Kesempatan : ' . $this->loginChance() . ' kali")');
+                    Session::flash('alert', 'sweetAlert("error", "Account not found", "Chance : ' . $this->loginChance() . ' time")');
                     return redirect('login');
                 }
             }
@@ -260,10 +258,10 @@ class login extends Controller
 
         if ($question1 == $answer1 && $question2 == $answer2) {
             // return view('system::login/login_forgot_password', $data);
-            Session::flash('alert', 'toast("success", "Yeay, berhasil")');
+            Session::flash('alert', 'toast("success", "Yeay, Success")');
             return view('system::login/login_forgot_password', $data);
         } else {
-            Session::flash('alert', 'sweetAlert("error", "Jawaban Salah")');
+            Session::flash('alert', 'sweetAlert("error", "Wrong Answer")');
             return redirect(url('forgotpassword'));
         }
     }
@@ -278,7 +276,7 @@ class login extends Controller
             return redirect(url('login'));
         } else {
             if ($password == 'password123') {
-                Session::flash('alert', 'sweetAlert("error", "Gagal", "Silahkan masukkan password lain")');
+                Session::flash('alert', 'sweetAlert("error", "Failed", "Please enter another password")');
                 return redirect(url('forgotpassword'));
             } else {
                 try {
@@ -385,7 +383,7 @@ class login extends Controller
                 if ($cek->kode_validate == 'N') {
                     $param = modelsystem::first();
                     $url = $param->url . 'getvalidation/' . base64_encode($cek->token) . '/' . $this->enkripsi($post->nik) . '/' . $this->enkripsi($cek->kode);
-                    login::sendEmail($post->nik, $post->nama, $cek->kode, $url, "Web Forwarder Aktifasi User");
+                    login::sendEmail($post->nik, $post->nama, $cek->kode, $url, "Web Forwarder User Activation");
                     $data = array(
                         'title'     => 'Aktifasi Akun',
                         'nik'       => $post->nik,
@@ -399,7 +397,7 @@ class login extends Controller
                 $this->choosemenu();
                 return redirect(url(''));
             } else {
-                Session::flash('toast', 'toast("error", "Error : Password gagal diubah")');
+                Session::flash('toast', 'toast("error", "Error : Password failed to change")');
                 return redirect(url('login/newnohripspassword'));
             }
         } else {
@@ -422,9 +420,9 @@ class login extends Controller
         $cek = modelprivilege::where('privilege_user_nik', $user)->first();
         $param = modelsystem::first();
         $url = $param->url . 'getvalidation/' . base64_encode($cek->token) . '/' . $this->enkripsi($user) . '/' . $this->enkripsi($cek->kode);
-        login::sendEmail($user, $nama, $cek->kode, $url, "Web Forwarder Aktifasi User");
+        login::sendEmail($user, $nama, $cek->kode, $url, "Web Forwarder User Activation");
 
-        Session::flash('alert', 'sweetAlert("success", "Silahkan cek email anda kembali")');
+        Session::flash('alert', 'sweetAlert("success", "Please check your email again")');
         return redirect()->back();
     }
 
@@ -455,7 +453,7 @@ class login extends Controller
 
         $cek = modelprivilege::where('privilege_user_nik', $user)->first();
         if ($cek == null) {
-            Session::flash('alert', 'sweetAlert("error", "Token tidak cocok")');
+            Session::flash('alert', 'sweetAlert("error", "Tokens don`t match")');
             return redirect()->back();
         } else {
             if ($kode == $cek->kode) {
@@ -463,19 +461,17 @@ class login extends Controller
                 $kode = rand(11111, 99999);
                 $update = modelprivilege::where('privilege_user_nik', $user)->update(['kode' => $kode, 'token' => $token, 'kode_validate' => 'Y']);
                 if ($update) {
-                    Session::flash('alert', 'sweetAlert("success", "User Anda sudah aktif")');
+                    Session::flash('alert', 'sweetAlert("success", "Your user is already active")');
                     return redirect()->route('dashcam');
                 } else {
-                    Session::flash('alert', 'sweetAlert("error", "Token tidak cocok")');
+                    Session::flash('alert', 'sweetAlert("error", "Tokens don`t match")');
                     return redirect()->back();
                 }
             } else {
-                Session::flash('alert', 'sweetAlert("error", "Token tidak cocok")');
+                Session::flash('alert', 'sweetAlert("error", "Tokens don`t match")');
                 return redirect()->back();
             }
         }
-
-
 
         dd($request);
     }
@@ -488,7 +484,7 @@ class login extends Controller
 
         $cek = modelprivilege::where('privilege_user_nik', $user)->where('token', $token)->first();
         if ($cek == null) {
-            Session::flash('alert', 'sweetAlert("error", "Token tidak cocok")');
+            Session::flash('alert', 'sweetAlert("error", "Tokens don`t match")');
             return redirect()->back();
         } else {
             if ($kode == $cek->kode) {
@@ -496,14 +492,14 @@ class login extends Controller
                 $kode = rand(11111, 99999);
                 $update = modelprivilege::where('privilege_user_nik', $user)->update(['kode' => $kode, 'token' => $token, 'kode_validate' => 'Y']);
                 if ($update) {
-                    Session::flash('alert', 'sweetAlert("success", "User Anda sudah aktif")');
+                    Session::flash('alert', 'sweetAlert("success", "Your user is already active")');
                     return redirect()->route('dashcam');
                 } else {
-                    Session::flash('alert', 'sweetAlert("error", "Token tidak cocok")');
+                    Session::flash('alert', 'sweetAlert("error", "Tokens don`t match")');
                     return redirect()->back();
                 }
             } else {
-                Session::flash('alert', 'sweetAlert("error", "Token tidak cocok")');
+                Session::flash('alert', 'sweetAlert("error", "Tokens don`t match")');
                 return redirect()->back();
             }
         }
@@ -693,9 +689,9 @@ class login extends Controller
         $cek = modelprivilege::where('privilege_user_nik', $user)->first();
         $param = modelsystem::first();
         $url = $param->url . 'getvalidation/' . base64_encode($cek->token) . '/' . $this->enkripsi($user) . '/' . $this->enkripsi($cek->kode);
-        login::sendEmail($user, $nama, $cek->kode, $url, "Web Forwarder Aktifasi User");
+        login::sendEmail($user, $nama, $cek->kode, $url, "Web Forwarder User Activation");
 
-        Session::flash('alert', 'sweetAlert("success", "Silahkan cek email anda kembali")');
+        Session::flash('alert', 'sweetAlert("success", "Please check your email again")');
         return redirect()->back();
     }
 
@@ -891,7 +887,7 @@ class login extends Controller
         $this->middleware('checklogin');
 
         Session::flush();
-        return redirect('login')->with('alert', 'Kamu sudah logout');
+        return redirect('login')->with('alert', 'You are logout');
     }
 
     public function getdetailbynik($nik)
