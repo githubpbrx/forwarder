@@ -247,17 +247,24 @@ class MasterForwarder extends Controller
     public function destroyfwd($id)
     {
         // dd($id);
-
+        DB::beginTransaction();
         $delete = forwarder::where('id', $id)->update([
             'aktif' => 'N',
             'updated_at'   => date('Y-m-d H:i:s'),
             'updated_user' => Session::get('session')['user_nik']
         ]);
 
-        if ($delete) {
+        $deleteprivilege = privilege::where('idforwarder', $id)->update([
+            'privilege_aktif' => 'N',
+            'updated_at'   => date('Y-m-d H:i:s'),
+        ]);
+
+        if ($delete && $deleteprivilege) {
+            DB::commit();
             $status = ['title' => 'Success', 'status' => 'success', 'message' => 'Data Successfully Deleted'];
             return response()->json($status, 200);
         } else {
+            DB::rollback();
             $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'Data Failed Deleted'];
             return response()->json($status, 200);
         }
