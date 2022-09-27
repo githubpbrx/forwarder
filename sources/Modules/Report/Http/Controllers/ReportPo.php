@@ -133,31 +133,34 @@ class ReportPo extends Controller
 
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
-        $cell = 'A1:H1';
-        $sheet->setCellValue('A1', 'PO');
+
+        $cell = 'A4:H4';
+        $sheet->mergeCells('A2:H2');
+        $sheet->setCellValue('A4', 'PO');
         $sheet->getColumnDimension('A')->setWidth(20);
-        $sheet->setCellValue('B1', 'Supplier');
+        $sheet->setCellValue('B4', 'Supplier');
         $sheet->getColumnDimension('B')->setWidth(20);
-        $sheet->setCellValue('C1', 'Material');
+        $sheet->setCellValue('C4', 'Material');
         $sheet->getColumnDimension('C')->setWidth(40);
-        $sheet->setCellValue('D1', 'Material Desc');
+        $sheet->setCellValue('D4', 'Material Desc');
         $sheet->getColumnDimension('D')->setWidth(40);
-        $sheet->setCellValue('E1', 'Style');
+        $sheet->setCellValue('E4', 'Style');
         $sheet->getColumnDimension('E')->setWidth(15);
-        $sheet->setCellValue('F1', 'Quantity PO');
+        $sheet->setCellValue('F4', 'Quantity PO');
         $sheet->getColumnDimension('F')->setWidth(15);
-        $sheet->setCellValue('G1', 'Price');
+        $sheet->setCellValue('G4', 'Price');
         $sheet->getColumnDimension('G')->setWidth(10);
-        $sheet->setCellValue('H1', 'Plant');
+        $sheet->setCellValue('H4', 'Plant');
         $sheet->getColumnDimension('H')->setWidth(10);
         $sheet->getStyle($cell)->getAlignment()->setWrapText(true);
         $sheet->getStyle($cell)->getFont()->setBold(true);
+        $sheet->getStyle('A2:H2')->getFont()->setBold(true);
         $sheet->getStyle($cell)->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID);
         $sheet->getStyle($cell)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
         $sheet->getStyle($cell)->getAlignment()->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER);
         $sheet->getStyle($cell)->getFill()->getStartColor()->setARGB('ff8400');
 
-        $rows = 2;
+        $rows = 5;
         // BORDER STYLE
         $styleArray = [
             'borders' => [
@@ -167,6 +170,13 @@ class ReportPo extends Controller
             ],
         ];
 
+        $styleArraytitle = [
+            'alignment' => [
+                'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER,
+            ],
+        ];
+
+        $sheet->setCellValue('A' . '2', strtoupper('Detail PO'));
         $sheet->setCellValue('A' . $rows, $getdata->pono);
         $sheet->setCellValue('B' . $rows, $getdata->nama);
         $sheet->setCellValue('C' . $rows, $getdata->matcontents);
@@ -177,11 +187,81 @@ class ReportPo extends Controller
         $sheet->setCellValue('H' . $rows, $getdata->plant);
         $rows++;
 
-        $cell = 'A1:H' . ($rows - 1);
+        $cell = 'A4:H' . ($rows - 1);
+        $sheet->getStyle('A2:H2')->applyFromArray($styleArraytitle);
         $sheet->getStyle($cell)->applyFromArray($styleArray);
         $sheet->getStyle($cell)->getAlignment()->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER);
 
         $fileName = "Detail_PO_" . $getdata->pono . ".xlsx";
+
+        $writer = new Xlsx($spreadsheet);
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment; filename="' . urlencode($fileName) . '"');
+        $writer->save('php://output');
+
+        return;
+    }
+
+    function excelpoall()
+    {
+        $getdata = modelpo::get();
+        // dd($getdata);
+
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+
+        $cell = 'A4:D4';
+        $sheet->mergeCells('A2:D2');
+        $sheet->setCellValue('A4', 'PO');
+        $sheet->getColumnDimension('A')->setWidth(20);
+        $sheet->setCellValue('B4', 'Material');
+        $sheet->getColumnDimension('B')->setWidth(40);
+        $sheet->setCellValue('C4', 'Status Allocation');
+        $sheet->getColumnDimension('C')->setWidth(20);
+        $sheet->setCellValue('D4', 'Status Confirm');
+        $sheet->getColumnDimension('D')->setWidth(20);
+        $sheet->getStyle($cell)->getAlignment()->setWrapText(true);
+        $sheet->getStyle($cell)->getFont()->setBold(true);
+        $sheet->getStyle('A2:D2')->getFont()->setBold(true);
+        $sheet->getStyle($cell)->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID);
+        $sheet->getStyle($cell)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+        $sheet->getStyle($cell)->getAlignment()->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER);
+        $sheet->getStyle($cell)->getFill()->getStartColor()->setARGB('ff8400');
+
+        $rows = 5;
+        // BORDER STYLE
+        $styleArray = [
+            'borders' => [
+                'allBorders' => [
+                    'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
+                ],
+            ],
+            'alignment' => [
+                'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER,
+            ],
+        ];
+
+        $styleArraytitle = [
+            'alignment' => [
+                'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER,
+            ],
+        ];
+
+        $sheet->setCellValue('A' . '2', strtoupper('Data PO'));
+        foreach ($getdata as $key => $value) {
+            $sheet->setCellValue('A' . $rows, $value->pono);
+            $sheet->setCellValue('B' . $rows, $value->matcontents);
+            $sheet->setCellValue('C' . $rows, $value->statusalokasi);
+            $sheet->setCellValue('D' . $rows, $value->statusconfirm);
+            $rows++;
+        }
+
+        $cell = 'A4:D' . ($rows - 1);
+        $sheet->getStyle('A2:D2')->applyFromArray($styleArraytitle);
+        $sheet->getStyle($cell)->applyFromArray($styleArray);
+        $sheet->getStyle($cell)->getAlignment()->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER);
+
+        $fileName = "Data_PO.xlsx";
 
         $writer = new Xlsx($spreadsheet);
         header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');

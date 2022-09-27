@@ -20,6 +20,7 @@ Route::prefix('report')->group(function () {
         Route::get('search', 'ReportPo@datatable');
         Route::post('/getdetailpo/', 'ReportPo@detailpo')->name('report_detailpo');
         Route::get('/getexcelpo/{id}', 'ReportPo@excelpo')->name('report_excelpo');
+        Route::get('/getexcelpoall/', 'ReportPo@excelpoall')->name('report_excelpoall');
     });
 
     Route::group(['prefix' => 'alokasi'], function () {
