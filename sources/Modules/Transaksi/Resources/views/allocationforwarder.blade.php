@@ -301,12 +301,12 @@
 
                         if (poku[index].qtyall == null) {
                             nullku = '0';
+                        } else if (poku[index].qtyall == poku[index].qtypo) {
+                            nullku = '---';
                         } else {
-                            nullku = poku[index].qtyall;
+                            nullku = poku[index].qtypo - poku[index].qtyall;
                         }
 
-                        // $('#qtypo').val();
-                        console.log('poku.qtypo :>> ', poku.qtypo);
                         tot = tot + Number(poku[index].qtypo);
                         html +=
                             '<tr><td style="text-align:center"><input type="checkbox" class="check-' +
