@@ -56,15 +56,16 @@ class WebsupplierServices extends Controller
         }
     }
 
-    function shipping(Request $req)
+    function shipping(Request $post)
     {
-        $auth = $this->authorization($req);
+        
+        $auth = $this->authorization($post);
         if (isset($auth['failed'])) {
             return response()->json($auth, Response::HTTP_UNAUTHORIZED);
         }
 
-        $noinv = $req->noinv;
-
+        $noinv = Request::post('noinv');
+        dd($noinv);
         modellogproses::insert(['typelog' => 'api', 'activity' => '==== START CHECKING get data Shipping, inv no => ' . $noinv, 'status' => true, 'datetime' => date('Y-m-d H:i:s'), 'from' => 'api_shipping', 'created_at' => date('Y-m-d H:i:s')]);
         $data = formpo::where('noinv', $noinv)->where('statusformpo', 'confirm')->where('aktif', 'Y')->get();
         $datapo = array();
@@ -85,11 +86,12 @@ class WebsupplierServices extends Controller
             $lp['matcontents'] = $po->matcontents;
             $lp['colorcode'] = $po->colorcode;
             $lp['size'] = $r->size;
-
-            $fw = forward::where('id', $r->idforwarder)->first();
+            
+            $fw = forward::where('id', $r->idmasterfwd)->first();
             $lp['forwardername'] = $fw->name;
 
-            $all = fwd::where('id_forwarder', $r->idmasterfwd)->first();
+            $all = fwd::where('id_forwarder', $r->idforwarder)->first();
+
             $lp['qtyallocation'] = $all->qty_allocation;
             $lp['statusallocation'] = $all->status;
 
@@ -112,7 +114,7 @@ class WebsupplierServices extends Controller
             unset($lp);
         }
 
-
+        // dd($datapo);
         if (count($datapo) == 0) {
             modellogproses::insert(['typelog' => 'api', 'activity' => 'failed alert : Data Not found (array null)', 'status' => false, 'datetime' => date('Y-m-d H:i:s'), 'from' => 'api_shipping', 'created_at' => date('Y-m-d H:i:s')]);
             $datasend['message'] = 'Data Not Found';

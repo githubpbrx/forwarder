@@ -995,6 +995,75 @@ class login extends Controller
         }
     }
 
+    function apiTest($id){
+        $url =  "http://localhost/git/forwarder/api/websupplier/shipping";
+
+        $authorization = 'Bearer:$2y$10$gpwr15S9I67MHEx0gCD0jeIYovjwl6ymv7zfu4QaaZjVEufbXItl6';
+        
+
+
+$data=array("noinv"=>$id);
+ 
+$curl = curl_init();
+curl_setopt($curl, CURLOPT_URL, $url);
+curl_setopt($curl, CURLOPT_HTTPHEADER, array('Content-Type: application/json', $authorization) );
+curl_setopt($curl, CURLOPT_POST, 1);
+curl_setopt($curl, CURLOPT_POSTFIELDS, $data);
+curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+$response = curl_exec($curl);
+
+
+dd($response);
+// =======================
+
+        $postRequest = array(
+            'noinv' => $id,
+        );
+
+        $cURLConnection = curl_init($url);
+        curl_setopt($cURLConnection, CURLOPT_HTTPHEADER, array('Content-Type: application/json', $authorization) );
+        curl_setopt($cURLConnection, CURLOPT_POSTFIELDS, $postRequest);
+        curl_setopt($cURLConnection, CURLOPT_RETURNTRANSFER, true);
+
+        $apiResponse = curl_exec($cURLConnection);
+        curl_close($cURLConnection);
+
+        // $apiResponse - available data from the API request
+        $jsonArrayResponse = json_decode($apiResponse);
+
+        dd($jsonArrayResponse);
+
+
+
+        $postRequest = array(
+            'noinv' => $id
+        );
+
+        $ch = curl_init();
+
+        curl_setopt($ch, CURLOPT_URL,$url);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json', $authorization));
+        curl_setopt($ch, CURLOPT_POST, 1);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $postRequest);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+
+        $server_output = curl_exec($ch);
+
+        curl_close ($ch);
+
+        dd($server_output);
+
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json', $authorization));
+        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
+        curl_setopt($ch, CURLOPT_POSTFIELDS, "noinv=".$id);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
+        $result = curl_exec($ch);
+
+        dd(json_decode($result));
+    }
     function checkTimeChance()
     {
         if (Session::has('login_chance')) {
