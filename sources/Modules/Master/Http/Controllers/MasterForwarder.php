@@ -86,21 +86,21 @@ class MasterForwarder extends Controller
             return response()->json($status, 200);
         }
 
-        $cekfwd = forwarder::where('name', $request->namefwd)->first();
+        $cekfwd = forwarder::where('name', $request->namefwd)->where('aktif', 'Y')->first();
         if ($cekfwd != null) {
             DB::rollback();
             $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'Data Name Forwarder is available, please check again'];
             return response()->json($status, 200);
         }
 
-        $cekprivilege = privilege::where('privilege_user_nik', $request->emailfwd)->first();
+        $cekprivilege = privilege::where('privilege_user_nik', $request->emailfwd)->where('privilege_aktif', 'Y')->first();
         if ($cekprivilege != null) {
             DB::rollback();
             $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'Data Email Forwarder is available, please check again'];
             return response()->json($status, 200);
         }
 
-        $cekprivilege2 = privilege::where('privilege_user_name', strtoupper($request->namefwd))->first();
+        $cekprivilege2 = privilege::where('privilege_user_name', strtoupper($request->namefwd))->where('privilege_aktif', 'Y')->first();
         if ($cekprivilege2 != null) {
             DB::rollback();
             $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'Data Name Forwarder is available, please check again'];

@@ -430,8 +430,8 @@
                     let nikk = $('#nikfinanceedit').val(datapriv.nikfinance);
                     $('#emailfinanceedit').val(datapriv.emailfinance);
 
-                    let urlnik = '{!! route('getkaryawan', ['id']) !!}'
-                    urlnik = urlnik.replace('id', nikk[0]['value'])
+                    let urlnik = '{!! route('getkaryawan', ['params']) !!}'
+                    urlnik = urlnik.replace('params', nikk[0]['value'])
                     $.ajax({
                         url: urlnik,
                         type: 'GET',
@@ -524,12 +524,12 @@
             $('body').on('click', '#delbtn', function() {
                 console.log('objectdelete :>> ', 'klik');
                 let idku = $(this).attr('data-id');
-                let url = '{!! route('masterfwd_delete', ['id']) !!}';
-                url = url.replace('id', idku);
+                let url = '{!! route('masterfwd_delete', ['params']) !!}';
+                url = url.replace('params', idku);
                 console.log('idku :>> ', url);
                 Swal.fire({
-                    title: 'Validasi hapus data!',
-                    text: 'Apakah anda yakin akan menghapus semua data  ?',
+                    title: 'Validation delete data!',
+                    text: 'Are you sure you want to delete the data  ?',
                     type: 'question',
                     showConfirmButton: true,
                     showCancelButton: true,
