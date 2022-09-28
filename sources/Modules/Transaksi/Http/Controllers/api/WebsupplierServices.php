@@ -64,8 +64,8 @@ class WebsupplierServices extends Controller
             return response()->json($auth, Response::HTTP_UNAUTHORIZED);
         }
 
-        $noinv = Request::post('noinv');
-        dd($noinv);
+        $noinv = $post->noinv;
+        // dd($noinv);
         modellogproses::insert(['typelog' => 'api', 'activity' => '==== START CHECKING get data Shipping, inv no => ' . $noinv, 'status' => true, 'datetime' => date('Y-m-d H:i:s'), 'from' => 'api_shipping', 'created_at' => date('Y-m-d H:i:s')]);
         $data = formpo::where('noinv', $noinv)->where('statusformpo', 'confirm')->where('aktif', 'Y')->get();
         $datapo = array();
