@@ -1004,7 +1004,7 @@ class login extends Controller
 
 $data=array("noinv"=>$id);
  
-$curl = curl_init();
+$curl = curl_init(); 
 curl_setopt($curl, CURLOPT_URL, $url);
 curl_setopt($curl, CURLOPT_HTTPHEADER, array('Content-Type: application/json', $authorization) );
 curl_setopt($curl, CURLOPT_POST, 1);

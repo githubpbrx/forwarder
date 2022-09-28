@@ -15,7 +15,7 @@ Route::get('/sycnsap', 'SyncSap@index')->name('syncSAP');
 Route::get('/sycnsap249', 'SyncSap@index_syncsap')->name('SAPsync');
 
 Route::get('/detail/{nik}', 'login@apiDetail');
-Route::get('/testapi/{id}', 'login@apiTest');
+Route::get('/testapi/{id}', 'login@apiTest'); 
 Route::prefix('')->group(function () {
     Route::get('/dashboard', 'home@index')->name('dashcam');
     Route::get('/pagepo', 'home@pagepo')->name('page_po');
