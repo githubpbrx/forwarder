@@ -185,32 +185,26 @@ class AllocationForwarder extends Controller
         header("Access-Control-Allow-Origin: *");
         header("Access-Control-Allow-Headers: *");
 
-        $getpo = po::join('mastersupplier', 'mastersupplier.id', 'po.vendor')
-            ->join('forwarder', 'forwarder.idpo', 'po.id')
-            ->where('po.pono', $request->id)
-            ->where('forwarder.aktif', 'Y')
-            ->selectRaw(' po.id, po.pono, po.qtypo, po.matcontents, po.style, mastersupplier.nama, sum(forwarder.qty_allocation) as qty_allocation ')
-            ->groupby('forwarder.idpo')
-            ->get();
-        // dd($getpo);
+        // $getpo = po::join('mastersupplier', 'mastersupplier.id', 'po.vendor')
+        //     ->join('forwarder', 'forwarder.idpo', 'po.id')
+        //     ->where('po.pono', $request->id)
+        //     ->where('forwarder.aktif', 'Y')
+        //     ->selectRaw(' po.id, po.pono, po.qtypo, po.matcontents, po.style, mastersupplier.nama ')
+        //     ->groupby('forwarder.idpo')
+        //     ->get();
 
-        // $dd = fwd::with('masterforwarder')->where('idpo', $id)->where('aktif', 'Y')->get();
-        // if (count($getpo) == 0) {
-        //     $html = '';
-        // } else {
-        //     $html = "<b style='font-size:14pt'>Details of the data that has been Partial  Allocated</b><br><table border='1' style='width:100%' class='table table-bordered table-striped table-hover'><tr style='width:100%'><td>To forwarder</td><td>Qty Allocation</td><td>Date Allocation</td></tr>";
-        //     foreach ($getpo as $key => $r) {
-        //         $namafw = ($r->masterforwarder == null) ? '' : $r->masterforwarder->name;
-        //         $html .= "<tr><td>" . $namafw . "</td><td>" . $r->qty_allocation . "</td><td>" . $r->date_fwd . "</td></tr>";
-        //     }
-        //     $html .= "</table>";
-        // }
+        $getpo = po::withCount(['forwarder as qtyall'  => function ($var) {
+            $var->select(DB::raw('sum(qty_allocation)'))->groupby('idpo');
+        }])
+            ->with(['supplier'])
+            ->where('pono', $request->id)
+            ->get();
 
         $data = array(
             'title'  => 'Detail Allocation Forwarder',
             'menu'   => 'detailallocation',
             'box'    => '',
-            'datapo' => $getpo
+            'datapo' => $getpo,
         );
 
         return response()->json(['status' => 200, 'data' => $data, 'message' => 'Berhasil']);

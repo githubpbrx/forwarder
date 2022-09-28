@@ -286,7 +286,9 @@
                     console.log('data :>> ', data.data);
                     let dataku = data.data;
                     let poku = dataku.datapo;
-
+                    // let fwdku = dataku.datafwd;
+                    // console.log('fwdku :>> ', fwdku);
+                    console.log('poku :>> ', poku[0].supplier.nama);
                     $('#detailhtml').empty();
                     $('#detailstyle').empty();
 
@@ -295,6 +297,13 @@
                     html =
                         '<table border="0" style="width:100%"><tr><th style="text-align:center"><input type="checkbox" class="checkall" style="height:18px;width:18px"></th><th>Material</th><th>Style</th><th>Qty Item</th><th>Remaining Qty</th><th>Qty Allocation</th></tr>';
                     for (let index = 0; index < poku.length; index++) {
+                        let nullku;
+
+                        if (poku[index].qtyall == null) {
+                            nullku = '0';
+                        } else {
+                            nullku = poku[index].qtyall;
+                        }
 
                         // $('#qtypo').val();
                         console.log('poku.qtypo :>> ', poku.qtypo);
@@ -304,7 +313,7 @@
                             index + '" style="height:18px;width:18px"></td><td>' + poku[index]
                             .matcontents + '</td><td>' + poku[index]
                             .style + '</td><td>' + poku[index].qtypo +
-                            '</td><td>' + poku[index].qty_allocation +
+                            '</td><td>' + nullku +
                             '</td><td><input type="number" min="0" id="qty_allocation" name="qty_allocation" class="form-control trigerinput cekinput-' +
                             index + '" data-id="' + poku[index].id + '" data-pono="' + poku[index]
                             .pono + '" data-qty="' + poku[index].qtypo + '" disabled></td></tr>';
@@ -328,7 +337,7 @@
 
                     $('#po').val(poku[0].pono);
                     $('#qtypo').val(tot);
-                    $('#detailsup').val(poku[0].nama);
+                    $('#detailsup').val(poku[0].supplier.nama);
                 })
             });
 

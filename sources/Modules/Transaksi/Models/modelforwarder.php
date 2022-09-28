@@ -20,4 +20,9 @@ class modelforwarder extends Model
     {
         return $this->hasOne('Modules\Transaksi\Models\masterforwarder', 'id', 'idmasterfwd');
     }
+
+    public function poku()
+    {
+        return $this->belongsTo('Modules\Transaksi\Models\modelpo', 'id', 'idpo');
+    }
 }
