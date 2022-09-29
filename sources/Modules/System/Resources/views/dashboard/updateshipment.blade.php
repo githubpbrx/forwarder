@@ -14,7 +14,7 @@
                             <center>List PO#</center>
                         </th>
                         <th>
-                            <center>Item PO</center>
+                            <center>No Booking</center>
                         </th>
                         {{-- <th>
                             <center>Status</center>
@@ -219,8 +219,8 @@
                         name: 'listpo'
                     },
                     {
-                        data: 'listitem',
-                        name: 'listitem'
+                        data: 'nobook',
+                        name: 'nobook'
                     },
                     // {
                     //     data: 'status',
@@ -239,7 +239,7 @@
                 $('[data-toggle="tooltip"]').tooltip();
             })
 
-            // var length;
+            var length;
             $('body').on('click', '#updateship', function() {
                 $('#updateshipment').modal({
                     show: true,
@@ -258,34 +258,34 @@
                     let dataku = data.data.dataku;
                     let forwarderku = data.data.dataforwarder;
 
-                    // length = dataku.length;
+                    length = dataku.length;
                     $('#detailitem').empty();
 
                     html =
                         '<table border="0" style="width:100%"><tr><th>Material Contents</th><th>Color Code</th><th>Size</th><th>Quantity PO</th><th>Quantity Allocation</th><th>Status</th></tr>';
-                    // for (let index = 0; index < dataku.length; index++) {
-
-                    html +=
-                        '<tr><td>' +
-                        dataku.matcontents + '</td><td>' +
-                        dataku.colorcode + '</td><td>' + dataku.size +
-                        '</td><td>' + dataku.qtypo + '</td><td>' + forwarderku.qty_allocation +
-                        '</td><td>' + forwarderku.statusforwarder +
-                        '</td><td><input type="hidden" id="dataid" data-idpo="' +
-                        dataku.id + '" data-idformpo="' + dataku.id_formpo +
-                        '"></td></tr>';
-                    // }
+                    for (let index = 0; index < dataku.length; index++) {
+                        html +=
+                            '<tr><td>' +
+                            dataku[index].matcontents + '</td><td>' +
+                            dataku[index].colorcode + '</td><td>' + dataku[index].size +
+                            '</td><td>' + dataku[index].qtypo + '</td><td>' + forwarderku[index]
+                            .qty_allocation +
+                            '</td><td>' + forwarderku[index].statusforwarder +
+                            '</td><td><input type="hidden" id="dataid-' + index + '" data-idpo="' +
+                            dataku[index].id + '" data-idformpo="' + dataku[index].id_formpo +
+                            '"></td></tr>';
+                    }
 
                     html += "</table>";
                     $('#detailitem').html(html);
 
-                    $('#nomorpo').val(dataku.pono);
-                    $('#nobook').val(dataku.kode_booking);
-                    $('#datebook').val(dataku.date_booking);
-                    $('#etd').val(dataku.etd);
-                    $('#eta').val(dataku.eta);
-                    $('#shipmode').val(dataku.shipmode);
-                    $('#submode').val(dataku.subshipmode);
+                    $('#nomorpo').val(dataku[0].pono);
+                    $('#nobook').val(dataku[0].kode_booking);
+                    $('#datebook').val(dataku[0].date_booking);
+                    $('#etd').val(dataku[0].etd);
+                    $('#eta').val(dataku[0].eta);
+                    $('#shipmode').val(dataku[0].shipmode);
+                    $('#submode').val(dataku[0].subshipmode);
                 })
             });
 
@@ -299,19 +299,19 @@
                 let etdfix = $('#etdfix').val();
                 let etafix = $('#etafix').val();
 
-                // var arrayku = [];
-                // for (let index = 0; index < length; index++) {
-                //     let data = {
-                //         'idpo': $('#dataid-' + index).attr('data-idpo'),
-                //         'idformpo': $('#dataid-' + index).attr('data-idformpo'),
-                //     };
-                //     arrayku.push(data);
-                // }
+                var arrayku = [];
+                for (let index = 0; index < length; index++) {
+                    let data = {
+                        'idpo': $('#dataid-' + index).attr('data-idpo'),
+                        'idformpo': $('#dataid-' + index).attr('data-idformpo'),
+                    };
+                    arrayku.push(data);
+                }
 
                 let form_data = new FormData();
-                // form_data.append('dataid', JSON.stringify(arrayku));
-                form_data.append('idpo', idpo);
-                form_data.append('idformpo', idformpo);
+                form_data.append('dataid', JSON.stringify(arrayku));
+                // form_data.append('idpo', idpo);
+                // form_data.append('idformpo', idformpo);
                 form_data.append('nomorbl', nomorbl);
                 form_data.append('vessel', vessel);
                 form_data.append('file', file);

@@ -223,8 +223,8 @@ class home extends Controller
             ->addColumn('listpo', function ($query) {
                 return  $query->pono;
             })
-            ->addColumn('listitem', function ($query) {
-                return  $query->itemdesc;
+            ->addColumn('nobook', function ($query) {
+                return  $query->kode_booking;
             })
             // ->addColumn('status', function ($query) {
             //     return  $query->status;
@@ -232,7 +232,7 @@ class home extends Controller
             ->addColumn('action', function ($query) {
                 $process    = '';
 
-                $process    = '<a href="#" data-id="' . $query->id . '" id="updateship"><i class="fa fa-angle-double-right text-green"></i></a>';
+                $process    = '<a href="#" data-id="' . $query->pono . '" id="updateship"><i class="fa fa-angle-double-right text-green"></i></a>';
 
                 return $process;
             })
@@ -290,17 +290,16 @@ class home extends Controller
         // $mydata = po::where('id', $databook->idpo)->first();
 
         $mydata = po::join('formpo', 'formpo.idpo', 'po.id')
-            ->where('po.id', $request->id)
+            ->where('po.pono', $request->id)
             ->where('formpo.aktif', 'Y')
-            ->first();
+            ->get();
 
         $dataforwarder = forwarder::join('privilege', 'privilege.idforwarder', 'forwarder.idmasterfwd')
             ->where('privilege.privilege_user_nik', Session::get('session')['user_nik'])
-            ->where('idpo', $request->id)->where('aktif', 'Y')->first();
+            ->where('po_nomor', $request->id)->where('aktif', 'Y')->get();
         // dd($dataforwarder);
 
-
-        // dd($mydata);
+        // dd($mydata, $dataforwarder);
         $data = array(
             'dataku' => $mydata,
             'dataforwarder' => $dataforwarder
@@ -435,64 +434,64 @@ class home extends Controller
 
     public function saveshipment(Request $request)
     {
-        // $decode = json_decode($request->dataid);
-        // dd($request);
+        $decode = json_decode($request->dataid);
+        // dd($decode);
 
         $file = $request->file('file');
         $originalName = str_replace(' ', '_', $file->getClientOriginalName());
         $fileName = time() . '_' . $originalName;
         Storage::disk('local')->put($fileName, file_get_contents($request->file));
 
-        // foreach ($decode as $key => $value) {
-        if ($file == '' || $file == null) {
-            $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'File BL is required, please input File BL'];
-            return response()->json($status, 200);
+        foreach ($decode as $key => $value) {
+            if ($file == '' || $file == null) {
+                $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'File BL is required, please input File BL'];
+                return response()->json($status, 200);
+            }
+
+            if ($request->nomorbl == '' || $request->nomorbl == null) {
+                $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'Nomor BL is required, please input Nomor BL'];
+                return response()->json($status, 200);
+            }
+
+            if ($request->vessel == '' || $request->vessel == null) {
+                $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'Vessel is required, please input Vessel'];
+                return response()->json($status, 200);
+            }
+
+            if ($request->invoice == '' || $request->invoice == null) {
+                $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'Invoice is required, please input Invoice'];
+                return response()->json($status, 200);
+            }
+
+            if ($request->etdfix == '' || $request->etdfix == null) {
+                $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'ETD Fix is required, please input ETD Fix'];
+                return response()->json($status, 200);
+            }
+
+            if ($request->etafix == '' || $request->etafix == null) {
+                $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'ETA Fix is required, please input ETA Fix'];
+                return response()->json($status, 200);
+            }
+
+            $save1 = formpo::where('id_formpo', $value->idformpo)->update([
+                'file_bl'    => $fileName,
+                'nomor_bl'   => $request->nomorbl,
+                'vessel'     => $request->vessel,
+                'noinv'      => $request->invoice,
+                'etdfix'     => $request->etdfix,
+                'etafix'     => $request->etafix,
+                'updated_at' => date('Y-m-d H:i:s'),
+                'updated_by' => Session::get('session')['user_nik']
+            ]);
+
+            if ($save1) {
+                $sukses[] = "OK";
+            } else {
+                $gagal[] = "OK";
+            }
         }
 
-        if ($request->nomorbl == '' || $request->nomorbl == null) {
-            $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'Nomor BL is required, please input Nomor BL'];
-            return response()->json($status, 200);
-        }
-
-        if ($request->vessel == '' || $request->vessel == null) {
-            $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'Vessel is required, please input Vessel'];
-            return response()->json($status, 200);
-        }
-
-        if ($request->invoice == '' || $request->invoice == null) {
-            $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'Invoice is required, please input Invoice'];
-            return response()->json($status, 200);
-        }
-
-        if ($request->etdfix == '' || $request->etdfix == null) {
-            $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'ETD Fix is required, please input ETD Fix'];
-            return response()->json($status, 200);
-        }
-
-        if ($request->etafix == '' || $request->etafix == null) {
-            $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'ETA Fix is required, please input ETA Fix'];
-            return response()->json($status, 200);
-        }
-
-        $save1 = formpo::where('id_formpo', $request->idformpo)->update([
-            'file_bl'    => $fileName,
-            'nomor_bl'   => $request->nomorbl,
-            'vessel'     => $request->vessel,
-            'noinv'      => $request->invoice,
-            'etdfix'     => $request->etdfix,
-            'etafix'     => $request->etafix,
-            'updated_at' => date('Y-m-d H:i:s'),
-            'updated_by' => Session::get('session')['user_nik']
-        ]);
-
-        //     if ($save1) {
-        //         $sukses[] = "OK";
-        //     } else {
-        //         $gagal[] = "OK";
-        //     }
-        // }
-
-        if ($save1) {
+        if (empty($gagal)) {
             $status = ['title' => 'Success', 'status' => 'success', 'message' => 'Data Successfully Saved'];
             return response()->json($status, 200);
         } else {
