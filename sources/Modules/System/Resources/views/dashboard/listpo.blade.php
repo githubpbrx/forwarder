@@ -281,7 +281,7 @@
                 $('[data-toggle="tooltip"]').tooltip();
             })
 
-            // var length;
+            var length;
             $('body').on('click', '#formpo', function() {
                 $('#formulir_po').modal({
                     show: true,
@@ -300,23 +300,23 @@
                 }).done(function(data) {
                     let poku = data.data.datapo;
                     let forwarderku = data.data.dataforwarder;
-                    // length = poku.length;
+                    length = poku.length;
 
                     $('#detailitem').empty();
 
                     html =
                         '<table border="0" style="width:100%"><tr><th>Material Contents</th><th>Color Code</th><th>Size</th><th>Quantity PO</th><th>Quantity Allocation</th><th>Status</th></tr>';
-                    // for (let index = 0; index < poku.length; index++) {
-                    html +=
-                        '<tr><td>' + poku.matcontents + '</td><td>' +
-                        poku.colorcode + '</td><td>' + poku.size + '</td><td>' +
-                        poku.qtypo + '</td><td>' + forwarderku.qty_allocation +
-                        '</td><td>' + forwarderku.statusforwarder +
-                        '</td><td><input type="hidden" id="idall" data-id="' +
-                        poku.id + '" data-idfwd="' + forwarderku.id_forwarder +
-                        '" data-idmasterfwd="' + forwarderku.idmasterfwd +
-                        '"></td></tr>';
-                    // }
+                    for (let index = 0; index < poku.length; index++) {
+                        html +=
+                            '<tr><td>' + poku[index].matcontents + '</td><td>' +
+                            poku[index].colorcode + '</td><td>' + poku[index].size + '</td><td>' +
+                            poku[index].qtypo + '</td><td>' + forwarderku[index].qty_allocation +
+                            '</td><td>' + forwarderku[index].statusforwarder +
+                            '</td><td><input type="hidden" id="idall-' + index + '" data-id="' +
+                            poku[index].id + '" data-idfwd="' + forwarderku[index].id_forwarder +
+                            '" data-idmasterfwd="' + forwarderku[index].idmasterfwd +
+                            '"></td></tr>';
+                    }
 
                     html += "</table>";
                     $('#detailitem').html(html);
@@ -326,9 +326,9 @@
             });
 
             $('#btnsubmit').click(function(e) {
-                let idpo = $('#idall').attr('data-id');
-                let idfwd = $('#idall').attr('data-idfwd');
-                let idmasterfwd = $('#idall').attr('data-idmasterfwd');
+                // let idpo = $('#idall').attr('data-id');
+                // let idfwd = $('#idall').attr('data-idfwd');
+                // let idmasterfwd = $('#idall').attr('data-idmasterfwd');
                 let nobook = $('#nobook').val();
                 let datebook = $('#datebook').val();
                 let myetd = $('#etd').val();
@@ -338,16 +338,16 @@
                 let mylcl = $('#lclku').val();
                 let myair = $('#airku').val();
 
-                // var dataid = [];
-                // for (let index = 0; index < Number(length); index++) {
-                //     let idall = {
-                //         'idpo': $('#idall-' + index).attr('data-id'),
-                //         'idfwd': $('#idall-' + index).attr('data-idfwd'),
-                //         'idmasterfwd': $('#idall-' + index).attr('data-idmasterfwd'),
-                //     };
+                var dataid = [];
+                for (let index = 0; index < Number(length); index++) {
+                    let idall = {
+                        'idpo': $('#idall-' + index).attr('data-id'),
+                        'idfwd': $('#idall-' + index).attr('data-idfwd'),
+                        'idmasterfwd': $('#idall-' + index).attr('data-idmasterfwd'),
+                    };
 
-                //     dataid.push(idall);
-                // }
+                    dataid.push(idall);
+                }
 
                 if (nobook == null || nobook == '') {
                     notifalert('Nomor Booking');
@@ -369,9 +369,7 @@
                         url: "{{ route('formposave') }}",
                         data: {
                             _token: $('meta[name=csrf-token]').attr('content'),
-                            'idpo': idpo,
-                            'idfwd': idfwd,
-                            'idmasterfwd': idmasterfwd,
+                            'dataid': dataid,
                             'nobooking': nobook,
                             'datebooking': datebook,
                             'etd': myetd,
