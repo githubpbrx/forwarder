@@ -43,10 +43,10 @@ class SyncSap extends Controller
 
         if ($mode == 'prd') {
             // $filesdir = $root."/sapint/PRD/WEBSUPPLIER/PO/PROCESSED/";
-            $filesdir = storage_path('public/WEBSUPPLIER/PO/PROCESSED/');
+            $filesdir = storage_path('PSS/PRD/PROCESSED/');
         } else if ($mode == 'dev' or $mode == 'qas') {
             // $filesdir = $root."/sapint/DEV/WEBSUPPLIER/PO/PROCESSED/";
-            $filesdir = storage_path('public/WEBSUPPLIER/PO/PROCESSED/');
+            $filesdir = storage_path('PSS/DEV/PROCESSED/');
         } else {
             $this->logsap($mode, "", $fname, "FAILED :: Mode tidak ditemukan...");
             echo "FAILED :: Mode tidak ditemukan";
@@ -114,9 +114,9 @@ class SyncSap extends Controller
 
         if ($mode == '0') {
             // $filesdir = $root."/sapint/PRD/WEBSUPPLIER/PO/PROCESSED/";
-            $filesdir = storage_path('public/WEBSUPPLIER/PO/PROCESSED/');
+            $filesdir = storage_path('PANCA/PRD/Archive/');
         } else if ($mode == '1') {
-            $filesdir = $root . "/Web_Sup/Dev/Archive/";
+            $filesdir = storage_path('PANCA/DEV/Archive/');
             // $filesdir = $root."/sapint/DEV/WEBSUPPLIER/PO/PROCESSED/";
             // $filesdir = storage_path('public/WEBSUPPLIER/PO/PROCESSED/');
         } else {
