@@ -11,23 +11,32 @@
                 <div class="row">
                     <div class="col-md-12">
                         <div id="fullscreen-container" class="card-body" style="overflow-y: auto;">
-                            {{-- <div class="row">
-                                <div class="col-md-3">
-                                    <label class="col-sm-5 control-label">Choose PO :</label>
-                                    <div class="col-sm-12">
-                                        <select class="select2" style="width: 100%;" name="datapo" id="datapo">
-                                            <option value=""></option>
-                                        </select>
-                                    </div>
+                            <div class="d-flex">
+                                <div class="p-2">
+                                    {{-- <div class="col-md-3"> --}}
+                                    <label class="control-label">Choose PO :</label>
+                                    {{-- <div class="col-sm-12"> --}}
+                                    <select class="select2" style="width: 100%;" name="datapo" id="datapo">
+                                        <option value=""></option>
+                                    </select>
+                                    {{-- </div> --}}
+                                    {{-- </div> --}}
                                 </div>
-                                <div class="col-md-1">
-                                    <label class="col-sm-5 control-label"> &nbsp; </label>
-                                    <div class="col-sm-12">
-                                        <a href="#" type="button" id="search" class="btn btn-info form-control"
-                                            data-value="klik">Search</a>
-                                    </div>
+                                <div class="p-2">
+                                    {{-- <div class="col-md-1"> --}}
+                                    <label class="control-label"> &nbsp; </label>
+                                    {{-- <div class="col-sm-12"> --}}
+                                    <a href="#" type="button" id="search" class="btn btn-info form-control"
+                                        data-value="klik">Search</a>
+                                    {{-- </div> --}}
+                                    {{-- </div> --}}
                                 </div>
-                            </div> --}}
+                                <div class="ml-auto p-2">
+                                    <label class="control-label"> &nbsp; </label>
+                                    <a href="{{ url('report/forwarder/getexcelforwarderall') }}" type="button"
+                                        class="btn btn-warning form-control">Download Data Excel</a>
+                                </div>
+                            </div>
                             <br>
                             <div class="table-responsive">
                                 <table id="dataTables" class="table table-bordered table-striped table-hover"
@@ -36,6 +45,9 @@
                                         <tr>
                                             <th>
                                                 <center>PO</center>
+                                            </th>
+                                            <th>
+                                                <center>Code Booking</center>
                                             </th>
                                             <th>
                                                 <center>Material</center>
@@ -105,27 +117,27 @@
                         <div class="row">
                             <div class="col-md-4">
                                 <div class="form-group">
-                                    <label class="col-sm-12 control-label">Material Desc</label>
-                                    <div class="col-sm-12">
-                                        <input type="text" class="form-control" id="matdesc" name="matdesc"
-                                            autocomplete="off" readonly>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="form-group">
-                                    <label class="col-sm-12 control-label">Style</label>
-                                    <div class="col-sm-12">
-                                        <input type="text" class="form-control" id="style" name="style"
-                                            autocomplete="off" readonly>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="form-group">
                                     <label class="col-sm-12 control-label">Quantity PO</label>
                                     <div class="col-sm-12">
                                         <input type="text" class="form-control" id="qtypo" name="qtypo"
+                                            autocomplete="off" readonly>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label class="col-sm-12 control-label">Quantity Allocation</label>
+                                    <div class="col-sm-12">
+                                        <input type="text" class="form-control" id="qtyall" name="qtyall"
+                                            autocomplete="off" readonly>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label class="col-sm-12 control-label">Code Booking</label>
+                                    <div class="col-sm-12">
+                                        <input type="text" class="form-control" id="kodebook" name="kodebook"
                                             autocomplete="off" readonly>
                                     </div>
                                 </div>
@@ -134,19 +146,65 @@
                         <div class="row">
                             <div class="col-md-4">
                                 <div class="form-group">
-                                    <label class="col-sm-12 control-label">Price</label>
+                                    <label class="col-sm-12 control-label">Invoice</label>
                                     <div class="col-sm-12">
-                                        <input type="text" class="form-control" id="price" name="price"
+                                        <input type="text" class="form-control" id="invoice" name="invoice"
                                             autocomplete="off" readonly>
                                     </div>
                                 </div>
                             </div>
                             <div class="col-md-4">
                                 <div class="form-group">
-                                    <label class="col-sm-12 control-label">Plant</label>
+                                    <label class="col-sm-12 control-label">ETD</label>
                                     <div class="col-sm-12">
-                                        <input type="text" class="form-control" id="plant" name="plant"
+                                        <input type="text" class="form-control" id="etd" name="etd"
                                             autocomplete="off" readonly>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label class="col-sm-12 control-label">ETA</label>
+                                    <div class="col-sm-12">
+                                        <input type="text" class="form-control" id="eta" name="eta"
+                                            autocomplete="off" readonly>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label class="col-sm-12 control-label">No BL</label>
+                                    <div class="col-sm-12">
+                                        <input type="text" class="form-control" id="nobl" name="nobl"
+                                            autocomplete="off" readonly>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label class="col-sm-12 control-label">Vessel</label>
+                                    <div class="col-sm-12">
+                                        <input type="text" class="form-control" id="vessel" name="vessel"
+                                            autocomplete="off" readonly>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label class="col-sm-12 control-label">Ship Mode</label>
+                                    <div class="col-sm-12">
+                                        <div class="row">
+                                            <div class="col-sm-6">
+                                                <input type="text" class="form-control" id="shipmode"
+                                                    name="shipmode" autocomplete="off" readonly>
+                                            </div>
+                                            <div class="col-sm-6">
+                                                <input type="text" class="form-control" id="subshipmode"
+                                                    name="subshipmode" autocomplete="off" readonly>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -181,13 +239,17 @@
                 serverSide: true,
                 ajax: {
                     url: "{{ url('report/forwarder/search') }}",
-                    // data: function(d) {
-                    //     d.po = $('#datapo').val()
-                    // }
+                    data: function(d) {
+                        d.po = $('#datapo').val()
+                    }
                 },
                 columns: [{
                         data: 'po',
                         name: 'po'
+                    },
+                    {
+                        data: 'nobook',
+                        name: 'nobook'
                     },
                     {
                         data: 'material',
@@ -222,15 +284,15 @@
                 $('[data-toggle="tooltip"]').tooltip();
             });
 
-            // $('#search').click(function(e) {
-            //     tabel.draw();
-            //     // table.ajax.reload();
-            // });
+            $('#search').click(function(e) {
+                tabel.draw();
+                // table.ajax.reload();
+            });
 
             $('#datapo').select2({
                 placeholder: '-- Choose PO --',
                 ajax: {
-                    url: "{!! route('report_getpo') !!}",
+                    url: "{!! url('report/forwarder/getpo') !!}",
                     dataType: 'json',
                     delay: 500,
                     type: 'post',
@@ -274,18 +336,25 @@
                     },
                 }).done(function(data) {
                     console.log('data :>> ', data.data);
-                    let datapo = data.data.dataku;
 
-                    $('#nomorpo').val(datapo.pono);
-                    $('#material').val(datapo.matcontents);
-                    $('#matdesc').val(datapo.itemdesc);
-                    $('#qtypo').val(datapo.qtypo);
-                    let curr = datapo.curr;
-                    let pr = datapo.price;
-                    $('#price').val(pr + ' ' + curr);
-                    $('#supplier').val(datapo.nama);
-                    $('#plant').val(datapo.plant);
-                    $('#style').val(datapo.style);
+                    // let dataformpo = data.data.dataformpo;
+                    // let datapo = data.data.datapo;
+                    // let dataforwarder = data.data.dataforwarder;
+                    let mydata = data.data.alldata;
+
+                    $('#nomorpo').val(mydata.pono);
+                    $('#supplier').val(mydata.nama);
+                    $('#material').val(mydata.matcontents);
+                    $('#qtypo').val(mydata.qtypo);
+                    $('#qtyall').val(mydata.qty_allocation);
+                    $('#kodebook').val(mydata.kode_booking);
+                    $('#invoice').val(mydata.noinv);
+                    $('#etd').val(mydata.etdfix);
+                    $('#eta').val(mydata.etafix);
+                    $('#nobl').val(mydata.nomor_bl);
+                    $('#vessel').val(mydata.vessel);
+                    $('#shipmode').val(mydata.shipmode);
+                    $('#subshipmode').val(mydata.subshipmode);
                 })
             });
         });
