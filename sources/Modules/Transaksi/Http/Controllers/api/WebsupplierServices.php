@@ -58,19 +58,20 @@ class WebsupplierServices extends Controller
 
     function shipping(Request $post)
     {
-        
         $auth = $this->authorization($post);
         if (isset($auth['failed'])) {
             return response()->json($auth, Response::HTTP_UNAUTHORIZED);
         }
 
         $noinv = $post->noinv;
+        $sup = $post->supplier;
         // dd($noinv);
-        modellogproses::insert(['typelog' => 'api', 'activity' => '==== START CHECKING get data Shipping, inv no => ' . $noinv, 'status' => true, 'datetime' => date('Y-m-d H:i:s'), 'from' => 'api_shipping', 'created_at' => date('Y-m-d H:i:s')]);
+        modellogproses::insert(['typelog' => 'api', 'activity' => '==== START CHECKING get data Shipping, inv no => ' . $noinv . ' supplier => ' . $sup, 'status' => true, 'datetime' => date('Y-m-d H:i:s'), 'from' => 'api_shipping', 'created_at' => date('Y-m-d H:i:s')]);
         $data = formpo::where('noinv', $noinv)->where('statusformpo', 'confirm')->where('aktif', 'Y')->get();
+        $datasup = supplier::where('nama', $sup)->where('aktif', 'Y')->first();
         $datapo = array();
 
-        if (count($data) == 0) {
+        if (count($data) == 0 || $datasup == null) {
             modellogproses::insert(['typelog' => 'api', 'activity' => 'failed alert : Data Not found', 'status' => false, 'datetime' => date('Y-m-d H:i:s'), 'from' => 'api_shipping', 'created_at' => date('Y-m-d H:i:s')]);
             $datasend['message'] = 'Data Not Found';
             $datasend['success'] = false;
@@ -80,38 +81,44 @@ class WebsupplierServices extends Controller
         }
 
         foreach ($data as $key => $r) {
-            $po = po::where('id', $r->idpo)->first();
+            $po = po::where('id', $r->idpo)->where('vendor', $datasup->id)->first();
+            if ($po == null) {
+                $lp = [];
+            } else {
+                $lp['pono'] = $po->pono;
+                $lp['matcontents'] = $po->matcontents;
+                $lp['colorcode'] = $po->colorcode;
+                $lp['size'] = $po->size;
 
-            $lp['pono'] = $po->pono;
-            $lp['matcontents'] = $po->matcontents;
-            $lp['colorcode'] = $po->colorcode;
-            $lp['size'] = $r->size;
-            
-            $fw = forward::where('id', $r->idmasterfwd)->first();
-            $lp['forwardername'] = $fw->name;
+                // $sup = supplier::where('id', $po->vendor)->where('aktif', 'Y')->first();
+                // $lp['supplier'] = $r->noinv . '_' . $sup->nama;
 
-            $all = fwd::where('id_forwarder', $r->idforwarder)->first();
+                $fw = forward::where('id', $r->idmasterfwd)->first();
+                $lp['forwardername'] = $fw->name;
 
-            $lp['qtyallocation'] = $all->qty_allocation;
-            $lp['statusallocation'] = $all->status;
+                $all = fwd::where('id_forwarder', $r->idforwarder)->first();
 
-            $lp['kodebooking'] = $r->kode_booking;
-            $lp['datebooking'] = $r->date_booking;
-            $lp['estimasietd'] = $r->etd;
-            $lp['estimasieta'] = $r->eta;
-            $lp['shipmode'] = $r->shipmode;
-            $lp['subshipmode'] = $r->subshipmode;
-            $lp['etd'] = $r->etdfix;
-            $lp['eta'] = $r->etafix;
-            $lp['nomor_bl'] = $r->nomor_bl;
-            $lp['vessel'] = $r->vessel;
-            $sys = modelsystem::first();
-            $url = $sys->url . 'sources/storage/app/' . $r->file_bl;
-            $lp['file_bl'] = $url;
+                $lp['qtyallocation'] = $all->qty_allocation;
+                $lp['statusallocation'] = $all->statusforwarder;
 
-            modellogproses::insert(['typelog' => 'api', 'activity' => json_encode($lp), 'status' => true, 'datetime' => date('Y-m-d H:i:s'), 'from' => 'api_shipping', 'created_at' => date('Y-m-d H:i:s')]);
-            array_push($datapo, $lp);
-            unset($lp);
+                $lp['kodebooking'] = $r->kode_booking;
+                $lp['datebooking'] = $r->date_booking;
+                $lp['estimasietd'] = $r->etd;
+                $lp['estimasieta'] = $r->eta;
+                $lp['shipmode'] = $r->shipmode;
+                $lp['subshipmode'] = $r->subshipmode;
+                $lp['etd'] = $r->etdfix;
+                $lp['eta'] = $r->etafix;
+                $lp['nomor_bl'] = $r->nomor_bl;
+                $lp['vessel'] = $r->vessel;
+                $sys = modelsystem::first();
+                $url = $sys->url . 'sources/storage/app/' . $r->file_bl;
+                $lp['file_bl'] = $url;
+
+                modellogproses::insert(['typelog' => 'api', 'activity' => json_encode($lp), 'status' => true, 'datetime' => date('Y-m-d H:i:s'), 'from' => 'api_shipping', 'created_at' => date('Y-m-d H:i:s')]);
+                array_push($datapo, $lp);
+                unset($lp);
+            }
         }
 
         // dd($datapo);
