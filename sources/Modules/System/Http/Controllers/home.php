@@ -270,14 +270,20 @@ class home extends Controller
     public function formpo(Request $request)
     {
         // dd($request);
-        $mydata = po::where('pono', $request->id)->get();
-        $dataforwarder = forwarder::join('privilege', 'privilege.idforwarder', 'forwarder.idmasterfwd')
+        // $mydata = po::where('pono', $request->id)->get();
+        // $dataforwarder = forwarder::join('privilege', 'privilege.idforwarder', 'forwarder.idmasterfwd')
+        //     ->where('privilege.privilege_user_nik', Session::get('session')['user_nik'])
+        //     ->where('po_nomor', $request->id)->where('aktif', 'Y')->get();
+        $mydata = forwarder::join('po', 'po.id', 'forwarder.idpo')
+            ->join('privilege', 'privilege.idforwarder', 'forwarder.idmasterfwd')
+            ->where('po.pono', $request->id)
             ->where('privilege.privilege_user_nik', Session::get('session')['user_nik'])
-            ->where('po_nomor', $request->id)->where('aktif', 'Y')->get();
-        // dd($dataforwarder);
+            ->where('forwarder.aktif', 'Y')
+            ->get();
+        // dd($mydata);
         $data = array(
             'datapo' => $mydata,
-            'dataforwarder' => $dataforwarder
+            // 'dataforwarder' => $dataforwarder
         );
 
         return response()->json(['status' => 200, 'data' => $data, 'message' => 'Berhasil']);

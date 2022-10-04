@@ -299,9 +299,11 @@
                     },
                 }).done(function(data) {
                     let poku = data.data.datapo;
-                    let forwarderku = data.data.dataforwarder;
+                    // let forwarderku = data.data.dataforwarder;
+                    // console.log('forwarderku :>> ', forwarderku);
+                    console.log('poku :>> ', poku);
                     length = poku.length;
-
+                    console.log('length :>> ', length);
                     $('#detailitem').empty();
 
                     html =
@@ -310,18 +312,18 @@
                         html +=
                             '<tr><td>' + poku[index].matcontents + '</td><td>' +
                             poku[index].colorcode + '</td><td>' + poku[index].size + '</td><td>' +
-                            poku[index].qtypo + '</td><td>' + forwarderku[index].qty_allocation +
-                            '</td><td>' + forwarderku[index].statusforwarder +
+                            poku[index].qtypo + '</td><td>' + poku[index].qty_allocation +
+                            '</td><td>' + poku[index].statusforwarder +
                             '</td><td><input type="hidden" id="idall-' + index + '" data-id="' +
-                            poku[index].id + '" data-idfwd="' + forwarderku[index].id_forwarder +
-                            '" data-idmasterfwd="' + forwarderku[index].idmasterfwd +
+                            poku[index].id + '" data-idfwd="' + poku[index].id_forwarder +
+                            '" data-idmasterfwd="' + poku[index].idmasterfwd +
                             '"></td></tr>';
                     }
 
                     html += "</table>";
                     $('#detailitem').html(html);
 
-                    $('#nomorpo').val(poku.pono);
+                    $('#nomorpo').val(poku[0].pono);
                 })
             });
 
