@@ -27,7 +27,7 @@ class checklogin
         $ses = Session::get('session');
         $user = $ses['user_nik'];
         // dd($ses);
-        $pri = modelprivilege::where('privilege_user_nik', $user)->first();
+        $pri = modelprivilege::where('privilege_user_nik', $user)->where('privilege_aktif', 'Y')->first();
         if ($pri == null) {
             Session::flash('alert', 'sweetAlert("warning", "Please login to access")');
             return redirect('login');
