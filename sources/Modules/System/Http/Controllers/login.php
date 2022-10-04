@@ -411,7 +411,6 @@ class login extends Controller
 
     public function resendemail(Request $request)
     {
-        // dd('sini');
         $ses = Session::get('session');
         $user = $ses['user_nik'];
         $nama = $ses['user_nama'];
@@ -420,7 +419,7 @@ class login extends Controller
         $kode = rand(11111, 99999);
         modelprivilege::where('privilege_user_nik', $user)->update(['kode' => $kode, 'token' => $token]);
 
-        $cek = modelprivilege::where('privilege_user_nik', $user)->first();
+        $cek = modelprivilege::where('privilege_user_nik', $user)->where('privilege_aktif', 'Y')->first();
         $param = modelsystem::first();
         $url = $param->url . 'getvalidation/' . base64_encode($cek->token) . '/' . $this->enkripsi($user) . '/' . $this->enkripsi($cek->kode);
         login::sendEmail($user, $nama, $cek->kode, $url, "Web Forwarder User Activation");
@@ -435,7 +434,7 @@ class login extends Controller
         $user = $ses['user_nik'];
         $nama = $ses['user_nama'];
 
-        $cek = modelprivilege::where('privilege_user_nik', $user)->first();
+        $cek = modelprivilege::where('privilege_user_nik', $user)->where('privilege_aktif', 'Y')->first();
         $param = modelsystem::first();
         $url = $param->url . 'getvalidation/' . base64_encode($cek->token) . '/' . $this->enkripsi($user) . '/' . $this->enkripsi($cek->kode);
         $data = array(
@@ -454,7 +453,7 @@ class login extends Controller
         $ses = Session::get('session');
         $user = $ses['user_nik'];
 
-        $cek = modelprivilege::where('privilege_user_nik', $user)->first();
+        $cek = modelprivilege::where('privilege_user_nik', $user)->where('privilege_aktif', 'Y')->first();
         if ($cek == null) {
             Session::flash('alert', 'sweetAlert("error", "Tokens don`t match")');
             return redirect()->back();
@@ -485,7 +484,7 @@ class login extends Controller
         $user = $this->dekripsi($kode);
         $kode = $this->dekripsi($po);
 
-        $cek = modelprivilege::where('privilege_user_nik', $user)->where('token', $token)->first();
+        $cek = modelprivilege::where('privilege_user_nik', $user)->where('token', $token)->where('privilege_aktif', 'Y')->first();
         if ($cek == null) {
             Session::flash('alert', 'sweetAlert("error", "Tokens don`t match")');
             return redirect()->back();
@@ -516,7 +515,7 @@ class login extends Controller
         $user = $ses['user_nik'];
         $nama = $ses['user_nama'];
 
-        $cek = modelprivilege::where('privilege_user_nik', $user)->first();
+        $cek = modelprivilege::where('privilege_user_nik', $user)->where('privilege_aktif', 'Y')->first();
 
         $masterfwd = masterforwarder::where('id', $cek->idforwarder)->where('aktif', 'Y')->first();
         $data = array(
@@ -581,7 +580,7 @@ class login extends Controller
         $user = $ses['user_nik'];
         $nama = $ses['user_nama'];
 
-        $cek = modelprivilege::where('privilege_user_nik', $user)->first();
+        $cek = modelprivilege::where('privilege_user_nik', $user)->where('privilege_aktif', 'Y')->first();
         $param = modelsystem::first();
 
         $statuskyc = modelkyc::where('name_kyc', $nama)->where('aktif', 'Y')->first();
@@ -611,7 +610,7 @@ class login extends Controller
         $user = $ses['user_nik'];
         $nama = $ses['user_nama'];
 
-        $cek = modelprivilege::where('privilege_user_nik', $user)->first();
+        $cek = modelprivilege::where('privilege_user_nik', $user)->where('privilege_aktif', 'Y')->first();
 
         $rejectkyc = modelkyc::where('name_kyc', $nama)->where('nik_kyc', $user)->where('aktif', 'Y')->where('status', 'reject')->first();
         // dd($rejectkyc);
@@ -691,7 +690,7 @@ class login extends Controller
         $kode = rand(11111, 99999);
         modelprivilege::where('privilege_user_nik', $user)->update(['kode' => $kode, 'token' => $token]);
 
-        $cek = modelprivilege::where('privilege_user_nik', $user)->first();
+        $cek = modelprivilege::where('privilege_user_nik', $user)->where('privilege_aktif', 'Y')->first();
         $param = modelsystem::first();
         $url = $param->url . 'getvalidation/' . base64_encode($cek->token) . '/' . $this->enkripsi($user) . '/' . $this->enkripsi($cek->kode);
         login::sendEmail($user, $nama, $cek->kode, $url, "Web Forwarder User Activation");
@@ -929,8 +928,7 @@ class login extends Controller
         // app()->call('Modules\System\Http\Controllers\Privileges\privilege@getPrivilege', [$user['user_nik']]);
 
         $nik = $user['user_nik'];
-        $privilege      = modelprivilege::where('privilege_user_nik', '=', $nik)
-            ->first();
+        $privilege      = modelprivilege::where('privilege_user_nik', '=', $nik)->where('privilege_aktif', 'Y')->first();
         // dd($nik);
         if ($privilege) {
             $role_access    = modelrole_access::where('role_access_group_access_id', '=', $privilege->privilege_group_access_id)
@@ -955,7 +953,7 @@ class login extends Controller
 
     public function createPrivilege($nik, $nama = null)
     {
-        $privilege = modelprivilege::where('privilege_user_nik', '=', $nik)->first();
+        $privilege = modelprivilege::where('privilege_user_nik', '=', $nik)->where('privilege_aktif', 'Y')->first();
         if (!isset($privilege->privilege_user_nik)) {
             modelprivilege::create([
                 'privilege_user_nik'    => $nik,
