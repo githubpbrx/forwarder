@@ -890,7 +890,7 @@ class login extends Controller
     public function logout()
     {
         $this->middleware('checklogin');
-
+        \LogActivity::addToLog('Logout', $this->micro);
         Session::flush();
         return redirect('login')->with('alert', 'You are logout');
     }
