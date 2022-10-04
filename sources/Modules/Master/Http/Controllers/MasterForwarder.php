@@ -21,6 +21,7 @@ class MasterForwarder extends Controller
     {
         header("Access-Control-Allow-Origin: *");
         header("Access-Control-Allow-Headers: *");
+        $this->micro = microtime(true);
         $this->ip_server = config('api.url.ip_address');
     }
     /**
@@ -33,6 +34,8 @@ class MasterForwarder extends Controller
             'title' => 'List Master Forwarder',
             'menu' => 'masterforwarder'
         ];
+
+        \LogActivity::addToLog('Access Menu Master Forwarder', $this->micro);
         return view('master::masterforwarder', $data);
     }
 
@@ -139,6 +142,7 @@ class MasterForwarder extends Controller
 
         if ($savedfwd && $saveprivilege) {
             DB::commit();
+            \LogActivity::addToLog('Save Master Forwarder', $this->micro);
             $status = ['title' => 'Success', 'status' => 'success', 'message' => 'Data Successfully Saved'];
             return response()->json($status, 200);
         } else {
@@ -230,6 +234,7 @@ class MasterForwarder extends Controller
 
         if ($updatefwd && $updateprivilege) {
             DB::commit();
+            \LogActivity::addToLog('Update Master Forwarder', $this->micro);
             $status = ['title' => 'Success', 'status' => 'success', 'message' => 'Data Successfully Saved'];
             return response()->json($status, 200);
         } else {
@@ -261,6 +266,7 @@ class MasterForwarder extends Controller
 
         if ($delete && $deleteprivilege) {
             DB::commit();
+            \LogActivity::addToLog('Delete Master Forwarder', $this->micro);
             $status = ['title' => 'Success', 'status' => 'success', 'message' => 'Data Successfully Deleted'];
             return response()->json($status, 200);
         } else {
