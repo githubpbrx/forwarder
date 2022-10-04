@@ -26,6 +26,7 @@ class login extends Controller
     public function __construct()
     {
         $this->ip_server = config('api.url.ip_address');
+        $this->micro = microtime(true);
     }
 
     public $question_1 = array(
@@ -105,7 +106,7 @@ class login extends Controller
         $password   = $post->password;
 
         //cek
-        $ceklogin = modelprivilege::where('privilege_user_nik', $nik)->first();
+        $ceklogin = modelprivilege::where('privilege_user_nik', $nik)->where('privilege_aktif', 'Y')->first();
         if ($ceklogin == null) {
             $this->loginChance();
             Session::flash('alert', 'sweetAlert("error", "Access Denied", "Chance : ' . $this->loginChance() . ' time")');
@@ -135,6 +136,7 @@ class login extends Controller
                             'user_nama'  => $ceklogin->privilege_user_name
                         );
                         Session::put('session', $session);
+                        \LogActivity::addToLog('Login Forwarder', $this->micro);
                         $this->choosemenu();
                         Session::flash('alert', 'sweetAlert("success", "Successfully Login")');
                         return redirect('dashboard');
@@ -210,6 +212,7 @@ class login extends Controller
                             Session::put('session', $session);
 
                             $this->createPrivilege($this->dekripsi($login_data['a']), $this->dekripsi($login_data['b']));
+                            \LogActivity::addToLog('Login Logistik', $this->micro);
                             Session::flash('toast', 'sweetAlert("success", "Successfully Login")');
                             $this->choosemenu();
                             return redirect('dashboard');
@@ -562,6 +565,7 @@ class login extends Controller
 
         if ($submit && $cocupdate) {
             DB::commit();
+            \LogActivity::addToLog('Validasi CoC', $this->micro);
             $status = ['title' => 'Success', 'status' => 'success', 'message' => 'Data Successfully Saved'];
             return response()->json($status, 200);
         } else {
@@ -667,6 +671,7 @@ class login extends Controller
         ]);
 
         if ($save1) {
+            \LogActivity::addToLog('Validasi KYC', $this->micro);
             $status = ['title' => 'Success', 'status' => 'success', 'message' => 'Data Successfully Saved'];
             return response()->json($status, 200);
         } else {
@@ -995,23 +1000,23 @@ class login extends Controller
         }
     }
 
-    function apiTest($id){
+    function apiTest($id)
+    {
         $url =  "http://pbrx.web.id/forwarder/api/websupplier/shipping";
 
         $authorization = 'Bearer:$2y$10$gpwr15S9I67MHEx0gCD0jeIYovjwl6ymv7zfu4QaaZjVEufbXItl6';
-        
-        $data = json_encode(array( "noinv"=> $id ) );
-         
-        $curl = curl_init(); 
+
+        $data = json_encode(array("noinv" => $id));
+
+        $curl = curl_init();
         curl_setopt($curl, CURLOPT_URL, $url);
-        curl_setopt($curl, CURLOPT_HTTPHEADER, array('Content-Type: application/json', $authorization) );
+        curl_setopt($curl, CURLOPT_HTTPHEADER, array('Content-Type: application/json', $authorization));
         curl_setopt($curl, CURLOPT_POST, 1);
         curl_setopt($curl, CURLOPT_POSTFIELDS, $data);
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
         $response = curl_exec($curl);
 
         return $response;
-
     }
     function checkTimeChance()
     {
