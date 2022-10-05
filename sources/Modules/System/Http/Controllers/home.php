@@ -23,7 +23,7 @@ class home extends Controller
     public function __construct()
     {
         $this->middleware('checklogin');
-
+        $this->micro = microtime(true);
         header("Access-Control-Allow-Origin: *");
         header("Access-Control-Allow-Headers: *");
     }
@@ -109,6 +109,8 @@ class home extends Controller
             'datauser'      => $datauser,
             'totalkyc'      => count($userkyc),
         );
+
+        \LogActivity::addToLog('Access Menu Dashboard', $this->micro);
         return view('system::dashboard/dashboard', $data);
     }
 
@@ -119,6 +121,8 @@ class home extends Controller
             'menu'  => 'pagepo',
             'box'   => '',
         );
+
+        \LogActivity::addToLog('Process Input Data Approval PO', $this->micro);
         return view('system::dashboard/listpo', $data);
     }
 
@@ -129,6 +133,8 @@ class home extends Controller
             'menu'  => 'updateshipment',
             'box'   => '',
         );
+
+        \LogActivity::addToLog('Process Input Data Shipment', $this->micro);
         return view('system::dashboard/updateshipment', $data);
     }
 
@@ -139,6 +145,8 @@ class home extends Controller
             'menu'  => 'listapproval',
             'box'   => '',
         );
+
+        \LogActivity::addToLog('Process Approval Data PO by Logistik', $this->micro);
         return view('transaksi::listapproval', $data);
     }
 
@@ -149,6 +157,8 @@ class home extends Controller
             'menu'  => 'listkyc',
             'box'   => '',
         );
+
+        \LogActivity::addToLog('Process Approval KYC by Logistik', $this->micro);
         return view('system::dashboard/listkyc', $data);
     }
 
@@ -429,6 +439,7 @@ class home extends Controller
 
         if (empty($gagal)) {
             DB::commit();
+            \LogActivity::addToLog('Saved Data Approval PO by Forwarder', $this->micro);
             $status = ['title' => 'Success', 'status' => 'success', 'message' => 'Data Successfully Saved'];
             return response()->json($status, 200);
         } else {
@@ -498,6 +509,7 @@ class home extends Controller
         }
 
         if (empty($gagal)) {
+            \LogActivity::addToLog('Saved Data Shipment by Forwarder', $this->micro);
             $status = ['title' => 'Success', 'status' => 'success', 'message' => 'Data Successfully Saved'];
             return response()->json($status, 200);
         } else {
@@ -525,6 +537,7 @@ class home extends Controller
 
             if ($statusupdate && $kycupdate) {
                 DB::commit();
+                \LogActivity::addToLog('Status KYC Confirmed by Logistik', $this->micro);
                 $status = ['title' => 'Success', 'status' => 'success', 'message' => 'Data Successfully Saved'];
                 return response()->json($status, 200);
             } else {
@@ -542,6 +555,7 @@ class home extends Controller
             ]);
 
             if ($statusupdate) {
+                \LogActivity::addToLog('Status KYC Rejected by Logistik', $this->micro);
                 $status = ['title' => 'Success', 'status' => 'success', 'message' => 'Data Successfully Saved'];
                 return response()->json($status, 200);
             } else {
