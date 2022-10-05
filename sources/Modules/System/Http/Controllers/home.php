@@ -144,7 +144,6 @@ class home extends Controller
             'box'   => '',
         );
 
-        \LogActivity::addToLog('Process Approval Data PO by Logistik', $this->micro);
         return view('transaksi::listapproval', $data);
     }
 

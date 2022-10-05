@@ -201,6 +201,7 @@ class ApprovalConfirmation extends Controller
             'dataku' => $dataku
         ];
 
+        \LogActivity::addToLog('Process Approval Data PO by Logistik', $this->micro);
         return response()->json(['status' => 200, 'data' => $data, 'message' => 'Berhasil']);
     }
 
