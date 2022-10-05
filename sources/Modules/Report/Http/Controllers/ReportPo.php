@@ -20,6 +20,7 @@ class ReportPo extends Controller
     {
         header("Access-Control-Allow-Origin: *");
         header("Access-Control-Allow-Headers: *");
+        $this->micro = microtime(true);
     }
 
     public function index()
@@ -30,6 +31,7 @@ class ReportPo extends Controller
             'box'   => '',
         );
 
+        \LogActivity::addToLog('Access Menu Report PO', $this->micro);
         return view('report::reportpo', $data);
     }
 
