@@ -122,7 +122,6 @@ class home extends Controller
             'box'   => '',
         );
 
-        \LogActivity::addToLog('Process Input Data Approval PO', $this->micro);
         return view('system::dashboard/listpo', $data);
     }
 
@@ -134,7 +133,6 @@ class home extends Controller
             'box'   => '',
         );
 
-        \LogActivity::addToLog('Process Input Data Shipment', $this->micro);
         return view('system::dashboard/updateshipment', $data);
     }
 
@@ -158,7 +156,6 @@ class home extends Controller
             'box'   => '',
         );
 
-        \LogActivity::addToLog('Process Approval KYC by Logistik', $this->micro);
         return view('system::dashboard/listkyc', $data);
     }
 
@@ -296,6 +293,7 @@ class home extends Controller
             // 'dataforwarder' => $dataforwarder
         );
 
+        \LogActivity::addToLog('Process Input Data Approval PO', $this->micro);
         return response()->json(['status' => 200, 'data' => $data, 'message' => 'Berhasil']);
     }
 
@@ -321,6 +319,7 @@ class home extends Controller
             'dataforwarder' => $dataforwarder
         );
 
+        \LogActivity::addToLog('Process Input Data Shipment', $this->micro);
         return response()->json(['status' => 200, 'data' => $data, 'message' => 'Berhasil']);
     }
 
@@ -333,6 +332,7 @@ class home extends Controller
             'datakyc' => $datakyc
         );
 
+        \LogActivity::addToLog('Process Approval KYC by Logistik', $this->micro);
         return response()->json(['status' => 200, 'data' => $data, 'message' => 'Berhasil']);
     }
 
