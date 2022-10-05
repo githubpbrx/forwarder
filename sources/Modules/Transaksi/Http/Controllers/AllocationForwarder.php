@@ -18,6 +18,7 @@ class AllocationForwarder extends Controller
     {
         header("Access-Control-Allow-Origin: *");
         header("Access-Control-Allow-Headers: *");
+        $this->micro = microtime(true);
     }
 
     /**
@@ -33,6 +34,7 @@ class AllocationForwarder extends Controller
             'sup'   => supplier::where('aktif', 'Y')->get(),
         );
 
+        \LogActivity::addToLog('Access Menu Allocation Forwarder', $this->micro);
         return view('transaksi::allocationforwarder', $data);
     }
 
@@ -166,6 +168,7 @@ class AllocationForwarder extends Controller
 
         if (empty($gagal)) {
             DB::commit();
+            \LogActivity::addToLog('Save Allocation Forwarder', $this->micro);
             $status = ['title' => 'Success', 'status' => 'success', 'message' => 'Data Successfully Saved'];
             return response()->json($status, 200);
         } else {
