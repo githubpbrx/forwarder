@@ -291,6 +291,7 @@
                     console.log('poku :>> ', poku[0].supplier.nama);
                     $('#detailhtml').empty();
                     $('#detailstyle').empty();
+                    $('#forwarder').empty();
 
                     var tot = 0;
                     length = poku.length;
@@ -300,9 +301,9 @@
                         let nullku;
 
                         if (poku[index].qtyall == null) {
-                            nullku = '0';
+                            nullku = poku[index].qtypo;
                         } else if (poku[index].qtyall == poku[index].qtypo) {
-                            nullku = '---';
+                            nullku = '0';
                         } else {
                             nullku = poku[index].qtypo - poku[index].qtyall;
                         }
