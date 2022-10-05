@@ -262,6 +262,7 @@ class login extends Controller
         if ($question1 == $answer1 && $question2 == $answer2) {
             // return view('system::login/login_forgot_password', $data);
             Session::flash('alert', 'toast("success", "Yeay, Success")');
+            \LogActivity::addToLog('Process Forgot Password', $this->micro);
             return view('system::login/login_forgot_password', $data);
         } else {
             Session::flash('alert', 'sweetAlert("error", "Wrong Answer")');
@@ -284,6 +285,7 @@ class login extends Controller
             } else {
                 try {
                     $this->apiForgotPassword($nik, $password);
+                    \LogActivity::addToLog('Process Password changed', $this->micro);
                     Session::flash('alert', 'sweetAlert("success", "Password changed, please login again")');
                 } catch (\Exception $e) {
                     Session::flash('alert', 'sweetAlert("error", ' . $e . ')');
@@ -373,16 +375,16 @@ class login extends Controller
 
         if (isset($post->nik) && isset($post->password)) {
 
-            $exesql = modelprivilege::where('privilege_user_nik', $post->nik)->update(['privilege_password' => Hash::make($post->password)]);
+            $exesql = modelprivilege::where('privilege_user_nik', $post->nik)->where('privilege_aktif', 'Y')->update(['privilege_password' => Hash::make($post->password)]);
             if ($exesql) {
-                $ceklogin =  modelprivilege::where('privilege_user_nik', $post->nik)->first();
+                $ceklogin =  modelprivilege::where('privilege_user_nik', $post->nik)->where('privilege_aktif', 'Y')->first();
                 $session = array(
                     'user_nik'   => $ceklogin->privilege_user_nik,
                     'user_nama'  => $ceklogin->privilege_user_name
                 );
                 Session::put('session', $session);
                 //cek
-                $cek = modelprivilege::where('privilege_user_nik', $post->nik)->first();
+                $cek = modelprivilege::where('privilege_user_nik', $post->nik)->where('privilege_aktif', 'Y')->first();
                 if ($cek->kode_validate == 'N') {
                     $param = modelsystem::first();
                     $url = $param->url . 'getvalidation/' . base64_encode($cek->token) . '/' . $this->enkripsi($post->nik) . '/' . $this->enkripsi($cek->kode);
@@ -417,13 +419,13 @@ class login extends Controller
 
         $token = Hash::make('ittetapsemangant');
         $kode = rand(11111, 99999);
-        modelprivilege::where('privilege_user_nik', $user)->update(['kode' => $kode, 'token' => $token]);
+        modelprivilege::where('privilege_user_nik', $user)->where('privilege_aktif', 'Y')->update(['kode' => $kode, 'token' => $token]);
 
         $cek = modelprivilege::where('privilege_user_nik', $user)->where('privilege_aktif', 'Y')->first();
         $param = modelsystem::first();
         $url = $param->url . 'getvalidation/' . base64_encode($cek->token) . '/' . $this->enkripsi($user) . '/' . $this->enkripsi($cek->kode);
         login::sendEmail($user, $nama, $cek->kode, $url, "Web Forwarder User Activation");
-
+        \LogActivity::addToLog('Process Resend Email', $this->micro);
         Session::flash('alert', 'sweetAlert("success", "Please check your email again")');
         return redirect()->back();
     }
@@ -461,7 +463,8 @@ class login extends Controller
             if ($kode == $cek->kode) {
                 $token = Hash::make('ittetapsemangant');
                 $kode = rand(11111, 99999);
-                $update = modelprivilege::where('privilege_user_nik', $user)->update(['kode' => $kode, 'token' => $token, 'kode_validate' => 'Y']);
+                $update = modelprivilege::where('privilege_user_nik', $user)->where('privilege_aktif', 'Y')->update(['kode' => $kode, 'token' => $token, 'kode_validate' => 'Y']);
+                \LogActivity::addToLog('Account Activation', $this->micro);
                 if ($update) {
                     Session::flash('alert', 'sweetAlert("success", "Your user is already active")');
                     return redirect()->route('dashcam');
@@ -492,7 +495,7 @@ class login extends Controller
             if ($kode == $cek->kode) {
                 $token = Hash::make('ittetapsemangant');
                 $kode = rand(11111, 99999);
-                $update = modelprivilege::where('privilege_user_nik', $user)->update(['kode' => $kode, 'token' => $token, 'kode_validate' => 'Y']);
+                $update = modelprivilege::where('privilege_user_nik', $user)->where('privilege_aktif', 'Y')->update(['kode' => $kode, 'token' => $token, 'kode_validate' => 'Y']);
                 if ($update) {
                     Session::flash('alert', 'sweetAlert("success", "Your user is already active")');
                     return redirect()->route('dashcam');
@@ -526,6 +529,8 @@ class login extends Controller
             'ses'   => $ses,
             'datafwd' => $masterfwd,
         );
+
+        \LogActivity::addToLog('Process Input Data CoC by Forwarder', $this->micro);
         return view('system::login/aktifasicoc', $data);
     }
 
@@ -564,7 +569,7 @@ class login extends Controller
 
         if ($submit && $cocupdate) {
             DB::commit();
-            \LogActivity::addToLog('Validasi CoC', $this->micro);
+            \LogActivity::addToLog('Save Data CoC', $this->micro);
             $status = ['title' => 'Success', 'status' => 'success', 'message' => 'Data Successfully Saved'];
             return response()->json($status, 200);
         } else {
@@ -601,6 +606,8 @@ class login extends Controller
             'statuskyc' => $datakyc,
             'kycku'    => $statuskyc
         );
+
+        \LogActivity::addToLog('Process Input Data KYC by Forwarder', $this->micro);
         return view('system::login/aktifasikyc', $data);
     }
 
@@ -670,7 +677,7 @@ class login extends Controller
         ]);
 
         if ($save1) {
-            \LogActivity::addToLog('Validasi KYC', $this->micro);
+            \LogActivity::addToLog('Save Data KYC by Forwarder', $this->micro);
             $status = ['title' => 'Success', 'status' => 'success', 'message' => 'Data Successfully Saved'];
             return response()->json($status, 200);
         } else {
@@ -688,13 +695,13 @@ class login extends Controller
 
         $token = Hash::make('ittetapsemangant');
         $kode = rand(11111, 99999);
-        modelprivilege::where('privilege_user_nik', $user)->update(['kode' => $kode, 'token' => $token]);
+        modelprivilege::where('privilege_user_nik', $user)->where('privilege_aktif', 'Y')->update(['kode' => $kode, 'token' => $token]);
 
         $cek = modelprivilege::where('privilege_user_nik', $user)->where('privilege_aktif', 'Y')->first();
         $param = modelsystem::first();
         $url = $param->url . 'getvalidation/' . base64_encode($cek->token) . '/' . $this->enkripsi($user) . '/' . $this->enkripsi($cek->kode);
         login::sendEmail($user, $nama, $cek->kode, $url, "Web Forwarder User Activation");
-
+        \LogActivity::addToLog('Send Email to Finance', $this->micro);
         Session::flash('alert', 'sweetAlert("success", "Please check your email again")');
         return redirect()->back();
     }
