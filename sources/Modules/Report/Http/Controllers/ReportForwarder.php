@@ -22,6 +22,7 @@ class ReportForwarder extends Controller
     {
         header("Access-Control-Allow-Origin: *");
         header("Access-Control-Allow-Headers: *");
+        $this->micro = microtime(true);
     }
 
     public function index()
@@ -32,6 +33,7 @@ class ReportForwarder extends Controller
             'box'   => '',
         );
 
+        \LogActivity::addToLog('Access Menu Report Forwarder', $this->micro);
         return view('report::reportforwarder', $data);
     }
 
