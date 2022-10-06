@@ -284,7 +284,9 @@ class home extends Controller
             ->join('privilege', 'privilege.idforwarder', 'forwarder.idmasterfwd')
             ->where('po.pono', $request->id)
             ->where('privilege.privilege_user_nik', Session::get('session')['user_nik'])
-            ->where('forwarder.statusapproval', '=', null)
+            ->where(function ($kus) {
+                $kus->where('forwarder.statusapproval', null)->orWhere('forwarder.statusapproval', 'reject');
+            })
             ->where('forwarder.aktif', 'Y')->where('privilege.privilege_aktif', 'Y')
             ->get();
         // dd($mydata);
