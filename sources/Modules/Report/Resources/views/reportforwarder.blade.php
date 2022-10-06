@@ -47,16 +47,16 @@
                                                 <center>PO</center>
                                             </th>
                                             <th>
+                                                <center>Supplier</center>
+                                            </th>
+                                            <th>
                                                 <center>Code Booking</center>
                                             </th>
                                             <th>
-                                                <center>Material</center>
+                                                <center>Invoice</center>
                                             </th>
                                             <th>
-                                                <center>Quantity Allocation</center>
-                                            </th>
-                                            <th>
-                                                <center>Status Allocation</center>
+                                                <center>Nomor BL</center>
                                             </th>
                                             <th>
                                                 <center>Action</center>
@@ -101,35 +101,6 @@
                                     <label class="col-sm-12 control-label">Supplier</label>
                                     <div class="col-sm-12">
                                         <input type="text" class="form-control" id="supplier" name="supplier" readonly>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="form-group">
-                                    <label class="col-sm-12 control-label">Material</label>
-                                    <div class="col-sm-12">
-                                        <input type="text" class="form-control" id="material" name="material"
-                                            autocomplete="off" readonly>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-4">
-                                <div class="form-group">
-                                    <label class="col-sm-12 control-label">Quantity PO</label>
-                                    <div class="col-sm-12">
-                                        <input type="text" class="form-control" id="qtypo" name="qtypo"
-                                            autocomplete="off" readonly>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="form-group">
-                                    <label class="col-sm-12 control-label">Quantity Allocation</label>
-                                    <div class="col-sm-12">
-                                        <input type="text" class="form-control" id="qtyall" name="qtyall"
-                                            autocomplete="off" readonly>
                                     </div>
                                 </div>
                             </div>
@@ -248,20 +219,20 @@
                         name: 'po'
                     },
                     {
+                        data: 'supplier',
+                        name: 'supplier'
+                    },
+                    {
                         data: 'nobook',
                         name: 'nobook'
                     },
                     {
-                        data: 'material',
-                        name: 'material'
+                        data: 'invoice',
+                        name: 'invoice'
                     },
                     {
-                        data: 'qtyall',
-                        name: 'qtyall'
-                    },
-                    {
-                        data: 'statusallocation',
-                        name: 'statusallocation'
+                        data: 'nobl',
+                        name: 'nobl'
                     },
                     {
                         data: 'action',
@@ -344,9 +315,9 @@
 
                     $('#nomorpo').val(mydata.pono);
                     $('#supplier').val(mydata.nama);
-                    $('#material').val(mydata.matcontents);
-                    $('#qtypo').val(mydata.qtypo);
-                    $('#qtyall').val(mydata.qty_allocation);
+                    // $('#material').val(mydata.matcontents);
+                    // $('#qtypo').val(mydata.qtypo);
+                    // $('#qtyall').val(mydata.qty_allocation);
                     $('#kodebook').val(mydata.kode_booking);
                     $('#invoice').val(mydata.noinv);
                     $('#etd').val(mydata.etdfix);

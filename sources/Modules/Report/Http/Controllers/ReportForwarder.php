@@ -33,7 +33,7 @@ class ReportForwarder extends Controller
             'box'   => '',
         );
 
-        \LogActivity::addToLog('Access Menu Report Forwarder', $this->micro);
+        \LogActivity::addToLog('Web Forwarder :: Forwarder : Access Menu Report Forwarder', $this->micro);
         return view('report::reportforwarder', $data);
     }
 
@@ -45,8 +45,10 @@ class ReportForwarder extends Controller
                 $data = modelformpo::join('po', 'po.id', 'formpo.idpo')
                     ->join('forwarder', 'forwarder.id_forwarder', 'formpo.idforwarder')
                     ->join('privilege', 'privilege.idforwarder', 'formpo.idmasterfwd')
+                    ->join('mastersupplier', 'mastersupplier.id', 'po.vendor')->where('mastersupplier.aktif', 'Y')
                     ->where('privilege.privilege_user_nik', Session::get('session')['user_nik'])
                     ->where('formpo.statusformpo', 'confirm')
+                    ->groupby('formpo.kode_booking')
                     ->where('formpo.aktif', 'Y')
                     ->get();
             } else {
@@ -54,9 +56,11 @@ class ReportForwarder extends Controller
                 $data = modelformpo::join('po', 'po.id', 'formpo.idpo')
                     ->join('forwarder', 'forwarder.id_forwarder', 'formpo.idforwarder')
                     ->join('privilege', 'privilege.idforwarder', 'formpo.idmasterfwd')
+                    ->join('mastersupplier', 'mastersupplier.id', 'po.vendor')->where('mastersupplier.aktif', 'Y')
                     ->where('privilege.privilege_user_nik', Session::get('session')['user_nik'])
                     ->where('formpo.statusformpo', 'confirm')
                     ->where('formpo.aktif', 'Y')
+                    ->groupby('formpo.kode_booking')
                     ->where('po.pono', $request->po)
                     ->get();
             }
@@ -67,32 +71,24 @@ class ReportForwarder extends Controller
                 ->addColumn('po', function ($data) {
                     return $data->pono;
                 })
+                ->addColumn('supplier', function ($data) {
+                    return $data->nama;
+                })
                 ->addColumn('nobook', function ($data) {
                     return $data->kode_booking;
                 })
-                ->addColumn('material', function ($data) {
-                    return $data->matcontents;
+                ->addColumn('invoice', function ($data) {
+                    return $data->noinv;
                 })
-                ->addColumn('qtyall', function ($data) {
-                    return $data->qty_allocation;
-                })
-                ->addColumn('statusallocation', function ($data) {
-                    if ($data->statusforwarder == 'full_allocated') {
-                        $statuspo = 'Full Allocated';
-                    } elseif ($data->statusforwarder == 'partial_allocated') {
-                        $statuspo = 'Partial Allocation';
-                    } else {
-                        $statuspo = 'Waiting';
-                    }
-
-                    return $statuspo;
+                ->addColumn('nobl', function ($data) {
+                    return $data->nomor_bl;
                 })
                 ->addColumn('action', function ($data) {
                     $button = '';
 
                     $button .= '<a href="#" data-id="' . $data->id_formpo . '" id="detailpo"><i class="fa fa-info-circle"></i></a>';
                     $button .= '&nbsp';
-                    $button .= '<a href="' . url('report/forwarder/getexcelforwarder', ['id' => $data->id_formpo]) . '" data-id="#"><i class="fa fa-file-excel text-success"></i></a>';
+                    $button .= '<a href="' . url('report/forwarder/getexcelforwarder', ['id' => $data->kode_booking]) . '" data-id="#"><i class="fa fa-file-excel text-success"></i></a>';
 
                     return $button;
                 })
@@ -153,11 +149,11 @@ class ReportForwarder extends Controller
         $getdata = modelformpo::join('po', 'po.id', 'formpo.idpo')
             ->join('forwarder', 'forwarder.id_forwarder', 'formpo.idforwarder')
             ->join('mastersupplier', 'mastersupplier.id', 'po.vendor')
-            ->where('formpo.id_formpo', $id)
+            ->where('formpo.kode_booking', $id)
             ->where('formpo.aktif', 'Y')
             ->where('formpo.statusformpo', 'confirm')
-            ->selectRaw(' formpo.kode_booking, formpo.noinv, formpo.etdfix, formpo.etafix, formpo.shipmode, formpo.subshipmode, formpo.nomor_bl, formpo.vessel, forwarder.qty_allocation, po.pono, po.matcontents, po.qtypo, mastersupplier.nama ')
-            ->first();
+            ->selectRaw(' formpo.kode_booking, formpo.noinv, formpo.etdfix, formpo.etafix, formpo.shipmode, formpo.subshipmode, formpo.nomor_bl, formpo.vessel, forwarder.qty_allocation, forwarder.statusforwarder, po.pono, po.matcontents, po.qtypo, mastersupplier.nama ')
+            ->get();
         // dd($getdata);
 
         $spreadsheet = new Spreadsheet();
@@ -167,7 +163,7 @@ class ReportForwarder extends Controller
         $sheet->getStyle('A2:F2')->getFont()->setBold(true);
 
         //for supplier
-        $cellsupplier = 'A5:E5';
+        $cellsupplier = 'A5:F5';
         $sheet->setCellValue('A4', 'SUPPLIER');
         $sheet->setCellValue('A5', 'PO');
         $sheet->getColumnDimension('A')->setWidth(20);
@@ -179,6 +175,8 @@ class ReportForwarder extends Controller
         $sheet->getColumnDimension('D')->setWidth(10);
         $sheet->setCellValue('E5', 'Quantity Allocation');
         $sheet->getColumnDimension('E')->setWidth(10);
+        $sheet->setCellValue('F5', 'Status Allocation');
+        $sheet->getColumnDimension('F')->setWidth(20);
         $sheet->getStyle($cellsupplier)->getAlignment()->setWrapText(true);
         $sheet->getStyle($cellsupplier)->getFont()->setBold(true);
         $sheet->getStyle('A4')->getFont()->setBold(true);
@@ -201,7 +199,7 @@ class ReportForwarder extends Controller
         $sheet->setCellValue('E9', 'Shipmode');
         $sheet->getColumnDimension('E')->setWidth(10);
         $sheet->setCellValue('F9', 'Sub Shipmode');
-        $sheet->getColumnDimension('F')->setWidth(10);
+        $sheet->getColumnDimension('F')->setWidth(20);
         $sheet->getStyle($cellforwarder)->getAlignment()->setWrapText(true);
         $sheet->getStyle($cellforwarder)->getFont()->setBold(true);
         $sheet->getStyle('A8')->getFont()->setBold(true);
@@ -247,28 +245,31 @@ class ReportForwarder extends Controller
         $sheet->setCellValue('A' . '2', strtoupper('Detail Forwarder'));
 
         //supplier
-        $sheet->setCellValue('A' . $rows_sup, $getdata->pono);
-        $sheet->setCellValue('B' . $rows_sup, $getdata->nama);
-        $sheet->setCellValue('C' . $rows_sup, $getdata->matcontents);
-        $sheet->setCellValue('D' . $rows_sup, $getdata->qtypo);
-        $sheet->setCellValue('E' . $rows_sup, $getdata->qty_allocation);
-        $rows_sup++;
+        foreach ($getdata as $key => $value) {
+            $sheet->setCellValue('A' . $rows_sup, $value->pono);
+            $sheet->setCellValue('B' . $rows_sup, $value->nama);
+            $sheet->setCellValue('C' . $rows_sup, $value->matcontents);
+            $sheet->setCellValue('D' . $rows_sup, $value->qtypo);
+            $sheet->setCellValue('E' . $rows_sup, $value->qty_allocation);
+            $sheet->setCellValue('F' . $rows_sup, $value->statusforwarder);
+            $rows_sup++;
+        }
 
         //forwarder
-        $sheet->setCellValue('A' . $rows_fwd, $getdata->kode_booking);
-        $sheet->setCellValue('B' . $rows_fwd, $getdata->noinv);
-        $sheet->setCellValue('C' . $rows_fwd, $getdata->etdfix);
-        $sheet->setCellValue('D' . $rows_fwd, $getdata->etafix);
-        $sheet->setCellValue('E' . $rows_fwd, $getdata->shipmode);
-        $sheet->setCellValue('F' . $rows_fwd, $getdata->subshipmode);
+        $sheet->setCellValue('A' . $rows_fwd, $getdata[0]->kode_booking);
+        $sheet->setCellValue('B' . $rows_fwd, $getdata[0]->noinv);
+        $sheet->setCellValue('C' . $rows_fwd, $getdata[0]->etdfix);
+        $sheet->setCellValue('D' . $rows_fwd, $getdata[0]->etafix);
+        $sheet->setCellValue('E' . $rows_fwd, $getdata[0]->shipmode);
+        $sheet->setCellValue('F' . $rows_fwd, $getdata[0]->subshipmode);
         $rows_fwd++;
 
         //forwarder
-        $sheet->setCellValue('A' . $rows_ship, $getdata->nomor_bl);
-        $sheet->setCellValue('B' . $rows_ship, $getdata->vessel);
+        $sheet->setCellValue('A' . $rows_ship, $getdata[0]->nomor_bl);
+        $sheet->setCellValue('B' . $rows_ship, $getdata[0]->vessel);
         $rows_ship++;
 
-        $cellsupplier = 'A5:E' . ($rows_sup - 1);
+        $cellsupplier = 'A5:F' . ($rows_sup - 1);
         $cellforwarder = 'A9:F' . ($rows_fwd - 1);
         $cellshipment = 'A13:B' . ($rows_ship - 1);
         $sheet->getStyle('A2:F2')->applyFromArray($styleArraytitle);
@@ -280,7 +281,7 @@ class ReportForwarder extends Controller
         $sheet->getStyle($cellshipment)->getAlignment()->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER);
 
 
-        $fileName = "Detail_Forwarder_" . $getdata->kode_booking . ".xlsx";
+        $fileName = "Detail_Forwarder_" . $getdata[0]->kode_booking . ".xlsx";
 
         $writer = new Xlsx($spreadsheet);
         header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
@@ -295,9 +296,11 @@ class ReportForwarder extends Controller
         $getdata = modelformpo::join('po', 'po.id', 'formpo.idpo')
             ->join('forwarder', 'forwarder.id_forwarder', 'formpo.idforwarder')
             ->join('privilege', 'privilege.idforwarder', 'formpo.idmasterfwd')
+            ->join('mastersupplier', 'mastersupplier.id', 'po.vendor')->where('mastersupplier.aktif', 'Y')
             ->where('privilege.privilege_user_nik', Session::get('session')['user_nik'])
             ->where('formpo.statusformpo', 'confirm')
             ->where('formpo.aktif', 'Y')
+            ->groupby('formpo.kode_booking')
             ->get();
         // dd($getdata);
 
@@ -308,13 +311,13 @@ class ReportForwarder extends Controller
         $sheet->mergeCells('A2:E2');
         $sheet->setCellValue('A4', 'PO');
         $sheet->getColumnDimension('A')->setWidth(20);
-        $sheet->setCellValue('B4', 'Code Booking');
+        $sheet->setCellValue('B4', 'Supplier');
         $sheet->getColumnDimension('B')->setWidth(20);
-        $sheet->setCellValue('C4', 'Material');
+        $sheet->setCellValue('C4', 'Code Booking');
         $sheet->getColumnDimension('C')->setWidth(40);
-        $sheet->setCellValue('D4', 'Quantity Allocation');
+        $sheet->setCellValue('D4', 'Invoice');
         $sheet->getColumnDimension('D')->setWidth(20);
-        $sheet->setCellValue('E4', 'Status Allocation');
+        $sheet->setCellValue('E4', 'Nomor BL');
         $sheet->getColumnDimension('E')->setWidth(20);
         $sheet->getStyle($cell)->getAlignment()->setWrapText(true);
         $sheet->getStyle($cell)->getFont()->setBold(true);
@@ -346,10 +349,10 @@ class ReportForwarder extends Controller
         $sheet->setCellValue('A' . '2', strtoupper('Data Report Forwarder'));
         foreach ($getdata as $key => $value) {
             $sheet->setCellValue('A' . $rows, $value->pono);
-            $sheet->setCellValue('B' . $rows, $value->kode_booking);
-            $sheet->setCellValue('C' . $rows, $value->matcontents);
-            $sheet->setCellValue('D' . $rows, $value->qty_allocation);
-            $sheet->setCellValue('E' . $rows, $value->statusforwarder);
+            $sheet->setCellValue('B' . $rows, $value->nama);
+            $sheet->setCellValue('C' . $rows, $value->kode_booking);
+            $sheet->setCellValue('D' . $rows, $value->noinv);
+            $sheet->setCellValue('E' . $rows, $value->nomor_bl);
             $rows++;
         }
 
