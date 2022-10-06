@@ -110,7 +110,7 @@ class home extends Controller
             'totalkyc'      => count($userkyc),
         );
 
-        \LogActivity::addToLog('Access Menu Dashboard', $this->micro);
+        \LogActivity::addToLog('Forwarder : Access Menu Dashboard', $this->micro);
         return view('system::dashboard/dashboard', $data);
     }
 
@@ -292,33 +292,37 @@ class home extends Controller
             // 'dataforwarder' => $dataforwarder
         );
 
-        \LogActivity::addToLog('Process Input Data Approval PO', $this->micro);
+        \LogActivity::addToLog('Forwarder : Process Input Data Approval PO', $this->micro);
         return response()->json(['status' => 200, 'data' => $data, 'message' => 'Berhasil']);
     }
 
     public function formupdate(Request $request)
     {
         // dd($request);
-        // $databook = formpo::where('id_formpo', $request->id)->first();
-        // $mydata = po::where('id', $databook->idpo)->first();
 
-        $mydata = po::join('formpo', 'formpo.idpo', 'po.id')
+        // $mydata = po::join('formpo', 'formpo.idpo', 'po.id')
+        //     ->where('po.pono', $request->id)
+        //     ->where('formpo.aktif', 'Y')
+        //     ->get();
+        // $dataforwarder = forwarder::join('privilege', 'privilege.idforwarder', 'forwarder.idmasterfwd')
+        //     ->where('privilege.privilege_user_nik', Session::get('session')['user_nik'])
+        //     ->where('po_nomor', $request->id)->where('aktif', 'Y')->get();
+
+        $mydata = formpo::join('po', 'po.id', 'formpo.idpo')
+            ->join('forwarder', 'forwarder.id_forwarder', 'formpo.idforwarder')
+            ->join('privilege', 'privilege.idforwarder', 'forwarder.idmasterfwd')
             ->where('po.pono', $request->id)
-            ->where('formpo.aktif', 'Y')
+            ->where('privilege.privilege_user_nik', Session::get('session')['user_nik'])
+            ->where('formpo.aktif', 'Y')->where('forwarder.aktif', 'Y')->where('privilege.privilege_aktif', 'Y')
+            ->selectRaw(' formpo.*, po.pono, po.matcontents, po.colorcode, po.size, po.qtypo, forwarder.qty_allocation, forwarder.statusforwarder')
             ->get();
 
-        $dataforwarder = forwarder::join('privilege', 'privilege.idforwarder', 'forwarder.idmasterfwd')
-            ->where('privilege.privilege_user_nik', Session::get('session')['user_nik'])
-            ->where('po_nomor', $request->id)->where('aktif', 'Y')->get();
-        // dd($dataforwarder);
-
-        // dd($mydata, $dataforwarder);
+        // dd($mydata);
         $data = array(
             'dataku' => $mydata,
-            'dataforwarder' => $dataforwarder
         );
 
-        \LogActivity::addToLog('Process Input Data Shipment', $this->micro);
+        \LogActivity::addToLog('Forwarder : Process Input Data Shipment', $this->micro);
         return response()->json(['status' => 200, 'data' => $data, 'message' => 'Berhasil']);
     }
 
@@ -331,7 +335,7 @@ class home extends Controller
             'datakyc' => $datakyc
         );
 
-        \LogActivity::addToLog('Process Approval KYC by Logistik', $this->micro);
+        \LogActivity::addToLog('Forwarder : Process Approval KYC by Logistik', $this->micro);
         return response()->json(['status' => 200, 'data' => $data, 'message' => 'Berhasil']);
     }
 
@@ -438,7 +442,7 @@ class home extends Controller
 
         if (empty($gagal)) {
             DB::commit();
-            \LogActivity::addToLog('Saved Data Approval PO by Forwarder', $this->micro);
+            \LogActivity::addToLog('Forwarder : Insert Data Approval PO by Forwarder', $this->micro);
             $status = ['title' => 'Success', 'status' => 'success', 'message' => 'Data Successfully Saved'];
             return response()->json($status, 200);
         } else {
@@ -508,7 +512,7 @@ class home extends Controller
         }
 
         if (empty($gagal)) {
-            \LogActivity::addToLog('Saved Data Shipment by Forwarder', $this->micro);
+            \LogActivity::addToLog('Forwarder : Insert Data Shipment by Forwarder', $this->micro);
             $status = ['title' => 'Success', 'status' => 'success', 'message' => 'Data Successfully Saved'];
             return response()->json($status, 200);
         } else {
@@ -536,7 +540,7 @@ class home extends Controller
 
             if ($statusupdate && $kycupdate) {
                 DB::commit();
-                \LogActivity::addToLog('Status KYC Confirmed by Logistik', $this->micro);
+                \LogActivity::addToLog('Forwarder : Status KYC Confirmed by Logistik', $this->micro);
                 $status = ['title' => 'Success', 'status' => 'success', 'message' => 'Data Successfully Saved'];
                 return response()->json($status, 200);
             } else {
@@ -554,7 +558,7 @@ class home extends Controller
             ]);
 
             if ($statusupdate) {
-                \LogActivity::addToLog('Status KYC Rejected by Logistik', $this->micro);
+                \LogActivity::addToLog('Forwarder : Status KYC Rejected by Logistik', $this->micro);
                 $status = ['title' => 'Success', 'status' => 'success', 'message' => 'Data Successfully Saved'];
                 return response()->json($status, 200);
             } else {

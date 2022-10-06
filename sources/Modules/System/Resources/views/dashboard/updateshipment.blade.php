@@ -256,7 +256,8 @@
                     },
                 }).done(function(data) {
                     let dataku = data.data.dataku;
-                    let forwarderku = data.data.dataforwarder;
+                    console.log('dataku :>> ', dataku);
+                    // let forwarderku = data.data.dataforwarder;
 
                     length = dataku.length;
                     $('#detailitem').empty();
@@ -268,9 +269,9 @@
                             '<tr><td>' +
                             dataku[index].matcontents + '</td><td>' +
                             dataku[index].colorcode + '</td><td>' + dataku[index].size +
-                            '</td><td>' + dataku[index].qtypo + '</td><td>' + forwarderku[index]
+                            '</td><td>' + dataku[index].qtypo + '</td><td>' + dataku[index]
                             .qty_allocation +
-                            '</td><td>' + forwarderku[index].statusforwarder +
+                            '</td><td>' + dataku[index].statusforwarder +
                             '</td><td><input type="hidden" id="dataid-' + index + '" data-idpo="' +
                             dataku[index].id + '" data-idformpo="' + dataku[index].id_formpo +
                             '"></td></tr>';
