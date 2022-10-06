@@ -528,7 +528,7 @@ class home extends Controller
         // dd($request, $approval);
         if ($approval == 'disetujui') {
             DB::beginTransaction();
-            $statusupdate = kyc::where('idmasterfwd', $request->idfwd)->update([
+            $statusupdate = kyc::where('idmasterfwd', $request->idfwd)->where('aktif', 'Y')->update([
                 'status' => 'confirm',
                 'user_approval' => Session::get('session')['user_nik'],
                 'updated_at' => date('Y-m-d H:i:s'),
@@ -551,7 +551,7 @@ class home extends Controller
                 return response()->json($status, 200);
             }
         } else {
-            $statusupdate = kyc::where('idmasterfwd', $request->idfwd)->update([
+            $statusupdate = kyc::where('idmasterfwd', $request->idfwd)->where('aktif', 'Y')->update([
                 'status' => 'reject',
                 'user_approval' => Session::get('session')['user_nik'],
                 'ket_tolak' => $request->tolak,
