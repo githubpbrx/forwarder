@@ -136,9 +136,10 @@ class login extends Controller
                             'user_nama'  => $ceklogin->privilege_user_name
                         );
                         Session::put('session', $session);
-                        \LogActivity::addToLog('Login Forwarder', $this->micro);
+                        \LogActivity::addToLog('Forwarder : Success Login to Forwarder', $this->micro);
                         $this->choosemenu();
-                        Session::flash('alert', 'sweetAlert("success", "Successfully Login")');
+                        // Session::flash('alert', 'sweetAlert("success", "Successfully Login")');
+                        Session::flash('toast', 'sweetAlert("success", "Successfully Login")');
                         return redirect('dashboard');
                     }
                 } else {
@@ -212,7 +213,7 @@ class login extends Controller
                             Session::put('session', $session);
 
                             $this->createPrivilege($this->dekripsi($login_data['a']), $this->dekripsi($login_data['b']));
-                            \LogActivity::addToLog('Login Logistik', $this->micro);
+                            \LogActivity::addToLog('Forwarder : Success Login to Logistik', $this->micro);
                             Session::flash('toast', 'sweetAlert("success", "Successfully Login")');
                             $this->choosemenu();
                             return redirect('dashboard');
@@ -262,7 +263,7 @@ class login extends Controller
         if ($question1 == $answer1 && $question2 == $answer2) {
             // return view('system::login/login_forgot_password', $data);
             Session::flash('alert', 'toast("success", "Yeay, Success")');
-            \LogActivity::addToLog('Process Forgot Password', $this->micro);
+            \LogActivity::addToLog('Forwarder : Process Forgot Password', $this->micro);
             return view('system::login/login_forgot_password', $data);
         } else {
             Session::flash('alert', 'sweetAlert("error", "Wrong Answer")');
@@ -285,7 +286,7 @@ class login extends Controller
             } else {
                 try {
                     $this->apiForgotPassword($nik, $password);
-                    \LogActivity::addToLog('Process Password changed', $this->micro);
+                    \LogActivity::addToLog('Forwarder : Success Password changed', $this->micro);
                     Session::flash('alert', 'sweetAlert("success", "Password changed, please login again")');
                 } catch (\Exception $e) {
                     Session::flash('alert', 'sweetAlert("error", ' . $e . ')');
@@ -425,7 +426,7 @@ class login extends Controller
         $param = modelsystem::first();
         $url = $param->url . 'getvalidation/' . base64_encode($cek->token) . '/' . $this->enkripsi($user) . '/' . $this->enkripsi($cek->kode);
         login::sendEmail($user, $nama, $cek->kode, $url, "Web Forwarder User Activation");
-        \LogActivity::addToLog('Process Resend Email', $this->micro);
+        \LogActivity::addToLog('Forwarder : Process Resend Email', $this->micro);
         Session::flash('alert', 'sweetAlert("success", "Please check your email again")');
         return redirect()->back();
     }
@@ -464,7 +465,7 @@ class login extends Controller
                 $token = Hash::make('ittetapsemangant');
                 $kode = rand(11111, 99999);
                 $update = modelprivilege::where('privilege_user_nik', $user)->where('privilege_aktif', 'Y')->update(['kode' => $kode, 'token' => $token, 'kode_validate' => 'Y']);
-                \LogActivity::addToLog('Account Activation', $this->micro);
+                \LogActivity::addToLog('Forwarder : Account Activation', $this->micro);
                 if ($update) {
                     Session::flash('alert', 'sweetAlert("success", "Your user is already active")');
                     return redirect()->route('dashcam');
@@ -530,7 +531,7 @@ class login extends Controller
             'datafwd' => $masterfwd,
         );
 
-        \LogActivity::addToLog('Process Input Data CoC by Forwarder', $this->micro);
+        \LogActivity::addToLog('Forwarder : Process Input Data CoC by Forwarder', $this->micro);
         return view('system::login/aktifasicoc', $data);
     }
 
@@ -569,7 +570,7 @@ class login extends Controller
 
         if ($submit && $cocupdate) {
             DB::commit();
-            \LogActivity::addToLog('Save Data CoC', $this->micro);
+            \LogActivity::addToLog('Forwarder : Insert Data Validation CoC', $this->micro);
             $status = ['title' => 'Success', 'status' => 'success', 'message' => 'Data Successfully Saved'];
             return response()->json($status, 200);
         } else {
@@ -589,6 +590,7 @@ class login extends Controller
         $param = modelsystem::first();
 
         $statuskyc = modelkyc::where('name_kyc', $nama)->where('aktif', 'Y')->first();
+        // dd($statuskyc);
         if ($statuskyc == null) {
             $datakyc = '0';
         } elseif ($statuskyc != null && $statuskyc->status == 'waiting') {
@@ -607,7 +609,7 @@ class login extends Controller
             'kycku'    => $statuskyc
         );
 
-        \LogActivity::addToLog('Process Input Data KYC by Forwarder', $this->micro);
+        \LogActivity::addToLog('Forwarder : Process Input Data KYC', $this->micro);
         return view('system::login/aktifasikyc', $data);
     }
 
@@ -677,7 +679,7 @@ class login extends Controller
         ]);
 
         if ($save1) {
-            \LogActivity::addToLog('Save Data KYC by Forwarder', $this->micro);
+            \LogActivity::addToLog('Forwarder : Insert Data Validation KYC ', $this->micro);
             $status = ['title' => 'Success', 'status' => 'success', 'message' => 'Data Successfully Saved'];
             return response()->json($status, 200);
         } else {
@@ -701,7 +703,7 @@ class login extends Controller
         $param = modelsystem::first();
         $url = $param->url . 'getvalidation/' . base64_encode($cek->token) . '/' . $this->enkripsi($user) . '/' . $this->enkripsi($cek->kode);
         login::sendEmail($user, $nama, $cek->kode, $url, "Web Forwarder User Activation");
-        \LogActivity::addToLog('Send Email to Finance', $this->micro);
+        \LogActivity::addToLog('Forwarder : Send Email to Finance', $this->micro);
         Session::flash('alert', 'sweetAlert("success", "Please check your email again")');
         return redirect()->back();
     }
@@ -740,6 +742,7 @@ class login extends Controller
             return redirect(url('login/pass_exp'));
         } else {
             $this->apiForgotPassword($nik, $newpass);
+            \LogActivity::addToLog('Forwarder : Success Save Password Expired', $this->micro);
             Session::flash('alert', 'sweetAlert("success", "Please Login with New Password !")');
             return redirect('login');
         }
@@ -896,7 +899,7 @@ class login extends Controller
     public function logout()
     {
         $this->middleware('checklogin');
-        \LogActivity::addToLog('Logout', $this->micro);
+        \LogActivity::addToLog('Forwarder : Logout', $this->micro);
         Session::flush();
         return redirect('login')->with('alert', 'You are logout');
     }
