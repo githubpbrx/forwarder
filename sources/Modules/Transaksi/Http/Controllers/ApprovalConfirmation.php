@@ -41,7 +41,7 @@ class ApprovalConfirmation extends Controller
             'box'   => '',
         );
 
-        \LogActivity::addToLog('Access Menu Approval Confirmation', $this->micro);
+        \LogActivity::addToLog('Forwarder : Access Menu Approval Confirmation', $this->micro);
         return view('transaksi::approvalconfirmation', $data);
     }
 
@@ -191,8 +191,10 @@ class ApprovalConfirmation extends Controller
         $dataku = po::join('forwarder', 'forwarder.idpo', 'po.id')->where('forwarder.aktif', 'Y')
             ->join('formpo', 'formpo.idforwarder', 'forwarder.id_forwarder')->where('formpo.aktif', 'Y')
             ->join('masterforwarder', 'masterforwarder.id', 'formpo.idmasterfwd')->where('masterforwarder.aktif', 'Y')
-            ->join('privilege', 'privilege.privilege_user_nik', 'formpo.created_by')->where('privilege_aktif', 'Y')
+            ->join('privilege', 'privilege.idforwarder', 'formpo.idmasterfwd')->where('privilege_aktif', 'Y')
             ->where('po.pono', $request->id)
+            ->where('formpo.statusformpo', 'waiting')
+            ->where('privilege.nikfinance', Session::get('session')['user_nik'])
             ->selectRaw(' po.id, po.pono, po.matcontents, po.qtypo, po.statusalokasi, forwarder.qty_allocation, forwarder.statusforwarder, forwarder.id_forwarder, formpo.id_formpo, formpo.kode_booking, formpo.date_booking, formpo.etd, formpo.eta, formpo.shipmode, formpo.subshipmode, masterforwarder.name, privilege.privilege_user_name, privilege.privilege_user_nik')
             ->get();
         // dd($dataku);
@@ -201,7 +203,7 @@ class ApprovalConfirmation extends Controller
             'dataku' => $dataku
         ];
 
-        \LogActivity::addToLog('Process Approval Data PO by Logistik', $this->micro);
+        \LogActivity::addToLog('Forwarder : Process Approval Data PO by Logistik', $this->micro);
         return response()->json(['status' => 200, 'data' => $data, 'message' => 'Berhasil']);
     }
 
