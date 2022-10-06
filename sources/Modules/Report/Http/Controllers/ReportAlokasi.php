@@ -13,6 +13,7 @@ use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 use Modules\Report\Models\modelprivilege;
 use Modules\Report\Models\modelpo;
+use Modules\Report\Models\modelformpo;
 
 class ReportAlokasi extends Controller
 {
@@ -31,13 +32,12 @@ class ReportAlokasi extends Controller
             'box'   => '',
         );
 
-        \LogActivity::addToLog('Access Menu Report Allocation', $this->micro);
+        \LogActivity::addToLog('Web Forwarder :: Logistik : Access Menu Report Allocation', $this->micro);
         return view('report::reportalokasi', $data);
     }
 
     public function datatable(Request $request)
     {
-
         if ($request->ajax()) {
             // dd($request);
 
@@ -46,7 +46,7 @@ class ReportAlokasi extends Controller
                     ->join('formpo', 'formpo.idforwarder', 'forwarder.id_forwarder')
                     ->join('masterforwarder', 'masterforwarder.id', 'formpo.idmasterfwd')
                     ->where('forwarder.aktif', 'Y')->where('formpo.aktif', 'Y')->where('masterforwarder.aktif', 'Y')
-                    ->selectRaw(' po.id, po.pono, po.qtypo, po.statusalokasi, po.statusconfirm, forwarder.qty_allocation, formpo.noinv, masterforwarder.name ')
+                    ->selectRaw(' po.id, po.pono, po.qtypo, po.statusalokasi, po.statusconfirm, forwarder.id_forwarder, forwarder.qty_allocation, formpo.noinv, masterforwarder.name ')
                     ->get();
             } else {
                 $data = modelpo::join('forwarder', 'forwarder.idpo', 'po.id')
@@ -101,9 +101,9 @@ class ReportAlokasi extends Controller
                 ->addColumn('action', function ($data) {
                     $process    = '';
 
-                    $process    .= '<a href="#" data-id="' . $data->id . '" id="detailalokasi"><i class="fa fa-info-circle"></i></a>';
+                    $process    .= '<a href="#" data-id="' . $data->id_forwarder . '" id="detailalokasi"><i class="fa fa-info-circle"></i></a>';
                     $process    .= '&nbsp';
-                    $process    .= '<a href="' . url('report/alokasi/getexcelalokasi', ['id' => $data->id]) . '"><i class="fa fa-file-excel text-success"></i></a>';
+                    $process    .= '<a href="' . url('report/alokasi/getexcelalokasi', ['id' => $data->id_forwarder]) . '"><i class="fa fa-file-excel text-success"></i></a>';
 
                     return $process;
                 })
@@ -135,12 +135,20 @@ class ReportAlokasi extends Controller
     {
         // dd($request);
 
-        $data = modelpo::join('forwarder', 'forwarder.idpo', 'po.id')
-            ->join('formpo', 'formpo.idforwarder', 'forwarder.id_forwarder')
+        // $data = modelpo::join('forwarder', 'forwarder.idpo', 'po.id')
+        //     ->join('formpo', 'formpo.idforwarder', 'forwarder.id_forwarder')
+        //     ->join('masterforwarder', 'masterforwarder.id', 'formpo.idmasterfwd')
+        //     ->join('mastersupplier', 'mastersupplier.id', 'po.vendor')
+        //     ->where('po.id', $request->id)
+        //     ->where('forwarder.aktif', 'Y')->where('formpo.aktif', 'Y')->where('masterforwarder.aktif', 'Y')->where('mastersupplier.aktif', 'Y')
+        //     ->selectRaw(' po.*, forwarder.qty_allocation, forwarder.statusforwarder, formpo.*, masterforwarder.name, mastersupplier.nama ')
+        //     ->first();
+        $data = modelformpo::join('po', 'po.id', 'formpo.idpo')
+            ->join('forwarder', 'forwarder.id_forwarder', 'formpo.idforwarder')
             ->join('masterforwarder', 'masterforwarder.id', 'formpo.idmasterfwd')
             ->join('mastersupplier', 'mastersupplier.id', 'po.vendor')
-            ->where('forwarder.aktif', 'Y')->where('formpo.aktif', 'Y')->where('masterforwarder.aktif', 'Y')
-            ->where('po.id', $request->id)
+            ->where('formpo.idforwarder', $request->id)
+            ->where('forwarder.aktif', 'Y')->where('formpo.aktif', 'Y')->where('masterforwarder.aktif', 'Y')->where('mastersupplier.aktif', 'Y')
             ->selectRaw(' po.*, forwarder.qty_allocation, forwarder.statusforwarder, formpo.*, masterforwarder.name, mastersupplier.nama ')
             ->first();
 
@@ -150,12 +158,12 @@ class ReportAlokasi extends Controller
 
     function excelalokasi($id)
     {
-        $getdata = modelpo::join('forwarder', 'forwarder.idpo', 'po.id')
-            ->join('formpo', 'formpo.idforwarder', 'forwarder.id_forwarder')
+        $getdata = modelformpo::join('po', 'po.id', 'formpo.idpo')
+            ->join('forwarder', 'forwarder.id_forwarder', 'formpo.idforwarder')
             ->join('masterforwarder', 'masterforwarder.id', 'formpo.idmasterfwd')
             ->join('mastersupplier', 'mastersupplier.id', 'po.vendor')
-            ->where('forwarder.aktif', 'Y')->where('formpo.aktif', 'Y')->where('masterforwarder.aktif', 'Y')
-            ->where('po.id', $id)
+            ->where('formpo.idforwarder', $id)
+            ->where('forwarder.aktif', 'Y')->where('formpo.aktif', 'Y')->where('masterforwarder.aktif', 'Y')->where('mastersupplier.aktif', 'Y')
             ->selectRaw(' po.*, forwarder.qty_allocation, forwarder.statusforwarder, formpo.*, masterforwarder.name, mastersupplier.nama ')
             ->first();
         // dd($getdata);
@@ -291,7 +299,7 @@ class ReportAlokasi extends Controller
         $sheet->getStyle($cellforwarder)->getAlignment()->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER);
         $sheet->getStyle($cellshipment)->getAlignment()->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER);
 
-        $fileName = "Detail_Allocation_" . $getdata->pono . ".xlsx";
+        $fileName = "Report_Allocation_" . $getdata->pono . ".xlsx";
 
         $writer = new Xlsx($spreadsheet);
         header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
@@ -372,7 +380,7 @@ class ReportAlokasi extends Controller
         $sheet->getStyle($cell)->applyFromArray($styleArray);
         $sheet->getStyle($cell)->getAlignment()->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER);
 
-        $fileName = "Data_Allocation.xlsx";
+        $fileName = "Report_Allocation_All.xlsx";
 
         $writer = new Xlsx($spreadsheet);
         header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
