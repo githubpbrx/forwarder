@@ -39,6 +39,9 @@
                                                 <center>PO</center>
                                             </th>
                                             <th>
+                                                <center>MATERIAL</center>
+                                            </th>
+                                            <th>
                                                 <center>QUANTITY PO</center>
                                             </th>
                                             <th>
@@ -312,6 +315,10 @@
                 columns: [{
                         data: 'po',
                         name: 'po'
+                    },
+                    {
+                        data: 'material',
+                        name: 'material'
                     },
                     {
                         data: 'qtypo',

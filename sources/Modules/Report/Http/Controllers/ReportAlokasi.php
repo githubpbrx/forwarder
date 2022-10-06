@@ -46,7 +46,7 @@ class ReportAlokasi extends Controller
                     ->join('formpo', 'formpo.idforwarder', 'forwarder.id_forwarder')
                     ->join('masterforwarder', 'masterforwarder.id', 'formpo.idmasterfwd')
                     ->where('forwarder.aktif', 'Y')->where('formpo.aktif', 'Y')->where('masterforwarder.aktif', 'Y')
-                    ->selectRaw(' po.id, po.pono, po.qtypo, po.statusalokasi, po.statusconfirm, forwarder.id_forwarder, forwarder.qty_allocation, formpo.noinv, masterforwarder.name ')
+                    ->selectRaw(' po.id, po.pono, po.matcontents, po.qtypo, po.statusalokasi, po.statusconfirm, forwarder.id_forwarder, forwarder.qty_allocation, formpo.noinv, masterforwarder.name ')
                     ->get();
             } else {
                 $data = modelpo::join('forwarder', 'forwarder.idpo', 'po.id')
@@ -54,7 +54,7 @@ class ReportAlokasi extends Controller
                     ->join('masterforwarder', 'masterforwarder.id', 'formpo.idmasterfwd')
                     ->where('forwarder.aktif', 'Y')->where('formpo.aktif', 'Y')->where('masterforwarder.aktif', 'Y')
                     ->where('po.pono', $request->po)
-                    ->selectRaw(' po.id, po.pono, po.qtypo, po.statusalokasi, po.statusconfirm, forwarder.qty_allocation, formpo.noinv, masterforwarder.name ')
+                    ->selectRaw(' po.id, po.pono, po.matcontents, po.qtypo, po.statusalokasi, po.statusconfirm, forwarder.qty_allocation, formpo.noinv, masterforwarder.name ')
                     ->get();
             }
 
@@ -63,6 +63,9 @@ class ReportAlokasi extends Controller
                 ->addIndexColumn()
                 ->addColumn('po', function ($data) {
                     return $data->pono;
+                })
+                ->addColumn('material', function ($data) {
+                    return $data->matcontents;
                 })
                 ->addColumn('qtypo', function ($data) {
                     return $data->qtypo;
