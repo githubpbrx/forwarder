@@ -106,6 +106,7 @@ class ApprovalConfirmation extends Controller
                     ->where('masterforwarder.aktif', 'Y')
                     ->whereRaw(' vendor="' . $request->supplier . '" ' . $where . ' ')
                     ->selectRaw(' formpo.kode_booking, formpo.date_booking, formpo.statusformpo, masterforwarder.name')
+                    ->groupby('formpo.kode_booking')
                     ->get();
             }
 
