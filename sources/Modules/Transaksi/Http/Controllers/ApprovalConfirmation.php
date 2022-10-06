@@ -125,8 +125,10 @@ class ApprovalConfirmation extends Controller
                 ->addColumn('status', function ($data) {
                     if ($data->statusformpo == 'confirm') {
                         $statusku = 'Confirmed';
-                    } else {
+                    } else if ($data->statusformpo == 'reject') {
                         $statusku = 'Rejected';
+                    } else {
+                        $statusku = 'Waiting';
                     }
 
                     return $statusku;
