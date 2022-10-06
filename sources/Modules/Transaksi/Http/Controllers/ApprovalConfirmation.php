@@ -41,7 +41,7 @@ class ApprovalConfirmation extends Controller
             'box'   => '',
         );
 
-        \LogActivity::addToLog('Forwarder : Access Menu Approval Confirmation', $this->micro);
+        \LogActivity::addToLog('Web Forwarder :: Logistik : Access Menu Approval Confirmation', $this->micro);
         return view('transaksi::approvalconfirmation', $data);
     }
 
@@ -89,7 +89,7 @@ class ApprovalConfirmation extends Controller
             } else {
                 $where = '';
                 if ($request->statusfwd != "all") {
-                    $where .= ' AND status="' . $request->statusfwd . '" ';
+                    $where .= ' AND statusformpo="' . $request->statusfwd . '" ';
                 }
                 if ($request->tanggal1 != "" and $request->tanggal2 != "") {
                     $where .= ' AND (date_booking BETWEEN "' . $request->tanggal1 . '" AND "' . $request->tanggal2 . '") ';
@@ -103,7 +103,9 @@ class ApprovalConfirmation extends Controller
                 // $data = po::whereRaw(' vendor="' . $request->supplier . '"   ' . $where . ' ')->get();
                 $data = formpo::join('po', 'po.id', 'formpo.idpo')
                     ->join('masterforwarder', 'masterforwarder.id', 'formpo.idmasterfwd')
+                    ->where('masterforwarder.aktif', 'Y')
                     ->whereRaw(' vendor="' . $request->supplier . '" ' . $where . ' ')
+                    ->selectRaw(' formpo.kode_booking, formpo.date_booking, formpo.statusformpo, masterforwarder.name')
                     ->get();
             }
 
@@ -121,11 +123,7 @@ class ApprovalConfirmation extends Controller
                     return $data->name;
                 })
                 ->addColumn('status', function ($data) {
-                    if ($data->status == 'all') {
-                        $statusku = 'All';
-                    } elseif ($data->status == 'waiting') {
-                        $statusku = 'Waiting';
-                    } elseif ($data->status == 'confirm') {
+                    if ($data->statusformpo == 'confirm') {
                         $statusku = 'Confirmed';
                     } else {
                         $statusku = 'Rejected';
@@ -203,7 +201,7 @@ class ApprovalConfirmation extends Controller
             'dataku' => $dataku
         ];
 
-        \LogActivity::addToLog('Forwarder : Process Approval Data PO by Logistik', $this->micro);
+        \LogActivity::addToLog('Web Forwarder :: Logistik : Process Approval Data PO by Logistik', $this->micro);
         return response()->json(['status' => 200, 'data' => $data, 'message' => 'Berhasil']);
     }
 
@@ -266,7 +264,7 @@ class ApprovalConfirmation extends Controller
 
             if (empty($gagal)) {
                 DB::commit();
-                \LogActivity::addToLog('Approval Confirmed', $this->micro);
+                \LogActivity::addToLog('Web Forwarder :: Logistik : Approval Confirmed', $this->micro);
                 $status = ['title' => 'Success', 'status' => 'success', 'message' => 'Data Successfully Saved'];
                 return response()->json($status, 200);
             } else {
@@ -311,7 +309,7 @@ class ApprovalConfirmation extends Controller
 
             if (empty($gagal)) {
                 DB::commit();
-                \LogActivity::addToLog('Approval Rejected', $this->micro);
+                \LogActivity::addToLog('Web Forwarder :: Logistik : Approval Rejected', $this->micro);
                 $status = ['title' => 'Success', 'status' => 'success', 'message' => 'Data Successfully Saved'];
                 return response()->json($status, 200);
             } else {
