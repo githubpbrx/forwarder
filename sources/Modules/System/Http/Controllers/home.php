@@ -36,9 +36,10 @@ class home extends Controller
         $datapo = forwarder::join('privilege', 'privilege.idforwarder', 'forwarder.idmasterfwd')
             ->join('po', 'po.id', 'forwarder.idpo')
             ->where('privilege.privilege_user_nik', Session::get('session')['user_nik'])
-            ->where(function ($qq) {
-                $qq->where('po.statusalokasi', 'partial_allocated')->orWhere('po.statusalokasi', 'full_allocated');
-            })
+            // ->where(function ($qq) {
+            //     $qq->where('po.statusalokasi', 'partial_allocated')->orWhere('po.statusalokasi', 'full_allocated');
+            // })
+            ->where('po.statusalokasi', 'waiting')
             ->where('forwarder.statusapproval', '=', null)
             ->groupby('po.pono')
             ->get();
@@ -48,9 +49,6 @@ class home extends Controller
             ->join('po', 'po.id', 'formpo.idpo')
             ->where('privilege.privilege_user_nik', Session::get('session')['user_nik'])
             ->where('formpo.statusformpo', '=', 'reject')
-            ->where('formpo.file_bl', '=', null)
-            ->where('formpo.nomor_bl', '=', null)
-            ->where('formpo.vessel', '=', null)
             ->where('aktif', 'Y')
             ->selectRaw(' po.pono, formpo.kode_booking, formpo.date_booking, formpo.etd, formpo.eta, formpo.shipmode, formpo.subshipmode, formpo.ket_tolak ')
             ->groupby('po.pono')
@@ -60,24 +58,21 @@ class home extends Controller
             ->join('po', 'po.id', 'formpo.idpo')
             ->where('privilege.privilege_user_nik', Session::get('session')['user_nik'])
             ->where('formpo.statusformpo', '=', 'reject')
-            ->where('formpo.file_bl', '=', null)
-            ->where('formpo.nomor_bl', '=', null)
-            ->where('formpo.vessel', '=', null)
             ->where('aktif', 'Y')
             ->selectRaw(' po.pono, po.matcontents, po.itemdesc, formpo.kode_booking, formpo.date_booking, formpo.etd, formpo.eta, formpo.shipmode, formpo.subshipmode, formpo.ket_tolak ')
             ->get();
         // dd($datareject);
 
-        $dataconfirm = formpo::join('privilege', 'privilege.idforwarder', 'formpo.idmasterfwd')
-            ->join('po', 'po.id', 'formpo.idpo')
-            ->where('privilege.privilege_user_nik', Session::get('session')['user_nik'])
-            ->where('formpo.statusformpo', '=', 'confirm')
-            ->where('formpo.file_bl', '=', null)
-            ->where('formpo.nomor_bl', '=', null)
-            ->where('formpo.vessel', '=', null)
-            ->where('formpo.aktif', 'Y')
-            ->groupby('po.pono')
-            ->get();
+        // $dataconfirm = formpo::join('privilege', 'privilege.idforwarder', 'formpo.idmasterfwd')
+        //     ->join('po', 'po.id', 'formpo.idpo')
+        //     ->where('privilege.privilege_user_nik', Session::get('session')['user_nik'])
+        //     ->where('formpo.statusformpo', '=', 'confirm')
+        //     ->where('formpo.file_bl', '=', null)
+        //     ->where('formpo.nomor_bl', '=', null)
+        //     ->where('formpo.vessel', '=', null)
+        //     ->where('formpo.aktif', 'Y')
+        //     ->groupby('po.pono')
+        //     ->get();
         // dd($dataconfirm);
 
         $userkyc = privilege::join('kyc', 'kyc.idmasterfwd', 'privilege.idforwarder')
@@ -102,7 +97,8 @@ class home extends Controller
             'menu'          => 'dashboard',
             'box'           => '',
             'totalpo'       => count($datapo),
-            'totalconfirm'  => count($dataconfirm),
+            // 'totalconfirm'  => count($dataconfirm),
+            'totalconfirm'  => '1',
             'totalreject'   => count($totalreject),
             'datareject'    => $datareject,
             'totalapproval' => count($dataapproval),
@@ -442,7 +438,6 @@ class home extends Controller
                 $gagal[] = "OK";
             }
         }
-
 
         if (empty($gagal)) {
             DB::commit();
