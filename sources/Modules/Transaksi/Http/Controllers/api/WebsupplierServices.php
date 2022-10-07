@@ -149,6 +149,7 @@ class WebsupplierServices extends Controller
         if (isset($auth['failed'])) {
             return response()->json($auth, Response::HTTP_UNAUTHORIZED);
         }
+
         $pono = $req->pono;
         $matcontents = $req->matcontents;
         $colorcode = $req->colorcode;
@@ -156,6 +157,7 @@ class WebsupplierServices extends Controller
         $pino = $req->pino;
         $pirecdate = $req->pirecdate;
         $pideldate = $req->pideldate;
+        $forwarder = $req->forwarder;
         modellogproses::insert(['typelog' => 'prosesupdatepi', 'activity' => '==== START CHECKING Update PI po => ' . $pono . '; matcontents => ' . $matcontents . '; colorcode=>' . $colorcode . '; size=>' . $size . '; pino =>' . $pino . '; pirecdate=>' . $pirecdate . '; pideldate=>' . $pideldate, 'status' => true, 'datetime' => date('Y-m-d H:i:s'), 'from' => 'api_updatepi', 'created_at' => date('Y-m-d H:i:s')]);
         if ($pono == "") {
             modellogproses::insert(['typelog' => 'prosesupdatepi', 'activity' => 'FAILED alert => The PO your send cannot be empty', 'status' => false, 'datetime' => date('Y-m-d H:i:s'), 'from' => 'api_updatepi', 'created_at' => date('Y-m-d H:i:s')]);
@@ -197,6 +199,19 @@ class WebsupplierServices extends Controller
 
         $update = po::where('pono', $pono)->where('matcontents', $matcontents)->where('colorcode', $colorcode)->where('size', $size)->update(['pino' => $pino, 'pirecdate' => $pirecdate, 'pideldate' => $pideldate]);
         if ($update) {
+            $cekforwarder = forward::where('name', $forwarder)->first();
+            if ($cekforwarder == null) {
+                forward::insert(['name' => $forwarder, 'aktif' => 'Y', 'created_at' => date('Y-m-d H:i:s')]);
+                $forwarderku = forward::latest('id')->first();
+                $insert = $forwarderku->id;
+            } else {
+                $insert = $cekforwarder->id;
+            }
+
+            $getqtypo = po::where('pono', $pono)->where('matcontents', $matcontents)->where('colorcode', $colorcode)->where('size', $size)->first();
+            $insertdatafwd = fwd::insert(['idpo' => $getqtypo->id, 'idmasterfwd' => $insert, 'po_nomor' => $getqtypo->pono, 'qty_allocation' => $getqtypo->qtypo, 'statusforwarder' => 'full_alocated', 'aktif' => 'Y', 'created_at' => date('Y-m-d H:i:s')]);
+
+            // dd($getqtypo);
             modellogproses::insert(['typelog' => 'prosesupdatepi', 'activity' => '=== SUCCESS UPDATE PI NUMBER ===', 'status' => true, 'datetime' => date('Y-m-d H:i:s'), 'from' => 'api_updatepi', 'created_at' => date('Y-m-d H:i:s')]);
             $failed['message'] = "Data Pi Number Successfully Updated";
             $failed['success'] = true;
