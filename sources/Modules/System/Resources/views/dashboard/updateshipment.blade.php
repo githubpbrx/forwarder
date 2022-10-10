@@ -115,14 +115,22 @@
                             </div>
                             <div class="col-md-4">
                                 <div class="form-group">
+                                    <label class="col-sm-12 control-label">Quantity Shipment</label>
+                                    <div class="col-sm-12">
+                                        <input type="number" class="form-control" id="qtyshipment" name="qtyshipment">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group">
                                     <label class="col-sm-12 control-label">BL</label>
                                     <div class="col-sm-12">
                                         <input type="file" class="form-control" id="bl" name="bl">
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="row">
                             <div class="col-md-4">
                                 <div class="form-group">
                                     <label class="col-sm-12 control-label">Nomor BL</label>
@@ -141,6 +149,8 @@
                                     </div>
                                 </div>
                             </div>
+                        </div>
+                        <div class="row">
                             <div class="col-md-4">
                                 <div class="form-group">
                                     <label class="col-sm-12 control-label">Invoice</label>
@@ -150,11 +160,9 @@
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="row">
                             <div class="col-md-4">
                                 <div class="form-group">
-                                    <label class="col-sm-12 control-label">ETD (Estimate Delivery Date) Fix</label>
+                                    <label class="col-sm-12 control-label">ETD (Estimated Time Departure) Fix</label>
                                     <div class="col-sm-12">
                                         <input type="text" class="form-control" id="etdfix" name="etdfix"
                                             autocomplete="off">
@@ -163,7 +171,7 @@
                             </div>
                             <div class="col-md-4">
                                 <div class="form-group">
-                                    <label class="col-sm-12 control-label">ETA (Estimate Actual Delivery Date) Fix</label>
+                                    <label class="col-sm-12 control-label">ETA (Estimated Time Arrival) Fix</label>
                                     <div class="col-sm-12">
                                         <input type="text" class="form-control" id="etafix" name="etafix"
                                             autocomplete="off">
@@ -273,7 +281,7 @@
                             .qty_allocation +
                             '</td><td>' + dataku[index].statusforwarder +
                             '</td><td><input type="hidden" id="dataid-' + index + '" data-idpo="' +
-                            dataku[index].id + '" data-idformpo="' + dataku[index].id_formpo +
+                            dataku[index].idpo + '" data-idformpo="' + dataku[index].id_formpo +
                             '"></td></tr>';
                     }
 
@@ -287,18 +295,20 @@
                     $('#eta').val(dataku[0].eta);
                     $('#shipmode').val(dataku[0].shipmode);
                     $('#submode').val(dataku[0].subshipmode);
+                    $('#qtyshipment').val(dataku[0].qtypo);
                 })
             });
 
             $('#btnsubmit').click(function(e) {
-                let idpo = $('#dataid').attr('data-idpo');
-                let idformpo = $('#dataid').attr('data-idformpo');
+                // let idpo = $('#dataid').attr('data-idpo');
+                // let idformpo = $('#dataid').attr('data-idformpo');
                 let nomorbl = $('#nobl').val();
                 let vessel = $('#vessel').val();
                 let file = $('#bl').prop('files')[0];
                 let inv = $('#invoice').val();
                 let etdfix = $('#etdfix').val();
                 let etafix = $('#etafix').val();
+                let qtyshipment = $('#qtyshipment').val();
 
                 var arrayku = [];
                 for (let index = 0; index < length; index++) {
@@ -313,6 +323,7 @@
                 form_data.append('dataid', JSON.stringify(arrayku));
                 // form_data.append('idpo', idpo);
                 // form_data.append('idformpo', idformpo);
+                form_data.append('qtyshipment', qtyshipment);
                 form_data.append('nomorbl', nomorbl);
                 form_data.append('vessel', vessel);
                 form_data.append('file', file);
@@ -334,6 +345,8 @@
                     notifalert('ETD Fix');
                 } else if (etafix == null || etafix == '') {
                     notifalert('ETA Fix');
+                } else if (qtyshipment == null || qtyshipment == '') {
+                    notifalert('Quantity Shipment');
                 } else {
                     $.ajax({
                         type: "post",
