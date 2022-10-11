@@ -124,7 +124,7 @@ class DataShipment extends Controller
         $cekshipment = modelformshipment::where('id_shipment', '!=', $request->idshipment)->where('noinv', $request->inv)->where('aktif', 'Y')->first();
         if ($cekshipment != null) {
             // DB::rollback();
-            $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'Data is Already Exist'];
+            $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'Invoice is Already Exist'];
             return response()->json($status, 200);
         }
 
@@ -132,7 +132,7 @@ class DataShipment extends Controller
         $cekpo = modelpo::where('id', $cekformpo->idpo)->first();
         $qtypo = (float)$cekpo->qtypo;
 
-        $cekqtyshipment = modelformshipment::where('idformpo', $request->idformpo)->where('aktif', 'Y')->selectRaw(' sum(qty_shipment) ')->first();
+        $cekqtyshipment = modelformshipment::where('idformpo', $request->idformpo)->where('aktif', 'Y')->selectRaw(' sum(qty_shipment) as jml ')->first();
         $jumlahexist = ($cekqtyshipment == null) ? 0 : $cekqtyshipment->jml;
 
         $jumlahall = $request->qtyshipment + $jumlahexist;
