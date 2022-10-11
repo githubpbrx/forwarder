@@ -80,7 +80,7 @@
                             </div>
                             <div class="col-md-4">
                                 <div class="form-group">
-                                    <label class="col-sm-12 control-label">ETD (Estimate Delivery Date)</label>
+                                    <label class="col-sm-12 control-label">ETD (Estimated Time Departure)</label>
                                     <div class="col-sm-12">
                                         <input type="text" class="form-control" id="etd" name="etd" readonly>
                                     </div>
@@ -90,7 +90,7 @@
                         <div class="row">
                             <div class="col-md-4">
                                 <div class="form-group">
-                                    <label class="col-sm-12 control-label">ETA (Estimate Actual Delivery Date)</label>
+                                    <label class="col-sm-12 control-label">ETA (Estimated Time Arrival)</label>
                                     <div class="col-sm-12">
                                         <input type="text" class="form-control" id="eta" name="eta" readonly>
                                     </div>
