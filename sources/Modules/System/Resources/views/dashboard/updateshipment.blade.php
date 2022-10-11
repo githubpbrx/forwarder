@@ -117,7 +117,8 @@
                                 <div class="form-group">
                                     <label class="col-sm-12 control-label">Quantity Shipment</label>
                                     <div class="col-sm-12">
-                                        <input type="number" class="form-control" id="qtyshipment" name="qtyshipment">
+                                        <input type="number" class="form-control" id="qtyshipment" name="qtyshipment"
+                                            autocomplete="off">
                                     </div>
                                 </div>
                             </div>
@@ -271,15 +272,22 @@
                     $('#detailitem').empty();
 
                     html =
-                        '<table border="0" style="width:100%"><tr><th>Material Contents</th><th>Color Code</th><th>Size</th><th>Quantity PO</th><th>Quantity Allocation</th><th>Status</th></tr>';
+                        '<table border="0" style="width:100%"><tr><th>Material Contents</th><th>Color Code</th><th>Size</th><th>Quantity PO</th><th>Remaining Quantity</th><th>Status</th></tr>';
                     for (let index = 0; index < dataku.length; index++) {
-                        html +=
-                            '<tr><td>' +
-                            dataku[index].matcontents + '</td><td>' +
-                            dataku[index].colorcode + '</td><td>' + dataku[index].size +
-                            '</td><td>' + dataku[index].qtypo + '</td><td>' + dataku[index]
-                            .qty_allocation +
-                            '</td><td>' + dataku[index].statusforwarder +
+                        let remain;
+
+                        if (dataku[index].qtyshipment == null) {
+                            remain = dataku[index].qtypo;
+                        } else if (dataku[index].qtyshipment == dataku[index].qtypo) {
+                            remain = '0';
+                        } else {
+                            remain = dataku[index].qtypo - dataku[index].qtyshipment
+                        }
+
+                        html += '<tr><td>' + dataku[index].matcontents + '</td><td>' + dataku[index]
+                            .colorcode + '</td><td>' + dataku[index].size + '</td><td>' +
+                            dataku[index].qtypo + '</td><td>' + remain +
+                            '</td><td>' + dataku[index].statusshipment +
                             '</td><td><input type="hidden" id="dataid-' + index + '" data-idpo="' +
                             dataku[index].idpo + '" data-idformpo="' + dataku[index].id_formpo +
                             '"></td></tr>';
@@ -295,7 +303,6 @@
                     $('#eta').val(dataku[0].eta);
                     $('#shipmode').val(dataku[0].shipmode);
                     $('#submode').val(dataku[0].subshipmode);
-                    $('#qtyshipment').val(dataku[0].qtypo);
                 })
             });
 
