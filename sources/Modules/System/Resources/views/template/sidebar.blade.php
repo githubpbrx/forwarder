@@ -139,6 +139,15 @@
                     </li>
                 @endif
 
+                @if (RoleAccess::whereMenu(12) > 0)
+                    <li class="nav-item">
+                        <a href="{{ route('datashipment') }}" class="nav-link">
+                            <i class="fa fa-archive nav-icon"></i>
+                            <p>Data Shipment</p>
+                        </a>
+                    </li>
+                @endif
+
                 @if (RoleAccess::whereMenu(11) > 0)
                     <li class="nav-item">
                         <a href="{{ route('reportforwarder') }}" class="nav-link">

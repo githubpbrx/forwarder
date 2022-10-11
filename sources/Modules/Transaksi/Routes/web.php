@@ -36,4 +36,13 @@ Route::prefix('transaksi')->group(function () {
         Route::post('statusapproval/{approval}', 'ApprovalConfirmation@statusapproval')->name('approvalstatus');
         Route::get('listapproval', 'ApprovalConfirmation@listapproval')->name('list_approval');
     });
+
+    Route::group(['prefix' => 'shipment'], function () {
+        Route::get('/', 'DataShipment@index')->name('datashipment');
+        Route::get('/listshipment', 'DataShipment@listshipment')->name('list_shipment');
+        Route::post('/getshipment', 'DataShipment@getdatashipment')->name('getdatashipment');
+        Route::post('/updateshipment/', 'DataShipment@updateshipment')->name('updateshipment');
+        // Route::post('statusapproval/{approval}', 'DataShipment@statusapproval')->name('approvalstatus');
+        // Route::get('listapproval', 'DataShipment@listapproval')->name('list_approval');
+    });
 });
