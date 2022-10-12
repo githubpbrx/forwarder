@@ -100,55 +100,45 @@ class ApprovalConfirmation extends Controller
                 if ($request->book != "") {
                     $where .= ' AND kode_booking=" ' . $request->book . '" ';
                 }
-                // $data = po::whereRaw(' vendor="' . $request->supplier . '"   ' . $where . ' ')->get();
-                $data = formpo::join('po', 'po.id', 'formpo.idpo')
-                    ->join('masterforwarder', 'masterforwarder.id', 'formpo.idmasterfwd')
-                    ->where('masterforwarder.aktif', 'Y')
+                // $data = formpo::join('po', 'po.id', 'formpo.idpo')
+                //     ->join('masterforwarder', 'masterforwarder.id', 'formpo.idmasterfwd')
+                //     ->where('masterforwarder.aktif', 'Y')
+                //     ->whereRaw(' vendor="' . $request->supplier . '" ' . $where . ' ')
+                //     ->selectRaw(' formpo.kode_booking, formpo.date_booking, formpo.statusformpo, masterforwarder.name')
+                //     ->groupby('formpo.kode_booking')
+                //     ->get();
+                $data = fwd::join('po', 'po.id', 'forwarder.idpo')
+                    ->join('formpo', 'formpo.idpo', 'forwarder.idpo')
+                    ->join('masterforwarder', 'masterforwarder.id', 'forwarder.idmasterfwd')
+                    ->where('forwarder.aktif', 'Y')->where('formpo.aktif', 'Y')->where('masterforwarder.aktif', 'Y')
                     ->whereRaw(' vendor="' . $request->supplier . '" ' . $where . ' ')
-                    ->selectRaw(' formpo.kode_booking, formpo.date_booking, formpo.statusformpo, masterforwarder.name')
-                    ->groupby('formpo.kode_booking')
+                    ->selectRaw(' forwarder.id_forwarder, po.pono, formpo.kode_booking, masterforwarder.name ')
                     ->get();
             }
 
             // dd($data);
             return DataTables::of($data)
                 ->addIndexColumn()
-                ->addColumn('booking', function ($data) {
-                    return $data->kode_booking;
+                ->addColumn('nopo', function ($data) {
+                    return $data->pono;
                 })
-                ->addColumn('date', function ($data) {
-                    $date = Carbon::parse($data->date_booking)->format('d F Y');
-                    return $date;
+                // ->addColumn('date', function ($data) {
+                //     $date = Carbon::parse($data->date_booking)->format('d F Y');
+                //     return $date;
+                // })
+                ->addColumn('kodebook', function ($data) {
+                    return $data->kode_booking;
                 })
                 ->addColumn('forwarder', function ($data) {
                     return $data->name;
                 })
-                ->addColumn('status', function ($data) {
-                    if ($data->statusformpo == 'confirm') {
-                        $statusku = 'Confirmed';
-                    } else if ($data->statusformpo == 'reject') {
-                        $statusku = 'Rejected';
-                    } else {
-                        $statusku = 'Waiting';
-                    }
+                ->addColumn('action', function ($data) {
+                    $button = '';
 
-                    return $statusku;
+                    $button = '<a href="#" data-id="' . $data->id_forwarder . '" id="detailbtn"><i data-tooltip="tooltip" title="Detail Approval Confirmation" class="fa fa-info-circle fa-lg"></i></a>';
+
+                    return $button;
                 })
-                // ->addColumn('action', function ($data) {
-                //     $button = '';
-
-                //     if ($data->status == 'all') {
-                //         $button = '<a href="#" data-id="' . $data->poid . '" id="detailbtn"><i data-tooltip="tooltip" title="Detail Allocation" class="fa fa-info-circle fa-lg"></i></a>';
-                //     } elseif ($data->status == 'waiting' && $data->idapproval == null) {
-                //         $button = '<a href="#" data-id="' . $data->poid . '" id="waitbtn"><i data-tooltip="tooltip" title="Detail Allocation" class="fa fa-angle-double-right fa-lg text-green"></i></a>';
-                //     } elseif ($data->status == 'confirm') {
-                //         $button = '<a href="#" data-id="' . $data->poid . '" id="detailbtn"><i data-tooltip="tooltip" title="Detail Allocation" class="fa fa-info-circle fa-lg"></i></a>';
-                //     } else {
-                //         $button = '<a href="#" data-id="' . $data->poid . '" id="detailbtn"><i data-tooltip="tooltip" title="Detail Allocation" class="fa fa-info-circle fa-lg"></i></a>';
-                //     }
-
-                //     return $button;
-                // })
                 // ->rawColumns(['poku', 'date', 'material', 'status', 'action'])
                 // ->rawColumns(['status'])
                 ->make(true);
@@ -212,24 +202,23 @@ class ApprovalConfirmation extends Controller
     {
         // dd($request);
 
-        $datapo = po::where('id', $request->id)->first();
-        $databooking = formpo::where('idpo', $request->id)->where('aktif', 'Y')->first();
-        $dataforward = fwd::join('masterforwarder', 'masterforwarder.id', 'forwarder.idmasterfwd')->where('forwarder.idpo', $request->id)->first();
-        $privilege = privilege::where('privilege_user_nik', $databooking->created_by)->first();
-        $approval = approval::where('id_approval', $databooking->idapproval)->first();
-        $privilegeuser = privilege::where('privilege_user_nik', $approval->user_pengesah)->first();
+        $dataformpo = formpo::join('po', 'po.id', 'formpo.idpo')
+            ->join('masterforwarder', 'masterforwarder.id', 'formpo.idmasterfwd')
+            ->where('formpo.idforwarder', $request->id)
+            ->where('formpo.aktif', 'Y')->where('masterforwarder.aktif', 'Y')
+            ->first();
+        // dd($dataformpo);
+        // $data = [
+        //     'datapo' => $datapo,
+        //     'databooking' => $databooking,
+        //     'dataforward' => $dataforward,
+        //     'privilege' => $privilege,
+        //     'approval' => $approval,
+        //     'jenis'    => 'detail',
+        //     'user' => $privilegeuser
+        // ];
 
-        $data = [
-            'datapo' => $datapo,
-            'databooking' => $databooking,
-            'dataforward' => $dataforward,
-            'privilege' => $privilege,
-            'approval' => $approval,
-            'jenis'    => 'detail',
-            'user' => $privilegeuser
-        ];
-
-        return response()->json(['status' => 200, 'data' => $data, 'message' => 'Berhasil']);
+        return response()->json(['status' => 200, 'data' => $dataformpo, 'message' => 'Berhasil']);
     }
 
     public function statusapproval(Request $request, $approval)

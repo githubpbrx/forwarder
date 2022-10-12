@@ -80,20 +80,17 @@
                                     <thead>
                                         <tr>
                                             <th>
-                                                <center>Book#</center>
+                                                <center>PO</center>
                                             </th>
                                             <th>
-                                                <center>Date</center>
+                                                <center>Code Booking</center>
                                             </th>
                                             <th>
                                                 <center>Forwarder</center>
                                             </th>
                                             <th>
-                                                <center>Status</center>
-                                            </th>
-                                            {{-- <th>
                                                 <center>Action</center>
-                                            </th> --}}
+                                            </th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -108,7 +105,7 @@
     </div>
 
     {{-- Modal Approval Forwarder --}}
-    <div class="modal fade" id="approvalfwd">
+    <div class="modal fade" id="detailapproval">
         <div class="modal-dialog modal-xl">
             <div class="modal-content">
                 <div class="modal-header">
@@ -122,12 +119,45 @@
                         {{ csrf_field() }}
                         <div class="row">
                             <div class="col-md-6">
-                                <label class="col-sm-12 control-label">Nomor PO</label>
-                                <div class="col-sm-12">
-                                    <input type="text" class="form-control" id="nomorpo" name="nomorpo" readonly>
+                                <div class="form-group">
+                                    <label class="col-sm-12 control-label">Nomor PO</label>
+                                    <div class="col-sm-12">
+                                        <input type="text" class="form-control" id="nomorpo" name="nomorpo" readonly>
+                                    </div>
                                 </div>
                             </div>
-                            <div class="col-md-6">
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label class="col-sm-12 control-label">Material</label>
+                                    <div class="col-sm-12">
+                                        <input type="text" class="form-control" id="material" name="material"
+                                            readonly>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label class="col-sm-12 control-label">Color Code</label>
+                                    <div class="col-sm-12">
+                                        <input type="text" class="form-control" id="colorcode" name="colorcode"
+                                            readonly>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label class="col-sm-12 control-label">Size</label>
+                                    <div class="col-sm-12">
+                                        <input type="text" class="form-control" id="size" name="size"
+                                            readonly>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4">
                                 <div class="form-group">
                                     <label class="col-sm-12 control-label">Nomor Booking</label>
                                     <div class="col-sm-12">
@@ -136,57 +166,7 @@
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label class="col-sm-12 control-label">Date Booking</label>
-                                    <div class="col-sm-12">
-                                        <input type="text" class="form-control" id="datebook" name="datebook"
-                                            readonly>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label class="col-sm-12 control-label">ETD (Estimate Delivery Date)</label>
-                                    <div class="col-sm-12">
-                                        <input type="text" class="form-control" id="etd" name="etd"
-                                            readonly>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label class="col-sm-12 control-label">ETA (Estimate Acutal Delivery Date)</label>
-                                    <div class="col-sm-12">
-                                        <input type="text" class="form-control" id="eta" name="eta"
-                                            readonly>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label class="col-sm-12 control-label">Ship Mode</label>
-                                    <div class="col-sm-12">
-                                        <div class="row">
-                                            <div class="col-sm-6">
-                                                <input type="text" class="form-control" id="shipmode"
-                                                    name="shipmode" readonly>
-                                            </div>
-                                            <div class="col-sm-6">
-                                                <input type="text" class="form-control" id="submode" name="submode"
-                                                    readonly>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-6">
+                            <div class="col-md-4">
                                 <div class="form-group">
                                     <label class="col-sm-12 control-label">Forwarder</label>
                                     <div class="col-sm-12">
@@ -195,23 +175,11 @@
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-6">
+                            <div class="col-md-4">
                                 <div class="form-group">
-                                    <label class="col-sm-12 control-label">User Applicant</label>
-                                    <div class="col-sm-8">
-                                        <div id="pengajunama"></div>
-                                        <input class="form-control" type="text" id="pengajunik" readonly>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label class="col-sm-12 control-label">User Approved</label>
-                                    <div class="col-sm-8">
-                                        <div id="detailpengesah"></div>
-                                        <input type="text" name="nikpengesah" id="nik" class="form-control"
+                                    <label class="col-sm-12 control-label">Status</label>
+                                    <div class="col-sm-12">
+                                        <input type="text" class="form-control" id="status" name="status"
                                             readonly>
                                     </div>
                                 </div>
@@ -226,9 +194,6 @@
         </div>
     </div>
 
-@endsection
-
-@section('script_src')
 @endsection
 
 @section('script')
@@ -256,25 +221,21 @@
                     }
                 },
                 columns: [{
-                        data: 'booking',
-                        name: 'booking'
+                        data: 'nopo',
+                        name: 'nopo'
                     },
                     {
-                        data: 'date',
-                        name: 'date'
+                        data: 'kodebook',
+                        name: 'kodebook'
                     },
                     {
                         data: 'forwarder',
                         name: 'forwarder'
                     },
                     {
-                        data: 'status',
-                        name: 'status'
-                    },
-                    // {
-                    //     data: 'action',
-                    //     name: 'action'
-                    // }
+                        data: 'action',
+                        name: 'action'
+                    }
                 ]
             });
             // }
@@ -349,7 +310,7 @@
             $('body').on('click', '#detailbtn', function() {
                 console.log('objectdetail :>> ', 'klik');
                 // $('#modal-detail').modal('show');
-                $('#approvalfwd').modal({
+                $('#detailapproval').modal({
                     show: true,
                     backdrop: 'static'
                 });
@@ -363,43 +324,16 @@
                         id: idku,
                     },
                 }).done(function(data) {
-                    $('#approvalstatus').show();
-                    $('#approvalreject').show();
-                    $('#keteranganreject').show();
-
                     console.log('data :>> ', data.data);
-                    let databook = data.data.databooking;
-                    let poku = data.data.datapo;
-                    let forward = data.data.dataforward;
-                    let privilege = data.data.privilege;
-                    let approve = data.data.approval;
-                    let user = data.data.user;
+                    let dataku = data.data;
 
-                    $('#nomorpo').val(poku.pono);
-                    $('#nobook').val(databook.kode_booking);
-                    $('#datebook').val(databook.date_booking);
-                    $('#etd').val(databook.etd);
-                    $('#eta').val(databook.eta);
-                    $('#shipmode').val(databook.shipmode);
-                    $('#submode').val(databook.subshipmode);
-                    $('#forwarder').val(forward.nama);
-                    $('#pengajunama').html(privilege.privilege_user_name);
-                    $('#pengajunik').val(privilege.privilege_user_nik);
-                    $('#detailpengesah').html(user.privilege_user_name);
-                    $('#nik').val(approve.user_pengesah);
-                    $('#nik').attr('readonly', true);
-                    $('.btnapproval').hide();
-
-                    if (databook.status == 'confirm') {
-                        $('#approvalstatus').html('Approved Logistik');
-                        $('#approvalreject').show();
-                        $('#keteranganreject').show();
-                    } else {
-                        $('#approvalstatus').html('Not Approved Logistik');
-                        $('#approvalreject').show();
-                        $('#keteranganreject').html(approve.ket_tolak);
-                    }
-
+                    $('#nomorpo').val(dataku.pono);
+                    $('#material').val(dataku.matcontents);
+                    $('#colorcode').val(dataku.colorcode);
+                    $('#size').val(dataku.size);
+                    $('#nobook').val(dataku.kode_booking);
+                    $('#forwarder').val(dataku.name);
+                    $('#status').val(dataku.statusformpo);
                 })
             });
         });
