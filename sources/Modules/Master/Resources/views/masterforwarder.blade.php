@@ -161,7 +161,7 @@
                                     <label class="col-sm-12 control-label">Email Forwarder</label>
                                     <div class="col-sm-12">
                                         <input type="email" class="form-control" id="emailfwdedit" name="emailfwdedit"
-                                            autocomplete="off" readonly>
+                                            autocomplete="off">
                                     </div>
                                 </div>
                             </div>
@@ -403,6 +403,15 @@
 
             $('body').on('click', '#editfwd', function() {
                 console.log('objectproses :>> ', 'klik');
+                $('#namefwdedit').val('');
+                $('#positionedit').val('');
+                $('#companyedit').val('');
+                $('#addressedit').val('');
+                $('#emailfwdedit').val('');
+                $('#emailfinanceedit').val('');
+                $('#nikfinanceedit').val('');
+                $("#namefinanceedit").val('');
+
                 $('#editforwarder').modal({
                     show: true,
                     backdrop: 'static'
@@ -420,6 +429,12 @@
                     console.log('data :>> ', data.data);
                     let datafwd = data.data.datafwd;
                     let datapriv = data.data.datapriv;
+
+                    if (datapriv != null) {
+                        $('#emailfwdedit').prop('readonly', true);
+                    } else {
+                        $('#emailfwdedit').prop('readonly', false);
+                    }
 
                     $('#idku').val(datafwd.id);
                     $('#namefwdedit').val(datafwd.name);
@@ -457,6 +472,15 @@
 
                 if (namefwdedit == '' || namefwdedit == null) {
                     notifalert('Name Forwarder');
+                } else if (emailfwd == '' || emailfwd == null) {
+                    notifalert('Email Forwarder');
+                } else if (IsEmail(emailfwd) == false) {
+                    Swal.fire({
+                        title: 'Information',
+                        text: ' Please use format email in Email Forwarder',
+                        type: 'warning'
+                    });
+                    return;
                 } else if (position == '' || position == null) {
                     notifalert('Position Forwarder');
                 } else if (company == '' || company == null) {

@@ -35,7 +35,7 @@ class MasterForwarder extends Controller
             'menu' => 'masterforwarder'
         ];
 
-        \LogActivity::addToLog('Access Menu Master Forwarder', $this->micro);
+        \LogActivity::addToLog('Web Forwarder :: Logistik : Access Menu Master Forwarder', $this->micro);
         return view('master::masterforwarder', $data);
     }
 
@@ -142,7 +142,7 @@ class MasterForwarder extends Controller
 
         if ($savedfwd && $saveprivilege) {
             DB::commit();
-            \LogActivity::addToLog('Save Master Forwarder', $this->micro);
+            \LogActivity::addToLog('Web Forwarder :: Logistik : Save Master Forwarder', $this->micro);
             $status = ['title' => 'Success', 'status' => 'success', 'message' => 'Data Successfully Saved'];
             return response()->json($status, 200);
         } else {
@@ -172,7 +172,7 @@ class MasterForwarder extends Controller
         // dd($request);
 
         $datafwd = forwarder::where('id', $request->id)->where('aktif', 'Y')->first();
-        $dataprivilege = privilege::where('idforwarder', $request->id)->first();
+        $dataprivilege = privilege::where('idforwarder', $request->id)->where('privilege_aktif', 'Y')->first();
 
         $data = [
             'datafwd' => $datafwd,
@@ -191,56 +191,134 @@ class MasterForwarder extends Controller
      */
     public function updatefwd(Request $request)
     {
-        // dd($request);
+        $cekprivilege = privilege::where('idforwarder', $request->id)->where('privilege_aktif', 'Y')->first();
+        // dd($cekprivilege);
+        if ($cekprivilege == null) {
+            DB::beginTransaction();
+            //make password
+            $pass = Hash::make('password123');
+            //make kode
+            $kode = rand(11111, 99999);
+            //make token
+            $token = Hash::make('ittetapsemangant');
 
-        DB::beginTransaction();
-        if ($request->namefwdedit == '' || $request->positionedit == '' || $request->companyedit == '' || $request->addressedit == '' || $request->emailfwdedit == '' || $request->namefinanceedit == '' || $request->nikfinanceedit == '' || $request->emailfinanceedit == '') {
-            DB::rollback();
-            $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'Data is required, please input data'];
-            return response()->json($status, 200);
-        }
+            if ($request->namefwdedit == '' || $request->positionedit == '' || $request->companyedit == '' || $request->addressedit == '' || $request->emailfwdedit == '' || $request->namefinanceedit == '' || $request->nikfinanceedit == '' || $request->emailfinanceedit == '') {
+                DB::rollback();
+                $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'Data is required, please input data'];
+                return response()->json($status, 200);
+            }
 
-        $cekfwd = forwarder::where('id', '!=', $request->id)->where('name', $request->namefwdedit)->where('aktif', 'Y')->first();
-        if ($cekfwd != null) {
-            DB::rollback();
-            $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'Data Name Forwarder is available, please check again'];
-            return response()->json($status, 200);
-        }
+            $cekfwd = forwarder::where('id', '!=', $request->id)->where('name', $request->namefwdedit)->where('aktif', 'Y')->first();
+            if ($cekfwd != null) {
+                DB::rollback();
+                $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'Data Name Forwarder is available, please check again'];
+                return response()->json($status, 200);
+            }
 
-        $cekprivilege2 = privilege::where('idforwarder', '!=', $request->id)->where('privilege_user_name', strtoupper($request->namefwd))->first();
-        if ($cekprivilege2 != null) {
-            DB::rollback();
-            $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'Data Name Forwarder is available, please check again'];
-            return response()->json($status, 200);
-        }
+            $cekprivilege = privilege::where('idforwarder', '!=', $request->id)->where('privilege_user_nik', $request->emailfwdedit)->where('privilege_aktif', 'Y')->first();
+            if ($cekprivilege != null) {
+                DB::rollback();
+                $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'Data Email Forwarder is available, please check again'];
+                return response()->json($status, 200);
+            }
 
-        $updatefwd = forwarder::where('id', $request->id)->update([
-            'name'         => strtoupper($request->namefwdedit),
-            'position'     => $request->positionedit,
-            'company'      => $request->companyedit,
-            'address'      => $request->addressedit,
-            'aktif'        => 'Y',
-            'updated_at'   => date('Y-m-d H:i:s'),
-            'updated_user' => Session::get('session')['user_nik']
-        ]);
+            $cekprivilege2 = privilege::where('idforwarder', '!=', $request->id)->where('privilege_user_name', strtoupper($request->namefwdedit))->where('privilege_aktif', 'Y')->first();
+            if ($cekprivilege2 != null) {
+                DB::rollback();
+                $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'Data Name Forwarder is available, please check again'];
+                return response()->json($status, 200);
+            }
 
-        $updateprivilege = privilege::where('idforwarder', $request->id)->update([
-            'privilege_user_nik'        => $request->emailfwdedit,
-            'privilege_user_name'       => strtoupper($request->namefwdedit),
-            'emailfinance'              => $request->emailfinanceedit,
-            'nikfinance'                => $request->nikfinanceedit,
-            'namafinance'               => $request->namefinanceedit
-        ]);
+            $updatefwd = forwarder::where('id', $request->id)->update([
+                'name'         => strtoupper($request->namefwdedit),
+                'position'     => $request->positionedit,
+                'company'      => $request->companyedit,
+                'address'      => $request->addressedit,
+                'aktif'        => 'Y',
+                'updated_at'   => date('Y-m-d H:i:s'),
+                'updated_user' => Session::get('session')['user_nik']
+            ]);
 
-        if ($updatefwd && $updateprivilege) {
-            DB::commit();
-            \LogActivity::addToLog('Update Master Forwarder', $this->micro);
-            $status = ['title' => 'Success', 'status' => 'success', 'message' => 'Data Successfully Saved'];
-            return response()->json($status, 200);
+            $saveprivilege = privilege::insert([
+                'privilege_user_nik'        => $request->emailfwdedit,
+                'privilege_user_name'       => strtoupper($request->namefwdedit),
+                'privilege_password'        => $pass,
+                'privilege_group_access_id' => '1',
+                'privilege_aktif'           => 'Y',
+                'privilege_hrips'           => 'N',
+                'created_at'                => date('Y-m-d H:i:s'),
+                'coc'                       => 'N',
+                'kyc'                       => 'N',
+                'kode'                      => $kode,
+                'kode_validate'             => 'N',
+                'token'                     => $token,
+                'emailfinance'              => $request->emailfinanceedit,
+                'nikfinance'                => $request->nikfinanceedit,
+                'namafinance'               => $request->namefinanceedit,
+                'idforwarder'               => $request->id
+            ]);
+
+            if ($updatefwd && $saveprivilege) {
+                DB::commit();
+                \LogActivity::addToLog('Web Forwarder :: Logistik : Update Master Forwarder', $this->micro);
+                $status = ['title' => 'Success', 'status' => 'success', 'message' => 'Data Successfully Saved'];
+                return response()->json($status, 200);
+            } else {
+                DB::rollback();
+                $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'Data Failed Saved'];
+                return response()->json($status, 200);
+            }
         } else {
-            DB::rollback();
-            $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'Data Failed Saved'];
-            return response()->json($status, 200);
+            DB::beginTransaction();
+            if ($request->namefwdedit == '' || $request->positionedit == '' || $request->companyedit == '' || $request->addressedit == '' || $request->emailfwdedit == '' || $request->namefinanceedit == '' || $request->nikfinanceedit == '' || $request->emailfinanceedit == '') {
+                DB::rollback();
+                $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'Data is required, please input data'];
+                return response()->json($status, 200);
+            }
+
+            $cekfwd = forwarder::where('id', '!=', $request->id)->where('name', $request->namefwdedit)->where('aktif', 'Y')->first();
+            if ($cekfwd != null) {
+                DB::rollback();
+                $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'Data Name Forwarder is available, please check again'];
+                return response()->json($status, 200);
+            }
+
+            $cekprivilege2 = privilege::where('idforwarder', '!=', $request->id)->where('privilege_user_name', strtoupper($request->namefwd))->where('privilege_aktif', 'Y')->first();
+            if ($cekprivilege2 != null) {
+                DB::rollback();
+                $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'Data Name Forwarder is available, please check again'];
+                return response()->json($status, 200);
+            }
+
+            $updatefwd = forwarder::where('id', $request->id)->update([
+                'name'         => strtoupper($request->namefwdedit),
+                'position'     => $request->positionedit,
+                'company'      => $request->companyedit,
+                'address'      => $request->addressedit,
+                'aktif'        => 'Y',
+                'updated_at'   => date('Y-m-d H:i:s'),
+                'updated_user' => Session::get('session')['user_nik']
+            ]);
+
+            $updateprivilege = privilege::where('idforwarder', $request->id)->update([
+                'privilege_user_nik'        => $request->emailfwdedit,
+                'privilege_user_name'       => strtoupper($request->namefwdedit),
+                'emailfinance'              => $request->emailfinanceedit,
+                'nikfinance'                => $request->nikfinanceedit,
+                'namafinance'               => $request->namefinanceedit,
+                'updated_at'                => date('Y-m-d H:i:s')
+            ]);
+
+            if ($updatefwd && $updateprivilege) {
+                DB::commit();
+                \LogActivity::addToLog('Web Forwarder :: Logistik : Update Master Forwarder', $this->micro);
+                $status = ['title' => 'Success', 'status' => 'success', 'message' => 'Data Successfully Saved'];
+                return response()->json($status, 200);
+            } else {
+                DB::rollback();
+                $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'Data Failed Saved'];
+                return response()->json($status, 200);
+            }
         }
     }
 
@@ -266,7 +344,7 @@ class MasterForwarder extends Controller
 
         if ($delete && $deleteprivilege) {
             DB::commit();
-            \LogActivity::addToLog('Delete Master Forwarder', $this->micro);
+            \LogActivity::addToLog('Web Forwarder :: Logistik : Delete Master Forwarder', $this->micro);
             $status = ['title' => 'Success', 'status' => 'success', 'message' => 'Data Successfully Deleted'];
             return response()->json($status, 200);
         } else {
