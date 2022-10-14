@@ -42,6 +42,7 @@ class home extends Controller
             // })
             ->where('po.statusalokasi', 'waiting')
             ->where('forwarder.statusapproval', '=', null)
+            ->where('forwarder.aktif', 'Y')->where('privilege.privilege_aktif', 'Y')
             ->groupby('po.pono')
             ->get();
         // dd($datapo);
@@ -68,7 +69,7 @@ class home extends Controller
             ->join('po', 'po.id', 'formpo.idpo')
             ->where('privilege.privilege_user_nik', Session::get('session')['user_nik'])
             ->where('formpo.statusformpo', '=', 'confirm')
-            ->where('formpo.aktif', 'Y')
+            ->where('formpo.aktif', 'Y')->where('privilege.privilege_aktif', 'Y')
             ->groupby('po.pono')
             ->get();
         // dd($dataconfirm);
@@ -163,6 +164,7 @@ class home extends Controller
             ->where(function ($kus) {
                 $kus->where('forwarder.statusapproval', null)->orWhere('forwarder.statusapproval', 'reject');
             })
+            ->where('forwarder.aktif', 'Y')->where('privilege.privilege_aktif', 'Y')
             ->selectRaw(' forwarder.statusforwarder, forwarder.statusapproval, po.id, po.pono, po.itemdesc ')
             ->groupby('po.pono')
             ->get();
@@ -206,12 +208,19 @@ class home extends Controller
     public function listupdate()
     {
         // $query = formpo::where('status', 'confirm')->where('file_bl', '=', null)->where('nomor_bl', '=', null)->where('vessel', '=', null)->where('aktif', 'Y')->get();
-        $query = formpo::join('privilege', 'privilege.idforwarder', 'formpo.idmasterfwd')
+        $query = formpo::withCount(['shipment as qtyship' => function ($var) {
+            $var->select(DB::raw('sum(qty_shipment)'))->groupby('idformpo');
+        }])
+            ->with(['shipment' => function ($stat) {
+                $stat->latest()->first();
+            }])
+            ->join('privilege', 'privilege.idforwarder', 'formpo.idmasterfwd')
             ->join('po', 'po.id', 'formpo.idpo')
             ->where('privilege.privilege_user_nik', Session::get('session')['user_nik'])
             ->where('formpo.statusformpo', '=', 'confirm')
-            ->where('formpo.aktif', 'Y')
+            ->where('formpo.aktif', 'Y')->where('privilege.privilege_aktif', 'Y')
             ->groupby('po.pono')
+            ->selectRaw(' formpo.*, po.id, po.pono, po.matcontents, po.colorcode, po.size, po.qtypo')
             ->get();
         // dd($query);
         return Datatables::of($query)
@@ -222,13 +231,46 @@ class home extends Controller
             ->addColumn('nobook', function ($query) {
                 return  $query->kode_booking;
             })
-            // ->addColumn('status', function ($query) {
-            //     return  $query->status;
-            // })
+            ->addColumn('qtypo', function ($query) {
+                return  $query->qtypo;
+            })
+            ->addColumn('qtyship', function ($query) {
+                $rep = str_replace('.', '', $query->qtypo);
+                $qtypo = (float)$rep;
+
+                if ($query->qtyship == null) {
+                    $remain = $query->qtypo;
+                } else if ($query->qtyship == $qtypo) {
+                    $remain = '0';
+                } else {
+                    $remain = $qtypo - $query->qtyship;
+                }
+                return  $remain;
+            })
+            ->addColumn('status', function ($query) {
+                if ($query->shipment == null) {
+                    $status = 'No Status';
+                } else {
+                    if ($query->shipment->statusshipment == 'full_allocated') {
+                        $status = 'Full Allocated';
+                    } else {
+                        $status = 'Partial Allocated';
+                    }
+                }
+
+                return  $status;
+            })
             ->addColumn('action', function ($query) {
                 $process    = '';
-
-                $process    = '<a href="#" data-id="' . $query->pono . '" id="updateship"><i class="fa fa-angle-double-right text-green"></i></a>';
+                if ($query->shipment == null) {
+                    $process    = '<a href="#" data-id="' . $query->id . '" id="updateship"><i class="fa fa-angle-double-right text-green"></i></a>';
+                } else {
+                    if ($query->shipment->statusshipment == 'partial_allocated') {
+                        $process    = '<a href="#" data-id="' . $query->id . '" id="updateship"><i class="fa fa-angle-double-right text-green"></i></a>';
+                    } else {
+                        $process = '';
+                    }
+                }
 
                 return $process;
             })
@@ -293,25 +335,29 @@ class home extends Controller
     {
         // dd($request);
 
-        // $mydata = po::join('formpo', 'formpo.idpo', 'po.id')
-        //     ->where('po.pono', $request->id)
-        //     ->where('formpo.aktif', 'Y')
-        //     ->get();
-        // $dataforwarder = forwarder::join('privilege', 'privilege.idforwarder', 'forwarder.idmasterfwd')
-        //     ->where('privilege.privilege_user_nik', Session::get('session')['user_nik'])
-        //     ->where('po_nomor', $request->id)->where('aktif', 'Y')->get();
-
-        $mydata = formpo::join('po', 'po.id', 'formpo.idpo')
+        $mydata = formpo::withCount(['shipment as qtyship' => function ($var) {
+            $var->select(DB::raw('sum(qty_shipment)'))->groupby('idformpo');
+        }])
+            ->join('po', 'po.id', 'formpo.idpo')
             ->join('forwarder', 'forwarder.id_forwarder', 'formpo.idforwarder')
             ->join('privilege', 'privilege.idforwarder', 'forwarder.idmasterfwd')
-            ->join('formshipment', 'formshipment.idformpo', 'formpo.id_formpo')
-            ->where('po.pono', $request->id)
+            ->where('po.id', $request->id)
             ->where('privilege.privilege_user_nik', Session::get('session')['user_nik'])
             ->where('formpo.statusformpo', 'confirm')
-            ->where('formpo.aktif', 'Y')->where('forwarder.aktif', 'Y')->where('privilege.privilege_aktif', 'Y')->where('formshipment.aktif', 'Y')
-            ->groupby('formshipment.idformpo')
-            ->selectRaw(' formpo.*, po.pono, po.matcontents, po.colorcode, po.size, po.qtypo, forwarder.qty_allocation, forwarder.statusforwarder, sum(formshipment.qty_shipment) as qtyshipment, formshipment.statusshipment')
+            ->where('formpo.aktif', 'Y')->where('forwarder.aktif', 'Y')->where('privilege.privilege_aktif', 'Y')
+            ->selectRaw(' formpo.*, po.pono, po.style, po.matcontents, po.colorcode, po.size, po.qtypo, forwarder.qty_allocation, forwarder.statusforwarder')
             ->get();
+
+        // $mydata = formpo::with(['po' => function ($var) use ($request) {
+        //     $var->where('id', $request->id)->select('id', 'pono', 'style', 'matcontents', 'colorcode', 'size', 'qtypo');
+        // }])
+        //     ->with(['privilege' => function ($var2) {
+        //         $var2->where('privilege.privilege_user_nik', Session::get('session')['user_nik']);
+        //     }])
+        //     ->with(['forwarder', 'shipment'])
+        //     ->where('idpo', $request->id)
+        //     ->where('formpo.statusformpo', 'confirm')
+        //     ->get();
 
         // dd($mydata);
         $data = array(
@@ -449,9 +495,8 @@ class home extends Controller
 
     public function saveshipment(Request $request)
     {
-        // dd($request);
         $decode = json_decode($request->dataid);
-        // dd($decode);
+        // dd($decode, $request);
         // DB::beginTransaction();
 
         $file = $request->file('file');
@@ -459,16 +504,10 @@ class home extends Controller
         $fileName = time() . '_' . $originalName;
         Storage::disk('local')->put($fileName, file_get_contents($request->file));
 
-        foreach ($decode as $key => $value) {
+        foreach ($decode as $key => $val) {
             if ($file == '' || $file == null) {
                 // DB::rollback();
                 $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'File BL is required, please input File BL'];
-                return response()->json($status, 200);
-            }
-
-            if ($request->qtyshipment == '' || $request->qtyshipment == null) {
-                // DB::rollback();
-                $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'Quantity Shipment is required, please input Quantity Shipment'];
                 return response()->json($status, 200);
             }
 
@@ -509,13 +548,15 @@ class home extends Controller
                 return response()->json($status, 200);
             }
 
-            $cekpo = po::where('id', $value->idpo)->first();
-            $qtypo = (float) $cekpo->qtypo;
+            $cekpo = po::where('id', $val->idpo)->first();
+            $rep = str_replace('.', '', $cekpo->qtypo);
+            $qtypo = (float)$rep;
 
-            $cekqtyshipment = shipment::where('idformpo', $value->idformpo)->where('aktif', 'Y')->selectRaw(' sum(qty_shipment) as jml ')->first();
-            $jumlahexist = ($cekqtyshipment == null) ? 0 : $cekqtyshipment->jml;
+            $cekqtyshipment = shipment::where('idformpo', $val->idformpo)->where('aktif', 'Y')->selectRaw(' sum(qty_shipment) as jml ')->first();
+            $jumlahexist = ($cekqtyshipment->jml == null) ? 0 : $cekqtyshipment->jml;
 
-            $jumlahall = $request->qtyshipment + $jumlahexist;
+            $jumlahall = $val->value + $jumlahexist;
+            // dd($jumlahall, $qtypo);
 
             if ($jumlahall > $qtypo) {
                 // DB::rollback();
@@ -530,14 +571,14 @@ class home extends Controller
             }
 
             $save1 = shipment::insert([
-                'idformpo'     => $value->idformpo,
-                'qty_shipment' => $request->qtyshipment,
-                'noinv'        => $request->invoice,
+                'idformpo'     => $val->idformpo,
+                'qty_shipment' => $val->value,
+                'noinv'        => strtoupper($request->invoice),
                 'etdfix'       => $request->etdfix,
                 'etafix'       => $request->etafix,
                 'file_bl'      => $fileName,
-                'nomor_bl'     => $request->nomorbl,
-                'vessel'       => $request->vessel,
+                'nomor_bl'     => strtoupper($request->nomorbl),
+                'vessel'       => strtoupper($request->vessel),
                 'statusshipment' => $status,
                 'aktif'        => 'Y',
                 'created_at'   => date('Y-m-d H:i:s'),

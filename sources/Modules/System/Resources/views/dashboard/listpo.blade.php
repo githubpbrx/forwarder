@@ -302,18 +302,17 @@
                     // let forwarderku = data.data.dataforwarder;
                     // console.log('forwarderku :>> ', forwarderku);
                     console.log('poku :>> ', poku);
+
                     length = poku.length;
-                    console.log('length :>> ', length);
                     $('#detailitem').empty();
 
                     html =
-                        '<table border="0" style="width:100%"><tr><th>Material Contents</th><th>Color Code</th><th>Size</th><th>Quantity PO</th><th>Quantity Allocation</th><th>Status</th></tr>';
+                        '<table border="0" style="width:100%"><tr><th>Material</th><th>Color Code</th><th>Size</th><th>Quantity PO</th><th>Status</th></tr>';
                     for (let index = 0; index < poku.length; index++) {
                         html +=
                             '<tr><td>' + poku[index].matcontents + '</td><td>' +
                             poku[index].colorcode + '</td><td>' + poku[index].size + '</td><td>' +
-                            poku[index].qtypo + '</td><td>' + poku[index].qty_allocation +
-                            '</td><td>' + poku[index].statusforwarder +
+                            poku[index].qtypo + '</td><td>' + poku[index].statusforwarder +
                             '</td><td><input type="hidden" id="idall-' + index + '" data-id="' +
                             poku[index].id + '" data-idfwd="' + poku[index].id_forwarder +
                             '" data-idmasterfwd="' + poku[index].idmasterfwd +

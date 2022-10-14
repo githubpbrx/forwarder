@@ -16,9 +16,15 @@
                         <th>
                             <center>No Booking</center>
                         </th>
-                        {{-- <th>
+                        <th>
+                            <center>Quantity PO</center>
+                        </th>
+                        <th>
+                            <center>Remaining Quantity</center>
+                        </th>
+                        <th>
                             <center>Status</center>
-                        </th> --}}
+                        </th>
                         <th>
                             <center>Action</center>
                         </th>
@@ -34,7 +40,7 @@
         <div class="modal-dialog modal-xl">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h4 class="modal-title"><span id="modaltitle">Formulir PO</span></h4>
+                    <h4 class="modal-title"><span id="modaltitle">Allocation Shipment</span></h4>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -115,23 +121,14 @@
                             </div>
                             <div class="col-md-4">
                                 <div class="form-group">
-                                    <label class="col-sm-12 control-label">Quantity Shipment</label>
-                                    <div class="col-sm-12">
-                                        <input type="number" class="form-control" id="qtyshipment" name="qtyshipment"
-                                            autocomplete="off">
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-4">
-                                <div class="form-group">
                                     <label class="col-sm-12 control-label">BL</label>
                                     <div class="col-sm-12">
                                         <input type="file" class="form-control" id="bl" name="bl">
                                     </div>
                                 </div>
                             </div>
+                        </div>
+                        <div class="row">
                             <div class="col-md-4">
                                 <div class="form-group">
                                     <label class="col-sm-12 control-label">Nomor BL</label>
@@ -150,8 +147,6 @@
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="row">
                             <div class="col-md-4">
                                 <div class="form-group">
                                     <label class="col-sm-12 control-label">Invoice</label>
@@ -161,6 +156,8 @@
                                     </div>
                                 </div>
                             </div>
+                        </div>
+                        <div class="row">
                             <div class="col-md-4">
                                 <div class="form-group">
                                     <label class="col-sm-12 control-label">ETD (Estimated Time Departure) Fix</label>
@@ -231,10 +228,18 @@
                         data: 'nobook',
                         name: 'nobook'
                     },
-                    // {
-                    //     data: 'status',
-                    //     name: 'status'
-                    // },
+                    {
+                        data: 'qtypo',
+                        name: 'qtypo'
+                    },
+                    {
+                        data: 'qtyship',
+                        name: 'qtyship'
+                    },
+                    {
+                        data: 'status',
+                        name: 'status'
+                    },
                     {
                         data: 'action',
                         name: 'action',
@@ -272,29 +277,36 @@
                     $('#detailitem').empty();
 
                     html =
-                        '<table border="0" style="width:100%"><tr><th>Material Contents</th><th>Color Code</th><th>Size</th><th>Quantity PO</th><th>Remaining Quantity</th><th>Status</th></tr>';
+                        '<table border="0" style="width:100%"><tr><th style="text-align:center"><input type="checkbox" class="checkall" style="height:18px;width:18px"></th><th>Material</th><th>Style</th><th>Color Code</th><th>Size</th><th>Quantity Item</th><th>Remaining Quantity</th><th>Quantity Allocation</th></tr>';
                     for (let index = 0; index < dataku.length; index++) {
                         let remain;
 
-                        if (dataku[index].qtyshipment == null) {
+                        // let qtypo = dataku[index].qtypo;
+                        // let newqtypo = qtypo.replace(".", "");
+
+                        if (dataku[index].qtyship == null) {
                             remain = dataku[index].qtypo;
-                        } else if (dataku[index].qtyshipment == dataku[index].qtypo) {
+                        } else if (dataku[index].qtyship == dataku[index].qtypo) {
                             remain = '0';
                         } else {
-                            remain = dataku[index].qtypo - dataku[index].qtyshipment
+                            remain = dataku[index].qtypo - dataku[index].qtyship;
                         }
 
-                        html += '<tr><td>' + dataku[index].matcontents + '</td><td>' + dataku[index]
-                            .colorcode + '</td><td>' + dataku[index].size + '</td><td>' +
-                            dataku[index].qtypo + '</td><td>' + remain +
-                            '</td><td>' + dataku[index].statusshipment +
-                            '</td><td><input type="hidden" id="dataid-' + index + '" data-idpo="' +
-                            dataku[index].idpo + '" data-idformpo="' + dataku[index].id_formpo +
-                            '"></td></tr>';
+                        html +=
+                            '<tr><td style="text-align:center"><input type="checkbox" class="check-' +
+                            index + '" style="height:18px;width:18px"></td><td>' +
+                            dataku[index].matcontents + '</td><td>' + dataku[index].style +
+                            '</td><td>' + dataku[index].colorcode + '</td><td>' + dataku[index]
+                            .size +
+                            '</td><td>' + dataku[index].qtypo + '</td><td>' + remain +
+                            '</td><td><input type="number" min="0" id="qty_allocation" name="qty_allocation" class="form-control trigerinput cekinput-' +
+                            index + '" data-idpo="' + dataku[index].idpo + '"  data-idformpo="' +
+                            dataku[index].id_formpo + '" disabled></td></tr>';
                     }
 
                     html += "</table>";
                     $('#detailitem').html(html);
+                    checkqtyall();
 
                     $('#nomorpo').val(dataku[0].pono);
                     $('#nobook').val(dataku[0].kode_booking);
@@ -306,6 +318,34 @@
                 })
             });
 
+            function checkqtyall() {
+
+                $('.checkall').change(function(e) {
+                    if (this.checked) {
+                        $('.trigerinput').prop('disabled', false);
+                        $('input[type="checkbox"]').prop('checked', true);
+                    } else {
+                        $('.trigerinput').val('');
+                        $('.trigerinput').prop('disabled', true);
+                        $('input[type="checkbox"]').prop('checked', false);
+                    }
+                });
+
+                for (let index = 0; index < Number(length); index++) {
+                    $('.check-' + index).change(function(e) {
+                        if (this.checked) {
+                            console.log('objectsijine :>> ', 'isChecked');
+                            $('.cekinput-' + index).prop('disabled', false);
+                            // }
+                        } else {
+                            console.log('objectsijine :>> ', 'notChecked');
+                            $('.cekinput-' + index).val('');
+                            $('.cekinput-' + index).prop('disabled', true);
+                        }
+                    });
+                }
+            }
+
             $('#btnsubmit').click(function(e) {
                 // let idpo = $('#dataid').attr('data-idpo');
                 // let idformpo = $('#dataid').attr('data-idformpo');
@@ -315,22 +355,26 @@
                 let inv = $('#invoice').val();
                 let etdfix = $('#etdfix').val();
                 let etafix = $('#etafix').val();
-                let qtyshipment = $('#qtyshipment').val();
 
                 var arrayku = [];
-                for (let index = 0; index < length; index++) {
-                    let data = {
-                        'idpo': $('#dataid-' + index).attr('data-idpo'),
-                        'idformpo': $('#dataid-' + index).attr('data-idformpo'),
-                    };
-                    arrayku.push(data);
+                for (let index = 0; index < Number(length); index++) {
+                    let val = $('.cekinput-' + index).val();
+
+                    if (val) {
+                        let data = {
+                            'idpo': $('.cekinput-' + index).attr('data-idpo'),
+                            'idformpo': $('.cekinput-' + index).attr('data-idformpo'),
+                            'value': val,
+                        };
+
+                        arrayku.push(data);
+                    }
                 }
 
                 let form_data = new FormData();
                 form_data.append('dataid', JSON.stringify(arrayku));
                 // form_data.append('idpo', idpo);
                 // form_data.append('idformpo', idformpo);
-                form_data.append('qtyshipment', qtyshipment);
                 form_data.append('nomorbl', nomorbl);
                 form_data.append('vessel', vessel);
                 form_data.append('file', file);
@@ -338,9 +382,11 @@
                 form_data.append('etdfix', etdfix);
                 form_data.append('etafix', etafix);
 
-                console.log('form :>> ', form_data);
+                console.log('form :>> ', arrayku);
 
-                if (file == null || file == '') {
+                if (arrayku == null || arrayku == '') {
+                    notifalert('Quantity Allocation');
+                } else if (file == null || file == '') {
                     notifalert('File BL');
                 } else if (nomorbl == null || nomorbl == '') {
                     notifalert('Nomor BL');
@@ -352,8 +398,6 @@
                     notifalert('ETD Fix');
                 } else if (etafix == null || etafix == '') {
                     notifalert('ETA Fix');
-                } else if (qtyshipment == null || qtyshipment == '') {
-                    notifalert('Quantity Shipment');
                 } else {
                     $.ajax({
                         type: "post",
