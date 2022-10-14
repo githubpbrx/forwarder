@@ -55,8 +55,8 @@ class DataShipment extends Controller
                 ->join('formshipment', 'formshipment.idformpo', 'formpo.id_formpo')
                 ->where('privilege.privilege_user_nik', Session::get('session')['user_nik'])
                 ->where('formpo.statusformpo', '=', 'confirm')
+                ->where('privilege.privilege_aktif', 'Y')->where('formshipment.aktif', 'Y')->where('formpo.aktif', 'Y')
                 // ->where('formpo.statusupdateshipment', 'has updated')
-                ->where('formpo.aktif', 'Y')
                 ->get();
             // dd($data);
             return DataTables::of($data)
