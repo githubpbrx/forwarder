@@ -71,7 +71,7 @@ class DataShipment extends Controller
                     $idku = $data->pono;
                     $button = '';
 
-                    $button = '<a href="#" data-id="' . $data->id_shipment . '" id="detailbtn"><i data-tooltip="tooltip" title="Detail Allocation" class="fa fa-edit fa-lg"></i></a>';
+                    $button = '<a href="#" data-id="' . $data->id_shipment . '" id="detailbtn"><i data-tooltip="tooltip" title="Edit Shipment" class="fa fa-edit fa-lg"></i></a>';
 
                     // $button = '<a href="' . route('detail_allocation', ['id' => $idku]) . '" id="detailbtn"><i data-tooltip="tooltip" title="Detail Allocation" class="fa fa-info-circle fa-lg"></i></a>';
                     return $button;
@@ -133,16 +133,20 @@ class DataShipment extends Controller
         $qtypo = (float)$cekpo->qtypo;
 
         $cekqtyshipment = modelformshipment::where('idformpo', $request->idformpo)->where('aktif', 'Y')->selectRaw(' sum(qty_shipment) as jml ')->first();
-        $jumlahexist = ($cekqtyshipment == null) ? 0 : $cekqtyshipment->jml;
+        $jumlahexist = ($cekqtyshipment->jml == null) ? 0 : $cekqtyshipment->jml;
 
         $jumlahall = $request->qtyshipment + $jumlahexist;
 
-        if ($jumlahall > $qtypo) {
+        $cekdata = modelformshipment::where('id_shipment', $request->idshipment)->where('aktif', 'Y')->select('qty_shipment')->first();
+        $jumlahfix = $jumlahall - $cekdata->qty_shipment;
+        // dd($qtypo, $jumlahall, $jumlahfix);
+
+        if ($jumlahfix > $qtypo) {
             $status = ['title' => 'Error!', 'status' => 'error', 'message' => 'Data Quantity Allocation Over Quantity PO'];
             return response()->json($status, 200);
         }
 
-        if ($jumlahall == $qtypo) {
+        if ($jumlahfix == $qtypo) {
             $status = 'full_allocated';
         } else {
             $status = 'partial_allocated';
