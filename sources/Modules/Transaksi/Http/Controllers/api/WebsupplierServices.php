@@ -209,7 +209,7 @@ class WebsupplierServices extends Controller
             }
 
             $getqtypo = po::where('pono', $pono)->where('matcontents', $matcontents)->where('colorcode', $colorcode)->where('size', $size)->first();
-            $insertdatafwd = fwd::insert(['idpo' => $getqtypo->id, 'idmasterfwd' => $insert, 'po_nomor' => $getqtypo->pono, 'qty_allocation' => $getqtypo->qtypo, 'statusforwarder' => 'full_alocated', 'aktif' => 'Y', 'created_at' => date('Y-m-d H:i:s')]);
+            $insertdatafwd = fwd::insert(['idpo' => $getqtypo->id, 'idmasterfwd' => $insert, 'po_nomor' => $getqtypo->pono, 'qty_allocation' => $getqtypo->qtypo, 'statusforwarder' => 'full_allocated', 'aktif' => 'Y', 'created_at' => date('Y-m-d H:i:s')]);
 
             // dd($getqtypo);
             modellogproses::insert(['typelog' => 'prosesupdatepi', 'activity' => '=== SUCCESS UPDATE PI NUMBER ===', 'status' => true, 'datetime' => date('Y-m-d H:i:s'), 'from' => 'api_updatepi', 'created_at' => date('Y-m-d H:i:s')]);
