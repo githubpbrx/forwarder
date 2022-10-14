@@ -215,7 +215,7 @@ class home extends Controller
             $var->select(DB::raw('sum(qty_shipment)'))->groupby('idformpo');
         }])
             ->with(['shipment' => function ($stat) {
-                $stat->latest()->first();
+                $stat->where('statusshipment', 'full_allocated');
             }])
             ->join('privilege', 'privilege.idforwarder', 'formpo.idmasterfwd')
             ->join('po', 'po.id', 'formpo.idpo')
