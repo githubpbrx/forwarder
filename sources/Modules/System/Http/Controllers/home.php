@@ -50,8 +50,9 @@ class home extends Controller
         $totalreject = formpo::join('privilege', 'privilege.idforwarder', 'formpo.idmasterfwd')
             ->join('po', 'po.id', 'formpo.idpo')
             ->where('privilege.privilege_user_nik', Session::get('session')['user_nik'])
+            ->where('privilege.privilege_aktif', 'Y')
             ->where('formpo.statusformpo', '=', 'reject')
-            ->where('aktif', 'Y')
+            ->where('formpo.aktif', 'Y')
             ->selectRaw(' po.pono, formpo.kode_booking, formpo.date_booking, formpo.etd, formpo.eta, formpo.shipmode, formpo.subshipmode, formpo.ket_tolak ')
             ->groupby('po.pono')
             ->get();
@@ -59,8 +60,9 @@ class home extends Controller
         $datareject = formpo::join('privilege', 'privilege.idforwarder', 'formpo.idmasterfwd')
             ->join('po', 'po.id', 'formpo.idpo')
             ->where('privilege.privilege_user_nik', Session::get('session')['user_nik'])
+            ->where('privilege.privilege_aktif', 'Y')
             ->where('formpo.statusformpo', '=', 'reject')
-            ->where('aktif', 'Y')
+            ->where('formpo.aktif', 'Y')
             ->selectRaw(' po.pono, po.matcontents, po.itemdesc, formpo.kode_booking, formpo.date_booking, formpo.etd, formpo.eta, formpo.shipmode, formpo.subshipmode, formpo.ket_tolak ')
             ->get();
         // dd($datareject);
