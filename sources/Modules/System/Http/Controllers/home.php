@@ -78,6 +78,7 @@ class home extends Controller
             ->where('nikfinance', Session::get('session')['user_nik'])
             ->where('kyc.aktif', 'Y')
             ->where('kyc.status', 'waiting')
+            ->where('privilege.privilege_aktif', 'Y')
             ->get();
         // dd($userkyc);
         // End For Forwarder
@@ -281,7 +282,12 @@ class home extends Controller
     public function listkyc()
     {
         // $query = coc::where('status', '=', 'waiting')->where('aktif', 'Y')->get();
-        $query = privilege::join('kyc', 'kyc.idmasterfwd', 'privilege.idforwarder')->where('nikfinance', Session::get('session')['user_nik'])->where('kyc.aktif', 'Y')->where('kyc.status', 'waiting')->get();
+        $query = privilege::join('kyc', 'kyc.idmasterfwd', 'privilege.idforwarder')
+            ->where('nikfinance', Session::get('session')['user_nik'])
+            ->where('kyc.aktif', 'Y')
+            ->where('kyc.status', 'waiting')
+            ->where('privilege.privilege_aktif', 'Y')
+            ->get();
         // dd($query);
         return Datatables::of($query)
             ->addIndexColumn()
