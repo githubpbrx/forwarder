@@ -25,14 +25,14 @@
                             </p>
                         </div>
                     @endif
-                    @if ($totalconfirm >= 1)
+                    @if ($totalconfirm == 0)
                         <div class="alert alert-danger" style="background-color: rgb(253, 181, 181)">
                             {{-- <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button> --}}
                             <h5><i class="icon fas fa-info"></i> Notification</h5>
                             <p style="color:black">You got a new Update Shipment
-                                <span class="badge badge-info">{{ $totalconfirm }}</span>
+                                {{-- <span class="badge badge-info">{{ $totalconfirm }}</span> --}}
                                 <br>
-                                <a href="{{ route('page_update') }}"><button type="button"
+                                <a href="{{ route('process_shipment') }}"><button type="button"
                                         class="btn btn-primary btn-xs">Process</button></a>
                             </p>
                         </div>
