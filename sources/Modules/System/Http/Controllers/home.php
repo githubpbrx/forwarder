@@ -67,7 +67,15 @@ class home extends Controller
             ->get();
         // dd($datareject);
 
-        $dataconfirm = formpo::join('formshipment', 'formshipment.idformpo', 'formpo.id_formpo')
+        $dataconfirm = formpo::join('privilege', 'privilege.idforwarder', 'formpo.idmasterfwd')
+            ->join('po', 'po.id', 'formpo.idpo')
+            ->where('privilege.privilege_user_nik', Session::get('session')['user_nik'])
+            ->where('formpo.statusformpo', '=', 'confirm')
+            ->where('formpo.aktif', 'Y')->where('privilege.privilege_aktif', 'Y')
+            ->groupby('po.pono')
+            ->get();
+
+        $cekshipment = formpo::join('formshipment', 'formshipment.idformpo', 'formpo.id_formpo')
             ->join('privilege', 'privilege.idforwarder', 'formpo.idmasterfwd')
             ->join('po', 'po.id', 'formpo.idpo')
             ->where('privilege.privilege_user_nik', Session::get('session')['user_nik'])
@@ -75,7 +83,7 @@ class home extends Controller
             ->where('formpo.aktif', 'Y')->where('privilege.privilege_aktif', 'Y')->where('formshipment.aktif', 'Y')
             ->groupby('po.pono')
             ->get();
-        // dd($dataconfirm);
+        // dd($dataconfirm, $cekshipment);
 
         $userkyc = privilege::join('kyc', 'kyc.idmasterfwd', 'privilege.idforwarder')
             ->where('nikfinance', Session::get('session')['user_nik'])
@@ -101,6 +109,7 @@ class home extends Controller
             'box'           => '',
             'totalpo'       => count($datapo),
             'totalconfirm'  => count($dataconfirm),
+            'totalshipment'  => count($cekshipment),
             'totalreject'   => count($totalreject),
             'datareject'    => $datareject,
             'totalapproval' => count($dataapproval),
