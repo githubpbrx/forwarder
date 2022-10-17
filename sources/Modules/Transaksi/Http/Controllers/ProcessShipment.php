@@ -60,7 +60,7 @@ class ProcessShipment extends Controller
             ->where('formpo.statusformpo', '=', 'confirm')
             ->where('formpo.aktif', 'Y')->where('privilege.privilege_aktif', 'Y')
             ->groupby('po.pono')
-            ->selectRaw(' formpo.*, po.id, po.pono, po.matcontents, po.colorcode, po.size, po.qtypo')
+            ->selectRaw(' formpo.*, po.id, po.pono, po.matcontents, po.colorcode, po.size, sum(po.qtypo) as qtypoall, po.qtypo')
             ->get();
         // dd($query);
         return Datatables::of($query)
@@ -72,20 +72,7 @@ class ProcessShipment extends Controller
                 return  $query->kode_booking;
             })
             ->addColumn('qtypo', function ($query) {
-                return  $query->qtypo;
-            })
-            ->addColumn('qtyship', function ($query) {
-                $rep = str_replace('.', '', $query->qtypo);
-                $qtypo = (float)$rep;
-
-                if ($query->qtyship == null) {
-                    $remain = $query->qtypo;
-                } else if ($query->qtyship == $qtypo) {
-                    $remain = '0';
-                } else {
-                    $remain = $qtypo - $query->qtyship;
-                }
-                return  $remain;
+                return  $query->qtypoall;
             })
             ->addColumn('status', function ($query) {
                 if ($query->shipment == null) {
@@ -103,10 +90,10 @@ class ProcessShipment extends Controller
             ->addColumn('action', function ($query) {
                 $process    = '';
                 if ($query->shipment == null) {
-                    $process    = '<a href="#" data-id="' . $query->id . '" id="updateship"><i class="fa fa-angle-double-right text-green"></i></a>';
+                    $process    = '<a href="#" data-id="' . $query->pono . '" id="updateship"><i class="fa fa-angle-double-right text-green"></i></a>';
                 } else {
                     if ($query->shipment->statusshipment == 'partial_allocated') {
-                        $process    = '<a href="#" data-id="' . $query->id . '" id="updateship"><i class="fa fa-angle-double-right text-green"></i></a>';
+                        $process    = '<a href="#" data-id="' . $query->pono . '" id="updateship"><i class="fa fa-angle-double-right text-green"></i></a>';
                     } else {
                         $process = '';
                     }
@@ -133,7 +120,7 @@ class ProcessShipment extends Controller
             ->join('po', 'po.id', 'formpo.idpo')
             ->join('forwarder', 'forwarder.id_forwarder', 'formpo.idforwarder')
             ->join('privilege', 'privilege.idforwarder', 'forwarder.idmasterfwd')
-            ->where('po.id', $request->id)
+            ->where('po.pono', $request->id)
             ->where('privilege.privilege_user_nik', Session::get('session')['user_nik'])
             ->where('formpo.statusformpo', 'confirm')
             ->where('formpo.aktif', 'Y')->where('forwarder.aktif', 'Y')->where('privilege.privilege_aktif', 'Y')
@@ -214,12 +201,12 @@ class ProcessShipment extends Controller
                 return response()->json($status, 200);
             }
 
-            $cekdata = modelformshipment::where('noinv', $request->invoice)->where('aktif', 'Y')->first();
-            if ($cekdata != null) {
-                // DB::rollback();
-                $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'Invoice Already Exist'];
-                return response()->json($status, 200);
-            }
+            // $cekdata = modelformshipment::where('noinv', $request->invoice)->where('aktif', 'Y')->first();
+            // if ($cekdata != null) {
+            //     // DB::rollback();
+            //     $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'Invoice Already Exist'];
+            //     return response()->json($status, 200);
+            // }
 
             $cekpo = modelpo::where('id', $val->idpo)->first();
             $rep = str_replace('.', '', $cekpo->qtypo);

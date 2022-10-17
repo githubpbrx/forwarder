@@ -20,9 +20,6 @@
                             <center>Quantity PO</center>
                         </th>
                         <th>
-                            <center>Remaining Quantity</center>
-                        </th>
-                        <th>
                             <center>Status</center>
                         </th>
                         <th>
@@ -230,10 +227,6 @@
                     {
                         data: 'qtypo',
                         name: 'qtypo'
-                    },
-                    {
-                        data: 'qtyship',
-                        name: 'qtyship'
                     },
                     {
                         data: 'status',
