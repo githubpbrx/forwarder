@@ -51,7 +51,8 @@ class DataShipment extends Controller
         header("Access-Control-Allow-Headers: *");
 
         if ($request->ajax()) {
-            $data = modelformpo::join('privilege', 'privilege.idforwarder', 'formpo.idmasterfwd')
+            $data = modelformpo::join('po', 'po.id', 'formpo.idpo')
+                ->join('privilege', 'privilege.idforwarder', 'formpo.idmasterfwd')
                 ->join('formshipment', 'formshipment.idformpo', 'formpo.id_formpo')
                 ->where('privilege.privilege_user_nik', Session::get('session')['user_nik'])
                 ->where('formpo.statusformpo', '=', 'confirm')
@@ -66,6 +67,9 @@ class DataShipment extends Controller
                 })
                 ->addColumn('inv', function ($data) {
                     return $data->noinv;
+                })
+                ->addColumn('material', function ($data) {
+                    return $data->matcontents;
                 })
                 ->addColumn('action', function ($data) {
                     $idku = $data->pono;

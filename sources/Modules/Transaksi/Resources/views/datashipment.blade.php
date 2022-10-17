@@ -19,6 +19,9 @@
                                     <center>Invoice</center>
                                 </th>
                                 <th>
+                                    <center>Material</center>
+                                </th>
+                                <th>
                                     <center>Action</center>
                                 </th>
                             </tr>
@@ -173,6 +176,10 @@
                     {
                         data: 'inv',
                         name: 'inv'
+                    },
+                    {
+                        data: 'material',
+                        name: 'material'
                     },
                     {
                         data: 'action',
