@@ -45,4 +45,11 @@ Route::prefix('transaksi')->group(function () {
         // Route::post('statusapproval/{approval}', 'DataShipment@statusapproval')->name('approvalstatus');
         // Route::get('listapproval', 'DataShipment@listapproval')->name('list_approval');
     });
+
+    Route::group(['prefix' => 'shipmentprocess'], function () {
+        Route::get('/', 'ProcessShipment@index')->name('process_shipment');
+        Route::get('/listshipmentprocess', 'ProcessShipment@listshipmentprocess')->name('list_shipmentprocess');
+        Route::post('/formshipmentprocess', 'ProcessShipment@formshipment')->name('form_shipmentprocess');
+        Route::post('/saveshipmentprocess', 'ProcessShipment@saveshipment')->name('saveshipmentprocess');
+    });
 });

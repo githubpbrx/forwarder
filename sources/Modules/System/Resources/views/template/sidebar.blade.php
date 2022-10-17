@@ -139,6 +139,16 @@
                     </li>
                 @endif
 
+                {{-- start for forwarder --}}
+                @if (RoleAccess::whereMenu(13) > 0)
+                    <li class="nav-item">
+                        <a href="{{ route('process_shipment') }}" class="nav-link">
+                            <i class="fa fa-share nav-icon"></i>
+                            <p>Process Shipment</p>
+                        </a>
+                    </li>
+                @endif
+
                 @if (RoleAccess::whereMenu(12) > 0)
                     <li class="nav-item">
                         <a href="{{ route('datashipment') }}" class="nav-link">
@@ -156,6 +166,8 @@
                         </a>
                     </li>
                 @endif
+                {{-- end for forwarder --}}
+
 
                 @if ($menu_session != '')
                     @include($menu_session . '::template/' . $menu_session . '_sidebar')

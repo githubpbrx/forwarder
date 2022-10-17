@@ -9,4 +9,9 @@ class modelformpo extends Model
     protected $table = 'formpo';
     protected $primaryKey = 'id_formpo';
     protected $guarded = [];
+
+    public function shipment()
+    {
+        return $this->hasOne('Modules\Transaksi\Models\modelformshipment', 'idformpo', 'id_formpo')->where('aktif', 'Y');
+    }
 }
