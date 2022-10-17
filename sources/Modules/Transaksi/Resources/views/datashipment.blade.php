@@ -42,7 +42,7 @@
                 <div class="modal-body" style="font-size: 10pt;">
                     <form action="#" class="form-horizontal">
                         {{ csrf_field() }}
-                        {{-- <hr
+                        <hr
                             style="width: 100%; color: rgb(192, 192, 192); height: 0.5px; background-color:rgb(192, 192, 192);" />
                         <div class="row">
                             <div class="col-md-12">
@@ -50,13 +50,14 @@
                             </div>
                         </div>
                         <hr
-                            style="width: 100%; color: rgb(192, 192, 192); height: 0.5px; background-color:rgb(192, 192, 192);" /> --}}
+                            style="width: 100%; color: rgb(192, 192, 192); height: 0.5px; background-color:rgb(192, 192, 192);" />
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label class="col-sm-12 control-label">Invoice</label>
                                     <div class="col-sm-12">
-                                        <input type="text" class="form-control" id="invoice" name="invoice">
+                                        <input type="text" class="form-control" id="invoice" name="invoice"
+                                            autocomplete="off">
                                     </div>
                                 </div>
                             </div>
@@ -64,7 +65,8 @@
                                 <div class="form-group">
                                     <label class="col-sm-12 control-label">Quantity Shipment</label>
                                     <div class="col-sm-12">
-                                        <input type="text" class="form-control" id="qtyshipment" name="qtyshipment">
+                                        <input type="text" class="form-control" id="qtyshipment" name="qtyshipment"
+                                            autocomplete="off">
                                     </div>
                                 </div>
                             </div>
@@ -74,7 +76,8 @@
                                 <div class="form-group">
                                     <label class="col-sm-12 control-label">ETD (Estimated Time Departure) Fix</label>
                                     <div class="col-sm-12">
-                                        <input type="text" class="form-control" id="etd" name="etd">
+                                        <input type="text" class="form-control" id="etd" name="etd"
+                                            autocomplete="off">
                                     </div>
                                 </div>
                             </div>
@@ -82,7 +85,8 @@
                                 <div class="form-group">
                                     <label class="col-sm-12 control-label">ETA (Estimated Time Arrival) Fix</label>
                                     <div class="col-sm-12">
-                                        <input type="text" class="form-control" id="eta" name="eta">
+                                        <input type="text" class="form-control" id="eta" name="eta"
+                                            autocomplete="off">
                                     </div>
                                 </div>
                             </div>
@@ -92,7 +96,8 @@
                                 <div class="form-group">
                                     <label class="col-sm-12 control-label">Nomor BL</label>
                                     <div class="col-sm-12">
-                                        <input type="text" class="form-control" id="nobl" name="nobl">
+                                        <input type="text" class="form-control" id="nobl" name="nobl"
+                                            autocomplete="off">
                                     </div>
                                 </div>
                             </div>
@@ -100,7 +105,8 @@
                                 <div class="form-group">
                                     <label class="col-sm-12 control-label">Vessel</label>
                                     <div class="col-sm-12">
-                                        <input type="text" class="form-control" id="vessel" name="vessel">
+                                        <input type="text" class="form-control" id="vessel" name="vessel"
+                                            autocomplete="off">
                                     </div>
                                 </div>
                             </div>
@@ -199,31 +205,40 @@
                     },
                 }).done(function(data) {
                     console.log('datakuh :>> ', data);
-
-                    let mydata = data.shipment;
-                    idshipment = mydata.id_shipment;
-                    idformpo = mydata.idformpo;
+                    let mydata = data.data.shipment;
+                    let myremain = data.data.remaining[0];
+                    console.log('mydata :>> ', mydata);
+                    console.log('myremain :>> ', myremain);
+                    // idshipment = mydata.id_shipment;
+                    // idformpo = mydata.idformpo;
                     // length = mydata.length;
-                    // $('#detailitem').empty();
+                    $('#detailitem').empty();
 
-                    // html =
-                    //     '<table border="0" style="width:100%"><tr><th>Material</th><th>Qty Item</th><th>Qty Allocation</th><th>Status Allocation</th></tr>';
+                    html =
+                        '<table border="0" style="width:100%"><tr><th>Material</th><th>Style</th><th>Color Code</th><th>Size</th><th>Quantity Item</th><th>Remaining Quantity</th><th>Quantity Allocation</th></tr>';
                     // for (let index = 0; index < mydata.length; index++) {
+                    let remain;
+                    if (myremain.qtyshipment == null) {
+                        remain = mydata.qtypo;
+                    } else if (myremain.qtyshipment == mydata.qtypo) {
+                        remain = '0';
+                    } else {
+                        remain = mydata.qtypo - myremain.qtyshipment;
+                    }
 
-                    //     html +=
-                    //         '<tr><td>' +
-                    //         mydata[index].matcontents + '</td><td>' +
-                    //         mydata[index].qtypo + '</td><td>' + mydata[index].qty_allocation +
-                    //         '</td><td>' + mydata[index].statusforwarder +
-                    //         '</td><td><input type="hidden" id="dataid-' + index + '" data-idpo="' +
-                    //         mydata[index].id + '" data-idfwd="' + mydata[index].id_forwarder +
-                    //         '" data-idformpo="' +
-                    //         mydata[index].id_formpo +
-                    //         '"></td></tr>';
+                    html +=
+                        '<tr><td>' + mydata.matcontents + '</td><td>' + mydata.style + '</td><td>' +
+                        mydata.colorcode + '</td><td>' +
+                        mydata.size + '</td><td>' + mydata.qtypo +
+                        '</td><td>' + remain +
+                        '</td><td>' + mydata.qty_shipment +
+                        '</td><td><input type="hidden" data-idpo="' +
+                        mydata.id + '" data-idfwd="' + mydata.id_forwarder +
+                        '" data-idformpo="' + mydata.id_formpo + '"></td></tr>';
                     // }
 
-                    // html += "</table>";
-                    // $('#detailitem').html(html);
+                    html += "</table>";
+                    $('#detailitem').html(html);
 
                     // idpo = mydata[].id;
                     // idformpo = databook.id_formpo;

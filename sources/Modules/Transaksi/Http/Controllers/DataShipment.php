@@ -94,9 +94,24 @@ class DataShipment extends Controller
         header("Access-Control-Allow-Origin: *");
         header("Access-Control-Allow-Headers: *");
 
-        $getshipment = modelformshipment::where('id_shipment', $request->id)->where('aktif', 'Y')->first();
+        $getshipment = modelformshipment::join('formpo', 'formpo.id_formpo', 'formshipment.idformpo')
+            ->join('po', 'po.id', 'formpo.idpo')
+            ->where('id_shipment', $request->id)
+            ->where('formpo.aktif', 'Y')->where('formshipment.aktif', 'Y')
+            ->first();
 
-        return response()->json(['status' => 200, 'shipment' => $getshipment, 'message' => 'Berhasil']);
+        $getremain = modelformshipment::where('idformpo', $getshipment->idformpo)
+            ->selectRaw('sum(qty_shipment) as qtyshipment')
+            ->groupby('idformpo')
+            ->get();
+        // dd($getremain);
+
+        $data = [
+            'shipment' => $getshipment,
+            'remaining' => $getremain
+        ];
+
+        return response()->json(['status' => 200, 'data' => $data, 'message' => 'Berhasil']);
     }
 
     /**
