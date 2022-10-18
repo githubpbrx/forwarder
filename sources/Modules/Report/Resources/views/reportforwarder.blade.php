@@ -11,31 +11,31 @@
                 <div class="row">
                     <div class="col-md-12">
                         <div id="fullscreen-container" class="card-body" style="overflow-y: auto;">
-                            <div class="d-flex">
-                                <div class="p-2">
-                                    {{-- <div class="col-md-3"> --}}
+                            <div class="row">
+                                {{-- <div class="p-2"> --}}
+                                <div class="col-md-3">
                                     <label class="control-label">Choose PO :</label>
-                                    {{-- <div class="col-sm-12"> --}}
-                                    <select class="select2" style="width: 100%;" name="datapo" id="datapo">
-                                        <option value=""></option>
-                                    </select>
-                                    {{-- </div> --}}
-                                    {{-- </div> --}}
+                                    <div class="col-sm-12">
+                                        <select class="select2" style="width: 100%;" name="datapo" id="datapo">
+                                            <option value=""></option>
+                                        </select>
+                                    </div>
                                 </div>
-                                <div class="p-2">
-                                    {{-- <div class="col-md-1"> --}}
+                                {{-- </div> --}}
+                                {{-- <div class="p-2"> --}}
+                                <div class="col-md-1">
                                     <label class="control-label"> &nbsp; </label>
-                                    {{-- <div class="col-sm-12"> --}}
-                                    <a href="#" type="button" id="search" class="btn btn-info form-control"
-                                        data-value="klik">Search</a>
-                                    {{-- </div> --}}
-                                    {{-- </div> --}}
+                                    <div class="col-sm-12">
+                                        <a href="#" type="button" id="search" class="btn btn-info form-control"
+                                            data-value="klik">Search</a>
+                                    </div>
                                 </div>
-                                <div class="ml-auto p-2">
+                                {{-- </div> --}}
+                                {{-- <div class="ml-auto p-2">
                                     <label class="control-label"> &nbsp; </label>
                                     <a href="{{ url('report/forwarder/getexcelforwarderall') }}" type="button"
                                         class="btn btn-warning form-control">Download Data Excel</a>
-                                </div>
+                                </div> --}}
                             </div>
                             <br>
                             <div class="table-responsive">
@@ -85,102 +85,7 @@
                     </button>
                 </div>
                 <div class="modal-body" style="font-size: 10pt;">
-                    <form action="#" class="form-horizontal">
-                        {{ csrf_field() }}
-                        <div class="row">
-                            <div class="col-md-4">
-                                <div class="form-group">
-                                    <label class="col-sm-12 control-label">PO</label>
-                                    <div class="col-sm-12">
-                                        <input type="text" class="form-control" id="nomorpo" name="nomorpo" readonly>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="form-group">
-                                    <label class="col-sm-12 control-label">Supplier</label>
-                                    <div class="col-sm-12">
-                                        <input type="text" class="form-control" id="supplier" name="supplier" readonly>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="form-group">
-                                    <label class="col-sm-12 control-label">Code Booking</label>
-                                    <div class="col-sm-12">
-                                        <input type="text" class="form-control" id="kodebook" name="kodebook"
-                                            autocomplete="off" readonly>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-4">
-                                <div class="form-group">
-                                    <label class="col-sm-12 control-label">Invoice</label>
-                                    <div class="col-sm-12">
-                                        <input type="text" class="form-control" id="invoice" name="invoice"
-                                            autocomplete="off" readonly>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="form-group">
-                                    <label class="col-sm-12 control-label">ETD</label>
-                                    <div class="col-sm-12">
-                                        <input type="text" class="form-control" id="etd" name="etd"
-                                            autocomplete="off" readonly>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="form-group">
-                                    <label class="col-sm-12 control-label">ETA</label>
-                                    <div class="col-sm-12">
-                                        <input type="text" class="form-control" id="eta" name="eta"
-                                            autocomplete="off" readonly>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-4">
-                                <div class="form-group">
-                                    <label class="col-sm-12 control-label">No BL</label>
-                                    <div class="col-sm-12">
-                                        <input type="text" class="form-control" id="nobl" name="nobl"
-                                            autocomplete="off" readonly>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="form-group">
-                                    <label class="col-sm-12 control-label">Vessel</label>
-                                    <div class="col-sm-12">
-                                        <input type="text" class="form-control" id="vessel" name="vessel"
-                                            autocomplete="off" readonly>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="form-group">
-                                    <label class="col-sm-12 control-label">Ship Mode</label>
-                                    <div class="col-sm-12">
-                                        <div class="row">
-                                            <div class="col-sm-6">
-                                                <input type="text" class="form-control" id="shipmode"
-                                                    name="shipmode" autocomplete="off" readonly>
-                                            </div>
-                                            <div class="col-sm-6">
-                                                <input type="text" class="form-control" id="subshipmode"
-                                                    name="subshipmode" autocomplete="off" readonly>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </form>
+                    <div id="modalreportfwd"></div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Cancel</button>
@@ -300,32 +205,32 @@
                 $.ajax({
                     url: "{!! route('report_detailforwarder') !!}",
                     type: 'POST',
-                    dataType: 'json',
+                    // dataType: 'json',
                     data: {
                         _token: $('meta[name=csrf-token]').attr('content'),
                         id: idku,
                     },
                 }).done(function(data) {
-                    console.log('data :>> ', data.data);
-
+                    console.log('data :>> ', data);
+                    $('#modalreportfwd').html(data);
                     // let dataformpo = data.data.dataformpo;
                     // let datapo = data.data.datapo;
                     // let dataforwarder = data.data.dataforwarder;
-                    let mydata = data.data.alldata;
+                    // let mydata = data.data.alldata;
 
-                    $('#nomorpo').val(mydata.pono);
-                    $('#supplier').val(mydata.nama);
+                    // $('#nomorpo').val(mydata.pono);
+                    // $('#supplier').val(mydata.nama);
                     // $('#material').val(mydata.matcontents);
                     // $('#qtypo').val(mydata.qtypo);
                     // $('#qtyall').val(mydata.qty_allocation);
-                    $('#kodebook').val(mydata.kode_booking);
-                    $('#invoice').val(mydata.noinv);
-                    $('#etd').val(mydata.etdfix);
-                    $('#eta').val(mydata.etafix);
-                    $('#nobl').val(mydata.nomor_bl);
-                    $('#vessel').val(mydata.vessel);
-                    $('#shipmode').val(mydata.shipmode);
-                    $('#subshipmode').val(mydata.subshipmode);
+                    // $('#kodebook').val(mydata.kode_booking);
+                    // $('#invoice').val(mydata.noinv);
+                    // $('#etd').val(mydata.etdfix);
+                    // $('#eta').val(mydata.etafix);
+                    // $('#nobl').val(mydata.nomor_bl);
+                    // $('#vessel').val(mydata.vessel);
+                    // $('#shipmode').val(mydata.shipmode);
+                    // $('#subshipmode').val(mydata.subshipmode);
                 })
             });
         });
