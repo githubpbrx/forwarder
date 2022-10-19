@@ -74,19 +74,19 @@ class ProcessShipment extends Controller
             ->addColumn('qtypo', function ($query) {
                 return  $query->qtypoall;
             })
-            ->addColumn('status', function ($query) {
-                if ($query->shipment == null) {
-                    $status = 'No Status';
-                } else {
-                    if ($query->shipment->statusshipment == 'full_allocated') {
-                        $status = 'Full Allocated';
-                    } else {
-                        $status = 'Partial Allocated';
-                    }
-                }
+            // ->addColumn('status', function ($query) {
+            //     if ($query->shipment == null) {
+            //         $status = 'No Status';
+            //     } else {
+            //         if ($query->shipment->statusshipment == 'full_allocated') {
+            //             $status = 'Full Allocated';
+            //         } else {
+            //             $status = 'Partial Allocated';
+            //         }
+            //     }
 
-                return  $status;
-            })
+            //     return  $status;
+            // })
             ->addColumn('action', function ($query) {
                 $process    = '';
                 if ($query->shipment == null) {

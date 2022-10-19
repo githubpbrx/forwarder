@@ -19,9 +19,9 @@
                         <th>
                             <center>Quantity PO</center>
                         </th>
-                        <th>
+                        {{-- <th>
                             <center>Status</center>
-                        </th>
+                        </th> --}}
                         <th>
                             <center>Action</center>
                         </th>
@@ -228,10 +228,10 @@
                         data: 'qtypo',
                         name: 'qtypo'
                     },
-                    {
-                        data: 'status',
-                        name: 'status'
-                    },
+                    // {
+                    //     data: 'status',
+                    //     name: 'status'
+                    // },
                     {
                         data: 'action',
                         name: 'action',
