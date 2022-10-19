@@ -216,8 +216,8 @@
                     let myremain = data.data.remaining[0];
                     console.log('mydata :>> ', mydata);
                     console.log('myremain :>> ', myremain);
-                    // idshipment = mydata.id_shipment;
-                    // idformpo = mydata.idformpo;
+                    idshipment = mydata.id_shipment;
+                    idformpo = mydata.idformpo;
                     // length = mydata.length;
                     $('#detailitem').empty();
 

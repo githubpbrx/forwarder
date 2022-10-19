@@ -140,12 +140,12 @@ class DataShipment extends Controller
             $fileName = $namefile->file_bl;
         }
 
-        $cekshipment = modelformshipment::where('id_shipment', '!=', $request->idshipment)->where('noinv', $request->inv)->where('aktif', 'Y')->first();
-        if ($cekshipment != null) {
-            // DB::rollback();
-            $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'Invoice is Already Exist'];
-            return response()->json($status, 200);
-        }
+        // $cekshipment = modelformshipment::where('id_shipment', '!=', $request->idshipment)->where('noinv', $request->inv)->where('aktif', 'Y')->first();
+        // if ($cekshipment != null) {
+        //     // DB::rollback();
+        //     $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'Invoice is Already Exist'];
+        //     return response()->json($status, 200);
+        // }
 
         $cekformpo = modelformpo::where('id_formpo', $request->idformpo)->where('aktif', 'Y')->first();
         $cekpo = modelpo::where('id', $cekformpo->idpo)->first();
