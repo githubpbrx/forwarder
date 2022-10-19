@@ -48,13 +48,7 @@ class ProcessShipment extends Controller
     public function listshipmentprocess()
     {
         // $query = formpo::where('status', 'confirm')->where('file_bl', '=', null)->where('nomor_bl', '=', null)->where('vessel', '=', null)->where('aktif', 'Y')->get();
-        $query = modelformpo::withCount(['shipment as qtyship' => function ($var) {
-            $var->select(DB::raw('sum(qty_shipment)'))->groupby('idformpo');
-        }])
-            ->with(['shipment' => function ($stat) {
-                $stat->where('statusshipment', 'full_allocated');
-            }])
-            ->join('privilege', 'privilege.idforwarder', 'formpo.idmasterfwd')
+        $query = modelformpo::join('privilege', 'privilege.idforwarder', 'formpo.idmasterfwd')
             ->join('po', 'po.id', 'formpo.idpo')
             ->where('privilege.privilege_user_nik', Session::get('session')['user_nik'])
             ->where('formpo.statusformpo', '=', 'confirm')
@@ -71,7 +65,7 @@ class ProcessShipment extends Controller
             ->selectRaw(' sum(formshipment.qty_shipment) as qtyshipall ')
             ->first();
 
-        // dd($dataqty);
+        // dd($query);
         return Datatables::of($query)
             ->addIndexColumn()
             ->addColumn('listpo', function ($query) {
@@ -96,12 +90,12 @@ class ProcessShipment extends Controller
 
                 return  $status;
             })
-            ->addColumn('action', function ($query) {
+            ->addColumn('action', function ($query) use ($dataqty) {
                 $process    = '';
-                if ($query->shipment == null) {
+                if ($dataqty->qtyshipall == null) {
                     $process    = '<a href="#" data-id="' . $query->pono . '" id="updateship"><i class="fa fa-angle-double-right text-green"></i></a>';
                 } else {
-                    if ($query->shipment->statusshipment == 'partial_allocated') {
+                    if ($dataqty->qtyshipall != $query->qtypoall) {
                         $process    = '<a href="#" data-id="' . $query->pono . '" id="updateship"><i class="fa fa-angle-double-right text-green"></i></a>';
                     } else {
                         $process = '';
