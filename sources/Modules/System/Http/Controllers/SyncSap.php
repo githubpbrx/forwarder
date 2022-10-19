@@ -158,7 +158,7 @@ class SyncSap extends Controller
                 }
             } //end forewach
             DB::commit();
-            echo "SUKSES";
+            echo "DONE";
         } else {
             $this->logsap($mode, $filesdir, $file, "FAILED :: File NOT FOUND");
             echo "FAILED :: File NOT FOUND";

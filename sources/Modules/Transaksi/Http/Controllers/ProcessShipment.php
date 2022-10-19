@@ -62,7 +62,16 @@ class ProcessShipment extends Controller
             ->groupby('po.pono')
             ->selectRaw(' formpo.*, po.id, po.pono, po.matcontents, po.colorcode, po.size, sum(po.qtypo) as qtypoall, po.qtypo')
             ->get();
-        // dd($query);
+
+        $dataqty = modelformpo::join('privilege', 'privilege.idforwarder', 'formpo.idmasterfwd')
+            ->join('formshipment', 'formshipment.idformpo', 'formpo.id_formpo')
+            ->where('privilege.privilege_user_nik', Session::get('session')['user_nik'])
+            ->where('formpo.statusformpo', '=', 'confirm')
+            ->where('privilege.privilege_aktif', 'Y')->where('formpo.aktif', 'Y')->where('formshipment.aktif', 'Y')
+            ->selectRaw(' sum(formshipment.qty_shipment) as qtyshipall ')
+            ->first();
+
+        // dd($dataqty);
         return Datatables::of($query)
             ->addIndexColumn()
             ->addColumn('listpo', function ($query) {
@@ -74,19 +83,19 @@ class ProcessShipment extends Controller
             ->addColumn('qtypo', function ($query) {
                 return  $query->qtypoall;
             })
-            // ->addColumn('status', function ($query) {
-            //     if ($query->shipment == null) {
-            //         $status = 'No Status';
-            //     } else {
-            //         if ($query->shipment->statusshipment == 'full_allocated') {
-            //             $status = 'Full Allocated';
-            //         } else {
-            //             $status = 'Partial Allocated';
-            //         }
-            //     }
+            ->addColumn('status', function ($query) use ($dataqty) {
+                if ($dataqty->qtyshipall == null) {
+                    $status = 'No Status';
+                } else {
+                    if ($dataqty->qtyshipall == $query->qtypoall) {
+                        $status = 'Full Allocated';
+                    } else {
+                        $status = 'Partial Allocated';
+                    }
+                }
 
-            //     return  $status;
-            // })
+                return  $status;
+            })
             ->addColumn('action', function ($query) {
                 $process    = '';
                 if ($query->shipment == null) {
