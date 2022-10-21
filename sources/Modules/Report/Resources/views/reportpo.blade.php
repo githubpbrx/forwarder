@@ -135,7 +135,7 @@
                             </div>
                             <div class="col-md-4">
                                 <div class="form-group">
-                                    <label class="col-sm-12 control-label">Quantity PO</label>
+                                    <label class="col-sm-12 control-label">Quantity Item</label>
                                     <div class="col-sm-12">
                                         <input type="text" class="form-control" id="qtypo" name="qtypo"
                                             autocomplete="off" readonly>
