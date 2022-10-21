@@ -14,6 +14,7 @@ use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use Modules\Report\Models\modelprivilege;
 use Modules\Report\Models\modelpo;
 use Modules\Report\Models\modelformpo;
+use Modules\Report\Models\modelformshipment;
 
 class ReportAlokasi extends Controller
 {
@@ -42,19 +43,19 @@ class ReportAlokasi extends Controller
             // dd($request);
 
             if ($request->po == null) {
-                $data = modelpo::join('forwarder', 'forwarder.idpo', 'po.id')
-                    ->join('formpo', 'formpo.idforwarder', 'forwarder.id_forwarder')
+                $data = modelformshipment::join('formpo', 'formpo.id_formpo', 'formshipment.idformpo')
+                    ->join('po', 'po.id', 'formpo.idpo')
                     ->join('masterforwarder', 'masterforwarder.id', 'formpo.idmasterfwd')
-                    ->where('forwarder.aktif', 'Y')->where('formpo.aktif', 'Y')->where('masterforwarder.aktif', 'Y')
-                    ->selectRaw(' po.id, po.pono, po.matcontents, po.qtypo, po.statusalokasi, po.statusconfirm, forwarder.id_forwarder, forwarder.qty_allocation, formpo.noinv, masterforwarder.name ')
+                    ->where('formpo.aktif', 'Y')->where('masterforwarder.aktif', 'Y')->where('formshipment.aktif', 'Y')
+                    ->selectRaw(' formshipment.*, po.id, po.pono, po.matcontents, po.qtypo, po.statusalokasi, po.statusconfirm, masterforwarder.name ')
                     ->get();
             } else {
-                $data = modelpo::join('forwarder', 'forwarder.idpo', 'po.id')
-                    ->join('formpo', 'formpo.idforwarder', 'forwarder.id_forwarder')
+                $data = modelformshipment::join('formpo', 'formpo.id_formpo', 'formshipment.idformpo')
+                    ->join('po', 'po.id', 'formpo.idpo')
                     ->join('masterforwarder', 'masterforwarder.id', 'formpo.idmasterfwd')
-                    ->where('forwarder.aktif', 'Y')->where('formpo.aktif', 'Y')->where('masterforwarder.aktif', 'Y')
+                    ->where('formpo.aktif', 'Y')->where('masterforwarder.aktif', 'Y')->where('formshipment.aktif', 'Y')
                     ->where('po.pono', $request->po)
-                    ->selectRaw(' po.id, po.pono, po.matcontents, po.qtypo, po.statusalokasi, po.statusconfirm, forwarder.qty_allocation, formpo.noinv, masterforwarder.name ')
+                    ->selectRaw(' formshipment.*, po.id, po.pono, po.matcontents, po.qtypo, po.statusalokasi, po.statusconfirm, masterforwarder.name ')
                     ->get();
             }
 
@@ -71,7 +72,7 @@ class ReportAlokasi extends Controller
                     return $data->qtypo;
                 })
                 ->addColumn('qtyallocation', function ($data) {
-                    return $data->qty_allocation;
+                    return $data->qty_shipment;
                 })
                 ->addColumn('invoice', function ($data) {
                     return $data->noinv;
@@ -79,34 +80,34 @@ class ReportAlokasi extends Controller
                 ->addColumn('forwarder', function ($data) {
                     return $data->name;
                 })
-                ->addColumn('statusallocation', function ($data) {
-                    if ($data->statusalokasi == 'full_allocated') {
-                        $statuspo = 'Full Allocated';
-                    } elseif ($data->statusalokasi == 'partial_allocated') {
-                        $statuspo = 'Partial Allocation';
-                    } else {
-                        $statuspo = 'Waiting';
-                    }
+                // ->addColumn('statusallocation', function ($data) {
+                //     if ($data->statusalokasi == 'full_allocated') {
+                //         $statuspo = 'Full Allocated';
+                //     } elseif ($data->statusalokasi == 'partial_allocated') {
+                //         $statuspo = 'Partial Allocation';
+                //     } else {
+                //         $statuspo = 'Waiting';
+                //     }
 
-                    return $statuspo;
-                })
-                ->addColumn('statusconfirm', function ($data) {
-                    if ($data->statusconfirm == 'confirm') {
-                        $status = 'Confirmed';
-                    } elseif ($data->statusconfirm == 'reject') {
-                        $status = 'Rejected';
-                    } else {
-                        $status = 'Unprocessed';
-                    }
+                //     return $statuspo;
+                // })
+                // ->addColumn('statusconfirm', function ($data) {
+                //     if ($data->statusconfirm == 'confirm') {
+                //         $status = 'Confirmed';
+                //     } elseif ($data->statusconfirm == 'reject') {
+                //         $status = 'Rejected';
+                //     } else {
+                //         $status = 'Unprocessed';
+                //     }
 
-                    return $status;
-                })
+                //     return $status;
+                // })
                 ->addColumn('action', function ($data) {
                     $process    = '';
 
-                    $process    .= '<a href="#" data-id="' . $data->id_forwarder . '" id="detailalokasi"><i class="fa fa-info-circle"></i></a>';
+                    $process    .= '<a href="#" data-id="' . $data->id_shipment . '" id="detailalokasi"><i class="fa fa-info-circle"></i></a>';
                     $process    .= '&nbsp';
-                    $process    .= '<a href="' . url('report/alokasi/getexcelalokasi', ['id' => $data->id_forwarder]) . '"><i class="fa fa-file-excel text-success"></i></a>';
+                    $process    .= '<a href="' . url('report/alokasi/getexcelalokasi', ['id' => $data->id_shipment]) . '"><i class="fa fa-file-excel text-success"></i></a>';
 
                     return $process;
                 })
@@ -122,14 +123,18 @@ class ReportAlokasi extends Controller
         header("Access-Control-Allow-Headers: *");
 
         if (!$request->ajax()) return;
-        $po = modelpo::select('pono');
+        $po = modelformshipment::join('formpo', 'formpo.id_formpo', 'formshipment.idformpo')
+            ->join('po', 'po.id', 'formpo.idpo')
+            ->join('masterforwarder', 'masterforwarder.id', 'formpo.idmasterfwd')
+            ->where('formpo.aktif', 'Y')->where('masterforwarder.aktif', 'Y')->where('formshipment.aktif', 'Y')
+            ->selectRaw(' po.pono ');
 
         if ($request->has('q')) {
             $search = $request->q;
-            $po = $po->whereRaw(' pono like "%' . $search . '%" ');
+            $po = $po->whereRaw(' po.pono like "%' . $search . '%" ');
         }
 
-        $po = $po->orderby('pono', 'asc')->groupby('pono')->get();
+        $po = $po->orderby('po.pono', 'asc')->groupby('po.pono')->paginate(10, $request->page);
 
         return response()->json($po);
     }
@@ -138,21 +143,13 @@ class ReportAlokasi extends Controller
     {
         // dd($request);
 
-        // $data = modelpo::join('forwarder', 'forwarder.idpo', 'po.id')
-        //     ->join('formpo', 'formpo.idforwarder', 'forwarder.id_forwarder')
-        //     ->join('masterforwarder', 'masterforwarder.id', 'formpo.idmasterfwd')
-        //     ->join('mastersupplier', 'mastersupplier.id', 'po.vendor')
-        //     ->where('po.id', $request->id)
-        //     ->where('forwarder.aktif', 'Y')->where('formpo.aktif', 'Y')->where('masterforwarder.aktif', 'Y')->where('mastersupplier.aktif', 'Y')
-        //     ->selectRaw(' po.*, forwarder.qty_allocation, forwarder.statusforwarder, formpo.*, masterforwarder.name, mastersupplier.nama ')
-        //     ->first();
-        $data = modelformpo::join('po', 'po.id', 'formpo.idpo')
-            ->join('forwarder', 'forwarder.id_forwarder', 'formpo.idforwarder')
+        $data = modelformshipment::join('formpo', 'formpo.id_formpo', 'formshipment.idformpo')
+            ->join('po', 'po.id', 'formpo.idpo')
             ->join('masterforwarder', 'masterforwarder.id', 'formpo.idmasterfwd')
             ->join('mastersupplier', 'mastersupplier.id', 'po.vendor')
-            ->where('formpo.idforwarder', $request->id)
-            ->where('forwarder.aktif', 'Y')->where('formpo.aktif', 'Y')->where('masterforwarder.aktif', 'Y')->where('mastersupplier.aktif', 'Y')
-            ->selectRaw(' po.*, forwarder.qty_allocation, forwarder.statusforwarder, formpo.*, masterforwarder.name, mastersupplier.nama ')
+            ->where('formshipment.id_shipment', $request->id)
+            ->where('formshipment.aktif', 'Y')->where('formpo.aktif', 'Y')->where('masterforwarder.aktif', 'Y')->where('mastersupplier.aktif', 'Y')
+            ->selectRaw(' formshipment.*, po.pono, po.matcontents, po.itemdesc, po.qtypo, po.style, po.plant, formpo.*, masterforwarder.name, mastersupplier.nama ')
             ->first();
 
         // dd($data);
@@ -161,13 +158,13 @@ class ReportAlokasi extends Controller
 
     function excelalokasi($id)
     {
-        $getdata = modelformpo::join('po', 'po.id', 'formpo.idpo')
-            ->join('forwarder', 'forwarder.id_forwarder', 'formpo.idforwarder')
+        $getdata = modelformshipment::join('formpo', 'formpo.id_formpo', 'formshipment.idformpo')
+            ->join('po', 'po.id', 'formpo.idpo')
             ->join('masterforwarder', 'masterforwarder.id', 'formpo.idmasterfwd')
             ->join('mastersupplier', 'mastersupplier.id', 'po.vendor')
-            ->where('formpo.idforwarder', $id)
-            ->where('forwarder.aktif', 'Y')->where('formpo.aktif', 'Y')->where('masterforwarder.aktif', 'Y')->where('mastersupplier.aktif', 'Y')
-            ->selectRaw(' po.*, forwarder.qty_allocation, forwarder.statusforwarder, formpo.*, masterforwarder.name, mastersupplier.nama ')
+            ->where('formshipment.id_shipment', $id)
+            ->where('formshipment.aktif', 'Y')->where('formpo.aktif', 'Y')->where('masterforwarder.aktif', 'Y')->where('mastersupplier.aktif', 'Y')
+            ->selectRaw(' formshipment.*, po.pono, po.matcontents, po.itemdesc, po.qtypo, po.style, po.plant, formpo.*, masterforwarder.name, mastersupplier.nama ')
             ->first();
         // dd($getdata);
 
@@ -190,7 +187,7 @@ class ReportAlokasi extends Controller
         $sheet->getColumnDimension('D')->setWidth(40);
         $sheet->setCellValue('E5', 'Style');
         $sheet->getColumnDimension('E')->setWidth(20);
-        $sheet->setCellValue('F5', 'Quantity PO');
+        $sheet->setCellValue('F5', 'Quantity Item');
         $sheet->getColumnDimension('F')->setWidth(10);
         $sheet->setCellValue('G5', 'Quantity Allocation');
         $sheet->getColumnDimension('G')->setWidth(10);
@@ -232,7 +229,7 @@ class ReportAlokasi extends Controller
         //for shipment
         $cellshipment = 'A13:B13';
         $sheet->setCellValue('A12', 'SHIPMENT');
-        $sheet->setCellValue('A13', 'No BL');
+        $sheet->setCellValue('A13', 'BL Number');
         $sheet->getColumnDimension('A')->setWidth(20);
         $sheet->setCellValue('B13', 'Vessel');
         $sheet->getColumnDimension('B')->setWidth(30);
@@ -272,7 +269,7 @@ class ReportAlokasi extends Controller
         $sheet->setCellValue('D' . $rows_sup, $getdata->itemdesc);
         $sheet->setCellValue('E' . $rows_sup, $getdata->style);
         $sheet->setCellValue('F' . $rows_sup, $getdata->qtypo);
-        $sheet->setCellValue('G' . $rows_sup, $getdata->qty_allocation);
+        $sheet->setCellValue('G' . $rows_sup, $getdata->qty_shipment);
         $sheet->setCellValue('H' . $rows_sup, $getdata->plant);
         $rows_sup++;
 
