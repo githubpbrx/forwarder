@@ -50,7 +50,7 @@ class ReportForwarder extends Controller
                     ->where('formpo.aktif', 'Y')->where('mastersupplier.aktif', 'Y')
                     ->where('formshipment.aktif', 'Y')->where('privilege.privilege_aktif', 'Y')
                     ->where('formpo.statusformpo', 'confirm')
-                    ->groupby('formpo.kode_booking')
+                    ->groupby('formshipment.noinv')
                     ->selectRaw('po.id, po.pono, mastersupplier.nama, formpo.kode_booking, formshipment.noinv, formshipment.nomor_bl')
                     ->get();
             } else {
@@ -64,7 +64,7 @@ class ReportForwarder extends Controller
                     ->where('formpo.statusformpo', 'confirm')
                     ->where('formpo.aktif', 'Y')->where('mastersupplier.aktif', 'Y')
                     ->where('formshipment.aktif', 'Y')->where('privilege.privilege_aktif', 'Y')
-                    ->groupby('formpo.kode_booking')
+                    ->groupby('formshipment.noinv')
                     ->selectRaw('po.id, po.pono, mastersupplier.nama, formpo.kode_booking, formshipment.noinv, formshipment.nomor_bl')
                     ->get();
             }
@@ -90,9 +90,9 @@ class ReportForwarder extends Controller
                 ->addColumn('action', function ($data) {
                     $button = '';
 
-                    $button .= '<a href="#" data-id="' . $data->pono . '" id="detailpo"><i class="fa fa-info-circle"></i></a>';
+                    $button .= '<a href="#" data-id="' . $data->noinv . '" id="detailpo"><i class="fa fa-info-circle"></i></a>';
                     $button .= '&nbsp';
-                    $button .= '<a href="' . url('report/forwarder/getexcelforwarder', ['id' => $data->pono]) . '" data-id="#"><i class="fa fa-file-excel text-success"></i></a>';
+                    $button .= '<a href="' . url('report/forwarder/getexcelforwarder', ['id' => $data->noinv]) . '" data-id="#"><i class="fa fa-file-excel text-success"></i></a>';
 
                     return $button;
                 })
@@ -140,9 +140,9 @@ class ReportForwarder extends Controller
         $getdata = modelformshipment::join('formpo', 'formpo.id_formpo', 'formshipment.idformpo')
             ->join('po', 'po.id', 'formpo.idpo')
             ->join('mastersupplier', 'mastersupplier.id', 'po.vendor')
-            ->where('po.pono', $request->id)
+            ->where('formshipment.noinv', $request->id)
             ->where('formshipment.aktif', 'Y')->where('formpo.aktif', 'Y')->where('mastersupplier.aktif', 'Y')
-            ->selectRaw(' formshipment.qty_shipment, formshipment.noinv, formshipment.etdfix, formshipment.etafix, formshipment.nomor_bl, formshipment.vessel, po.pono, po.matcontents, formpo.kode_booking, formpo.shipmode, formpo.subshipmode, mastersupplier.nama ')
+            ->selectRaw(' formshipment.qty_shipment, formshipment.noinv, formshipment.etdfix, formshipment.etafix, formshipment.nomor_bl, formshipment.vessel, po.pono, po.qtypo, po.matcontents, po.style, po.colorcode, po.size, formpo.kode_booking, formpo.shipmode, formpo.subshipmode, mastersupplier.nama ')
             ->get();
         // dd($getdata);
         $data = array(
@@ -170,9 +170,9 @@ class ReportForwarder extends Controller
         $getdata = modelformshipment::join('formpo', 'formpo.id_formpo', 'formshipment.idformpo')
             ->join('po', 'po.id', 'formpo.idpo')
             ->join('mastersupplier', 'mastersupplier.id', 'po.vendor')
-            ->where('po.pono', $id)
+            ->where('formshipment.noinv', $id)
             ->where('formshipment.aktif', 'Y')->where('formpo.aktif', 'Y')->where('mastersupplier.aktif', 'Y')
-            ->selectRaw(' formshipment.qty_shipment, formshipment.noinv, formshipment.etdfix, formshipment.etafix, formshipment.nomor_bl, formshipment.vessel, po.pono, po.matcontents, formpo.kode_booking, formpo.shipmode, formpo.subshipmode, mastersupplier.nama ')
+            ->selectRaw(' formshipment.*, po.pono, po.style, po.colorcode, po.size, po.qtypo, po.matcontents, formpo.kode_booking, formpo.shipmode, formpo.subshipmode, mastersupplier.nama ')
             ->get();
         // dd($getdata);
 
@@ -182,18 +182,29 @@ class ReportForwarder extends Controller
         $sheet->mergeCells('A2:G2');
         $sheet->getStyle('A2:G2')->getFont()->setBold(true);
 
+        //single header
+        $sheet->setCellValue('A4', 'Invoice');
+        $sheet->setCellValue('A5', 'Invoice Date');
+        $sheet->setCellValue('A6', 'PO');
+        $sheet->setCellValue('A7', 'Supplier');
+        $sheet->getStyle('A4:A7')->getFont()->setBold(true);
+
         //for header
-        $cellheader = 'A4:E4';
-        $sheet->setCellValue('A4', 'PO');
-        $sheet->getColumnDimension('A')->setWidth(50);
-        $sheet->setCellValue('B4', 'Supplier');
+        $cellheader = 'A9:G9';
+        $sheet->setCellValue('A9', 'Code Booking');
+        $sheet->getColumnDimension('A')->setWidth(30);
+        $sheet->setCellValue('B9', 'Nomor BL');
         $sheet->getColumnDimension('B')->setWidth(30);
-        $sheet->setCellValue('C4', 'Code Booking');
+        $sheet->setCellValue('C9', 'ETD');
         $sheet->getColumnDimension('C')->setWidth(30);
-        $sheet->setCellValue('D4', 'Shipmode');
+        $sheet->setCellValue('D9', 'ETA');
         $sheet->getColumnDimension('D')->setWidth(20);
-        $sheet->setCellValue('E4', 'Sub Shipmode');
+        $sheet->setCellValue('E9', 'Shipmode');
         $sheet->getColumnDimension('E')->setWidth(20);
+        $sheet->setCellValue('F9', 'Sub Shipmode');
+        $sheet->getColumnDimension('F')->setWidth(20);
+        $sheet->setCellValue('G9', 'Vessel');
+        $sheet->getColumnDimension('G')->setWidth(20);
         $sheet->getStyle($cellheader)->getAlignment()->setWrapText(true);
         $sheet->getStyle($cellheader)->getFont()->setBold(true);
         $sheet->getStyle($cellheader)->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID);
@@ -202,21 +213,19 @@ class ReportForwarder extends Controller
         $sheet->getStyle($cellheader)->getFill()->getStartColor()->setARGB('ff8400');
 
         //for data
-        $celldata = 'A7:G7';
-        $sheet->setCellValue('A7', 'Material');
+        $celldata = 'A12:F12';
+        $sheet->setCellValue('A12', 'Material');
         $sheet->getColumnDimension('A')->setWidth(50);
-        $sheet->setCellValue('B7', 'Quantity Shipment');
+        $sheet->setCellValue('B12', 'Style');
         $sheet->getColumnDimension('B')->setWidth(30);
-        $sheet->setCellValue('C7', 'Invoice ');
-        $sheet->getColumnDimension('C')->setWidth(30);
-        $sheet->setCellValue('D7', 'ETD Fix');
+        $sheet->setCellValue('C12', 'Color Code ');
+        $sheet->getColumnDimension('C')->setWidth(20);
+        $sheet->setCellValue('D12', 'Size');
         $sheet->getColumnDimension('D')->setWidth(20);
-        $sheet->setCellValue('E7', 'ETA Fix');
+        $sheet->setCellValue('E12', 'Quantity Item');
         $sheet->getColumnDimension('E')->setWidth(20);
-        $sheet->setCellValue('F7', 'Nomor BL');
+        $sheet->setCellValue('F12', 'Quantity Shipment');
         $sheet->getColumnDimension('F')->setWidth(20);
-        $sheet->setCellValue('G7', 'Vessel');
-        $sheet->getColumnDimension('G')->setWidth(20);
         $sheet->getStyle($celldata)->getAlignment()->setWrapText(true);
         $sheet->getStyle($celldata)->getFont()->setBold(true);
         $sheet->getStyle($celldata)->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID);
@@ -224,8 +233,8 @@ class ReportForwarder extends Controller
         $sheet->getStyle($celldata)->getAlignment()->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER);
         $sheet->getStyle($celldata)->getFill()->getStartColor()->setARGB('ff8400');
 
-        $header = 5;
-        $bodydata = 8;
+        $header = 10;
+        $bodydata = 13;
         // BORDER STYLE
         $styleArray = [
             'borders' => [
@@ -244,35 +253,42 @@ class ReportForwarder extends Controller
         //title
         $sheet->setCellValue('A' . '2', strtoupper('Detail Forwarder'));
 
+        //single header
+        $sheet->setCellValue('B' . '4', ':' . $getdata[0]->noinv);
+        $sheet->setCellValue('B' . '5', ':' . $getdata[0]->created_at);
+        $sheet->setCellValue('B' . '6', ':' . $getdata[0]->pono);
+        $sheet->setCellValue('B' . '7', ':' . $getdata[0]->nama);
+
         //header
-        $sheet->setCellValue('A' . $header, $getdata[0]->pono);
-        $sheet->setCellValue('B' . $header, $getdata[0]->nama);
-        $sheet->setCellValue('C' . $header, $getdata[0]->kode_booking);
-        $sheet->setCellValue('D' . $header, $getdata[0]->shipmode);
-        $sheet->setCellValue('E' . $header, $getdata[0]->subshipmode);
+        $sheet->setCellValue('A' . $header, $getdata[0]->kode_booking);
+        $sheet->setCellValue('B' . $header, $getdata[0]->nomor_bl);
+        $sheet->setCellValue('C' . $header, $getdata[0]->etdfix);
+        $sheet->setCellValue('D' . $header, $getdata[0]->etafix);
+        $sheet->setCellValue('E' . $header, $getdata[0]->shipmode);
+        $sheet->setCellValue('F' . $header, $getdata[0]->subshipmode);
+        $sheet->setCellValue('G' . $header, $getdata[0]->vessel);
         $header++;
 
         //data
         foreach ($getdata as $key => $value) {
             $sheet->setCellValue('A' . $bodydata, $value->matcontents);
-            $sheet->setCellValue('B' . $bodydata, $value->qty_shipment);
-            $sheet->setCellValue('C' . $bodydata, $value->noinv);
-            $sheet->setCellValue('D' . $bodydata, $value->etdfix);
-            $sheet->setCellValue('E' . $bodydata, $value->etafix);
-            $sheet->setCellValue('F' . $bodydata, $value->nomor_bl);
-            $sheet->setCellValue('G' . $bodydata, $value->vessel);
+            $sheet->setCellValue('B' . $bodydata, $value->style);
+            $sheet->setCellValue('C' . $bodydata, $value->colorcode);
+            $sheet->setCellValue('D' . $bodydata, $value->size);
+            $sheet->setCellValue('E' . $bodydata, $value->qtypo);
+            $sheet->setCellValue('F' . $bodydata, $value->qty_shipment);
             $bodydata++;
         }
 
-        $cellheader = 'A4:E' . ($header - 1);
-        $celldata = 'A7:G' . ($bodydata - 1);
-        $sheet->getStyle('A2:E2')->applyFromArray($styleArraytitle);
+        $cellheader = 'A9:G' . ($header - 1);
+        $celldata = 'A12:F' . ($bodydata - 1);
+        $sheet->getStyle('A2:G2')->applyFromArray($styleArraytitle);
         $sheet->getStyle($cellheader)->applyFromArray($styleArray);
         $sheet->getStyle($celldata)->applyFromArray($styleArray);
         $sheet->getStyle($cellheader)->getAlignment()->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER);
         $sheet->getStyle($celldata)->getAlignment()->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER);
 
-        $fileName = "Detail_Forwarder_" . $getdata[0]->kode_booking . ".xlsx";
+        $fileName = "Detail_Forwarder_" . $getdata[0]->noinv . ".xlsx";
 
         $writer = new Xlsx($spreadsheet);
         header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
