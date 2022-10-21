@@ -85,7 +85,7 @@
         </div>
         <div class="col-md-2">
             <div class="form-group">
-                <label class="col-sm-12 control-label">No BL</label>
+                <label class="col-sm-12 control-label">BL Number</label>
                 <div class="col-sm-12">
                     <input type="text" class="form-control" id="kodebook" name="kodebook"
                         value="{{ $data[0]->nomor_bl }}" readonly>

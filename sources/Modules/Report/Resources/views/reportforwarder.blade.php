@@ -56,7 +56,7 @@
                                                 <center>Invoice</center>
                                             </th>
                                             <th>
-                                                <center>Nomor BL</center>
+                                                <center>BL Number</center>
                                             </th>
                                             <th>
                                                 <center>Action</center>
