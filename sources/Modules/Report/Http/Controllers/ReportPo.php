@@ -31,7 +31,7 @@ class ReportPo extends Controller
             'box'   => '',
         );
 
-        \LogActivity::addToLog('Access Menu Report PO', $this->micro);
+        \LogActivity::addToLog('Web Forwarder :: Logistik : Access Menu Report PO', $this->micro);
         return view('report::reportpo', $data);
     }
 
@@ -101,10 +101,10 @@ class ReportPo extends Controller
 
         if ($request->has('q')) {
             $search = $request->q;
-            $po = $po->whereRaw(' pono like "%' . $search . '%" ');
+            $po = $po->whereRaw(' (pono like "%' . $search . '%") ');
         }
 
-        $po = $po->orderby('pono', 'asc')->groupby('pono')->get();
+        $po = $po->orderby('pono', 'asc')->groupby('pono')->paginate(10, $request->page);
 
         return response()->json($po);
     }
@@ -136,27 +136,33 @@ class ReportPo extends Controller
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
 
-        $cell = 'A4:H4';
-        $sheet->mergeCells('A2:H2');
+        $cell = 'A4:K4';
+        $sheet->mergeCells('A2:K2');
         $sheet->setCellValue('A4', 'PO');
-        $sheet->getColumnDimension('A')->setWidth(20);
-        $sheet->setCellValue('B4', 'Supplier');
-        $sheet->getColumnDimension('B')->setWidth(20);
-        $sheet->setCellValue('C4', 'Material');
+        $sheet->getColumnDimension('A')->setWidth(30);
+        $sheet->setCellValue('B4', 'Material');
+        $sheet->getColumnDimension('B')->setWidth(40);
+        $sheet->setCellValue('C4', 'Material Desc');
         $sheet->getColumnDimension('C')->setWidth(40);
-        $sheet->setCellValue('D4', 'Material Desc');
-        $sheet->getColumnDimension('D')->setWidth(40);
-        $sheet->setCellValue('E4', 'Style');
-        $sheet->getColumnDimension('E')->setWidth(15);
+        $sheet->setCellValue('D4', 'Color Code');
+        $sheet->getColumnDimension('D')->setWidth(20);
+        $sheet->setCellValue('E4', 'Size');
+        $sheet->getColumnDimension('E')->setWidth(20);
         $sheet->setCellValue('F4', 'Quantity PO');
-        $sheet->getColumnDimension('F')->setWidth(15);
+        $sheet->getColumnDimension('F')->setWidth(20);
         $sheet->setCellValue('G4', 'Price');
-        $sheet->getColumnDimension('G')->setWidth(10);
-        $sheet->setCellValue('H4', 'Plant');
-        $sheet->getColumnDimension('H')->setWidth(10);
+        $sheet->getColumnDimension('G')->setWidth(20);
+        $sheet->setCellValue('H4', 'Supplier');
+        $sheet->getColumnDimension('H')->setWidth(20);
+        $sheet->setCellValue('I4', 'Plant');
+        $sheet->getColumnDimension('I')->setWidth(20);
+        $sheet->setCellValue('J4', 'Style');
+        $sheet->getColumnDimension('J')->setWidth(20);
+        $sheet->setCellValue('K4', 'Buyer');
+        $sheet->getColumnDimension('K')->setWidth(20);
         $sheet->getStyle($cell)->getAlignment()->setWrapText(true);
         $sheet->getStyle($cell)->getFont()->setBold(true);
-        $sheet->getStyle('A2:H2')->getFont()->setBold(true);
+        $sheet->getStyle('A2:K2')->getFont()->setBold(true);
         $sheet->getStyle($cell)->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID);
         $sheet->getStyle($cell)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
         $sheet->getStyle($cell)->getAlignment()->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER);
@@ -180,17 +186,20 @@ class ReportPo extends Controller
 
         $sheet->setCellValue('A' . '2', strtoupper('Detail PO'));
         $sheet->setCellValue('A' . $rows, $getdata->pono);
-        $sheet->setCellValue('B' . $rows, $getdata->nama);
-        $sheet->setCellValue('C' . $rows, $getdata->matcontents);
-        $sheet->setCellValue('D' . $rows, $getdata->itemdesc);
-        $sheet->setCellValue('E' . $rows, $getdata->style);
+        $sheet->setCellValue('B' . $rows, $getdata->matcontents);
+        $sheet->setCellValue('C' . $rows, $getdata->itemdesc);
+        $sheet->setCellValue('D' . $rows, $getdata->colorcode);
+        $sheet->setCellValue('E' . $rows, $getdata->size);
         $sheet->setCellValue('F' . $rows, $getdata->qtypo);
         $sheet->setCellValue('G' . $rows, $getdata->price . ' ' . $getdata->curr);
-        $sheet->setCellValue('H' . $rows, $getdata->plant);
+        $sheet->setCellValue('H' . $rows, $getdata->nama);
+        $sheet->setCellValue('I' . $rows, $getdata->plant);
+        $sheet->setCellValue('J' . $rows, $getdata->style);
+        $sheet->setCellValue('K' . $rows, $getdata->buyer);
         $rows++;
 
-        $cell = 'A4:H' . ($rows - 1);
-        $sheet->getStyle('A2:H2')->applyFromArray($styleArraytitle);
+        $cell = 'A4:K' . ($rows - 1);
+        $sheet->getStyle('A2:K2')->applyFromArray($styleArraytitle);
         $sheet->getStyle($cell)->applyFromArray($styleArray);
         $sheet->getStyle($cell)->getAlignment()->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER);
 
