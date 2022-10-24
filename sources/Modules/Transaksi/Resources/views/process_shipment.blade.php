@@ -66,7 +66,7 @@
                         <div class="row">
                             <div class="col-md-4">
                                 <div class="form-group">
-                                    <label class="col-sm-12 control-label">Nomor Booking</label>
+                                    <label class="col-sm-12 control-label">Booking Number</label>
                                     <div class="col-sm-12">
                                         <input type="text" class="form-control" id="nobook" name="nobook" readonly>
                                     </div>
@@ -127,7 +127,7 @@
                         <div class="row">
                             <div class="col-md-4">
                                 <div class="form-group">
-                                    <label class="col-sm-12 control-label">Nomor BL</label>
+                                    <label class="col-sm-12 control-label">BL Number</label>
                                     <div class="col-sm-12">
                                         <input type="text" class="form-control" id="nobl" name="nobl"
                                             autocomplete="off">
@@ -291,13 +291,18 @@
                             '</td><td>' + dataku[index].colorcode + '</td><td>' + dataku[index]
                             .size +
                             '</td><td>' + dataku[index].qtypo + '</td><td>' + remain +
-                            '</td><td><input type="number" min="0" id="qty_allocation" name="qty_allocation" class="form-control trigerinput cekinput-' +
+                            '</td><td><input type="number" min="0" id="qty_allocation" name="qty_allocation" value="' +
+                            remain + '" class="form-control trigerinput cekinput-' +
                             index + '" data-idpo="' + dataku[index].idpo + '"  data-idformpo="' +
                             dataku[index].id_formpo + '" disabled></td></tr>';
                     }
 
                     html += "</table>";
                     $('#detailitem').html(html);
+                    $('input[type="checkbox"]').prop('checked', true);
+                    for (let index = 0; index < Number(length); index++) {
+                        $('.cekinput-' + index).prop('disabled', false);
+                    }
                     checkqtyall();
 
                     $('#nomorpo').val(dataku[0].pono);
@@ -307,6 +312,8 @@
                     $('#eta').val(dataku[0].eta);
                     $('#shipmode').val(dataku[0].shipmode);
                     $('#submode').val(dataku[0].subshipmode);
+                    $('#etdfix').val(dataku[0].etd);
+                    $('#etafix').val(dataku[0].eta);
                 })
             });
 
