@@ -193,7 +193,7 @@ class ReportForwarder extends Controller
         $cellheader = 'A9:G9';
         $sheet->setCellValue('A9', 'Code Booking');
         $sheet->getColumnDimension('A')->setWidth(30);
-        $sheet->setCellValue('B9', 'Nomor BL');
+        $sheet->setCellValue('B9', 'BL Number');
         $sheet->getColumnDimension('B')->setWidth(30);
         $sheet->setCellValue('C9', 'ETD');
         $sheet->getColumnDimension('C')->setWidth(30);
