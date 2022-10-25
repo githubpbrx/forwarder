@@ -47,7 +47,7 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label class="col-sm-12 control-label">Nomor PO</label>
+                                    <label class="col-sm-12 control-label">PO</label>
                                     <div class="col-sm-12">
                                         <input type="text" class="form-control" id="nomorpo" name="nomorpo" readonly>
                                     </div>
