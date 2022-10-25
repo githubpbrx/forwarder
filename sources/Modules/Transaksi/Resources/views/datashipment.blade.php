@@ -13,13 +13,10 @@
                         <thead>
                             <tr>
                                 <th>
-                                    <center>Code Booking</center>
+                                    <center>PO</center>
                                 </th>
                                 <th>
                                     <center>Invoice</center>
-                                </th>
-                                <th>
-                                    <center>Material</center>
                                 </th>
                                 <th>
                                     <center>Action</center>
@@ -60,15 +57,15 @@
                                     <label class="col-sm-12 control-label">Invoice</label>
                                     <div class="col-sm-12">
                                         <input type="text" class="form-control" id="invoice" name="invoice"
-                                            autocomplete="off">
+                                            autocomplete="off" readonly>
                                     </div>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label class="col-sm-12 control-label">Quantity Shipment</label>
+                                    <label class="col-sm-12 control-label">BL Number</label>
                                     <div class="col-sm-12">
-                                        <input type="text" class="form-control" id="qtyshipment" name="qtyshipment"
+                                        <input type="text" class="form-control" id="nobl" name="nobl"
                                             autocomplete="off">
                                     </div>
                                 </div>
@@ -97,15 +94,6 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label class="col-sm-12 control-label">Nomor BL</label>
-                                    <div class="col-sm-12">
-                                        <input type="text" class="form-control" id="nobl" name="nobl"
-                                            autocomplete="off">
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group">
                                     <label class="col-sm-12 control-label">Vessel</label>
                                     <div class="col-sm-12">
                                         <input type="text" class="form-control" id="vessel" name="vessel"
@@ -113,8 +101,6 @@
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label class="col-sm-12 control-label">File BL</label>
@@ -170,16 +156,12 @@
                     url: "{{ route('list_shipment') }}"
                 },
                 columns: [{
-                        data: 'kodebook',
-                        name: 'kodebook'
+                        data: 'pono',
+                        name: 'pono'
                     },
                     {
                         data: 'inv',
                         name: 'inv'
-                    },
-                    {
-                        data: 'material',
-                        name: 'material'
                     },
                     {
                         data: 'action',
@@ -196,6 +178,7 @@
 
             var idshipment;
             var idformpo;
+            var length;
             $('body').on('click', '#detailbtn', function() {
                 $('#detailshipment').modal({
                     show: true,
@@ -213,39 +196,42 @@
                 }).done(function(data) {
                     console.log('datakuh :>> ', data);
                     let mydata = data.data.shipment;
-                    let myremain = data.data.remaining[0];
+                    let myremain = data.data.remaining;
                     console.log('mydata :>> ', mydata);
                     console.log('myremain :>> ', myremain);
                     idshipment = mydata.id_shipment;
                     idformpo = mydata.idformpo;
-                    // length = mydata.length;
+                    length = mydata.length;
                     $('#detailitem').empty();
 
                     html =
-                        '<table border="0" style="width:100%"><tr><th>Material</th><th>Style</th><th>Color Code</th><th>Size</th><th>Quantity Item</th><th>Remaining Quantity</th><th>Quantity Allocation</th></tr>';
-                    // for (let index = 0; index < mydata.length; index++) {
-                    let remain;
-                    if (myremain.qtyshipment == null) {
-                        remain = mydata.qtypo;
-                    } else if (myremain.qtyshipment == mydata.qtypo) {
-                        remain = '0';
-                    } else {
-                        remain = mydata.qtypo - myremain.qtyshipment;
+                        '<table border="0" style="width:100%"><tr><th style="text-align:center"><input type="checkbox" class="checkall" style="height:18px;width:18px"></th><th>Material</th><th>Style</th><th>Color Code</th><th>Size</th><th>Quantity Item</th><th>Remaining Quantity</th><th>Quantity Shipment</th></tr>';
+                    for (let index = 0; index < mydata.length; index++) {
+                        let remain;
+                        if (myremain[index][0].qtyshipment == null) {
+                            remain = mydata[index].qtypo;
+                        } else if (myremain[index][0].qtyshipment == mydata[index].qtypo) {
+                            remain = '0';
+                        } else {
+                            remain = mydata[index].qtypo - myremain[index][0].qtyshipment;
+                        }
+
+                        html +=
+                            '<tr><td style="text-align:center"><input type="checkbox" class="check-' +
+                            index + '" style="height:18px;width:18px"></td><td>' + mydata[index]
+                            .matcontents + '</td><td>' + mydata[index].style + '</td><td>' +
+                            mydata[index].colorcode + '</td><td>' + mydata[index].size +
+                            '</td><td>' + mydata[index].qtypo + '</td><td>' + remain +
+                            '</td><td><input type="number" min="0" id="qtyship" name="qtyship" value="' +
+                            mydata[index].qty_shipment +
+                            '" class="form-control trigerinput cekinput-' +
+                            index + '" data-idformshipment="' + mydata[index].id_shipment +
+                            '"  data-idformpo="' + mydata[index].id_formpo +
+                            '" disabled></td></tr>';
                     }
-
-                    html +=
-                        '<tr><td>' + mydata.matcontents + '</td><td>' + mydata.style + '</td><td>' +
-                        mydata.colorcode + '</td><td>' +
-                        mydata.size + '</td><td>' + mydata.qtypo +
-                        '</td><td>' + remain +
-                        '</td><td>' + mydata.qty_shipment +
-                        '</td><td><input type="hidden" data-idpo="' +
-                        mydata.id + '" data-idfwd="' + mydata.id_forwarder +
-                        '" data-idformpo="' + mydata.id_formpo + '"></td></tr>';
-                    // }
-
                     html += "</table>";
                     $('#detailitem').html(html);
+                    checkqtyall();
 
                     // idpo = mydata[].id;
                     // idformpo = databook.id_formpo;
@@ -253,38 +239,79 @@
                     // usernama = privilege.privilege_user_name;
                     // tglpengajuan = databook.created_at;
 
-                    $('#invoice').val(mydata.noinv);
-                    $('#qtyshipment').val(mydata.qty_shipment);
-                    $('#etd').val(mydata.etdfix);
-                    $('#eta').val(mydata.etafix);
-                    $('#nobl').val(mydata.nomor_bl);
-                    $('#vessel').val(mydata.vessel);
+                    $('#invoice').val(mydata[0].noinv);
+                    $('#etd').val(mydata[0].etdfix);
+                    $('#eta').val(mydata[0].etafix);
+                    $('#nobl').val(mydata[0].nomor_bl);
+                    $('#vessel').val(mydata[0].vessel);
                 })
             });
 
+            function checkqtyall() {
+
+                $('.checkall').change(function(e) {
+                    if (this.checked) {
+                        $('.trigerinput').prop('disabled', false);
+                        $('input[type="checkbox"]').prop('checked', true);
+                    } else {
+                        // $('.trigerinput').val('');
+                        $('.trigerinput').prop('disabled', true);
+                        $('input[type="checkbox"]').prop('checked', false);
+                    }
+                });
+
+                for (let index = 0; index < Number(length); index++) {
+                    $('.check-' + index).change(function(e) {
+                        if (this.checked) {
+                            console.log('objectsijine :>> ', 'isChecked');
+                            $('.cekinput-' + index).prop('disabled', false);
+                            // }
+                        } else {
+                            console.log('objectsijine :>> ', 'notChecked');
+                            // $('.cekinput-' + index).val('');
+                            $('.cekinput-' + index).prop('disabled', true);
+                        }
+                    });
+                }
+            }
+
             $('#btnupdate').click(function(e) {
                 let inv = $('#invoice').val();
-                let qtyshipment = $('#qtyshipment').val();
+                // let qtyshipment = $('#qtyshipment').val();
                 let etd = $('#etd').val();
                 let eta = $('#eta').val();
                 let nomorbl = $('#nobl').val();
                 let vessel = $('#vessel').val();
                 let file = $('#filebl').prop('files')[0];
 
+                var arrayku = [];
+                for (let index = 0; index < Number(length); index++) {
+                    let val = $('.cekinput-' + index).val();
+
+                    if (val) {
+                        let data = {
+                            'idshipment': $('.cekinput-' + index).attr('data-idformshipment'),
+                            'idformpo': $('.cekinput-' + index).attr('data-idformpo'),
+                            'value': val,
+                        };
+
+                        arrayku.push(data);
+                    }
+                }
+
                 let form_data = new FormData();
-                form_data.append('idshipment', idshipment);
-                form_data.append('idformpo', idformpo);
+                form_data.append('dataform', JSON.stringify(arrayku));
+                // form_data.append('idshipment', idshipment);
+                // form_data.append('idformpo', idformpo);
                 form_data.append('inv', inv);
-                form_data.append('qtyshipment', qtyshipment);
+                // form_data.append('qtyshipment', qtyshipment);
                 form_data.append('etd', etd);
                 form_data.append('eta', eta);
                 form_data.append('nomorbl', nomorbl);
                 form_data.append('vessel', vessel);
                 form_data.append('file', file);
 
-                if (qtyshipment == null || qtyshipment == '') {
-                    notifalert('File BL');
-                } else if (nomorbl == null || nomorbl == '') {
+                if (nomorbl == null || nomorbl == '') {
                     notifalert('Nomor BL');
                 } else if (vessel == null || vessel == '') {
                     notifalert('Vessel');
