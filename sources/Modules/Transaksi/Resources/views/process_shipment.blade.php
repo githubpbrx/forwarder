@@ -14,7 +14,7 @@
                             <center>List PO#</center>
                         </th>
                         <th>
-                            <center>No Booking</center>
+                            <center>Booking Number</center>
                         </th>
                         <th>
                             <center>Quantity PO</center>
