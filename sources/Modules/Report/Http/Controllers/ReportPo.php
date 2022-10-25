@@ -54,17 +54,17 @@ class ReportPo extends Controller
                 ->addColumn('material', function ($data) {
                     return $data->matcontents;
                 })
-                ->addColumn('allocation', function ($data) {
-                    if ($data->statusalokasi == 'full_allocated') {
-                        $statuspo = 'Full Allocated';
-                    } elseif ($data->statusalokasi == 'partial_allocated') {
-                        $statuspo = 'Partial Allocation';
-                    } else {
-                        $statuspo = 'Waiting';
-                    }
+                // ->addColumn('allocation', function ($data) {
+                //     if ($data->statusalokasi == 'full_allocated') {
+                //         $statuspo = 'Full Allocated';
+                //     } elseif ($data->statusalokasi == 'partial_allocated') {
+                //         $statuspo = 'Partial Allocation';
+                //     } else {
+                //         $statuspo = 'Waiting';
+                //     }
 
-                    return $statuspo;
-                })
+                //     return $statuspo;
+                // })
                 ->addColumn('status', function ($data) {
                     if ($data->statusconfirm == 'confirm') {
                         $status = 'Confirmed';

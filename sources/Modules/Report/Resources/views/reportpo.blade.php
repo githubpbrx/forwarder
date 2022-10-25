@@ -51,9 +51,9 @@
                                             <th>
                                                 <center>Material</center>
                                             </th>
-                                            <th>
+                                            {{-- <th>
                                                 <center>Status Allocation</center>
-                                            </th>
+                                            </th> --}}
                                             <th>
                                                 <center>Status</center>
                                             </th>
@@ -234,10 +234,10 @@
                         data: 'material',
                         name: 'material'
                     },
-                    {
-                        data: 'allocation',
-                        name: 'allocation'
-                    },
+                    // {
+                    //     data: 'allocation',
+                    //     name: 'allocation'
+                    // },
                     {
                         data: 'status',
                         name: 'status'
