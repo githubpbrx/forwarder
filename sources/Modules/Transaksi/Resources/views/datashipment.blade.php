@@ -205,20 +205,27 @@
                     $('#detailitem').empty();
 
                     html =
-                        '<table border="0" style="width:100%"><tr><th style="text-align:center"><input type="checkbox" class="checkall" style="height:18px;width:18px"></th><th>Material</th><th>Style</th><th>Color Code</th><th>Size</th><th>Quantity Item</th><th>Remaining Quantity</th><th>Quantity Shipment</th></tr>';
+                        '<table border="0" style="width:100%"><tr><th style="text-align:center"><input type="checkbox" class="checkall" style="height:18px;width:18px" checked></th><th>Material</th><th>Style</th><th>Color Code</th><th>Size</th><th>Quantity Item</th><th>Remaining Quantity</th><th>Quantity Shipment</th></tr>';
                     for (let index = 0; index < mydata.length; index++) {
                         let remain;
+                        let ceked;
+                        // let qtyshipment = (mydata[index].qty_shipment==[]) ? '0' : mydata[index].qty_shipment;
+
                         if (myremain[index][0].qtyshipment == null) {
                             remain = mydata[index].qtypo;
+                            ceked = 'checked';
                         } else if (myremain[index][0].qtyshipment == mydata[index].qtypo) {
                             remain = '0';
+                            ceked = '';
                         } else {
                             remain = mydata[index].qtypo - myremain[index][0].qtyshipment;
+                            ceked = 'checked';
                         }
 
                         html +=
                             '<tr><td style="text-align:center"><input type="checkbox" class="check-' +
-                            index + '" style="height:18px;width:18px"></td><td>' + mydata[index]
+                            index + '" style="height:18px;width:18px" ' + ceked + '></td><td>' +
+                            mydata[index]
                             .matcontents + '</td><td>' + mydata[index].style + '</td><td>' +
                             mydata[index].colorcode + '</td><td>' + mydata[index].size +
                             '</td><td>' + mydata[index].qtypo + '</td><td>' + remain +
@@ -227,7 +234,7 @@
                             '" class="form-control trigerinput cekinput-' +
                             index + '" data-idformshipment="' + mydata[index].id_shipment +
                             '"  data-idformpo="' + mydata[index].id_formpo +
-                            '" disabled></td></tr>';
+                            '"></td></tr>';
                     }
                     html += "</table>";
                     $('#detailitem').html(html);
@@ -288,16 +295,17 @@
                 for (let index = 0; index < Number(length); index++) {
                     let val = $('.cekinput-' + index).val();
 
-                    if (val) {
-                        let data = {
-                            'idshipment': $('.cekinput-' + index).attr('data-idformshipment'),
-                            'idformpo': $('.cekinput-' + index).attr('data-idformpo'),
-                            'value': val,
-                        };
+                    // if (val) {
+                    let data = {
+                        'idshipment': $('.cekinput-' + index).attr('data-idformshipment'),
+                        'idformpo': $('.cekinput-' + index).attr('data-idformpo'),
+                        'value': val,
+                    };
 
-                        arrayku.push(data);
-                    }
+                    arrayku.push(data);
+                    // }
                 }
+                console.log('objectwew :>> ', JSON.stringify(arrayku));
 
                 let form_data = new FormData();
                 form_data.append('dataform', JSON.stringify(arrayku));
@@ -312,7 +320,7 @@
                 form_data.append('file', file);
 
                 if (nomorbl == null || nomorbl == '') {
-                    notifalert('Nomor BL');
+                    notifalert('BL Number');
                 } else if (vessel == null || vessel == '') {
                     notifalert('Vessel');
                 } else if (inv == null || inv == '') {
