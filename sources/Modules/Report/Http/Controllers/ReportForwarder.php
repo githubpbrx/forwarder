@@ -144,7 +144,15 @@ class ReportForwarder extends Controller
             ->where('formshipment.aktif', 'Y')->where('formpo.aktif', 'Y')->where('mastersupplier.aktif', 'Y')
             ->selectRaw(' formshipment.qty_shipment, formshipment.noinv, formshipment.etdfix, formshipment.etafix, formshipment.nomor_bl, formshipment.vessel, po.pono, po.qtypo, po.matcontents, po.style, po.colorcode, po.size, formpo.kode_booking, formpo.shipmode, formpo.subshipmode, mastersupplier.nama ')
             ->get();
-        // dd($getdata);
+
+        $getdate = modelformshipment::join('formpo', 'formpo.id_formpo', 'formshipment.idformpo')
+            ->join('po', 'po.id', 'formpo.idpo')
+            ->join('mastersupplier', 'mastersupplier.id', 'po.vendor')
+            ->where('formshipment.noinv', $request->id)
+            ->where('formshipment.aktif', 'Y')->where('formpo.aktif', 'Y')->where('mastersupplier.aktif', 'Y')
+            ->selectRaw(' formshipment.id_shipment, formshipment.created_at, formshipment.updated_at')
+            ->latest('id_shipment')->first();
+        // dd($getdate);
         $data = array(
             // 'dataformpo' => $dataformpo,
             // 'datapo' => $datapo,
@@ -153,20 +161,12 @@ class ReportForwarder extends Controller
         );
 
         // return response()->json(['status' => 200, 'data' => $data, 'message' => 'Berhasil']);
-        $form = view('report::modalreportfwd', ['data' => $getdata]);
+        $form = view('report::modalreportfwd', ['data' => $getdata, 'dateku' => $getdate]);
         return $form->render();
     }
 
     function excelforwarder($id)
     {
-        // $getdata = modelformpo::join('po', 'po.id', 'formpo.idpo')
-        //     ->join('forwarder', 'forwarder.id_forwarder', 'formpo.idforwarder')
-        //     ->join('mastersupplier', 'mastersupplier.id', 'po.vendor')
-        //     ->where('formpo.kode_booking', $id)
-        //     ->where('formpo.aktif', 'Y')
-        //     ->where('formpo.statusformpo', 'confirm')
-        //     ->selectRaw(' formpo.kode_booking, formpo.noinv, formpo.etdfix, formpo.etafix, formpo.shipmode, formpo.subshipmode, formpo.nomor_bl, formpo.vessel, forwarder.qty_allocation, forwarder.statusforwarder, po.pono, po.matcontents, po.qtypo, mastersupplier.nama ')
-        //     ->get();
         $getdata = modelformshipment::join('formpo', 'formpo.id_formpo', 'formshipment.idformpo')
             ->join('po', 'po.id', 'formpo.idpo')
             ->join('mastersupplier', 'mastersupplier.id', 'po.vendor')
@@ -174,7 +174,15 @@ class ReportForwarder extends Controller
             ->where('formshipment.aktif', 'Y')->where('formpo.aktif', 'Y')->where('mastersupplier.aktif', 'Y')
             ->selectRaw(' formshipment.*, po.pono, po.style, po.colorcode, po.size, po.qtypo, po.matcontents, formpo.kode_booking, formpo.shipmode, formpo.subshipmode, mastersupplier.nama ')
             ->get();
-        // dd($getdata);
+
+        $getdate = modelformshipment::join('formpo', 'formpo.id_formpo', 'formshipment.idformpo')
+            ->join('po', 'po.id', 'formpo.idpo')
+            ->join('mastersupplier', 'mastersupplier.id', 'po.vendor')
+            ->where('formshipment.noinv', $id)
+            ->where('formshipment.aktif', 'Y')->where('formpo.aktif', 'Y')->where('mastersupplier.aktif', 'Y')
+            ->selectRaw(' formshipment.id_shipment, formshipment.created_at, formshipment.updated_at')
+            ->latest('id_shipment')->first();
+        // dd($getdate);
 
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
@@ -188,6 +196,10 @@ class ReportForwarder extends Controller
         $sheet->setCellValue('A6', 'PO');
         $sheet->setCellValue('A7', 'Supplier');
         $sheet->getStyle('A4:A7')->getFont()->setBold(true);
+        $sheet->setCellValue('C4', 'Input Data');
+        $sheet->setCellValue('C5', 'Update Data');
+        $sheet->getStyle('C4:C5')->getFont()->setBold(true);
+
 
         //for header
         $cellheader = 'A9:G9';
@@ -258,6 +270,9 @@ class ReportForwarder extends Controller
         $sheet->setCellValue('B' . '5', ':' . $getdata[0]->created_at);
         $sheet->setCellValue('B' . '6', ':' . $getdata[0]->pono);
         $sheet->setCellValue('B' . '7', ':' . $getdata[0]->nama);
+        $sheet->setCellValue('D' . '4', ':' . date('m-d-Y H:i:s', strtotime($getdate->created_at)));
+        $sheet->setCellValue('D' . '5', ':' . date('m-d-Y H:i:s', strtotime($getdate->updated_at)));
+
 
         //header
         $sheet->setCellValue('A' . $header, $getdata[0]->kode_booking);

@@ -92,6 +92,24 @@
                 </div>
             </div>
         </div>
+        <div class="col-md-2">
+            <div class="form-group">
+                <label class="col-sm-12 control-label">Input Data</label>
+                <div class="col-sm-12">
+                    <input type="text" class="form-control" id="kodebook" name="kodebook"
+                        value="{{ date('d-m-Y H:i:s', strtotime($dateku->created_at)) }}" readonly>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="form-group">
+                <label class="col-sm-12 control-label">Update Data</label>
+                <div class="col-sm-12">
+                    <input type="text" class="form-control" id="kodebook" name="kodebook"
+                        value="{{ date('d-m-Y H:i:s', strtotime($dateku->updated_at)) }}" readonly>
+                </div>
+            </div>
+        </div>
     </div>
     <hr style="width: 100%; height: 0.1px; background-color:rgb(145, 139, 139);" />
     <table class="form-horizontal" border="0" style="width:100%">
