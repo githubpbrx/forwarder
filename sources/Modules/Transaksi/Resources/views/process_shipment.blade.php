@@ -269,40 +269,48 @@
                     $('#detailitem').empty();
 
                     html =
-                        '<table border="0" style="width:100%"><tr><th style="text-align:center"><input type="checkbox" class="checkall" style="height:18px;width:18px"></th><th>Material</th><th>Style</th><th>Color Code</th><th>Size</th><th>Quantity Item</th><th>Remaining Quantity</th><th>Quantity Allocation</th></tr>';
+                        '<table border="0" style="width:100%"><tr><th style="text-align:center"><input type="checkbox" class="checkall" style="height:18px;width:18px" checked></th><th>Material</th><th>Style</th><th>Color Code</th><th>Size</th><th>Quantity Item</th><th>Remaining Quantity</th><th>Quantity Allocation</th></tr>';
                     for (let index = 0; index < dataku.length; index++) {
                         let remain;
-
+                        let block;
+                        let inputalokasi;
+                        let ceked;
                         // let qtypo = dataku[index].qtypo;
                         // let newqtypo = qtypo.replace(".", "");
 
                         if (dataku[index].qtyship == null) {
                             remain = dataku[index].qtypo;
+                            inputalokasi = dataku[index].qtypo;
+                            block = '';
+                            ceked = 'checked';
                         } else if (dataku[index].qtyship == dataku[index].qtypo) {
                             remain = '0';
+                            inputalokasi = '';
+                            block = 'disabled';
+                            ceked = '';
                         } else {
                             remain = dataku[index].qtypo - dataku[index].qtyship;
+                            inputalokasi = dataku[index].qtypo - dataku[index].qtyship;
+                            block = '';
+                            ceked = 'checked';
                         }
 
                         html +=
                             '<tr><td style="text-align:center"><input type="checkbox" class="check-' +
-                            index + '" style="height:18px;width:18px"></td><td>' +
+                            index + '" style="height:18px;width:18px" ' + block + ' ' + ceked +
+                            '></td><td>' +
                             dataku[index].matcontents + '</td><td>' + dataku[index].style +
                             '</td><td>' + dataku[index].colorcode + '</td><td>' + dataku[index]
                             .size +
                             '</td><td>' + dataku[index].qtypo + '</td><td>' + remain +
                             '</td><td><input type="number" min="0" id="qty_allocation" name="qty_allocation" value="' +
-                            remain + '" class="form-control trigerinput cekinput-' +
+                            inputalokasi + '" class="form-control trigerinput cekinput-' +
                             index + '" data-idpo="' + dataku[index].idpo + '"  data-idformpo="' +
-                            dataku[index].id_formpo + '" disabled></td></tr>';
+                            dataku[index].id_formpo + '" ' + block + '></td></tr>';
                     }
 
                     html += "</table>";
                     $('#detailitem').html(html);
-                    $('input[type="checkbox"]').prop('checked', true);
-                    for (let index = 0; index < Number(length); index++) {
-                        $('.cekinput-' + index).prop('disabled', false);
-                    }
                     checkqtyall();
 
                     $('#nomorpo').val(dataku[0].pono);
@@ -388,7 +396,7 @@
                 } else if (file == null || file == '') {
                     notifalert('File BL');
                 } else if (nomorbl == null || nomorbl == '') {
-                    notifalert('Nomor BL');
+                    notifalert('BL Number');
                 } else if (vessel == null || vessel == '') {
                     notifalert('Vessel');
                 } else if (inv == null || inv == '') {
