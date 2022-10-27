@@ -39,25 +39,19 @@
                                                 <center>PO</center>
                                             </th>
                                             <th>
-                                                <center>MATERIAL</center>
+                                                <center>Invoice</center>
                                             </th>
                                             <th>
-                                                <center>QUANTITY ITEM</center>
+                                                <center>Code Booking</center>
                                             </th>
                                             <th>
-                                                <center>QUANTITY SHIPMENT</center>
+                                                <center>BL Number</center>
                                             </th>
                                             <th>
-                                                <center>INVOICE</center>
+                                                <center>Forwarder</center>
                                             </th>
                                             <th>
-                                                <center>FORWARDER</center>
-                                            </th>
-                                            {{-- <th>
-                                                <center>STATUS SHIPMENT</center>
-                                            </th> --}}
-                                            <th>
-                                                <center>ACTION</center>
+                                                <center>Action</center>
                                             </th>
                                         </tr>
                                     </thead>
@@ -83,199 +77,7 @@
                     </button>
                 </div>
                 <div class="modal-body" style="font-size: 10pt;">
-                    <form action="#" class="form-horizontal">
-                        {{ csrf_field() }}
-                        <div class="row">
-                            <div class="col-md-4">
-                                <div class="form-group">
-                                    <label class="col-sm-12 control-label">PO</label>
-                                    <div class="col-sm-12">
-                                        <input type="text" class="form-control" id="nomorpo" name="nomorpo" readonly>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="form-group">
-                                    <label class="col-sm-12 control-label">Material</label>
-                                    <div class="col-sm-12">
-                                        <input type="text" class="form-control" id="material" name="material"
-                                            autocomplete="off" readonly>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="form-group">
-                                    <label class="col-sm-12 control-label">Material Desc</label>
-                                    <div class="col-sm-12">
-                                        <input type="text" class="form-control" id="matdesc" name="matdesc"
-                                            autocomplete="off" readonly>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        {{-- <hr
-                            style="width: 100%; color: rgb(192, 192, 192); height: 0.5px; background-color:rgb(192, 192, 192);" />
-                        <div class="row">
-                            <div class="col-md-12">
-                                <div id="detailitem"></div>
-                            </div>
-                        </div>
-                        <hr
-                            style="width: 100%; color: rgb(192, 192, 192); height: 0.5px; background-color:rgb(192, 192, 192);" /> --}}
-                        <div class="row">
-                            <div class="col-md-4">
-                                <div class="form-group">
-                                    <label class="col-sm-12 control-label">Quantity Item</label>
-                                    <div class="col-sm-12">
-                                        <input type="text" class="form-control" id="qtypo" name="qtypo"
-                                            autocomplete="off" readonly>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="form-group">
-                                    <label class="col-sm-12 control-label">Supplier</label>
-                                    <div class="col-sm-12">
-                                        <input type="text" class="form-control" id="supplier" name="supplier" readonly>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="form-group">
-                                    <label class="col-sm-12 control-label">Style</label>
-                                    <div class="col-sm-12">
-                                        <input type="text" class="form-control" id="style" name="style"
-                                            autocomplete="off" readonly>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-4">
-                                <div class="form-group">
-                                    <label class="col-sm-12 control-label">Plant</label>
-                                    <div class="col-sm-12">
-                                        <input type="text" class="form-control" id="plant" name="plant"
-                                            autocomplete="off" readonly>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="form-group">
-                                    <label class="col-sm-12 control-label">Forwarder</label>
-                                    <div class="col-sm-12">
-                                        <input type="text" class="form-control" id="forwarder" name="forwarder"
-                                            autocomplete="off" readonly>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="form-group">
-                                    <label class="col-sm-12 control-label">Code Booking</label>
-                                    <div class="col-sm-12">
-                                        <input type="text" class="form-control" id="booking" name="booking"
-                                            autocomplete="off" readonly>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-4">
-                                <div class="form-group">
-                                    <label class="col-sm-12 control-label">Quantity Shipment</label>
-                                    <div class="col-sm-12">
-                                        <input type="text" class="form-control" id="qtyship" name="qtyship"
-                                            autocomplete="off" readonly>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="form-group">
-                                    <label class="col-sm-12 control-label">Invoice</label>
-                                    <div class="col-sm-12">
-                                        <input type="text" class="form-control" id="invoice" name="invoice"
-                                            autocomplete="off" readonly>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="form-group">
-                                    <label class="col-sm-12 control-label">ETD</label>
-                                    <div class="col-sm-12">
-                                        <input type="text" class="form-control" id="etd" name="etd"
-                                            autocomplete="off" readonly>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-4">
-                                <div class="form-group">
-                                    <label class="col-sm-12 control-label">ETA</label>
-                                    <div class="col-sm-12">
-                                        <input type="text" class="form-control" id="eta" name="eta"
-                                            autocomplete="off" readonly>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="form-group">
-                                    <label class="col-sm-12 control-label">Shipmode</label>
-                                    <div class="col-sm-12">
-
-                                        <div class="row">
-                                            <div class="col-sm-6">
-                                                <input type="text" class="form-control" id="shipmode"
-                                                    name="shipmode" autocomplete="off" readonly>
-                                            </div>
-                                            <div class="col-sm-6">
-                                                <input type="text" class="form-control" id="subshipmode"
-                                                    name="subshipmode" autocomplete="off" readonly>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="form-group">
-                                    <label class="col-sm-12 control-label">BL Number</label>
-                                    <div class="col-sm-12">
-                                        <input type="text" class="form-control" id="nobl" name="nobl"
-                                            autocomplete="off" readonly>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-4">
-                                <div class="form-group">
-                                    <label class="col-sm-12 control-label">Vessel</label>
-                                    <div class="col-sm-12">
-                                        <input type="text" class="form-control" id="vessel" name="vessel"
-                                            autocomplete="off" readonly>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="form-group">
-                                    <label class="col-sm-12 control-label">File BL</label>
-                                    <div class="col-sm-12">
-                                        <div class="row">
-                                            <div class="col-sm-6">
-                                                <input type="text" class="form-control" id="filebl" name="filebl"
-                                                    autocomplete="off" readonly>
-                                            </div>
-                                            <div class="col-sm-6">
-                                                <a href="#" id="downloadfile" target="_BLANK"
-                                                    class="btn btn-info">Download
-                                                    File</a>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </form>
+                    <div id="formdetail"></div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Cancel</button>
@@ -314,20 +116,16 @@
                         name: 'po'
                     },
                     {
-                        data: 'material',
-                        name: 'material'
-                    },
-                    {
-                        data: 'qtypo',
-                        name: 'qtypo'
-                    },
-                    {
-                        data: 'qtyallocation',
-                        name: 'qtyallocation'
-                    },
-                    {
                         data: 'invoice',
                         name: 'invoice'
+                    },
+                    {
+                        data: 'kodebook',
+                        name: 'kodebook'
+                    },
+                    {
+                        data: 'blnumber',
+                        name: 'blnumber'
                     },
                     {
                         data: 'forwarder',
@@ -411,45 +209,38 @@
                 $.ajax({
                     url: "{!! route('report_detailalokasi') !!}",
                     type: 'POST',
-                    dataType: 'json',
+                    // dataType: 'json',
                     data: {
                         _token: $('meta[name=csrf-token]').attr('content'),
                         id: idku,
                     },
                 }).done(function(data) {
-                    console.log('data :>> ', data.data);
-                    let dataku = data.data;
+                    $('#formdetail').html(data);
+                    // console.log('data :>> ', data.data);
+                    // let dataku = data.data;
 
-                    namefile = dataku.file_bl;
+                    // namefile = dataku.file_bl;
 
-                    $('#nomorpo').val(dataku.pono);
-                    $('#material').val(dataku.matcontents);
-                    $('#matdesc').val(dataku.itemdesc);
-                    $('#qtypo').val(dataku.qtypo);
-                    $('#supplier').val(dataku.nama);
-                    $('#style').val(dataku.style);
-                    $('#plant').val(dataku.plant);
-                    $('#forwarder').val(dataku.name);
-                    $('#booking').val(dataku.kode_booking);
-                    $('#qtyship').val(dataku.qty_shipment);
-                    $('#invoice').val(dataku.noinv);
-                    $('#etd').val(dataku.etdfix);
-                    $('#eta').val(dataku.etafix);
-                    $('#shipmode').val(dataku.shipmode);
-                    $('#subshipmode').val(dataku.subshipmode);
-                    $('#nobl').val(dataku.nomor_bl);
-                    $('#vessel').val(dataku.vessel);
-                    $('#filebl').val(dataku.file_bl);
+                    // $('#nomorpo').val(dataku.pono);
+                    // $('#material').val(dataku.matcontents);
+                    // $('#matdesc').val(dataku.itemdesc);
+                    // $('#qtypo').val(dataku.qtypo);
+                    // $('#supplier').val(dataku.nama);
+                    // $('#style').val(dataku.style);
+                    // $('#plant').val(dataku.plant);
+                    // $('#forwarder').val(dataku.name);
+                    // $('#booking').val(dataku.kode_booking);
+                    // $('#qtyship').val(dataku.qty_shipment);
+                    // $('#invoice').val(dataku.noinv);
+                    // $('#etd').val(dataku.etdfix);
+                    // $('#eta').val(dataku.etafix);
+                    // $('#shipmode').val(dataku.shipmode);
+                    // $('#subshipmode').val(dataku.subshipmode);
+                    // $('#nobl').val(dataku.nomor_bl);
+                    // $('#vessel').val(dataku.vessel);
+                    // $('#filebl').val(dataku.file_bl);
                 })
             });
-
-            $('#downloadfile').click(function(e) {
-                // e.preventDefault();
-                // console.log('klik :>> ', 'klik');
-                var base = "{!! url('sources/storage/app') !!}" + "/" + namefile;
-                $('#downloadfile').attr('href', base);
-            });
-
         });
     </script>
 @endsection
