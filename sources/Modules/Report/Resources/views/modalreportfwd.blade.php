@@ -70,7 +70,7 @@
                 <label class="col-sm-12 control-label">ETD</label>
                 <div class="col-sm-12">
                     <input type="text" class="form-control" id="kodebook" name="kodebook"
-                        value="{{ $data[0]->etdfix }}" readonly>
+                        value="{{ date('d-m-Y', strtotime($data[0]->etdfix)) }}" readonly>
                 </div>
             </div>
         </div>
@@ -79,7 +79,7 @@
                 <label class="col-sm-12 control-label">ETA</label>
                 <div class="col-sm-12">
                     <input type="text" class="form-control" id="kodebook" name="kodebook"
-                        value="{{ $data[0]->etafix }}" readonly>
+                        value="{{ date('d-m-Y', strtotime($data[0]->etafix)) }}" readonly>
                 </div>
             </div>
         </div>
@@ -106,7 +106,8 @@
                 <label class="col-sm-12 control-label">Update Data</label>
                 <div class="col-sm-12">
                     <input type="text" class="form-control" id="kodebook" name="kodebook"
-                        value="{{ date('d-m-Y H:i:s', strtotime($dateku->updated_at)) }}" readonly>
+                        value="{{ $dateku->updated_at == null ? '' : date('d-m-Y H:i:s', strtotime($dateku->updated_at)) }}"
+                        readonly>
                 </div>
             </div>
         </div>
