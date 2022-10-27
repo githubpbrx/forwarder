@@ -208,23 +208,19 @@
                         '<table border="0" style="width:100%"><tr><th style="text-align:center"><input type="checkbox" class="checkall" style="height:18px;width:18px" checked></th><th>Material</th><th>Style</th><th>Color Code</th><th>Size</th><th>Quantity Item</th><th>Remaining Quantity</th><th>Quantity Shipment</th></tr>';
                     for (let index = 0; index < mydata.length; index++) {
                         let remain;
-                        let ceked;
                         // let qtyshipment = (mydata[index].qty_shipment==[]) ? '0' : mydata[index].qty_shipment;
 
                         if (myremain[index][0].qtyshipment == null) {
                             remain = mydata[index].qtypo;
-                            ceked = 'checked';
                         } else if (myremain[index][0].qtyshipment == mydata[index].qtypo) {
                             remain = '0';
-                            ceked = '';
                         } else {
                             remain = mydata[index].qtypo - myremain[index][0].qtyshipment;
-                            ceked = 'checked';
                         }
 
                         html +=
                             '<tr><td style="text-align:center"><input type="checkbox" class="check-' +
-                            index + '" style="height:18px;width:18px" ' + ceked + '></td><td>' +
+                            index + '" style="height:18px;width:18px" checked></td><td>' +
                             mydata[index]
                             .matcontents + '</td><td>' + mydata[index].style + '</td><td>' +
                             mydata[index].colorcode + '</td><td>' + mydata[index].size +
