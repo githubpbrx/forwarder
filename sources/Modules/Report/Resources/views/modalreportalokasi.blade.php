@@ -107,7 +107,8 @@
                 <label class="col-sm-12 control-label">Update Data</label>
                 <div class="col-sm-12">
                     <input type="text" class="form-control"
-                        value="{{ date('d-m-Y H:i:s', strtotime($dateku->updated_at)) }}" readonly>
+                        value="{{ $dateku->updated_at == null ? '' : date('d-m-Y H:i:s', strtotime($dateku->updated_at)) }}"
+                        readonly>
                 </div>
             </div>
         </div>

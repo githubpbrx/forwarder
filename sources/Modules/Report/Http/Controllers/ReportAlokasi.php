@@ -272,7 +272,12 @@ class ReportAlokasi extends Controller
         $sheet->setCellValue('B' . '7', ':' . $getdata[0]->nama);
         $sheet->setCellValue('D' . '4', ':' . $getdata[0]->name);
         $sheet->setCellValue('D' . '5', ':' . date('d-m-Y H:i:s', strtotime($getdate->created_at)));
-        $sheet->setCellValue('D' . '6', ':' . date('d-m-Y H:i:s', strtotime($getdate->updated_at)));
+        if ($getdate->updated_at == null) {
+            $stat = '';
+        } else {
+            $stat = date('d-m-Y H:i:s', strtotime($getdate->updated_at));
+        }
+        $sheet->setCellValue('D' . '6', ':' . $stat);
 
         //header
         $sheet->setCellValue('A' . $header, $getdata[0]->kode_booking);
