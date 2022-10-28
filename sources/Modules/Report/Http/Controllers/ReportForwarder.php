@@ -271,7 +271,12 @@ class ReportForwarder extends Controller
         $sheet->setCellValue('B' . '6', ':' . $getdata[0]->pono);
         $sheet->setCellValue('B' . '7', ':' . $getdata[0]->nama);
         $sheet->setCellValue('D' . '4', ':' . date('d-m-Y H:i:s', strtotime($getdate->created_at)));
-        $sheet->setCellValue('D' . '5', ':' . ($getdate->updated_at == null) ? '' : date('d-m-Y H:i:s', strtotime($getdate->updated_at)));
+        if ($getdate->updated_at == null) {
+            $stat = '';
+        } else {
+            $stat = date('d-m-Y H:i:s', strtotime($getdate->updated_at));
+        }
+        $sheet->setCellValue('D' . '5', ':' . $stat);
 
 
         //header
