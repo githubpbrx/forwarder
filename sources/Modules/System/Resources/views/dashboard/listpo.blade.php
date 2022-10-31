@@ -11,10 +11,10 @@
                 <thead>
                     <tr>
                         <th>
-                            <center>List PO#</center>
+                            <center>PO Number</center>
                         </th>
                         <th>
-                            <center>Items PO</center>
+                            <center>Material</center>
                         </th>
                         <th>
                             <center>Status Allocation</center>
@@ -48,7 +48,7 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label class="col-sm-12 control-label">Nomor PO</label>
+                                    <label class="col-sm-12 control-label">PO Number</label>
                                     <div class="col-sm-12">
                                         <input type="text" class="form-control" id="nomorpo" name="nomorpo" readonly>
                                     </div>
@@ -68,7 +68,7 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label class="col-sm-12 control-label">Nomor Booking</label>
+                                    <label class="col-sm-12 control-label">Booking Number</label>
                                     <div class="col-sm-12">
                                         <input type="text" class="form-control" id="nobook" name="nobook"
                                             autocomplete="off">
@@ -307,7 +307,7 @@
                     $('#detailitem').empty();
 
                     html =
-                        '<table border="0" style="width:100%"><tr><th>Material</th><th>Color Code</th><th>Size</th><th>Quantity PO</th><th>Status</th></tr>';
+                        '<table border="0" style="width:100%"><tr><th>Material</th><th>Color Code</th><th>Size</th><th>Quantity Item</th><th>Status</th></tr>';
                     for (let index = 0; index < poku.length; index++) {
                         html +=
                             '<tr><td>' + poku[index].matcontents + '</td><td>' +
