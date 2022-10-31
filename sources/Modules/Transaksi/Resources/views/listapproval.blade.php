@@ -13,10 +13,10 @@
                             <tr>
 
                                 <th>
-                                    <center>#PO</center>
+                                    <center>PO Number</center>
                                 </th>
                                 <th>
-                                    <center>Nomor Booking</center>
+                                    <center>Booking Number</center>
                                 </th>
                                 <th>
                                     <center>Action</center>
@@ -45,7 +45,7 @@
                         {{ csrf_field() }}
                         <div class="row">
                             <div class="col-md-6">
-                                <label class="col-sm-12 control-label">Nomor PO</label>
+                                <label class="col-sm-12 control-label">PO Number</label>
                                 <div class="col-sm-12">
                                     <input type="text" class="form-control" id="nomorpo" name="nomorpo" readonly>
                                 </div>
@@ -63,7 +63,7 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label class="col-sm-12 control-label">Nomor Booking</label>
+                                    <label class="col-sm-12 control-label">Booking Number</label>
                                     <div class="col-sm-12">
                                         <input type="text" class="form-control" id="nobook" name="nobook" readonly>
                                     </div>
@@ -81,7 +81,7 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label class="col-sm-12 control-label">ETD (Estimate Delivery Date)</label>
+                                    <label class="col-sm-12 control-label">ETD (Estimated Time Departure)</label>
                                     <div class="col-sm-12">
                                         <input type="text" class="form-control" id="etd" name="etd" readonly>
                                     </div>
@@ -89,7 +89,7 @@
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label class="col-sm-12 control-label">ETA (Estimate Acutal Delivery Date)</label>
+                                    <label class="col-sm-12 control-label">ETA (Estimated Time Arrival)</label>
                                     <div class="col-sm-12">
                                         <input type="text" class="form-control" id="eta" name="eta" readonly>
                                     </div>
