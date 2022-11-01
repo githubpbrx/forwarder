@@ -86,6 +86,9 @@
                                                 <center>Code Booking</center>
                                             </th>
                                             <th>
+                                                <center>Material</center>
+                                            </th>
+                                            <th>
                                                 <center>Forwarder</center>
                                             </th>
                                             <th>
@@ -120,7 +123,7 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label class="col-sm-12 control-label">Nomor PO</label>
+                                    <label class="col-sm-12 control-label">PO Number</label>
                                     <div class="col-sm-12">
                                         <input type="text" class="form-control" id="nomorpo" name="nomorpo" readonly>
                                     </div>
@@ -159,7 +162,7 @@
                         <div class="row">
                             <div class="col-md-4">
                                 <div class="form-group">
-                                    <label class="col-sm-12 control-label">Nomor Booking</label>
+                                    <label class="col-sm-12 control-label">Booking Number</label>
                                     <div class="col-sm-12">
                                         <input type="text" class="form-control" id="nobook" name="nobook"
                                             readonly>
@@ -227,6 +230,10 @@
                     {
                         data: 'kodebook',
                         name: 'kodebook'
+                    },
+                    {
+                        data: 'material',
+                        name: 'material'
                     },
                     {
                         data: 'forwarder',

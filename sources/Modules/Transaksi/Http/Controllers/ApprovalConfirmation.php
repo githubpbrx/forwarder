@@ -89,16 +89,16 @@ class ApprovalConfirmation extends Controller
             } else {
                 $where = '';
                 if ($request->statusfwd != "all") {
-                    $where .= ' AND statusformpo="' . $request->statusfwd . '" ';
+                    $where .= 'AND statusformpo="' . $request->statusfwd . '"';
                 }
                 if ($request->tanggal1 != "" and $request->tanggal2 != "") {
-                    $where .= ' AND (date_booking BETWEEN "' . $request->tanggal1 . '" AND "' . $request->tanggal2 . '") ';
+                    $where .= 'AND (date_booking BETWEEN "' . $request->tanggal1 . '" AND "' . $request->tanggal2 . '")';
                 }
                 if ($request->buyer != "") {
-                    $where .= ' AND buyer=" ' . $request->buyer . '" ';
+                    $where .= 'AND buyer="' . $request->buyer . '"';
                 }
                 if ($request->book != "") {
-                    $where .= ' AND kode_booking=" ' . $request->book . '" ';
+                    $where .= 'AND kode_booking="' . $request->book . '"';
                 }
                 // $data = formpo::join('po', 'po.id', 'formpo.idpo')
                 //     ->join('masterforwarder', 'masterforwarder.id', 'formpo.idmasterfwd')
@@ -111,8 +111,8 @@ class ApprovalConfirmation extends Controller
                     ->join('formpo', 'formpo.idpo', 'forwarder.idpo')
                     ->join('masterforwarder', 'masterforwarder.id', 'forwarder.idmasterfwd')
                     ->where('forwarder.aktif', 'Y')->where('formpo.aktif', 'Y')->where('masterforwarder.aktif', 'Y')
-                    ->whereRaw(' vendor="' . $request->supplier . '" ' . $where . ' ')
-                    ->selectRaw(' forwarder.id_forwarder, po.pono, formpo.kode_booking, masterforwarder.name ')
+                    ->whereRaw(' vendor="' . $request->supplier . '"' . $where . '')
+                    // ->selectRaw(' forwarder.id_forwarder, po.pono, po.matcontents, formpo.kode_booking, masterforwarder.name ')
                     ->get();
             }
 
@@ -128,6 +128,9 @@ class ApprovalConfirmation extends Controller
                 // })
                 ->addColumn('kodebook', function ($data) {
                     return $data->kode_booking;
+                })
+                ->addColumn('material', function ($data) {
+                    return $data->matcontents;
                 })
                 ->addColumn('forwarder', function ($data) {
                     return $data->name;
