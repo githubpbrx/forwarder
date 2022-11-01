@@ -267,23 +267,23 @@ class ReportAlokasi extends Controller
 
         //single header
         $sheet->setCellValue('B' . '4', ':' . $getdata[0]->noinv);
-        $sheet->setCellValue('B' . '5', ':' . date('d-m-Y H:i:s', strtotime($getdata[0]->created_at)));
+        $sheet->setCellValue('B' . '5', ':' . date('d F Y H:i:s', strtotime($getdata[0]->created_at)));
         $sheet->setCellValue('B' . '6', ':' . $getdata[0]->pono);
         $sheet->setCellValue('B' . '7', ':' . $getdata[0]->nama);
         $sheet->setCellValue('D' . '4', ':' . $getdata[0]->name);
-        $sheet->setCellValue('D' . '5', ':' . date('d-m-Y H:i:s', strtotime($getdate->created_at)));
+        $sheet->setCellValue('D' . '5', ':' . date('d F Y H:i:s', strtotime($getdate->created_at)));
         if ($getdate->updated_at == null) {
             $stat = '';
         } else {
-            $stat = date('d-m-Y H:i:s', strtotime($getdate->updated_at));
+            $stat = date('d F Y H:i:s', strtotime($getdate->updated_at));
         }
         $sheet->setCellValue('D' . '6', ':' . $stat);
 
         //header
         $sheet->setCellValue('A' . $header, $getdata[0]->kode_booking);
         $sheet->setCellValue('B' . $header, $getdata[0]->nomor_bl);
-        $sheet->setCellValue('C' . $header, date('d-m-Y', strtotime($getdata[0]->etdfix)));
-        $sheet->setCellValue('D' . $header, date('d-m-Y', strtotime($getdata[0]->etafix)));
+        $sheet->setCellValue('C' . $header, date('d F Y', strtotime($getdata[0]->etdfix)));
+        $sheet->setCellValue('D' . $header, date('d F Y', strtotime($getdata[0]->etafix)));
         $sheet->setCellValue('E' . $header, $getdata[0]->shipmode);
         $sheet->setCellValue('F' . $header, $getdata[0]->subshipmode);
         $sheet->setCellValue('G' . $header, $getdata[0]->vessel);

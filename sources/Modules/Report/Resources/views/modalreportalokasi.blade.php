@@ -47,7 +47,8 @@
             <div class="form-group">
                 <label class="col-sm-12 control-label">ETD</label>
                 <div class="col-sm-12">
-                    <input type="text" class="form-control" value="{{ $data[0]->etdfix }}" readonly>
+                    <input type="text" class="form-control" value="{{ date('d F Y', strtotime($data[0]->etdfix)) }}"
+                        readonly>
                 </div>
             </div>
         </div>
@@ -55,7 +56,8 @@
             <div class="form-group">
                 <label class="col-sm-12 control-label">ETA</label>
                 <div class="col-sm-12">
-                    <input type="text" class="form-control" value="{{ $data[0]->etafix }}" readonly>
+                    <input type="text" class="form-control" value="{{ date('d F Y', strtotime($data[0]->etafix)) }}"
+                        readonly>
                 </div>
             </div>
         </div>
@@ -98,7 +100,7 @@
                 <label class="col-sm-12 control-label">Input Data</label>
                 <div class="col-sm-12">
                     <input type="text" class="form-control"
-                        value="{{ date('d-m-Y H:i:s', strtotime($dateku->created_at)) }}" readonly>
+                        value="{{ date('d F Y H:i:s', strtotime($dateku->created_at)) }}" readonly>
                 </div>
             </div>
         </div>
@@ -107,7 +109,7 @@
                 <label class="col-sm-12 control-label">Update Data</label>
                 <div class="col-sm-12">
                     <input type="text" class="form-control"
-                        value="{{ $dateku->updated_at == null ? '' : date('d-m-Y H:i:s', strtotime($dateku->updated_at)) }}"
+                        value="{{ $dateku->updated_at == null ? '' : date('d F Y H:i:s', strtotime($dateku->updated_at)) }}"
                         readonly>
                 </div>
             </div>
