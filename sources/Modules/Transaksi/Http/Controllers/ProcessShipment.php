@@ -32,7 +32,7 @@ class ProcessShipment extends Controller
     public function index()
     {
         $data = array(
-            'title' => 'Process Shipment',
+            'title' => 'Process Allocation Shipment',
             'menu'  => 'processshipment',
             'box'   => '',
         );
@@ -123,11 +123,12 @@ class ProcessShipment extends Controller
             ->join('po', 'po.id', 'formpo.idpo')
             ->join('forwarder', 'forwarder.id_forwarder', 'formpo.idforwarder')
             ->join('privilege', 'privilege.idforwarder', 'forwarder.idmasterfwd')
+            ->join('mastersupplier', 'mastersupplier.id', 'po.vendor')
             ->where('po.pono', $request->id)
             ->where('privilege.privilege_user_nik', Session::get('session')['user_nik'])
             ->where('formpo.statusformpo', 'confirm')
             ->where('formpo.aktif', 'Y')->where('forwarder.aktif', 'Y')->where('privilege.privilege_aktif', 'Y')
-            ->selectRaw(' formpo.*, po.pono, po.style, po.matcontents, po.colorcode, po.size, po.qtypo, forwarder.qty_allocation, forwarder.statusforwarder')
+            ->selectRaw(' formpo.*, po.pono, po.matcontents, po.itemdesc, po.colorcode, po.size, po.qtypo, forwarder.qty_allocation, forwarder.statusforwarder, mastersupplier.nama')
             ->get();
 
         // $mydata = formpo::with(['po' => function ($var) use ($request) {

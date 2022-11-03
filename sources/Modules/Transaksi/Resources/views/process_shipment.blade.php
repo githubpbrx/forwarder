@@ -53,6 +53,14 @@
                                     </div>
                                 </div>
                             </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="col-sm-12 control-label">Supplier</label>
+                                    <div class="col-sm-12">
+                                        <input type="text" class="form-control" id="supplier" name="supplier" readonly>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                         <hr
                             style="width: 100%; color: rgb(192, 192, 192); height: 0.5px; background-color:rgb(192, 192, 192);" />
@@ -269,7 +277,7 @@
                     $('#detailitem').empty();
 
                     html =
-                        '<table border="0" style="width:100%"><tr><th style="text-align:center"><input type="checkbox" class="checkall" style="height:18px;width:18px" checked></th><th>Material</th><th>Style</th><th>Color Code</th><th>Size</th><th>Quantity Item</th><th>Remaining Quantity</th><th>Quantity Allocation</th></tr>';
+                        '<table border="0" style="width:100%"><tr><th style="text-align:center"><input type="checkbox" class="checkall" style="height:18px;width:18px" checked></th><th>Material</th><th>Material Description</th><th>HS Code</th><th>Color Code</th><th>Size</th><th>Quantity Item</th><th>Remaining Quantity</th><th>Quantity Allocation</th></tr>';
                     for (let index = 0; index < dataku.length; index++) {
                         let remain;
                         let block;
@@ -299,8 +307,9 @@
                             '<tr><td style="text-align:center"><input type="checkbox" class="check-' +
                             index + '" style="height:18px;width:18px" ' + block + ' ' + ceked +
                             '></td><td>' +
-                            dataku[index].matcontents + '</td><td>' + dataku[index].style +
-                            '</td><td>' + dataku[index].colorcode + '</td><td>' + dataku[index]
+                            dataku[index].matcontents + '</td><td>' + dataku[index].itemdesc +
+                            '</td><td>' + '(kosong)' + '</td><td>' + dataku[index].colorcode +
+                            '</td><td>' + dataku[index]
                             .size +
                             '</td><td>' + dataku[index].qtypo + '</td><td>' + remain +
                             '</td><td><input type="number" min="0" id="qty_allocation" name="qty_allocation" value="' +
@@ -314,6 +323,7 @@
                     checkqtyall();
 
                     $('#nomorpo').val(dataku[0].pono);
+                    $('#supplier').val(dataku[0].nama);
                     $('#nobook').val(dataku[0].kode_booking);
                     $('#datebook').val(dataku[0].date_booking);
                     $('#etd').val(dataku[0].etd);
