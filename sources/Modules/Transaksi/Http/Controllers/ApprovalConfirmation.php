@@ -186,10 +186,11 @@ class ApprovalConfirmation extends Controller
             ->join('formpo', 'formpo.idforwarder', 'forwarder.id_forwarder')->where('formpo.aktif', 'Y')
             ->join('masterforwarder', 'masterforwarder.id', 'formpo.idmasterfwd')->where('masterforwarder.aktif', 'Y')
             ->join('privilege', 'privilege.idforwarder', 'formpo.idmasterfwd')->where('privilege_aktif', 'Y')
+            ->join('mastersupplier', 'mastersupplier.id', 'po.vendor')->where('mastersupplier.aktif', 'Y')
             ->where('po.pono', $request->id)
             ->where('formpo.statusformpo', 'waiting')
             ->where('privilege.nikfinance', Session::get('session')['user_nik'])
-            ->selectRaw(' po.id, po.pono, po.matcontents, po.qtypo, po.statusalokasi, forwarder.qty_allocation, forwarder.statusforwarder, forwarder.id_forwarder, formpo.id_formpo, formpo.kode_booking, formpo.date_booking, formpo.etd, formpo.eta, formpo.shipmode, formpo.subshipmode, masterforwarder.name, privilege.privilege_user_name, privilege.privilege_user_nik')
+            ->selectRaw(' po.id, po.pono, po.matcontents, po.itemdesc, po.qtypo, po.statusalokasi, forwarder.qty_allocation, forwarder.statusforwarder, forwarder.id_forwarder, formpo.id_formpo, formpo.kode_booking, formpo.date_booking, formpo.etd, formpo.eta, formpo.shipmode, formpo.subshipmode, masterforwarder.name, privilege.privilege_user_name, privilege.privilege_user_nik, mastersupplier.nama')
             ->get();
         // dd($dataku);
 

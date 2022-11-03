@@ -50,6 +50,12 @@
                                     <input type="text" class="form-control" id="nomorpo" name="nomorpo" readonly>
                                 </div>
                             </div>
+                            <div class="col-md-6">
+                                <label class="col-sm-12 control-label">Supplier</label>
+                                <div class="col-sm-12">
+                                    <input type="text" class="form-control" id="supplier" name="supplier" readonly>
+                                </div>
+                            </div>
                         </div>
                         <hr
                             style="width: 100%; color: rgb(192, 192, 192); height: 0.5px; background-color:rgb(192, 192, 192);" />
@@ -99,18 +105,8 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label class="col-sm-12 control-label">Ship Mode</label>
                                     <div class="col-sm-12">
-                                        <div class="row">
-                                            <div class="col-sm-6">
-                                                <input type="text" class="form-control" id="shipmode" name="shipmode"
-                                                    readonly>
-                                            </div>
-                                            <div class="col-sm-6">
-                                                <input type="text" class="form-control" id="submode" name="submode"
-                                                    readonly>
-                                            </div>
-                                        </div>
+                                        <div id="datashipmode"></div>
                                     </div>
                                 </div>
                             </div>
@@ -269,12 +265,11 @@
                     $('#detailitem').empty();
 
                     html =
-                        '<table border="0" style="width:100%"><tr><th>Material</th><th>Qty Item</th><th>Qty Allocation</th><th>Status Allocation</th></tr>';
+                        '<table border="0" style="width:100%"><tr><th>Material</th><th>Material Description</th><th>HS Code</th><th>Qty Item</th><th>Qty Allocation</th><th>Status Allocation</th></tr>';
                     for (let index = 0; index < mydata.length; index++) {
-
                         html +=
-                            '<tr><td>' +
-                            mydata[index].matcontents + '</td><td>' +
+                            '<tr><td>' + mydata[index].matcontents + '</td><td>' + mydata[index]
+                            .itemdesc + '</td><td>' + 'kosong' + '</td><td>' +
                             mydata[index].qtypo + '</td><td>' + mydata[index].qty_allocation +
                             '</td><td>' + mydata[index].statusforwarder +
                             '</td><td><input type="hidden" id="dataid-' + index + '" data-idpo="' +
@@ -287,19 +282,35 @@
                     html += "</table>";
                     $('#detailitem').html(html);
 
-                    // idpo = mydata[].id;
-                    // idformpo = databook.id_formpo;
-                    // usernik = privilege.privilege_user_nik;
-                    // usernama = privilege.privilege_user_name;
-                    // tglpengajuan = databook.created_at;
+
+                    if ((mydata[0].shipmode == 'fcl')) {
+                        let exp = mydata[0].subshipmode.split("-");
+                        $('#datashipmode').append(
+                            '<div class="row"><div class="col-sm-3"><label class="control-label">Ship Mode</label><input type="text" class="form-control" value="' +
+                            mydata[0].shipmode +
+                            '" readonly></div><div class="col-sm-3"><label class="control-label">SubShipmode</label><input type="text" class="form-control" value="' +
+                            exp[0] +
+                            '&Prime;" readonly></div><div class="col-sm-3"><label class="control-label">Amount</label><input type="text" class="form-control" value="' +
+                            exp[1] +
+                            '" readonly></div><div class="col-sm-3"><label class="control-label">Weight</label><input type="text" class="form-control" value="' +
+                            exp[2] + '" readonly></div></div>'
+                        );
+                    } else {
+                        $('#datashipmode').append(
+                            '<div class="row"><div class="col-sm-6"><label class="control-label">Ship Mode</label><input type="text" class="form-control" value="' +
+                            mydata[0].shipmode +
+                            '" readonly></div><div class="col-sm-6"><label class="control-label">SubShipmode</label><input type="text" class="form-control" value="' +
+                            mydata[0].subshipmode +
+                            '" readonly></div></div>'
+                        );
+                    }
 
                     $('#nomorpo').val(mydata[0].pono);
+                    $('#supplier').val(mydata[0].nama);
                     $('#nobook').val(mydata[0].kode_booking);
                     $('#datebook').val(mydata[0].date_booking);
                     $('#etd').val(mydata[0].etd);
                     $('#eta').val(mydata[0].eta);
-                    $('#shipmode').val(mydata[0].shipmode);
-                    $('#submode').val(mydata[0].subshipmode);
                     $('#forwarder').val(mydata[0].name);
                     $('#pengajunama').html(mydata[0].privilege_user_name);
                     $('#pengajunik').val(mydata[0].privilege_user_nik);
