@@ -188,9 +188,9 @@ class home extends Controller
             ->addColumn('listpo', function ($query) {
                 return  $query->pono;
             })
-            ->addColumn('itempo', function ($query) {
-                return  $query->itemdesc;
-            })
+            // ->addColumn('itempo', function ($query) {
+            //     return  $query->itemdesc;
+            // })
             ->addColumn('statusalokasi', function ($query) {
                 if ($query->statusforwarder == 'full_allocated') {
                     $alokasi = 'Full Allocation';
@@ -332,12 +332,14 @@ class home extends Controller
         //     ->where('po_nomor', $request->id)->where('aktif', 'Y')->get();
         $mydata = forwarder::join('po', 'po.id', 'forwarder.idpo')
             ->join('privilege', 'privilege.idforwarder', 'forwarder.idmasterfwd')
+            ->join('mastersupplier', 'mastersupplier.id', 'po.vendor')
             ->where('po.pono', $request->id)
             ->where('privilege.privilege_user_nik', Session::get('session')['user_nik'])
             ->where(function ($kus) {
                 $kus->where('forwarder.statusapproval', null)->orWhere('forwarder.statusapproval', 'reject');
             })
-            ->where('forwarder.aktif', 'Y')->where('privilege.privilege_aktif', 'Y')
+            ->where('forwarder.aktif', 'Y')->where('privilege.privilege_aktif', 'Y')->where('mastersupplier.aktif', 'Y')
+            ->selectRaw(' forwarder.*, po.id, po.pono, po.matcontents, po.itemdesc, po.colorcode, po.size, po.qtypo, mastersupplier.nama')
             ->get();
         // dd($mydata);
         $data = array(
@@ -405,7 +407,7 @@ class home extends Controller
         DB::beginTransaction();
 
         if ($request->shipmode == 'fcl') {
-            $submode = $request->fcl;
+            $submode = $request->fcl . '-' . $request->amount . '-' . $request->weight . 'KG';
         } else if ($request->shipmode == 'lcl') {
             $submode = $request->lcl . ' ' . 'CBM';
         } else {

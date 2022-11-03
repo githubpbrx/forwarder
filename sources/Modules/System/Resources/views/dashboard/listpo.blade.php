@@ -13,9 +13,9 @@
                         <th>
                             <center>PO Number</center>
                         </th>
-                        <th>
+                        {{-- <th>
                             <center>Material</center>
-                        </th>
+                        </th> --}}
                         <th>
                             <center>Status Allocation</center>
                         </th>
@@ -51,6 +51,14 @@
                                     <label class="col-sm-12 control-label">PO Number</label>
                                     <div class="col-sm-12">
                                         <input type="text" class="form-control" id="nomorpo" name="nomorpo" readonly>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="col-sm-12 control-label">Supplier</label>
+                                    <div class="col-sm-12">
+                                        <input type="text" class="form-control" id="supplier" name="supplier" readonly>
                                     </div>
                                 </div>
                             </div>
@@ -122,12 +130,27 @@
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group" id="datafcl" style="display: none">
-                                    <label class="col-sm-12 control-label">FCL</label>
                                     <div class="col-sm-12">
-                                        <select class="select2" style="width: 100%;" name="fclku" id="fclku">
-                                            <option value="20">20"</option>
-                                            <option value="40">40"</option>
-                                        </select>
+                                        <div class="row">
+                                            <div class="col-sm-4">
+                                                <label class="control-label">FCL</label>
+                                                <select class="select2" style="width: 100%;" name="fclku"
+                                                    id="fclku">
+                                                    <option value="20">20"</option>
+                                                    <option value="40">40"</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-sm-4">
+                                                <label class="control-label">Amount</label>
+                                                <input type="number" min="0" class="form-control" name="amount"
+                                                    id="amount" autocomplete="off">
+                                            </div>
+                                            <div class="col-sm-4">
+                                                <label class="control-label">Weight</label>
+                                                <input type="number" min="0" class="form-control" name="weight"
+                                                    id="weight" autocomplete="off">
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="form-group" id="datalcl" style="display: none">
@@ -256,10 +279,10 @@
                         data: 'listpo',
                         name: 'listpo'
                     },
-                    {
-                        data: 'itempo',
-                        name: 'itempo'
-                    },
+                    // {
+                    //     data: 'itempo',
+                    //     name: 'itempo'
+                    // },
                     {
                         data: 'statusalokasi',
                         name: 'statusalokasi'
@@ -307,10 +330,11 @@
                     $('#detailitem').empty();
 
                     html =
-                        '<table border="0" style="width:100%"><tr><th>Material</th><th>Color Code</th><th>Size</th><th>Quantity Item</th><th>Status</th></tr>';
+                        '<table border="0" style="width:100%"><tr><th>Material</th><th>Material Description</th><th>HS Code</th><th>Color Code</th><th>Size</th><th>Quantity Item</th><th>Status</th></tr>';
                     for (let index = 0; index < poku.length; index++) {
                         html +=
-                            '<tr><td>' + poku[index].matcontents + '</td><td>' +
+                            '<tr><td>' + poku[index].matcontents + '</td><td>' + poku[index]
+                            .itemdesc + '</td><td>' + 'kosong' + '</td><td>' +
                             poku[index].colorcode + '</td><td>' + poku[index].size + '</td><td>' +
                             poku[index].qtypo + '</td><td>' + poku[index].statusforwarder +
                             '</td><td><input type="hidden" id="idall-' + index + '" data-id="' +
@@ -323,6 +347,7 @@
                     $('#detailitem').html(html);
 
                     $('#nomorpo').val(poku[0].pono);
+                    $('#supplier').val(poku[0].nama);
                 })
             });
 
@@ -336,6 +361,8 @@
                 let myeta = $('#eta').val();
                 let mode = $('#shipmode').val();
                 let myfcl = $('#fclku').val();
+                let myamount = $('#amount').val();
+                let myweight = $('#weight').val();
                 let mylcl = $('#lclku').val();
                 let myair = $('#airku').val();
 
@@ -349,7 +376,7 @@
 
                     dataid.push(idall);
                 }
-
+                console.log('dataid :>> ', dataid);
                 if (nobook == null || nobook == '') {
                     notifalert('Nomor Booking');
                 } else if (datebook == null || datebook == '') {
@@ -360,6 +387,12 @@
                     notifalert('ETA (Estimate Acutal Delivery Date)');
                 } else if (mode == null || mode == '') {
                     notifalert('Ship Mode');
+                } else if (mode == 'fcl' && myfcl == '') {
+                    notifalert('FCL');
+                } else if (mode == 'fcl' && myamount == '') {
+                    notifalert('Amount Container');
+                } else if (mode == 'fcl' && myweight == '') {
+                    notifalert('Weight');
                 } else if (mode == 'lcl' && mylcl == '') {
                     notifalert('LCL');
                 } else if (mode == 'air' && myair == '') {
@@ -377,6 +410,8 @@
                             'eta': myeta,
                             'shipmode': mode,
                             'fcl': myfcl,
+                            'amount': myamount,
+                            'weight': myweight,
                             'lcl': mylcl,
                             'air': myair,
                         },
