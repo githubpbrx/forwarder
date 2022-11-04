@@ -108,18 +108,8 @@
                             </div>
                             <div class="col-md-4">
                                 <div class="form-group">
-                                    <label class="col-sm-12 control-label">Ship Mode</label>
                                     <div class="col-sm-12">
-                                        <div class="row">
-                                            <div class="col-sm-6">
-                                                <input type="text" class="form-control" id="shipmode" name="shipmode"
-                                                    readonly>
-                                            </div>
-                                            <div class="col-sm-6">
-                                                <input type="text" class="form-control" id="submode" name="submode"
-                                                    readonly>
-                                            </div>
-                                        </div>
+                                        <div id="datashipmode"></div>
                                     </div>
                                 </div>
                             </div>
@@ -275,6 +265,7 @@
 
                     length = dataku.length;
                     $('#detailitem').empty();
+                    $('#datashipmode').empty();
 
                     html =
                         '<table border="0" style="width:100%"><tr><th style="text-align:center"><input type="checkbox" class="checkall" style="height:18px;width:18px" checked></th><th>Material</th><th>Material Description</th><th>HS Code</th><th>Color Code</th><th>Size</th><th>Quantity Item</th><th>Remaining Quantity</th><th>Quantity Allocation</th></tr>';
@@ -322,14 +313,34 @@
                     $('#detailitem').html(html);
                     checkqtyall();
 
+                    if ((dataku[0].shipmode == 'fcl')) {
+                        let exp = dataku[0].subshipmode.split("-");
+                        $('#datashipmode').append(
+                            '<div class="row"><div class="col-sm-3"><label class="control-label">Ship Mode</label><input type="text" class="form-control" value="' +
+                            dataku[0].shipmode +
+                            '" readonly></div><div class="col-sm-3"><label class="control-label">SubShipmode</label><input type="text" class="form-control" value="' +
+                            exp[0] +
+                            '&Prime;" readonly></div><div class="col-sm-3"><label class="control-label">Amount</label><input type="text" class="form-control" value="' +
+                            exp[1] +
+                            '" readonly></div><div class="col-sm-3"><label class="control-label">Weight</label><input type="text" class="form-control" value="' +
+                            exp[2] + '" readonly></div></div>'
+                        );
+                    } else {
+                        $('#datashipmode').append(
+                            '<div class="row"><div class="col-sm-6"><label class="control-label">Ship Mode</label><input type="text" class="form-control" value="' +
+                            dataku[0].shipmode +
+                            '" readonly></div><div class="col-sm-6"><label class="control-label">SubShipmode</label><input type="text" class="form-control" value="' +
+                            dataku[0].subshipmode +
+                            '" readonly></div></div>'
+                        );
+                    }
+
                     $('#nomorpo').val(dataku[0].pono);
                     $('#supplier').val(dataku[0].nama);
                     $('#nobook').val(dataku[0].kode_booking);
                     $('#datebook').val(dataku[0].date_booking);
                     $('#etd').val(dataku[0].etd);
                     $('#eta').val(dataku[0].eta);
-                    $('#shipmode').val(dataku[0].shipmode);
-                    $('#submode').val(dataku[0].subshipmode);
                     $('#etdfix').val(dataku[0].etd);
                     $('#etafix').val(dataku[0].eta);
                 })
