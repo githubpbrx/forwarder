@@ -13,6 +13,7 @@ use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 use Modules\Report\Models\modelprivilege;
 use Modules\Report\Models\modelpo;
+use Modules\Report\Models\modelforwarder;
 use Modules\Report\Models\modelformshipment;
 use Modules\Report\Models\modelformpo;
 
@@ -42,29 +43,30 @@ class ReportForwarder extends Controller
 
         if ($request->ajax()) {
             if ($request->po == null) {
-                $data = modelformshipment::join('formpo', 'formpo.id_formpo', 'formshipment.idformpo')
-                    ->join('po', 'po.id', 'formpo.idpo')
+                $data = modelformpo::join('po', 'po.id', 'formpo.idpo')
                     ->join('mastersupplier', 'mastersupplier.id', 'po.vendor')
                     ->join('privilege', 'privilege.idforwarder', 'formpo.idmasterfwd')
+                    ->leftjoin('formshipment', 'formshipment.idformpo', 'formpo.id_formpo')
                     ->where('privilege.privilege_user_nik', Session::get('session')['user_nik'])
-                    ->where('formpo.aktif', 'Y')->where('mastersupplier.aktif', 'Y')
-                    ->where('formshipment.aktif', 'Y')->where('privilege.privilege_aktif', 'Y')
-                    ->where('formpo.statusformpo', 'confirm')
-                    ->groupby('formshipment.noinv')
+                    ->where('mastersupplier.aktif', 'Y')->where('formpo.aktif', 'Y')->where('privilege.privilege_aktif', 'Y')
+                    ->where(function ($kk) {
+                        $kk->where('formshipment.id_shipment', null)->orWhere('formshipment.aktif', 'Y');
+                    })
+                    ->groupby('formpo.kode_booking')
                     ->selectRaw('po.id, po.pono, mastersupplier.nama, formpo.kode_booking, formshipment.noinv, formshipment.nomor_bl')
                     ->get();
             } else {
-                // $data = modelpo::where('pono', $request->po)->get();
-                $data = modelformshipment::join('formpo', 'formpo.id_formpo', 'formshipment.idformpo')
-                    ->join('po', 'po.id', 'formpo.idpo')
+                $data = modelformpo::join('po', 'po.id', 'formpo.idpo')
                     ->join('mastersupplier', 'mastersupplier.id', 'po.vendor')
                     ->join('privilege', 'privilege.idforwarder', 'formpo.idmasterfwd')
+                    ->leftjoin('formshipment', 'formshipment.idformpo', 'formpo.id_formpo')
                     ->where('po.pono', $request->po)
                     ->where('privilege.privilege_user_nik', Session::get('session')['user_nik'])
-                    ->where('formpo.statusformpo', 'confirm')
-                    ->where('formpo.aktif', 'Y')->where('mastersupplier.aktif', 'Y')
-                    ->where('formshipment.aktif', 'Y')->where('privilege.privilege_aktif', 'Y')
-                    ->groupby('formshipment.noinv')
+                    ->where('mastersupplier.aktif', 'Y')->where('privilege.privilege_aktif', 'Y')
+                    ->where(function ($kk) {
+                        $kk->where('formshipment.id_shipment', null)->orWhere('formshipment.aktif', 'Y');
+                    })
+                    ->groupby('formpo.kode_booking')
                     ->selectRaw('po.id, po.pono, mastersupplier.nama, formpo.kode_booking, formshipment.noinv, formshipment.nomor_bl')
                     ->get();
             }
@@ -90,9 +92,9 @@ class ReportForwarder extends Controller
                 ->addColumn('action', function ($data) {
                     $button = '';
 
-                    $button .= '<a href="#" data-id="' . $data->noinv . '" id="detailpo"><i class="fa fa-info-circle"></i></a>';
+                    $button .= '<a href="#" data-id="' . $data->kode_booking . '" id="detailpo"><i class="fa fa-info-circle"></i></a>';
                     $button .= '&nbsp';
-                    $button .= '<a href="' . url('report/forwarder/getexcelforwarder', ['id' => $data->noinv]) . '" data-id="#"><i class="fa fa-file-excel text-success"></i></a>';
+                    $button .= '<a href="' . url('report/forwarder/getexcelforwarder', ['id' => $data->kode_booking]) . '" data-id="#"><i class="fa fa-file-excel text-success"></i></a>';
 
                     return $button;
                 })
@@ -129,34 +131,33 @@ class ReportForwarder extends Controller
     public function detailforwarder(Request $request)
     {
         // dd($request);
-        // $getdata = modelformpo::join('po', 'po.id', 'formpo.idpo')
-        //     ->join('forwarder', 'forwarder.id_forwarder', 'formpo.idforwarder')
-        //     ->join('mastersupplier', 'mastersupplier.id', 'po.vendor')
-        //     ->where('po.pono', $request->id)
-        //     ->where('formpo.aktif', 'Y')->where('forwarder.aktif', 'Y')->where('mastersupplier.aktif', 'Y')
-        //     ->selectRaw(' formpo.kode_booking, formpo.shipmode, formpo.subshipmode, forwarder.qty_allocation, po.pono, po.matcontents, po.qtypo, mastersupplier.nama ')
-        //     ->get();
-
-        $getdata = modelformshipment::join('formpo', 'formpo.id_formpo', 'formshipment.idformpo')
-            ->join('po', 'po.id', 'formpo.idpo')
+        $getdata = modelformpo::join('po', 'po.id', 'formpo.idpo')
             ->join('mastersupplier', 'mastersupplier.id', 'po.vendor')
-            ->where('formshipment.noinv', $request->id)
-            ->where('formshipment.aktif', 'Y')->where('formpo.aktif', 'Y')->where('mastersupplier.aktif', 'Y')
-            ->selectRaw(' formshipment.qty_shipment, formshipment.noinv, formshipment.etdfix, formshipment.etafix, formshipment.nomor_bl, formshipment.vessel, po.pono, po.qtypo, po.matcontents, po.style, po.colorcode, po.size, formpo.kode_booking, formpo.shipmode, formpo.subshipmode, mastersupplier.nama ')
+            ->join('privilege', 'privilege.idforwarder', 'formpo.idmasterfwd')
+            ->leftjoin('formshipment', 'formshipment.idformpo', 'formpo.id_formpo')
+            ->where('formpo.kode_booking', $request->id)
+            ->where('privilege.privilege_user_nik', Session::get('session')['user_nik'])
+            ->where('mastersupplier.aktif', 'Y')->where('privilege.privilege_aktif', 'Y')
+            ->where(function ($kk) {
+                $kk->where('formshipment.id_shipment', null)->orWhere('formshipment.aktif', 'Y');
+            })
+            ->selectRaw('formshipment.qty_shipment, formshipment.noinv, formshipment.etdfix, formshipment.etafix, formshipment.nomor_bl, formshipment.vessel, po.pono, po.qtypo, po.matcontents, po.style, po.colorcode, po.size, formpo.kode_booking, formpo.shipmode, formpo.subshipmode, mastersupplier.nama')
             ->get();
 
-        $getdate = modelformshipment::join('formpo', 'formpo.id_formpo', 'formshipment.idformpo')
-            ->join('po', 'po.id', 'formpo.idpo')
+        $getdate = modelformpo::join('po', 'po.id', 'formpo.idpo')
             ->join('mastersupplier', 'mastersupplier.id', 'po.vendor')
-            ->where('formshipment.noinv', $request->id)
-            ->where('formshipment.aktif', 'Y')->where('formpo.aktif', 'Y')->where('mastersupplier.aktif', 'Y')
+            ->join('privilege', 'privilege.idforwarder', 'formpo.idmasterfwd')
+            ->leftjoin('formshipment', 'formshipment.idformpo', 'formpo.id_formpo')
+            ->where('formpo.kode_booking', $request->id)
+            ->where('privilege.privilege_user_nik', Session::get('session')['user_nik'])
+            ->where('mastersupplier.aktif', 'Y')->where('privilege.privilege_aktif', 'Y')
+            ->where(function ($kk) {
+                $kk->where('formshipment.id_shipment', null)->orWhere('formshipment.aktif', 'Y');
+            })
             ->selectRaw(' formshipment.id_shipment, formshipment.created_at, formshipment.updated_at')
             ->latest('id_shipment')->first();
-        // dd($getdate);
+
         $data = array(
-            // 'dataformpo' => $dataformpo,
-            // 'datapo' => $datapo,
-            // 'dataforwarder' => $dataforwarder
             'alldata' => $getdata
         );
 
@@ -167,19 +168,25 @@ class ReportForwarder extends Controller
 
     function excelforwarder($id)
     {
-        $getdata = modelformshipment::join('formpo', 'formpo.id_formpo', 'formshipment.idformpo')
-            ->join('po', 'po.id', 'formpo.idpo')
+        $getdata = modelformpo::join('po', 'po.id', 'formpo.idpo')
             ->join('mastersupplier', 'mastersupplier.id', 'po.vendor')
-            ->where('formshipment.noinv', $id)
-            ->where('formshipment.aktif', 'Y')->where('formpo.aktif', 'Y')->where('mastersupplier.aktif', 'Y')
-            ->selectRaw(' formshipment.*, po.pono, po.style, po.colorcode, po.size, po.qtypo, po.matcontents, formpo.kode_booking, formpo.shipmode, formpo.subshipmode, mastersupplier.nama ')
+            ->leftjoin('formshipment', 'formshipment.idformpo', 'formpo.id_formpo')
+            ->where('formpo.kode_booking', $id)
+            ->where('mastersupplier.aktif', 'Y')->where('formpo.aktif', 'Y')
+            ->where(function ($kk) {
+                $kk->where('formshipment.id_shipment', null)->orWhere('formshipment.aktif', 'Y');
+            })
+            ->selectRaw('formshipment.*, po.pono, po.style, po.colorcode, po.size, po.qtypo, po.matcontents, formpo.kode_booking, formpo.shipmode, formpo.subshipmode, mastersupplier.nama')
             ->get();
 
-        $getdate = modelformshipment::join('formpo', 'formpo.id_formpo', 'formshipment.idformpo')
-            ->join('po', 'po.id', 'formpo.idpo')
+        $getdate = modelformpo::join('po', 'po.id', 'formpo.idpo')
             ->join('mastersupplier', 'mastersupplier.id', 'po.vendor')
-            ->where('formshipment.noinv', $id)
-            ->where('formshipment.aktif', 'Y')->where('formpo.aktif', 'Y')->where('mastersupplier.aktif', 'Y')
+            ->leftjoin('formshipment', 'formshipment.idformpo', 'formpo.id_formpo')
+            ->where('formpo.kode_booking', $id)
+            ->where('mastersupplier.aktif', 'Y')->where('formpo.aktif', 'Y')
+            ->where(function ($kk) {
+                $kk->where('formshipment.id_shipment', null)->orWhere('formshipment.aktif', 'Y');
+            })
             ->selectRaw(' formshipment.id_shipment, formshipment.created_at, formshipment.updated_at')
             ->latest('id_shipment')->first();
         // dd($getdate);
@@ -267,23 +274,18 @@ class ReportForwarder extends Controller
 
         //single header
         $sheet->setCellValue('B' . '4', ':' . $getdata[0]->noinv);
-        $sheet->setCellValue('B' . '5', ':' . date('d F Y H:i:s', strtotime($getdata[0]->created_at)));
+        $sheet->setCellValue('B' . '5', ':' . ($getdata[0]->created_at == null) ? ':' : date('d F Y H:i:s', strtotime($getdata[0]->created_at)));
         $sheet->setCellValue('B' . '6', ':' . $getdata[0]->pono);
         $sheet->setCellValue('B' . '7', ':' . $getdata[0]->nama);
-        $sheet->setCellValue('D' . '4', ':' . date('d F Y H:i:s', strtotime($getdate->created_at)));
-        if ($getdate->updated_at == null) {
-            $stat = '';
-        } else {
-            $stat = date('d F Y H:i:s', strtotime($getdate->updated_at));
-        }
-        $sheet->setCellValue('D' . '5', ':' . $stat);
+        $sheet->setCellValue('D' . '4', ':' . ($getdate->created_at == null) ? ':' : date('d F Y H:i:s', strtotime($getdate->created_at)));
+        $sheet->setCellValue('D' . '5', ':' . ($getdate->updated_at == null) ? ':' : date('d F Y H:i:s', strtotime($getdate->updated_at)));
 
 
         //header
         $sheet->setCellValue('A' . $header, $getdata[0]->kode_booking);
         $sheet->setCellValue('B' . $header, $getdata[0]->nomor_bl);
-        $sheet->setCellValue('C' . $header, date('d F Y', strtotime($getdata[0]->etdfix)));
-        $sheet->setCellValue('D' . $header, date('d F Y', strtotime($getdata[0]->etafix)));
+        $sheet->setCellValue('C' . $header, ($getdata[0]->etdfix == null) ? '' : date('d F Y', strtotime($getdata[0]->etdfix)));
+        $sheet->setCellValue('D' . $header, ($getdata[0]->etdfix == null) ? '' : date('d F Y', strtotime($getdata[0]->etafix)));
         $sheet->setCellValue('E' . $header, $getdata[0]->shipmode);
         $sheet->setCellValue('F' . $header, $getdata[0]->subshipmode);
         $sheet->setCellValue('G' . $header, $getdata[0]->vessel);
@@ -308,7 +310,7 @@ class ReportForwarder extends Controller
         $sheet->getStyle($cellheader)->getAlignment()->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER);
         $sheet->getStyle($celldata)->getAlignment()->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER);
 
-        $fileName = "Detail_Forwarder_" . $getdata[0]->noinv . ".xlsx";
+        $fileName = "Detail_Forwarder_" . $getdata[0]->kode_booking . ".xlsx";
 
         $writer = new Xlsx($spreadsheet);
         header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
