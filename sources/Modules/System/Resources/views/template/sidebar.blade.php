@@ -144,7 +144,7 @@
                     <li class="nav-item">
                         <a href="{{ route('process_shipment') }}" class="nav-link">
                             <i class="fa fa-share nav-icon"></i>
-                            <p>Process Shipment Partial</p>
+                            <p>Outstanding Shipment</p>
                         </a>
                     </li>
                 @endif
