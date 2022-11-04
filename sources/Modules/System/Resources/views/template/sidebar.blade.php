@@ -144,7 +144,7 @@
                     <li class="nav-item">
                         <a href="{{ route('process_shipment') }}" class="nav-link">
                             <i class="fa fa-share nav-icon"></i>
-                            <p>Process Shipment</p>
+                            <p>Process Shipment Partial</p>
                         </a>
                     </li>
                 @endif
@@ -153,7 +153,7 @@
                     <li class="nav-item">
                         <a href="{{ route('datashipment') }}" class="nav-link">
                             <i class="fa fa-archive nav-icon"></i>
-                            <p>Data Shipment</p>
+                            <p>Update Shipment</p>
                         </a>
                     </li>
                 @endif
