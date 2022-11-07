@@ -151,14 +151,15 @@ class WebsupplierServices extends Controller
         }
 
         $pono = $req->pono;
-        $matcontents = $req->matcontents;
-        $colorcode = $req->colorcode;
-        $size = $req->size;
+        $lineid = $req->lineid;
+        // $matcontents = $req->matcontents;
+        // $colorcode = $req->colorcode;
+        // $size = $req->size;
         $pino = $req->pino;
         $pirecdate = $req->pirecdate;
         $pideldate = $req->pideldate;
         $forwarder = $req->forwarder;
-        modellogproses::insert(['typelog' => 'prosesupdatepi', 'activity' => '==== START CHECKING Update PI po => ' . $pono . '; matcontents => ' . $matcontents . '; colorcode=>' . $colorcode . '; size=>' . $size . '; pino =>' . $pino . '; pirecdate=>' . $pirecdate . '; pideldate=>' . $pideldate, 'status' => true, 'datetime' => date('Y-m-d H:i:s'), 'from' => 'api_updatepi', 'created_at' => date('Y-m-d H:i:s')]);
+        modellogproses::insert(['typelog' => 'prosesupdatepi', 'activity' => '==== START CHECKING Update PI po => ' . $pono . '; lineid => ' . $lineid . '; pino =>' . $pino . '; pirecdate=>' . $pirecdate . '; pideldate=>' . $pideldate, 'status' => true, 'datetime' => date('Y-m-d H:i:s'), 'from' => 'api_updatepi', 'created_at' => date('Y-m-d H:i:s')]);
         if ($pono == "") {
             modellogproses::insert(['typelog' => 'prosesupdatepi', 'activity' => 'FAILED alert => The PO your send cannot be empty', 'status' => false, 'datetime' => date('Y-m-d H:i:s'), 'from' => 'api_updatepi', 'created_at' => date('Y-m-d H:i:s')]);
             modellogproses::insert(['typelog' => 'prosesupdatepi', 'activity' => '=== END PROSES => ROLLBACK ===', 'status' => false, 'datetime' => date('Y-m-d H:i:s'), 'from' => 'api_updatepi', 'created_at' => date('Y-m-d H:i:s')]);
@@ -168,7 +169,7 @@ class WebsupplierServices extends Controller
             $failed['type'] = "warning";
             return response()->json($failed, Response::HTTP_UNPROCESSABLE_ENTITY);
         }
-        if ($matcontents == "") {
+        if ($lineid == "") {
             modellogproses::insert(['typelog' => 'prosesupdatepi', 'activity' => 'FAILED alert => The Items your send cannot be empty', 'status' => false, 'datetime' => date('Y-m-d H:i:s'), 'from' => 'api_updatepi', 'created_at' => date('Y-m-d H:i:s')]);
             modellogproses::insert(['typelog' => 'prosesupdatepi', 'activity' => '=== END PROSES => ROLLBACK ===', 'status' => false, 'datetime' => date('Y-m-d H:i:s'), 'from' => 'api_updatepi', 'created_at' => date('Y-m-d H:i:s')]);
             $failed['message'] = "The Items your send cannot be empty";
@@ -197,7 +198,7 @@ class WebsupplierServices extends Controller
             return response()->json($failed, Response::HTTP_UNPROCESSABLE_ENTITY);
         }
 
-        $update = po::where('pono', $pono)->where('matcontents', $matcontents)->where('colorcode', $colorcode)->where('size', $size)->update(['pino' => $pino, 'pirecdate' => $pirecdate, 'pideldate' => $pideldate]);
+        $update = po::where('pono', $pono)->where('line_id', $lineid)->update(['pino' => $pino, 'pirecdate' => $pirecdate, 'pideldate' => $pideldate]);
         if ($update) {
             $cekforwarder = forward::where('name', $forwarder)->first();
             if ($cekforwarder == null) {
@@ -208,7 +209,7 @@ class WebsupplierServices extends Controller
                 $insert = $cekforwarder->id;
             }
 
-            $getqtypo = po::where('pono', $pono)->where('matcontents', $matcontents)->where('colorcode', $colorcode)->where('size', $size)->first();
+            $getqtypo = po::where('pono', $pono)->where('line_id', $lineid)->first();
             $insertdatafwd = fwd::insert(['idpo' => $getqtypo->id, 'idmasterfwd' => $insert, 'po_nomor' => $getqtypo->pono, 'qty_allocation' => $getqtypo->qtypo, 'statusforwarder' => 'full_allocated', 'aktif' => 'Y', 'created_at' => date('Y-m-d H:i:s')]);
 
             // dd($getqtypo);
