@@ -165,57 +165,104 @@ class home extends Controller
         return view('system::dashboard/listkyc', $data);
     }
 
-    public function listpo()
+    public function getpi(Request $request)
     {
-        $query = forwarder::join('privilege', 'privilege.idforwarder', 'forwarder.idmasterfwd')
+        header("Access-Control-Allow-Origin: *");
+        header("Access-Control-Allow-Headers: *");
+
+        if (!$request->ajax()) return;
+        $po = forwarder::join('privilege', 'privilege.idforwarder', 'forwarder.idmasterfwd')
             ->join('po', 'po.id', 'forwarder.idpo')
+            ->join('mastersupplier', 'mastersupplier.id', 'po.vendor')
             ->where('privilege.privilege_user_nik', Session::get('session')['user_nik'])
-            // ->where('forwarder.statusapproval', '=', null)
-            // ->where(function ($qq) {
-            //     $qq->where('po.statusalokasi', 'partial_allocated')->orWhere('po.statusalokasi', 'full_allocated');
-            // })
             ->where(function ($kus) {
                 $kus->where('forwarder.statusapproval', null)->orWhere('forwarder.statusapproval', 'reject');
             })
-            ->where('forwarder.aktif', 'Y')->where('privilege.privilege_aktif', 'Y')
-            ->selectRaw(' forwarder.statusforwarder, forwarder.statusapproval, po.id, po.pono, po.itemdesc ')
-            ->groupby('po.pono')
-            ->get();
-        // dd($query);
+            ->where('forwarder.aktif', 'Y')->where('privilege.privilege_aktif', 'Y')->where('mastersupplier.aktif', 'Y')
+            ->selectRaw(' forwarder.statusforwarder, forwarder.statusapproval, po.id, po.pono, po.itemdesc, po.pino, po.pideldate, mastersupplier.nama ');
 
-        return Datatables::of($query)
-            ->addIndexColumn()
-            ->addColumn('listpo', function ($query) {
-                return  $query->pono;
-            })
-            // ->addColumn('itempo', function ($query) {
-            //     return  $query->itemdesc;
-            // })
-            ->addColumn('statusalokasi', function ($query) {
-                if ($query->statusforwarder == 'full_allocated') {
-                    $alokasi = 'Full Allocation';
-                } else {
-                    $alokasi = 'Partial Allocation';
-                }
-                return  $alokasi;
-            })
-            ->addColumn('status', function ($query) {
-                // if ($query->statusconfirm == 'confirm') {
-                //     $stat = 'Confirmed';
-                // } else {
-                //     $stat = 'Rejected';
-                // }
-                return  $query->statusapproval;
-            })
-            ->addColumn('action', function ($query) {
-                $process    = '';
+        if ($request->has('q')) {
+            $search = $request->q;
+            $po = $po->whereRaw(' po.pideldate like "%' . $search . '%" ');
+        }
 
-                $process    = '<a href="#" data-id="' . $query->pono . '" id="formpo"><i class="fa fa-angle-double-right text-orange"></i></a>';
+        $po = $po->orderby('po.pideldate', 'asc')->groupby('po.pideldate')->get();
+        // dd($po);
+        return response()->json($po);
+    }
 
-                return $process;
-            })
-            // ->rawColumns(['listpo', 'action'])
-            ->make(true);
+    public function listpo(Request $request)
+    {
+        if ($request->ajax()) {
+            if ($request->pidate == null) {
+                $query = forwarder::join('privilege', 'privilege.idforwarder', 'forwarder.idmasterfwd')
+                    ->join('po', 'po.id', 'forwarder.idpo')
+                    ->join('mastersupplier', 'mastersupplier.id', 'po.vendor')
+                    ->where('privilege.privilege_user_nik', Session::get('session')['user_nik'])
+                    ->where(function ($kus) {
+                        $kus->where('forwarder.statusapproval', null)->orWhere('forwarder.statusapproval', 'reject');
+                    })
+                    ->where('forwarder.aktif', 'Y')->where('privilege.privilege_aktif', 'Y')->where('mastersupplier.aktif', 'Y')
+                    ->selectRaw(' forwarder.statusforwarder, forwarder.statusapproval, po.id, po.pono, po.itemdesc, po.pino, po.pideldate, mastersupplier.nama ')
+                    ->groupby('po.pideldate')
+                    ->get();
+            } else {
+                $query = forwarder::join('privilege', 'privilege.idforwarder', 'forwarder.idmasterfwd')
+                    ->join('po', 'po.id', 'forwarder.idpo')
+                    ->join('mastersupplier', 'mastersupplier.id', 'po.vendor')
+                    ->where('privilege.privilege_user_nik', Session::get('session')['user_nik'])
+                    // ->where('forwarder.statusapproval', '=', null)
+                    // ->where(function ($qq) {
+                    //     $qq->where('po.statusalokasi', 'partial_allocated')->orWhere('po.statusalokasi', 'full_allocated');
+                    // })
+                    ->where(function ($kus) {
+                        $kus->where('forwarder.statusapproval', null)->orWhere('forwarder.statusapproval', 'reject');
+                    })
+                    ->where('pideldate', $request->pidate)
+                    ->where('forwarder.aktif', 'Y')->where('privilege.privilege_aktif', 'Y')->where('mastersupplier.aktif', 'Y')
+                    ->selectRaw(' forwarder.statusforwarder, forwarder.statusapproval, po.id, po.pono, po.itemdesc, po.pino, po.pideldate, mastersupplier.nama ')
+                    ->groupby('po.pideldate')
+                    ->get();
+            }
+
+            // dd($query);
+            return Datatables::of($query)
+                ->addIndexColumn()
+                ->addColumn('cekbok', function ($query) {
+                    $cekbox = '';
+                    $cekbox = '<center><input type="checkbox" name="mycekbok" id="mycekbok" value="' . $query->pideldate . '" ></center>';
+                    return  $cekbox;
+                })
+                ->addColumn('listpo', function ($query) {
+                    return  $query->pono;
+                })
+                ->addColumn('pinomor', function ($query) {
+                    return  $query->pino;
+                })
+                ->addColumn('pidel', function ($query) {
+                    return  $query->pideldate;
+                })
+                ->addColumn('supplier', function ($query) {
+                    return  $query->nama;
+                })
+                // ->addColumn('statusalokasi', function ($query) {
+                //     if ($query->statusforwarder == 'full_allocated') {
+                //         $alokasi = 'Full Allocation';
+                //     } else {
+                //         $alokasi = 'Partial Allocation';
+                //     }
+                //     return  $alokasi;
+                // })
+                // ->addColumn('action', function ($query) {
+                //     $process    = '';
+
+                //     $process    = '<a href="#" data-id="' . $query->pono . '" id="formpo"><i class="fa fa-angle-double-right text-orange"></i></a>';
+
+                //     return $process;
+                // })
+                ->rawColumns(['cekbok'])
+                ->make(true);
+        }
     }
 
     public function listupdate()
@@ -326,29 +373,48 @@ class home extends Controller
     public function formpo(Request $request)
     {
         // dd($request);
-        // $mydata = po::where('pono', $request->id)->get();
-        // $dataforwarder = forwarder::join('privilege', 'privilege.idforwarder', 'forwarder.idmasterfwd')
-        //     ->where('privilege.privilege_user_nik', Session::get('session')['user_nik'])
-        //     ->where('po_nomor', $request->id)->where('aktif', 'Y')->get();
-        $mydata = forwarder::join('po', 'po.id', 'forwarder.idpo')
+        $datapo = [];
+        foreach ($request->dataku as $key => $val) {
+            $mydata = forwarder::join('po', 'po.id', 'forwarder.idpo')
+                ->join('privilege', 'privilege.idforwarder', 'forwarder.idmasterfwd')
+                ->join('mastersupplier', 'mastersupplier.id', 'po.vendor')
+                ->where('po.pideldate', $val)
+                ->where('privilege.privilege_user_nik', Session::get('session')['user_nik'])
+                ->where(function ($kus) {
+                    $kus->where('forwarder.statusapproval', null)->orWhere('forwarder.statusapproval', 'reject');
+                })
+                ->where('forwarder.aktif', 'Y')->where('privilege.privilege_aktif', 'Y')->where('mastersupplier.aktif', 'Y')
+                ->selectRaw(' forwarder.*, po.id, po.pono, po.matcontents, po.itemdesc, po.colorcode, po.size, po.qtypo, po.pideldate, mastersupplier.nama')
+                ->get();
+            // dd($mydata);
+
+            array_push($datapo, $mydata);
+        }
+
+        $mypo = forwarder::join('po', 'po.id', 'forwarder.idpo')
             ->join('privilege', 'privilege.idforwarder', 'forwarder.idmasterfwd')
             ->join('mastersupplier', 'mastersupplier.id', 'po.vendor')
-            ->where('po.pono', $request->id)
+            ->whereIn('po.pideldate', $request->dataku)
             ->where('privilege.privilege_user_nik', Session::get('session')['user_nik'])
             ->where(function ($kus) {
                 $kus->where('forwarder.statusapproval', null)->orWhere('forwarder.statusapproval', 'reject');
             })
             ->where('forwarder.aktif', 'Y')->where('privilege.privilege_aktif', 'Y')->where('mastersupplier.aktif', 'Y')
             ->selectRaw(' forwarder.*, po.id, po.pono, po.matcontents, po.itemdesc, po.colorcode, po.size, po.qtypo, mastersupplier.nama')
+            ->groupby('po.pono')
             ->get();
-        // dd($mydata);
-        $data = array(
-            'datapo' => $mydata,
-            // 'dataforwarder' => $dataforwarder
-        );
+
+        // dd($datapo);
+
+        // $data = array(
+        //     'datapo' => $mydata,
+        //     // 'dataforwarder' => $dataforwarder
+        // );
 
         \LogActivity::addToLog('Web Forwarder :: Forwarder : Process Input Data Approval PO', $this->micro);
-        return response()->json(['status' => 200, 'data' => $data, 'message' => 'Berhasil']);
+        $form = view('system::dashboard.modal_listpo', ['data' => $datapo, 'mypo' => $mypo]);
+        return $form->render();
+        // return response()->json(['status' => 200, 'data' => $datapo, 'message' => 'Berhasil']);
     }
 
     public function formupdate(Request $request)
@@ -407,7 +473,7 @@ class home extends Controller
         DB::beginTransaction();
 
         if ($request->shipmode == 'fcl') {
-            $submode = $request->fcl . '-' . $request->amount . '-' . $request->weight . 'KG';
+            $submode = $request->fcl . '-' . $request->weight . 'KG';
         } else if ($request->shipmode == 'lcl') {
             $submode = $request->lcl . ' ' . 'CBM';
         } else {
@@ -415,7 +481,6 @@ class home extends Controller
         }
 
         foreach ($request->dataid as $key => $val) {
-
             if ($request->nobooking == '' || $request->nobooking == null) {
                 DB::rollback();
                 $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'Nomor Booking is required, please input Nomor Booking'];
@@ -464,7 +529,7 @@ class home extends Controller
             }
             // dd($cekpino);
 
-            $cekformpo = formpo::where('idpo', $val['idpo'])->where('idforwarder', $val['idfwd'])->where('idmasterfwd', $val['idmasterfwd'])->where('statusformpo', 'reject')->where('aktif', 'Y')->first();
+            $cekformpo = formpo::where('idpo', $val['idpo'])->where('idforwarder', $val['idforwarder'])->where('idmasterfwd', $val['idmasterfwd'])->where('statusformpo', 'reject')->where('aktif', 'Y')->first();
             // dd($cekformpo);
             if ($cekformpo != null) {
                 $del = formpo::where('id_formpo', $cekformpo->id_formpo)->update(['aktif' => 'N']);
@@ -473,7 +538,7 @@ class home extends Controller
             $save1 = formpo::insert([
                 'idpo'          => $val['idpo'],
                 'idmasterfwd'   => $val['idmasterfwd'],
-                'idforwarder'   => $val['idfwd'],
+                'idforwarder'   => $val['idforwarder'],
                 'kode_booking'  => $request->nobooking,
                 'date_booking'  => $request->datebooking,
                 'etd'           => $request->etd,
@@ -490,7 +555,7 @@ class home extends Controller
                 'statusconfirm' => 'waiting'
             ]);
 
-            $save3 = forwarder::where('id_forwarder', $val['idfwd'])->update([
+            $save3 = forwarder::where('id_forwarder', $val['idforwarder'])->update([
                 'statusapproval' => 'waiting'
             ]);
 

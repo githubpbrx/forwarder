@@ -2,33 +2,57 @@
 @section('title', $title)
 @section('link_href')
     <link href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/themes/smoothness/jquery-ui.css" rel="stylesheet" />
+    {{-- <link rel="stylesheet" href="https://cdn.datatables.net/select/1.4.0/css/select.dataTables.min.css"> --}}
+    {{-- <link type="text/css" href="https://gyrocode.github.io/jquery-datatables-checkboxes/1.2.12/css/dataTables.checkboxes.css"
+    rel="stylesheet" /> --}}
 @endsection
 
 @section('content')
     <div class="card" style="font-size: 10pt;">
         <div class="card-body">
+            <div class="row">
+                <div class="col-md-3">
+                    <label class="control-label">Choose PI Date :</label>
+                    <div class="col-sm-12">
+                        <select class="select2" style="width: 100%;" name="pidate" id="pidate">
+                            <option value=""></option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-1">
+                    <label class="control-label"> &nbsp; </label>
+                    <div class="col-sm-12">
+                        <a href="#" type="button" id="search" class="btn btn-info form-control"
+                            data-value="klik">Search</a>
+                    </div>
+                </div>
+            </div>
+            <br>
+            {{-- <form id="form-save"> --}}
             <table id="serverside" class="table table-bordered table-striped">
                 <thead>
                     <tr>
                         <th>
+                            <center><input type="checkbox" name="checkall" id="checkall"></center>
+                        </th>
+                        <th>
                             <center>PO Number</center>
                         </th>
-                        {{-- <th>
-                            <center>Material</center>
-                        </th> --}}
                         <th>
-                            <center>Status Allocation</center>
+                            <center>PI Number</center>
                         </th>
                         <th>
-                            <center>Status</center>
+                            <center>PI Delivery</center>
                         </th>
                         <th>
-                            <center>Action</center>
+                            <center>Supplier</center>
                         </th>
                     </tr>
                 </thead>
             </table>
             <a href="{{ route('dashcam') }}" type="button" class="btn btn-primary">Back</a>
+            <button type="button" class="btn btn-info" id="btnprocess">Process</button>
+            {{-- </form> --}}
         </div>
     </div>
 
@@ -37,160 +61,12 @@
         <div class="modal-dialog modal-xl">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h4 class="modal-title"><span id="modaltitle">Formulir PO</span></h4>
+                    <h4 class="modal-title"><span id="modaltitle">Booking Detail</span></h4>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
-                <div class="modal-body" style="font-size: 10pt;">
-                    <form action="#" class="form-horizontal">
-                        {{ csrf_field() }}
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label class="col-sm-12 control-label">PO Number</label>
-                                    <div class="col-sm-12">
-                                        <input type="text" class="form-control" id="nomorpo" name="nomorpo" readonly>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label class="col-sm-12 control-label">Supplier</label>
-                                    <div class="col-sm-12">
-                                        <input type="text" class="form-control" id="supplier" name="supplier" readonly>
-                                    </div>
-                                </div>
-                            </div>
-                            {{-- <input type="text" class="form-control" id="nomorpo" name="nomorpo" readonly> --}}
-                        </div>
-                        <hr
-                            style="width: 100%; color: rgb(192, 192, 192); height: 0.5px; background-color:rgb(192, 192, 192);" />
-                        <div class="row">
-                            <div class="col-md-12">
-                                <div id="detailitem"></div>
-                            </div>
-                        </div>
-                        <hr
-                            style="width: 100%; color: rgb(192, 192, 192); height: 0.5px; background-color:rgb(192, 192, 192);" />
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label class="col-sm-12 control-label">Booking Number</label>
-                                    <div class="col-sm-12">
-                                        <input type="text" class="form-control" id="nobook" name="nobook"
-                                            autocomplete="off">
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label class="col-sm-12 control-label">Date Booking</label>
-                                    <div class="col-sm-12">
-                                        <input type="text" class="form-control" id="datebook" name="datebook"
-                                            autocomplete="off">
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label class="col-sm-12 control-label">ETD (Estimated Time Departure)</label>
-                                    <div class="col-sm-12">
-                                        <input type="text" class="form-control" id="etd" name="etd"
-                                            autocomplete="off">
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label class="col-sm-12 control-label">ETA (Estimated Time Arrival)</label>
-                                    <div class="col-sm-12">
-                                        <input type="text" class="form-control" id="eta" name="eta"
-                                            autocomplete="off">
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label class="col-sm-12 control-label">Ship Mode</label>
-                                    <div class="col-sm-12">
-                                        <select class="form-control select2" style="width: 100%;" name="shipmode"
-                                            id="shipmode">
-                                            <option value="-1" selected disabled>-- Choose Mode --</option>
-                                            <option value="fcl">FCL</option>
-                                            <option value="lcl">LCL</option>
-                                            <option value="air">Air</option>
-                                        </select>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group" id="datafcl" style="display: none">
-                                    <div class="col-sm-12">
-                                        <div class="row">
-                                            <div class="col-sm-4">
-                                                <label class="control-label">FCL</label>
-                                                <select class="select2" style="width: 100%;" name="fclku"
-                                                    id="fclku">
-                                                    <option value="20">20"</option>
-                                                    <option value="40">40"</option>
-                                                </select>
-                                            </div>
-                                            <div class="col-sm-4">
-                                                <label class="control-label">Amount</label>
-                                                <input type="number" min="0" class="form-control" name="amount"
-                                                    id="amount" autocomplete="off">
-                                            </div>
-                                            <div class="col-sm-4">
-                                                <label class="control-label">Weight</label>
-                                                <input type="number" min="0" class="form-control" name="weight"
-                                                    id="weight" autocomplete="off">
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="form-group" id="datalcl" style="display: none">
-                                    <label class="col-sm-12 control-label">LCL</label>
-                                    <div class="col-sm-12">
-                                        {{-- <select class="select2" style="width: 100%;" name="lclku" id="lclku">
-                                            <option value="cbm">CBM</option>
-                                        </select> --}}
-                                        <div class="input-group">
-                                            <input type="number" min="0" class="form-control" name="lclku"
-                                                id="lclku" autocomplete="off">
-                                            <div class="input-group-append">
-                                                <span class="input-group-text">CBM</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="form-group" id="dataair" style="display: none">
-                                    <label class="col-sm-12 control-label">AIR</label>
-                                    <div class="col-sm-12">
-                                        {{-- <select class="select2" style="width: 100%;" name="airku" id="airku">
-                                            <option value="kg">KG</option>
-                                        </select> --}}
-                                        <div class="input-group">
-                                            <input type="number" min="0" class="form-control" name="airku"
-                                                id="airku" autocomplete="off">
-                                            <div class="input-group-append">
-                                                <span class="input-group-text">KG</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-info" id="btnsubmit">Submit</button>
-                </div>
+                <div id="bodymodaldetail"></div>
             </div>
         </div>
     </div>
@@ -199,6 +75,8 @@
 
 @section('script')
     <script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js"></script>
+    {{-- <script src="https://cdn.datatables.net/select/1.4.0/js/dataTables.select.min.js"></script> --}}\
+    {{-- <script src="https://gyrocode.github.io/jquery-datatables-checkboxes/1.2.12/js/dataTables.checkboxes.min.js"></script> --}}
     <script type="text/javascript">
         $(document).ready(function() {
             $.ajaxSetup({
@@ -207,111 +85,199 @@
                 }
             });
 
-            $('#etd').prop('disabled', true);
-            $('#eta').prop('disabled', true);
-            $('#datebook').datepicker({
-                changeYear: true,
-                changeMonth: true,
-                minDate: 0,
-                dateFormat: "yy-m-dd",
-                yearRange: "-100:+20",
-            });
-
-            $('#datebook').change(function() {
-                date1 = $('#datebook').val();
-                $('#etd').prop('disabled', false);
-
-                $('#etd').datepicker({
-                    changeYear: true,
-                    changeMonth: true,
-                    minDate: date1,
-                    dateFormat: "yy-m-dd",
-                    yearRange: "-100:+20",
-                });
-
-                $('#etd').change(function(e) {
-                    date2 = $('#etd').val();
-                    $('#eta').prop('disabled', false);
-
-                    $('#eta').datepicker({
-                        changeYear: true,
-                        changeMonth: true,
-                        minDate: date2,
-                        dateFormat: "yy-m-dd",
-                        yearRange: "-100:+20",
-                    });
-
-                    $('#eta').change(function(e) {
-                        date3 = $('#eta').val();
-                    });
-
-                });
-            });
-
-            $('#shipmode').on('change', function() {
-                let mode = $(this).val();
-                console.log('training :>> ', mode);
-                console.log('object :>> ', 'klik');
-                if (mode == 'fcl') {
-                    $('#datafcl').show()
-                    $('#datalcl').hide()
-                    $('#dataair').hide()
-
-                } else if (mode == 'lcl') {
-                    $('#datalcl').show()
-                    $('#datafcl').hide()
-                    $('#dataair').hide()
-                } else {
-                    $('#dataair').show()
-                    $('#datafcl').hide()
-                    $('#datalcl').hide()
-                }
-            });
-
+            // var repo = {};
             var oTable = $('#serverside').DataTable({
                 order: [],
                 processing: true,
                 serverSide: true,
                 ajax: {
-                    url: "{{ route('list_po') }}"
+                    url: "{{ url('listpo') }}",
+                    data: function(d) {
+                        d.pidate = $('#pidate').val()
+                    }
                 },
                 columns: [{
+                        data: 'cekbok',
+                        name: 'cekbok',
+                        orderable: false,
+                        orderable: false,
+                        // data: 'select-checkbox',
+                        // className: 'select-checkbox',
+                        // targets: 0
+                        // 'targets': 0,
+                        // 'checkboxes': {
+                        //     'selectRow': true,
+                        //     'selectCallback': function(cellNodes, isSelected) {
+                        //         console.log('isSelected :>> ', isSelected);
+                        //         var rowData = oTable.row($(cellNodes[0]).parent()).data();
+                        //         // console.log('rowID :>> ', rowData);
+                        //         //var rowPk = cellNodes.settings().rowId;
+                        //         var rowID = rowData['action']; // rowData[rowPk];
+
+                        //         if (isSelected === false) {
+                        //             delete repo[rowID];
+                        //         }
+
+                        //         if (isSelected === true) {
+                        //             repo[rowID] = rowData;
+                        //         }
+                        //     },
+                        // }
+                    },
+                    {
                         data: 'listpo',
                         name: 'listpo'
                     },
+                    {
+                        data: 'pinomor',
+                        name: 'pinomor'
+                    },
+                    {
+                        data: 'pidel',
+                        name: 'pidel'
+                    },
+                    {
+                        data: 'supplier',
+                        name: 'supplier'
+                    },
                     // {
-                    //     data: 'itempo',
-                    //     name: 'itempo'
+                    //     data: 'action',
+                    //     name: 'action',
+                    //     orderable: false,
+                    //     searchable: false
                     // },
-                    {
-                        data: 'statusalokasi',
-                        name: 'statusalokasi'
-                    },
-                    {
-                        data: 'status',
-                        name: 'status'
-                    },
-                    {
-                        data: 'action',
-                        name: 'action',
-                        orderable: false,
-                        searchable: false
-                    },
                 ],
+                // select: {
+                //     style: 'multi',
+                //     selector: 'td:first-child'
+                // },
+                // 'order': [
+                //     [1, 'asc']
+                // ]
             });
 
             $('#serverside').on('draw.dt', function() {
                 $('[data-toggle="tooltip"]').tooltip();
-            })
+            });
+
+            $('#search').click(function(e) {
+                oTable.draw();
+                // table.ajax.reload();
+            });
+
+            $('#pidate').select2({
+                placeholder: '-- Choose PI Date --',
+                ajax: {
+                    url: "{!! url('getpidate') !!}",
+                    dataType: 'json',
+                    delay: 500,
+                    type: 'post',
+                    data: function(params) {
+                        var query = {
+                            q: params.term,
+                            // page: params.page || 1,
+                            _token: $('meta[name=csrf-token]').attr('content')
+                        }
+                        return query;
+                    },
+                    processResults: function(data, params) {
+                        return {
+
+                            results: $.map(data, function(item) {
+                                return {
+                                    text: item.pideldate,
+                                    id: item.pideldate,
+                                    selected: true,
+                                }
+                            }),
+                        };
+                    },
+                    cache: true
+                }
+            });
+
+            var multi_id = [];
+            $('#checkall').change(function(e) {
+                $('#mycekbok').prop('checked', false);
+                singleid = [];
+                if (this.checked) {
+                    $('input[type="checkbox"]').prop('checked', true);
+                    let lengthtable = oTable.data().count();
+                    let data = oTable.data();
+
+                    for (let index = 0; index < Number(lengthtable); index++) {
+                        multi_id.push(data[index]['listpo']);
+                    }
+                } else {
+                    $('input[type="checkbox"]').prop('checked', false);
+                    multi_id = [];
+                }
+            });
+
+            var singleid = [];
+            $('body').on('change', '#mycekbok', function() {
+                if (multi_id.length != 0) {
+                    $('#checkall').prop('checked', false);
+                    var removeItem1 = this.value;
+                    singleid = jQuery.grep(multi_id, function(value) {
+                        return value != removeItem1;
+                    });
+                    multi_id = [];
+                }
+
+                if (this.checked) {
+                    singleid.push(this.value)
+                } else {
+                    var removeItem = this.value;
+                    singleid = jQuery.grep(singleid, function(value) {
+                        return value != removeItem;
+                    });
+                }
+            });
+
+            $('#btnprocess').click(function(e) {
+                let data;
+                if (singleid.length == 0) {
+                    data = multi_id;
+                } else {
+                    data = singleid;
+                }
+
+                if (singleid.length == 0 && multi_id.length == 0) {
+                    Swal.fire({
+                        title: 'Information',
+                        text: 'Please Select PO Number',
+                        type: 'warning'
+                    });
+                } else {
+                    $.ajax({
+                        type: "post",
+                        url: "{!! route('form_po') !!}",
+                        data: {
+                            _token: $('meta[name=csrf-token]').attr('content'),
+                            dataku: data,
+                        },
+                        // dataType: "json",
+                        success: function(response) {
+                            $('#formulir_po').modal({
+                                show: true,
+                                backdrop: 'static'
+                            });
+                            $('#bodymodaldetail').html(response);
+                        }
+                    });
+                }
+            });
 
             var length;
             $('body').on('click', '#formpo', function() {
-                $('#formulir_po').modal({
-                    show: true,
-                    backdrop: 'static'
-                });
+                // $('#formulir_po').modal({
+                //     show: true,
+                //     backdrop: 'static'
+                // });
 
                 let idku = $(this).attr('data-id');
+                console.log('idku :>> ', idku);
                 $.ajax({
                     url: "{!! route('form_po') !!}",
                     type: 'POST',
@@ -350,106 +316,6 @@
                     $('#supplier').val(poku[0].nama);
                 })
             });
-
-            $('#btnsubmit').click(function(e) {
-                // let idpo = $('#idall').attr('data-id');
-                // let idfwd = $('#idall').attr('data-idfwd');
-                // let idmasterfwd = $('#idall').attr('data-idmasterfwd');
-                let nobook = $('#nobook').val();
-                let datebook = $('#datebook').val();
-                let myetd = $('#etd').val();
-                let myeta = $('#eta').val();
-                let mode = $('#shipmode').val();
-                let myfcl = $('#fclku').val();
-                let myamount = $('#amount').val();
-                let myweight = $('#weight').val();
-                let mylcl = $('#lclku').val();
-                let myair = $('#airku').val();
-
-                var dataid = [];
-                for (let index = 0; index < Number(length); index++) {
-                    let idall = {
-                        'idpo': $('#idall-' + index).attr('data-id'),
-                        'idfwd': $('#idall-' + index).attr('data-idfwd'),
-                        'idmasterfwd': $('#idall-' + index).attr('data-idmasterfwd'),
-                    };
-
-                    dataid.push(idall);
-                }
-                console.log('dataid :>> ', dataid);
-                if (nobook == null || nobook == '') {
-                    notifalert('Nomor Booking');
-                } else if (datebook == null || datebook == '') {
-                    notifalert('Date Booking');
-                } else if (myetd == null || myetd == '') {
-                    notifalert('ETD (Estimate Delivery Date)');
-                } else if (myeta == null || myeta == '') {
-                    notifalert('ETA (Estimate Acutal Delivery Date)');
-                } else if (mode == null || mode == '') {
-                    notifalert('Ship Mode');
-                } else if (mode == 'fcl' && myfcl == '') {
-                    notifalert('FCL');
-                } else if (mode == 'fcl' && myamount == '') {
-                    notifalert('Amount Container');
-                } else if (mode == 'fcl' && myweight == '') {
-                    notifalert('Weight');
-                } else if (mode == 'lcl' && mylcl == '') {
-                    notifalert('LCL');
-                } else if (mode == 'air' && myair == '') {
-                    notifalert('AIR');
-                } else {
-                    $.ajax({
-                        type: "post",
-                        url: "{{ route('formposave') }}",
-                        data: {
-                            _token: $('meta[name=csrf-token]').attr('content'),
-                            'dataid': dataid,
-                            'nobooking': nobook,
-                            'datebooking': datebook,
-                            'etd': myetd,
-                            'eta': myeta,
-                            'shipmode': mode,
-                            'fcl': myfcl,
-                            'amount': myamount,
-                            'weight': myweight,
-                            'lcl': mylcl,
-                            'air': myair,
-                        },
-                        dataType: "json",
-                        success: function(response) {
-                            console.log('response :>> ', response);
-                            Swal.fire({
-                                title: response.title,
-                                text: response.message,
-                                type: (response.status != 'error') ? 'success' : 'error'
-                            }).then((result) => {
-                                (response.status == 'success') ? window.location
-                                    .replace("{{ route('page_po') }}"):
-                                    ''
-                            });
-                            return;
-                        },
-                        error: function(xhr, status, error) {
-                            Swal.fire({
-                                title: 'Unsuccessfully Saved Data',
-                                text: 'Check Your Data',
-                                type: 'error'
-                            });
-                            return;
-                        }
-                    });
-                }
-            });
-
-            function notifalert(params) {
-                Swal.fire({
-                    title: 'Information',
-                    text: params + ' Can not be empty',
-                    type: 'warning'
-                });
-                return;
-            }
-
         });
     </script>
 @endsection

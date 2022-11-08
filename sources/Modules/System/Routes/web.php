@@ -15,13 +15,14 @@ Route::get('/sycnsap', 'SyncSap@index')->name('syncSAP');
 Route::get('/sycnsap249', 'SyncSap@index_syncsap')->name('SAPsync');
 
 Route::get('/detail/{nik}', 'login@apiDetail');
-Route::get('/testapi/{id}', 'login@apiTest'); 
+Route::get('/testapi/{id}', 'login@apiTest');
 Route::prefix('')->group(function () {
     Route::get('/dashboard', 'home@index')->name('dashcam');
     Route::get('/pagepo', 'home@pagepo')->name('page_po');
     Route::get('/pageupdate', 'home@pageupdate')->name('page_update');
     Route::get('/pagekyc', 'home@pagekyc')->name('page_kyc');
     Route::get('/listpo', 'home@listpo')->name('list_po');
+    Route::post('/getpidate', 'home@getpi')->name('get_pi');
     Route::get('/listupdate', 'home@listupdate')->name('list_update');
     Route::get('/listkyc', 'home@listkyc')->name('list_kyc');
     Route::post('/formpo', 'home@formpo')->name('form_po');
