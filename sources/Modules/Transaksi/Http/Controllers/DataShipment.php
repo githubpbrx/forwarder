@@ -32,7 +32,7 @@ class DataShipment extends Controller
     public function index()
     {
         $data = array(
-            'title' => 'Data Shipment',
+            'title' => 'Data Update Shipment',
             'menu'  => 'datashipment',
             'box'   => '',
         );
@@ -57,7 +57,7 @@ class DataShipment extends Controller
                 ->where('privilege.privilege_user_nik', Session::get('session')['user_nik'])
                 ->where('formpo.statusformpo', '=', 'confirm')
                 ->where('privilege.privilege_aktif', 'Y')->where('formshipment.aktif', 'Y')->where('formpo.aktif', 'Y')
-                ->groupby('po.pono')->groupby('formshipment.noinv')
+                ->groupby('formpo.kode_booking')
                 ->get();
             // dd($data);
             return DataTables::of($data)
@@ -65,14 +65,14 @@ class DataShipment extends Controller
                 ->addColumn('po', function ($data) {
                     return $data->pono;
                 })
-                ->addColumn('inv', function ($data) {
-                    return $data->noinv;
+                ->addColumn('kodebook', function ($data) {
+                    return $data->kode_booking;
                 })
                 ->addColumn('action', function ($data) {
                     $idku = $data->pono;
                     $button = '';
 
-                    $button = '<a href="#" data-id="' . $data->noinv . '" id="detailbtn"><i data-tooltip="tooltip" title="Edit Shipment" class="fa fa-edit fa-lg"></i></a>';
+                    $button = '<a href="#" data-id="' . $data->kode_booking . '" id="detailbtn"><i data-tooltip="tooltip" title="Edit Shipment" class="fa fa-edit fa-lg"></i></a>';
 
                     // $button = '<a href="' . route('detail_allocation', ['id' => $idku]) . '" id="detailbtn"><i data-tooltip="tooltip" title="Detail Allocation" class="fa fa-info-circle fa-lg"></i></a>';
                     return $button;
@@ -95,31 +95,53 @@ class DataShipment extends Controller
         header("Access-Control-Allow-Origin: *");
         header("Access-Control-Allow-Headers: *");
 
-        $getshipment = modelformshipment::join('formpo', 'formpo.id_formpo', 'formshipment.idformpo')
+        $getgroup = modelformshipment::join('formpo', 'formpo.id_formpo', 'formshipment.idformpo')
             ->join('po', 'po.id', 'formpo.idpo')
-            ->where('noinv', $request->id)
-            ->where('formpo.aktif', 'Y')->where('formshipment.aktif', 'Y')
-            // ->selectRaw(' sum(qty_shipment) as qtyshipment, po.id, po.pono, po.matcontents, po.colorcode, po.size, po.style, po.qtypo ')
+            ->where('formpo.kode_booking', $request->id)
+            ->where('formpo.aktif', 'Y')
+            ->where('formshipment.aktif', 'Y')
+            ->groupby('formshipment.nomor_bl')
+            ->selectRaw(' formshipment.idformpo, formshipment.nomor_bl ')
             ->get();
-        // dd($getshipment);
 
-        $arr = [];
-        foreach ($getshipment as $key => $val) {
-            $getremain = modelformshipment::where('idformpo', $val->idformpo)
-                ->selectRaw('sum(qty_shipment) as qtyshipment')
-                ->groupby('idformpo')
+        $ship = [];
+        foreach ($getgroup as $key => $lue) {
+            $getshipment = modelformshipment::join('formpo', 'formpo.id_formpo', 'formshipment.idformpo')
+                ->join('po', 'po.id', 'formpo.idpo')
+                ->where('formshipment.nomor_bl', $lue->nomor_bl)
+                ->where('formpo.aktif', 'Y')
+                ->where('formshipment.aktif', 'Y')
+                // ->selectRaw(' sum(qty_shipment) as qtyshipment, po.id, po.pono, po.matcontents, po.colorcode, po.size, po.style, po.qtypo ')
                 ->get();
 
-            array_push($arr, $getremain);
+            array_push($ship, $getshipment);
         }
-        // dd($arr);
+
+        // dd($ship);
+
+        $arr = [];
+        foreach ($getgroup as $key => $val) {
+            $getdataremain = modelformshipment::join('formpo', 'formpo.id_formpo', 'formshipment.idformpo')
+                ->join('po', 'po.id', 'formpo.idpo')
+                ->where('formshipment.nomor_bl', $val->nomor_bl)
+                ->where('formpo.aktif', 'Y')
+                ->where('formshipment.aktif', 'Y')
+                ->groupby('idformpo')
+                ->selectRaw(' sum(qty_shipment) as qtyshipment ')
+                ->get();
+            array_push($arr, $getdataremain);
+        }
+        // dd($ship, $arr);
 
         $data = [
-            'shipment' => $getshipment,
+            'shipment' => $ship,
+            'groupbl' => $getgroup,
             'remaining' => $arr
         ];
 
-        return response()->json(['status' => 200, 'data' => $data, 'message' => 'Berhasil']);
+        // return response()->json(['status' => 200, 'data' => $data, 'message' => 'Berhasil']);
+        $form = view('transaksi::modaldatashipment', ['data' => $data]);
+        return $form->render();
     }
 
     /**
@@ -146,14 +168,34 @@ class DataShipment extends Controller
 
         foreach ($decode as $key => $val) {
             $qtydefault = ($val->value == '') ? '0' : $val->value;
-            $file = $request->file('file');
-            if ($file != null) {
-                $originalName = str_replace(' ', '_', $file->getClientOriginalName());
-                $fileName = time() . '_' . $originalName;
-                Storage::disk('local')->put($fileName, file_get_contents($request->file));
+            $filebl = $request->file('filebl');
+            if ($filebl != null) {
+                $originalNamebl = str_replace(' ', '_', $filebl->getClientOriginalName());
+                $fileNamebl = time() . '_' . $originalNamebl;
+                Storage::disk('local')->put($fileNamebl, file_get_contents($request->file));
             } else {
-                $namefile = modelformshipment::where('id_shipment', $val->idshipment)->where('aktif', 'Y')->first();
-                $fileName = $namefile->file_bl;
+                $namefilebl = modelformshipment::where('id_shipment', $val->idshipment)->where('aktif', 'Y')->first();
+                $fileNamebl = $namefilebl->file_bl;
+            }
+
+            $fileinv = $request->file('fileinv');
+            if ($fileinv != null) {
+                $originalNameinv = str_replace(' ', '_', $fileinv->getClientOriginalName());
+                $fileNameinv = time() . '_' . $originalNameinv;
+                Storage::disk('local')->put($fileNameinv, file_get_contents($request->file));
+            } else {
+                $namefileinv = modelformshipment::where('id_shipment', $val->idshipment)->where('aktif', 'Y')->first();
+                $fileNameinv = $namefileinv->file_invoice;
+            }
+
+            $filepack = $request->file('filepacking');
+            if ($filepack != null) {
+                $originalNamepack = str_replace(' ', '_', $filepack->getClientOriginalName());
+                $fileNamepack = time() . '_' . $originalNamepack;
+                Storage::disk('local')->put($fileNamepack, file_get_contents($request->file));
+            } else {
+                $namefilepack = modelformshipment::where('id_shipment', $val->idshipment)->where('aktif', 'Y')->first();
+                $fileNamepack = $namefilepack->file_packinglist;
             }
 
             $cekformpo = modelformpo::where('id_formpo', $val->idformpo)->where('aktif', 'Y')->first();
@@ -174,7 +216,7 @@ class DataShipment extends Controller
                 return response()->json($status, 200);
             }
 
-            if ($jumlahfix == $qtypo) {
+            if ($jumlahall == $qtypo) {
                 $status = 'full_allocated';
             } else {
                 $status = 'partial_allocated';
@@ -186,7 +228,9 @@ class DataShipment extends Controller
                     'qty_shipment' => $qtydefault,
                     'etdfix'       => $request->etd,
                     'etafix'       => $request->eta,
-                    'file_bl'      => $fileName,
+                    'file_bl'      => $fileNamebl,
+                    'file_invoice'      => $fileNameinv,
+                    'file_packinglist'      => $fileNamepack,
                     'nomor_bl'     => $request->nomorbl,
                     'vessel'       => $request->vessel,
                     'statusshipment' => $status,
@@ -197,10 +241,12 @@ class DataShipment extends Controller
             } else {
                 $updateship = modelformshipment::where('id_shipment', $val->idshipment)->where('aktif', 'Y')->update([
                     'noinv'        => $request->inv,
-                    'qty_shipment' => $val->value,
+                    'qty_shipment' => $jumlahall,
                     'etdfix'       => $request->etd,
                     'etafix'       => $request->eta,
-                    'file_bl'      => $fileName,
+                    'file_bl'      => $fileNamebl,
+                    'file_invoice'      => $fileNameinv,
+                    'file_packinglist'      => $fileNamepack,
                     'nomor_bl'     => $request->nomorbl,
                     'vessel'       => $request->vessel,
                     'statusshipment' => $status,
