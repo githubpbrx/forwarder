@@ -32,7 +32,7 @@ class ProcessShipment extends Controller
     public function index()
     {
         $data = array(
-            'title' => 'Process Allocation Shipment',
+            'title' => 'Outstanding Shipment',
             'menu'  => 'processshipment',
             'box'   => '',
         );
@@ -53,7 +53,7 @@ class ProcessShipment extends Controller
             ->where('privilege.privilege_user_nik', Session::get('session')['user_nik'])
             ->where('formpo.statusformpo', '=', 'confirm')
             ->where('formpo.aktif', 'Y')->where('privilege.privilege_aktif', 'Y')
-            ->groupby('po.pono')
+            ->groupby('formpo.kode_booking')
             ->selectRaw(' formpo.*, po.id, po.pono, po.matcontents, po.colorcode, po.size, sum(po.qtypo) as qtypoall, po.qtypo')
             ->get();
 
@@ -93,10 +93,10 @@ class ProcessShipment extends Controller
             ->addColumn('action', function ($query) use ($dataqty) {
                 $process    = '';
                 if ($dataqty->qtyshipall == null) {
-                    $process    = '<a href="#" data-id="' . $query->pono . '" id="updateship"><i class="fa fa-angle-double-right text-green"></i></a>';
+                    $process    = '<a href="#" data-id="' . $query->kode_booking . '" id="updateship"><i class="fa fa-angle-double-right text-green"></i></a>';
                 } else {
                     if ($dataqty->qtyshipall != $query->qtypoall) {
-                        $process    = '<a href="#" data-id="' . $query->pono . '" id="updateship"><i class="fa fa-angle-double-right text-green"></i></a>';
+                        $process    = '<a href="#" data-id="' . $query->kode_booking . '" id="updateship"><i class="fa fa-angle-double-right text-green"></i></a>';
                     } else {
                         $process = '';
                     }
@@ -124,31 +124,34 @@ class ProcessShipment extends Controller
             ->join('forwarder', 'forwarder.id_forwarder', 'formpo.idforwarder')
             ->join('privilege', 'privilege.idforwarder', 'forwarder.idmasterfwd')
             ->join('mastersupplier', 'mastersupplier.id', 'po.vendor')
-            ->where('po.pono', $request->id)
+            ->where('formpo.kode_booking', $request->id)
             ->where('privilege.privilege_user_nik', Session::get('session')['user_nik'])
             ->where('formpo.statusformpo', 'confirm')
             ->where('formpo.aktif', 'Y')->where('forwarder.aktif', 'Y')->where('privilege.privilege_aktif', 'Y')
             ->selectRaw(' formpo.*, po.pono, po.matcontents, po.itemdesc, po.colorcode, po.size, po.qtypo, forwarder.qty_allocation, forwarder.statusforwarder, mastersupplier.nama')
             ->get();
 
-        // $mydata = formpo::with(['po' => function ($var) use ($request) {
-        //     $var->where('id', $request->id)->select('id', 'pono', 'style', 'matcontents', 'colorcode', 'size', 'qtypo');
-        // }])
-        //     ->with(['privilege' => function ($var2) {
-        //         $var2->where('privilege.privilege_user_nik', Session::get('session')['user_nik']);
-        //     }])
-        //     ->with(['forwarder', 'shipment'])
-        //     ->where('idpo', $request->id)
-        //     ->where('formpo.statusformpo', 'confirm')
-        //     ->get();
+        $mydatapo = modelformpo::join('po', 'po.id', 'formpo.idpo')
+            ->join('privilege', 'privilege.idforwarder', 'formpo.idmasterfwd')
+            ->join('mastersupplier', 'mastersupplier.id', 'po.vendor')
+            ->where('formpo.kode_booking', $request->id)
+            ->where('privilege.privilege_user_nik', Session::get('session')['user_nik'])
+            ->where('formpo.statusformpo', 'confirm')
+            ->where('formpo.aktif', 'Y')->where('privilege.privilege_aktif', 'Y')
+            ->selectRaw('po.pono, mastersupplier.nama')
+            ->groupby('po.pono')
+            ->get();
 
-        // dd($mydata);
+        // dd($mydatapo);
         $data = array(
             'dataku' => $mydata,
+            'datapo' => $mydatapo
         );
 
         \LogActivity::addToLog('Web Forwarder :: Forwarder : Input Data Process Shipment', $this->micro);
-        return response()->json(['status' => 200, 'data' => $data, 'message' => 'Berhasil']);
+        // return response()->json(['status' => 200, 'data' => $data, 'message' => 'Berhasil']);
+        $form = view('transaksi::modalshipment', ['data' => $data]);
+        return $form->render();
     }
 
     /**
@@ -163,13 +166,23 @@ class ProcessShipment extends Controller
         // dd($decode, $request);
         // DB::beginTransaction();
 
-        $file = $request->file('file');
-        $originalName = str_replace(' ', '_', $file->getClientOriginalName());
-        $fileName = time() . '_' . $originalName;
-        Storage::disk('local')->put($fileName, file_get_contents($request->file));
+        $filebl = $request->file('filebl');
+        $originalNamebl = str_replace(' ', '_', $filebl->getClientOriginalName());
+        $fileNamebl = time() . '_' . $originalNamebl;
+        Storage::disk('local')->put($fileNamebl, file_get_contents($request->filebl));
+
+        $fileinv = $request->file('fileinv');
+        $originalNameinv = str_replace(' ', '_', $fileinv->getClientOriginalName());
+        $fileNameinv = time() . '_' . $originalNameinv;
+        Storage::disk('local')->put($fileNameinv, file_get_contents($request->fileinv));
+
+        $filepack = $request->file('filepack');
+        $originalNamepack = str_replace(' ', '_', $filepack->getClientOriginalName());
+        $fileNamepack = time() . '_' . $originalNamepack;
+        Storage::disk('local')->put($fileNamepack, file_get_contents($request->filepack));
 
         foreach ($decode as $key => $val) {
-            if ($file == '' || $file == null) {
+            if ($filebl == '' || $filebl == null) {
                 // DB::rollback();
                 $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'File BL is required, please input File BL'];
                 return response()->json($status, 200);
@@ -187,7 +200,7 @@ class ProcessShipment extends Controller
                 return response()->json($status, 200);
             }
 
-            if ($request->invoice == '' || $request->invoice == null) {
+            if ($fileinv == '' || $fileinv == null) {
                 // DB::rollback();
                 $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'Invoice is required, please input Invoice'];
                 return response()->json($status, 200);
@@ -235,18 +248,19 @@ class ProcessShipment extends Controller
             }
 
             $save1 = modelformshipment::insert([
-                'idformpo'     => $val->idformpo,
-                'qty_shipment' => $val->value,
-                'noinv'        => strtoupper($request->invoice),
-                'etdfix'       => $request->etdfix,
-                'etafix'       => $request->etafix,
-                'file_bl'      => $fileName,
-                'nomor_bl'     => strtoupper($request->nomorbl),
-                'vessel'       => strtoupper($request->vessel),
-                'statusshipment' => $status,
-                'aktif'        => 'Y',
-                'created_at'   => date('Y-m-d H:i:s'),
-                'created_by'   => Session::get('session')['user_nik']
+                'idformpo'         => $val->idformpo,
+                'qty_shipment'     => $val->value,
+                'etdfix'           => $request->etdfix,
+                'etafix'           => $request->etafix,
+                'file_bl'          => $fileNamebl,
+                'file_invoice'     => $fileNameinv,
+                'file_packinglist' => $fileNamepack,
+                'nomor_bl'         => strtoupper($request->nomorbl),
+                'vessel'           => strtoupper($request->vessel),
+                'statusshipment'   => $status,
+                'aktif'            => 'Y',
+                'created_at'       => date('Y-m-d H:i:s'),
+                'created_by'       => Session::get('session')['user_nik']
             ]);
 
             if ($save1) {
