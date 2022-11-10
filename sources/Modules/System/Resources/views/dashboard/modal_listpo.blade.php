@@ -8,7 +8,8 @@
                     <label class="col-sm-12 control-label">PO Number</label>
                     <div class="col-sm-12">
                         <input type="text" class="form-control" id="nomorpo" name="nomorpo"
-                            value="@foreach ($mypo as $po) {{ $po->pono . ',' }} @endforeach" readonly>
+                            value="@foreach ($mypo as $po) {{ count($mypo) > 1 ? $po->pono . ',' : $po->pono }} @endforeach"
+                            readonly>
                     </div>
                 </div>
             </div>
@@ -17,7 +18,8 @@
                     <label class="col-sm-12 control-label">Supplier</label>
                     <div class="col-sm-12">
                         <input type="text" class="form-control" id="supplier" name="supplier"
-                            value="@foreach ($mypo as $po) {{ $po->nama . ',' }} @endforeach" readonly>
+                            value="@foreach ($mypo as $po) {{ count($mypo) > 1 ? $po->nama . ',' : $po->nama }} @endforeach"
+                            readonly>
                     </div>
                 </div>
             </div>
@@ -188,6 +190,9 @@
 <script type="text/javascript">
     $(document).ready(function() {
         var dataku = @JSON($data);
+
+        //Initialize Select2 Elements
+        $('.select2').select2();
 
         $('#etd').prop('disabled', true);
         $('#eta').prop('disabled', true);

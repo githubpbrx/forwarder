@@ -14,9 +14,10 @@
                 <div class="col-md-3">
                     <label class="control-label">Choose PI Date :</label>
                     <div class="col-sm-12">
-                        <select class="select2" style="width: 100%;" name="pidate" id="pidate">
+                        {{-- <select class="select2" style="width: 100%;" name="pidate" id="pidate">
                             <option value=""></option>
-                        </select>
+                        </select> --}}
+                        <input type="text" class="form-control" id="selectdate" name="selectdate" autocomplete="off">
                     </div>
                 </div>
                 <div class="col-md-1">
@@ -85,6 +86,14 @@
                 }
             });
 
+            $('#selectdate').datepicker({
+                changeYear: true,
+                changeMonth: true,
+                minDate: 0,
+                dateFormat: "yy-m-dd",
+                yearRange: "-100:+20",
+            });
+
             // var repo = {};
             var oTable = $('#serverside').DataTable({
                 order: [],
@@ -93,7 +102,7 @@
                 ajax: {
                     url: "{{ url('listpo') }}",
                     data: function(d) {
-                        d.pidate = $('#pidate').val()
+                        d.pidate = $('#selectdate').val()
                     }
                 },
                 columns: [{
@@ -206,7 +215,7 @@
                     let data = oTable.data();
 
                     for (let index = 0; index < Number(lengthtable); index++) {
-                        multi_id.push(data[index]['listpo']);
+                        multi_id.push(data[index]['pideldate']);
                     }
                 } else {
                     $('input[type="checkbox"]').prop('checked', false);
