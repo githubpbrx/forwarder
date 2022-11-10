@@ -2,24 +2,41 @@
     <form action="#" class="form-horizontal">
         {{ csrf_field() }}
         {{-- {{ dd($data) }} --}}
+        <?php
+        $listpo = [];
+        $namasup = [];
+        $listpi = [];
+        foreach ($mypo as $po) {
+            array_push($listpo, $po->pono);
+            array_push($namasup, $po->nama);
+            array_push($listpi, $po->pino);
+        }
+        ?>
         <div class="row">
-            <div class="col-md-6">
+            <div class="col-md-4">
                 <div class="form-group">
                     <label class="col-sm-12 control-label">PO Number</label>
                     <div class="col-sm-12">
                         <input type="text" class="form-control" id="nomorpo" name="nomorpo"
-                            value="@foreach ($mypo as $po) {{ count($mypo) > 1 ? $po->pono . ',' : $po->pono }} @endforeach"
-                            readonly>
+                            value=" {{ implode(', ', $listpo) }}" readonly>
                     </div>
                 </div>
             </div>
-            <div class="col-md-6">
+            <div class="col-md-4">
+                <div class="form-group">
+                    <label class="col-sm-12 control-label">PI Number</label>
+                    <div class="col-sm-12">
+                        <input type="text" class="form-control" id="nomorpo" name="nomorpo"
+                            value=" {{ implode(', ', $listpi) }}" readonly>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
                 <div class="form-group">
                     <label class="col-sm-12 control-label">Supplier</label>
                     <div class="col-sm-12">
                         <input type="text" class="form-control" id="supplier" name="supplier"
-                            value="@foreach ($mypo as $po) {{ count($mypo) > 1 ? $po->nama . ',' : $po->nama }} @endforeach"
-                            readonly>
+                            value="{{ implode(', ', $namasup) }}" readonly>
                     </div>
                 </div>
             </div>

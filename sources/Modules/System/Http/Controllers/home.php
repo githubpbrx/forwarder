@@ -234,16 +234,55 @@ class home extends Controller
                     return  $cekbox;
                 })
                 ->addColumn('listpo', function ($query) {
-                    return  $query->pono;
+                    $mypo = forwarder::join('po', 'po.id', 'forwarder.idpo')
+                        ->join('privilege', 'privilege.idforwarder', 'forwarder.idmasterfwd')
+                        ->join('mastersupplier', 'mastersupplier.id', 'po.vendor')
+                        ->where('po.pideldate', $query->pideldate)
+                        ->where('privilege.privilege_user_nik', Session::get('session')['user_nik'])
+                        ->where(function ($kus) {
+                            $kus->where('forwarder.statusapproval', null)->orWhere('forwarder.statusapproval', 'reject');
+                        })
+                        ->where('forwarder.aktif', 'Y')->where('privilege.privilege_aktif', 'Y')->where('mastersupplier.aktif', 'Y')
+                        ->selectRaw('po.pono')
+                        ->groupby('po.pono')
+                        ->pluck('pono');
+
+                    return  str_replace("]", "", str_replace("[", "", str_replace('"', "", $mypo)));
                 })
                 ->addColumn('pinomor', function ($query) {
-                    return  $query->pino;
+                    $mypo = forwarder::join('po', 'po.id', 'forwarder.idpo')
+                        ->join('privilege', 'privilege.idforwarder', 'forwarder.idmasterfwd')
+                        ->join('mastersupplier', 'mastersupplier.id', 'po.vendor')
+                        ->where('po.pideldate', $query->pideldate)
+                        ->where('privilege.privilege_user_nik', Session::get('session')['user_nik'])
+                        ->where(function ($kus) {
+                            $kus->where('forwarder.statusapproval', null)->orWhere('forwarder.statusapproval', 'reject');
+                        })
+                        ->where('forwarder.aktif', 'Y')->where('privilege.privilege_aktif', 'Y')->where('mastersupplier.aktif', 'Y')
+                        ->selectRaw('po.pino')
+                        ->groupby('po.pono')
+                        ->pluck('pino');
+
+                    return  str_replace("]", "", str_replace("[", "", str_replace('"', "", $mypo)));
                 })
                 ->addColumn('pidel', function ($query) {
                     return  $query->pideldate;
                 })
                 ->addColumn('supplier', function ($query) {
-                    return  $query->nama;
+                    $mypo = forwarder::join('po', 'po.id', 'forwarder.idpo')
+                        ->join('privilege', 'privilege.idforwarder', 'forwarder.idmasterfwd')
+                        ->join('mastersupplier', 'mastersupplier.id', 'po.vendor')
+                        ->where('po.pideldate', $query->pideldate)
+                        ->where('privilege.privilege_user_nik', Session::get('session')['user_nik'])
+                        ->where(function ($kus) {
+                            $kus->where('forwarder.statusapproval', null)->orWhere('forwarder.statusapproval', 'reject');
+                        })
+                        ->where('forwarder.aktif', 'Y')->where('privilege.privilege_aktif', 'Y')->where('mastersupplier.aktif', 'Y')
+                        ->selectRaw('mastersupplier.nama')
+                        ->groupby('po.pono')
+                        ->pluck('nama');
+
+                    return  str_replace("]", "", str_replace("[", "", str_replace('"', "", $mypo)));
                 })
                 // ->addColumn('statusalokasi', function ($query) {
                 //     if ($query->statusforwarder == 'full_allocated') {
@@ -400,7 +439,7 @@ class home extends Controller
                 $kus->where('forwarder.statusapproval', null)->orWhere('forwarder.statusapproval', 'reject');
             })
             ->where('forwarder.aktif', 'Y')->where('privilege.privilege_aktif', 'Y')->where('mastersupplier.aktif', 'Y')
-            ->selectRaw(' forwarder.*, po.id, po.pono, po.matcontents, po.itemdesc, po.colorcode, po.size, po.qtypo, mastersupplier.nama')
+            ->selectRaw(' forwarder.*, po.id, po.pono, po.matcontents, po.itemdesc, po.colorcode, po.size, po.qtypo, po.pino, mastersupplier.nama')
             ->groupby('po.pono')
             ->get();
 

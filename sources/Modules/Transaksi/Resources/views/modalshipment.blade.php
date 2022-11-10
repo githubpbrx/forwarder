@@ -132,7 +132,7 @@
                 <div class="form-group">
                     <div class="col-sm-12">
                         <div class="row" id="datafcl" style="display: none; padding-bottom: 2.5%">
-                            <div class="col-sm-3">
+                            <div class="col-sm-3" class="radiocontainer">
                                 <label class="control-label">Container Number</label>
                                 <?php
                                 $dat = $data['dataku'][0]->subshipmode;
@@ -152,12 +152,12 @@
                             </div>
                             <div class="col-sm-4">
                                 <label class="control-label">Number Of Container</label>
-                                <input type="number" class="form-control" value="">
+                                <input type="number" class="form-control" name="noc[]" value="">
                             </div>
                             <div class="col-sm-3">
                                 <label class="control-label">Weight</label>
                                 <div class="input-group">
-                                    <input type="number" min="0" class="form-control" name="weight"
+                                    <input type="number" min="0" class="form-control" name="weight[]"
                                         id="weight" value="{{ $exp2[0] }}" autocomplete="off">
                                     <div class="input-group-append">
                                         <span class="input-group-text">KG</span>
@@ -199,7 +199,7 @@
                 <div class="form-group">
                     <label class="col-sm-12 control-label">Invoice</label>
                     <div class="col-sm-12">
-                        <input type="file" class="form-control" id="invoice" name="invoice"
+                        <input type="file" class="form-control" id="invoicefile" name="invoicefile"
                             autocomplete="off">
                     </div>
                 </div>
@@ -215,6 +215,15 @@
             </div>
         </div>
         <div class="row">
+            <div class="col-md-4">
+                <div class="form-group">
+                    <label class="col-sm-12 control-label">Invoice</label>
+                    <div class="col-sm-12">
+                        <input type="text" class="form-control" id="invoice" name="invoice"
+                            autocomplete="off">
+                    </div>
+                </div>
+            </div>
             <div class="col-md-4">
                 <div class="form-group">
                     <label class="col-sm-12 control-label">BL Number</label>
@@ -233,6 +242,8 @@
                     </div>
                 </div>
             </div>
+        </div>
+        <div class="row">
             <div class="col-md-4">
                 <div class="form-group">
                     <label class="col-sm-12 control-label">ATD (Actual Time Departure) Fix</label>
@@ -242,8 +253,6 @@
                     </div>
                 </div>
             </div>
-        </div>
-        <div class="row">
             <div class="col-md-4">
                 <div class="form-group">
                     <label class="col-sm-12 control-label">ATA (Actual Time Arrival) Fix</label>
@@ -264,6 +273,15 @@
 <script type="text/javascript">
     var current = 1;
     var dataku = @JSON($data['dataku']);
+
+    var radiovalue = $("input[name='inlineRadioOptions']:checked").val();
+    var cekrad;
+    $('.form-check-input').click(function(e) {
+        cekrad = $(this).val();
+    });
+
+    //Initialize Select2 Elements
+    $('.select2').select2()
 
     $('#etdfix').datepicker({
         changeYear: true,
@@ -347,11 +365,11 @@
                     <div class="form-group row">
                         <div class="col-sm-3"></div>
                         <div class="col-sm-4">
-                            <input type="number" class="form-control" value="">
+                            <input type="number" class="form-control" name="noc[]" value="">
                         </div>
                         <div class="col-sm-3">
                             <div class="input-group">
-                                <input type="number" min="0" class="form-control" name="weight"
+                                <input type="number" min="0" class="form-control" name="weight[]"
                                     id="weight" autocomplete="off">
                                 <div class="input-group-append">
                                     <span class="input-group-text">KG</span>
@@ -369,10 +387,28 @@
     });
 
     $('#btnsubmit').click(function(e) {
+        let numbofcont = $("input[name='noc[]']")
+            .map(function() {
+                if ($(this).val() == '') {
+                    return;
+                } else {
+                    return $(this).val();
+                }
+            }).get();
+        let weight = $("input[name='weight[]']")
+            .map(function() {
+                if ($(this).val() == '') {
+                    return;
+                } else {
+                    return $(this).val();
+                }
+            }).get();
+        let fclfeet = (cekrad == null) ? radiovalue : cekrad;
         let nomorbl = $('#nobl').val();
+        let noinv = $('#invoice').val();
         let vessel = $('#vessel').val();
         let filebl = $('#bl').prop('files')[0];
-        let fileinv = $('#invoice').prop('files')[0];
+        let fileinv = $('#invoicefile').prop('files')[0];
         let filepack = $('#packlist').prop('files')[0];
         let etdfix = $('#etdfix').val();
         let etafix = $('#etafix').val();
@@ -393,7 +429,11 @@
 
         let form_data = new FormData();
         form_data.append('dataid', JSON.stringify(arrayku));
+        form_data.append('datacontainer', JSON.stringify(numbofcont));
+        form_data.append('dataweight', JSON.stringify(weight));
+        form_data.append('fclfeet', fclfeet);
         form_data.append('nomorbl', nomorbl);
+        form_data.append('noinv', noinv);
         form_data.append('vessel', vessel);
         form_data.append('filebl', filebl);
         form_data.append('fileinv', fileinv);
@@ -403,10 +443,16 @@
 
         if (arrayku == null || arrayku == '') {
             notifalert('Quantity Allocation');
+        } else if (numbofcont == null || numbofcont == '') {
+            notifalert('Number Of Container');
+        } else if (weight == null || weight == '') {
+            notifalert('Weight');
         } else if (filebl == null || filebl == '') {
             notifalert('File BL');
         } else if (nomorbl == null || nomorbl == '') {
             notifalert('BL Number');
+        } else if (noinv == null || noinv == '') {
+            notifalert('Invoice');
         } else if (vessel == null || vessel == '') {
             notifalert('Vessel');
         } else if (fileinv == null || fileinv == '') {

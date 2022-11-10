@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Storage;
 use Modules\Transaksi\Models\mastersupplier;
 use Modules\Transaksi\Models\masterforwarder;
 use Modules\Transaksi\Models\modelpo;
-use Modules\Transaksi\Models\modelforwarder;
+use Modules\Transaksi\Models\modelcontainer;
 use Modules\Transaksi\Models\modelformpo;
 use Modules\Transaksi\Models\modelformshipment;
 
@@ -163,8 +163,11 @@ class ProcessShipment extends Controller
     public function saveshipment(Request $request)
     {
         $decode = json_decode($request->dataid);
+        $decodecont = json_decode($request->datacontainer);
+        $decodeweight = json_decode($request->dataweight);
         // dd($decode, $request);
         // DB::beginTransaction();
+        DB::beginTransaction();
 
         $filebl = $request->file('filebl');
         $originalNamebl = str_replace(' ', '_', $filebl->getClientOriginalName());
@@ -183,37 +186,49 @@ class ProcessShipment extends Controller
 
         foreach ($decode as $key => $val) {
             if ($filebl == '' || $filebl == null) {
-                // DB::rollback();
+                DB::rollback();
+                $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'File BL is required, please input File BL'];
+                return response()->json($status, 200);
+            }
+
+            if ($fileinv == '' || $fileinv == null) {
+                DB::rollback();
+                $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'File BL is required, please input File BL'];
+                return response()->json($status, 200);
+            }
+
+            if ($filepack == '' || $filepack == null) {
+                DB::rollback();
                 $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'File BL is required, please input File BL'];
                 return response()->json($status, 200);
             }
 
             if ($request->nomorbl == '' || $request->nomorbl == null) {
-                // DB::rollback();
+                DB::rollback();
                 $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'Nomor BL is required, please input Nomor BL'];
                 return response()->json($status, 200);
             }
 
             if ($request->vessel == '' || $request->vessel == null) {
-                // DB::rollback();
+                DB::rollback();
                 $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'Vessel is required, please input Vessel'];
                 return response()->json($status, 200);
             }
 
             if ($fileinv == '' || $fileinv == null) {
-                // DB::rollback();
+                DB::rollback();
                 $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'Invoice is required, please input Invoice'];
                 return response()->json($status, 200);
             }
 
             if ($request->etdfix == '' || $request->etdfix == null) {
-                // DB::rollback();
+                DB::rollback();
                 $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'ETD Fix is required, please input ETD Fix'];
                 return response()->json($status, 200);
             }
 
             if ($request->etafix == '' || $request->etafix == null) {
-                // DB::rollback();
+                DB::rollback();
                 $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'ETA Fix is required, please input ETA Fix'];
                 return response()->json($status, 200);
             }
@@ -250,6 +265,8 @@ class ProcessShipment extends Controller
             $save1 = modelformshipment::insert([
                 'idformpo'         => $val->idformpo,
                 'qty_shipment'     => $val->value,
+                'noinv'            => strtoupper($request->noinv),
+
                 'etdfix'           => $request->etdfix,
                 'etafix'           => $request->etafix,
                 'file_bl'          => $fileNamebl,
@@ -270,13 +287,33 @@ class ProcessShipment extends Controller
             }
         }
 
+        foreach ($decodecont as $key => $lue) {
+            foreach ($decode as $key2 => $value) {
+                $savecont = modelcontainer::insert([
+                    'idformpo'          => $value->idformpo,
+                    'containernumber'   => $request->fclfeet . '"',
+                    'numberofcontainer' => $lue,
+                    'weight'            => $decodeweight[$key] . 'KG',
+                    'aktif'             => 'Y',
+                    'created_at'        => date('Y-m-d H:i:s'),
+                    'created_by'        => Session::get('session')['user_nik']
+                ]);
+
+                if ($savecont) {
+                    $sukses[] = "OK";
+                } else {
+                    $gagal[] = "OK";
+                }
+            }
+        }
+
         if (empty($gagal)) {
-            // DB::commit();
+            DB::commit();
             \LogActivity::addToLog('Web Forwarder :: Forwarder : Insert Shipment Process by Forwarder', $this->micro);
             $status = ['title' => 'Success', 'status' => 'success', 'message' => 'Data Successfully Saved'];
             return response()->json($status, 200);
         } else {
-            // DB::rollback();
+            DB::rollback();
             $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'Data Failed Saved'];
             return response()->json($status, 200);
         }
