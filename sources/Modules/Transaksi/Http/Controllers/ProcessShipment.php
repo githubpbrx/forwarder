@@ -69,7 +69,16 @@ class ProcessShipment extends Controller
         return Datatables::of($query)
             ->addIndexColumn()
             ->addColumn('listpo', function ($query) {
-                return  $query->pono;
+                $mydatapo = modelformpo::join('po', 'po.id', 'formpo.idpo')
+                    ->join('privilege', 'privilege.idforwarder', 'formpo.idmasterfwd')
+                    ->where('formpo.kode_booking', $query->kode_booking)
+                    ->where('privilege.privilege_user_nik', Session::get('session')['user_nik'])
+                    ->where('formpo.statusformpo', 'confirm')
+                    ->where('formpo.aktif', 'Y')->where('privilege.privilege_aktif', 'Y')
+                    ->selectRaw('po.pono')
+                    ->groupby('po.pono')
+                    ->pluck('po.pono');
+                return  str_replace("]", "", str_replace("[", "", str_replace('"', " ", $mydatapo)));
             })
             ->addColumn('nobook', function ($query) {
                 return  $query->kode_booking;

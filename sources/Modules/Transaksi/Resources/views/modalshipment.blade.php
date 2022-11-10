@@ -2,13 +2,21 @@
     <form action="#" class="form-horizontal" enctype="multipart/form-data">
         {{ csrf_field() }}
         {{-- {{ dd($data['datapo']) }} --}}
+        <?php
+        $nopo = [];
+        $supname = [];
+        foreach ($data['datapo'] as $key => $value) {
+            array_push($nopo, $value->pono);
+            array_push($supname, $value->nama);
+        }
+        ?>
         <div class="row">
             <div class="col-md-6">
                 <div class="form-group">
                     <label class="col-sm-12 control-label">PO</label>
                     <div class="col-sm-12">
                         <input type="text" class="form-control" id="nomorpo" name="nomorpo"
-                            value="@foreach ($data['datapo'] as $dat) {{ $dat->pono . ',' }} @endforeach" readonly>
+                            value="{{ implode(', ', $nopo) }}" readonly>
                     </div>
                 </div>
             </div>
@@ -17,7 +25,7 @@
                     <label class="col-sm-12 control-label">Supplier</label>
                     <div class="col-sm-12">
                         <input type="text" class="form-control" id="supplier" name="supplier"
-                            value="@foreach ($data['datapo'] as $dat) {{ $dat->nama . ',' }} @endforeach" readonly>
+                            value="{{ implode(', ', $supname) }}" readonly>
                     </div>
                 </div>
             </div>
