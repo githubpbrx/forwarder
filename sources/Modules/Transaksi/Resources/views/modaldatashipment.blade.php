@@ -73,6 +73,16 @@
                                         <div class="row">
                                             <div class="col-md-3">
                                                 <div class="form-group">
+                                                    <label class="col-sm-12 control-label">Invoice</label>
+                                                    <div class="col-sm-12">
+                                                        <input type="text" class="form-control"
+                                                            id="invoice-{{ $key1 }}" name="invoice"
+                                                            value="{{ $item[0]->noinv }}" readonly>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <div class="form-group">
                                                     <label class="col-sm-12 control-label">BL Number</label>
                                                     <div class="col-sm-12">
                                                         <input type="text" class="form-control"
@@ -103,6 +113,8 @@
                                                     </div>
                                                 </div>
                                             </div>
+                                        </div>
+                                        <div class="row">
                                             <div class="col-md-3">
                                                 <div class="form-group">
                                                     <label class="col-sm-12 control-label">Vessel</label>
@@ -113,8 +125,6 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                        </div>
-                                        <div class="row">
                                             <div class="col-md-3">
                                                 <div class="form-group">
                                                     <label class="col-sm-12 control-label">File BL</label>
@@ -142,6 +152,8 @@
                                                     </div>
                                                 </div>
                                             </div>
+                                        </div>
+                                        <div class="row float-right">
                                             <div class="col-md-3">
                                                 <div class="form-group">
                                                     <label class="col-sm-12 control-label">&nbsp;</label>
