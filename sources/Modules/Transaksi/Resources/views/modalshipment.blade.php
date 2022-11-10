@@ -39,11 +39,11 @@
                     <th>Material</th>
                     <th>Material Description</th>
                     <th>HS Code</th>
-                    <th>Color Code</th>
+                    <th>Color</th>
                     <th>Size</th>
-                    <th>Quantity Item</th>
-                    <th>Remaining Quantity</th>
-                    <th>Quantity Allocation</th>
+                    <th>Qty PO</th>
+                    <th>Balance Qty</th>
+                    <th>Qty Ship</th>
                 </thead>
                 <tbody>
                     @foreach ($data['dataku'] as $key => $item)
