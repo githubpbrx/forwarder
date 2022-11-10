@@ -514,9 +514,9 @@ class home extends Controller
         if ($request->shipmode == 'fcl') {
             $submode = $request->fcl . '-' . $request->weight . 'KG';
         } else if ($request->shipmode == 'lcl') {
-            $submode = $request->lcl . ' ' . 'CBM';
+            $submode = $request->lcl . 'CBM' . '-' . $request->lclweight . 'KG';
         } else {
-            $submode = $request->air . ' ' . 'KG';
+            $submode = $request->air . 'M3' . '-' . $request->airweight . 'KG';
         }
 
         foreach ($request->dataid as $key => $val) {
@@ -578,7 +578,7 @@ class home extends Controller
                 'idpo'          => $val['idpo'],
                 'idmasterfwd'   => $val['idmasterfwd'],
                 'idforwarder'   => $val['idforwarder'],
-                'kode_booking'  => $request->nobooking,
+                'kode_booking'  => strtoupper($request->nobooking),
                 'date_booking'  => $request->datebooking,
                 'etd'           => $request->etd,
                 'eta'           => $request->eta,

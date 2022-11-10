@@ -150,7 +150,7 @@
                     <div class="col-sm-12">
                         <div class="row">
                             <div class="col-sm-6">
-                                <label class="control-label">FCL</label>
+                                <label class="control-label">Size</label>
                                 <select class="form-control select2" style="width: 100%;" name="fclku"
                                     id="fclku">
                                     <option value="20">20"</option>
@@ -159,38 +159,68 @@
                             </div>
                             <div class="col-sm-6">
                                 <label class="control-label">Weight</label>
-                                <input type="number" min="0" class="form-control" name="weight"
-                                    id="weight" autocomplete="off">
+                                <div class="input-group">
+                                    <input type="number" min="0" class="form-control" name="weight"
+                                        id="weight" autocomplete="off">
+                                    <div class="input-group-append">
+                                        <span class="input-group-text">KG</span>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
                 <div class="form-group" id="datalcl" style="display: none">
-                    <label class="col-sm-12 control-label">LCL</label>
                     <div class="col-sm-12">
                         {{-- <select class="select2" style="width: 100%;" name="lclku" id="lclku">
                         <option value="cbm">CBM</option>
                     </select> --}}
-                        <div class="input-group">
-                            <input type="number" min="0" class="form-control" name="lclku" id="lclku"
-                                autocomplete="off">
-                            <div class="input-group-append">
-                                <span class="input-group-text">CBM</span>
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <label class="control-label">LCL</label>
+                                <div class="input-group">
+                                    <input type="number" min="0" class="form-control" name="lclku"
+                                        id="lclku" autocomplete="off">
+                                    <div class="input-group-append">
+                                        <span class="input-group-text">CBM</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <label class="control-label">Weight</label>
+                                <div class="input-group">
+                                    <input type="number" min="0" class="form-control" name="lclweight"
+                                        id="lclweight" autocomplete="off">
+                                    <div class="input-group-append">
+                                        <span class="input-group-text">KG</span>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
                 <div class="form-group" id="dataair" style="display: none">
-                    <label class="col-sm-12 control-label">AIR</label>
                     <div class="col-sm-12">
-                        {{-- <select class="select2" style="width: 100%;" name="airku" id="airku">
-                        <option value="kg">KG</option>
-                    </select> --}}
-                        <div class="input-group">
-                            <input type="number" min="0" class="form-control" name="airku" id="airku"
-                                autocomplete="off">
-                            <div class="input-group-append">
-                                <span class="input-group-text">KG</span>
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <label class="control-label">Volume</label>
+                                <div class="input-group">
+                                    <input type="number" min="0" class="form-control" name="airku"
+                                        id="airku" autocomplete="off">
+                                    <div class="input-group-append">
+                                        <span class="input-group-text">M3</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <label class="control-label">Weight</label>
+                                <div class="input-group">
+                                    <input type="number" min="0" class="form-control" name="airweight"
+                                        id="airweight" autocomplete="off">
+                                    <div class="input-group-append">
+                                        <span class="input-group-text">KG</span>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -283,7 +313,10 @@
             let myfcl = $('#fclku').val();
             let myweight = $('#weight').val();
             let mylcl = $('#lclku').val();
+            let lclweight = $('#lclweight').val();
             let myair = $('#airku').val();
+            let airweight = $('#airweight').val();
+
 
             var arraysave = [];
             for (let index = 0; index < dataku.length; index++) {
@@ -300,22 +333,48 @@
 
             if (nobook == null || nobook == '') {
                 notifalert('Nomor Booking');
+                $('#btnsubmit').html('Submit')
+                $('#btnsubmit').prop('disabled', false)
             } else if (datebook == null || datebook == '') {
                 notifalert('Date Booking');
+                $('#btnsubmit').html('Submit')
+                $('#btnsubmit').prop('disabled', false)
             } else if (myetd == null || myetd == '') {
                 notifalert('ETD (Estimate Delivery Date)');
+                $('#btnsubmit').html('Submit')
+                $('#btnsubmit').prop('disabled', false)
             } else if (myeta == null || myeta == '') {
                 notifalert('ETA (Estimate Acutal Delivery Date)');
+                $('#btnsubmit').html('Submit')
+                $('#btnsubmit').prop('disabled', false)
             } else if (mode == null || mode == '') {
                 notifalert('Ship Mode');
+                $('#btnsubmit').html('Submit')
+                $('#btnsubmit').prop('disabled', false)
             } else if (mode == 'fcl' && myfcl == '') {
                 notifalert('FCL');
+                $('#btnsubmit').html('Submit')
+                $('#btnsubmit').prop('disabled', false)
             } else if (mode == 'fcl' && myweight == '') {
                 notifalert('Weight');
+                $('#btnsubmit').html('Submit')
+                $('#btnsubmit').prop('disabled', false)
             } else if (mode == 'lcl' && mylcl == '') {
                 notifalert('LCL');
+                $('#btnsubmit').html('Submit')
+                $('#btnsubmit').prop('disabled', false)
+            } else if (mode == 'lcl' && lclweight == '') {
+                notifalert('LCL Weight');
+                $('#btnsubmit').html('Submit')
+                $('#btnsubmit').prop('disabled', false)
             } else if (mode == 'air' && myair == '') {
                 notifalert('AIR');
+                $('#btnsubmit').html('Submit')
+                $('#btnsubmit').prop('disabled', false)
+            } else if (mode == 'air' && airweight == '') {
+                notifalert('AIR Weight');
+                $('#btnsubmit').html('Submit')
+                $('#btnsubmit').prop('disabled', false)
             } else {
                 $.ajax({
                     type: "post",
@@ -329,9 +388,11 @@
                         'eta': myeta,
                         'shipmode': mode,
                         'fcl': myfcl,
-                        'weight': myweight,
+                        'lclweight': myweight,
                         'lcl': mylcl,
+                        'lclweight': lclweight,
                         'air': myair,
+                        'airweight': airweight
                     },
                     dataType: "json",
                     success: function(response) {
