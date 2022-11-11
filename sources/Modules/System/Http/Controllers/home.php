@@ -433,7 +433,12 @@ class home extends Controller
                 ->get();
             // dd($mydata);
 
-            array_push($datapo, $mydata);
+            foreach ($mydata as $key => $value) {
+                // dd($value['privilege']);
+                if ($value['privilege'] != null) {
+                    array_push($datapo, $value);
+                }
+            }
         }
 
         $mypo = forwarder::join('po', 'po.id', 'forwarder.idpo')
@@ -449,7 +454,7 @@ class home extends Controller
             ->groupby('po.pono')
             ->get();
 
-        // dd($datapo);
+        // dd(collect([$datapo]));
 
         // $data = array(
         //     'datapo' => $mydata,
@@ -457,7 +462,7 @@ class home extends Controller
         // );
 
         \LogActivity::addToLog('Web Forwarder :: Forwarder : Process Input Data Approval PO', $this->micro);
-        $form = view('system::dashboard.modal_listpo', ['data' => $datapo, 'mypo' => $mypo]);
+        $form = view('system::dashboard.modal_listpo', ['data' => collect([$datapo]), 'mypo' => $mypo]);
         return $form->render();
         // return response()->json(['status' => 200, 'data' => $datapo, 'message' => 'Berhasil']);
     }
