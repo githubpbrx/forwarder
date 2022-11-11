@@ -18,4 +18,6 @@ Route::group(['prefix' => 'websupplier'], function () {
 
 
     Route::post('/updatepi', 'api\WebsupplierServices@updatepi');
+
+    Route::get('/lockshipment/{inv}/{namasuplier}', 'api\WebsupplierServices@lockshipment');
 });

@@ -155,6 +155,7 @@
                                     id="fclku">
                                     <option value="20">20"</option>
                                     <option value="40">40"</option>
+                                    <option value="40hq">40HQ</option>
                                 </select>
                             </div>
                             <div class="col-sm-6">

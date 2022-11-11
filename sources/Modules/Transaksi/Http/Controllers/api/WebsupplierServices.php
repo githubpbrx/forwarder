@@ -18,6 +18,7 @@ use Modules\Transaksi\Models\masterforwarder as forward;
 use Modules\Transaksi\Models\modelpo as po;
 use Modules\Transaksi\Models\modelforwarder as fwd;
 use Modules\Transaksi\Models\modelformpo as formpo;
+use Modules\Transaksi\Models\modelformshipment as shipment;
 
 class WebsupplierServices extends Controller
 {
@@ -229,5 +230,20 @@ class WebsupplierServices extends Controller
             return response()->json($failed, Response::HTTP_UNPROCESSABLE_ENTITY);
         }
         dd($req);
+    }
+
+    function lockshipment($inv, $namasup)
+    {
+        $select = supplier::where('nama', $namasup)->first();
+        if ($select == null) {
+            return;
+        }
+
+        $po = po::where('vendor', $select->id)->pluck('id');
+
+        $form = formpo::wherein('idpo', $po)->pluck('id_formpo');
+
+        $update = shipment::wherein('idformpo', $form)->where('noinv', $inv)->update(['lock' => 1]);
+        return;
     }
 }
