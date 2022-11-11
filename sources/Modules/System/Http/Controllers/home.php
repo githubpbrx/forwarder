@@ -414,16 +414,22 @@ class home extends Controller
         // dd($request);
         $datapo = [];
         foreach ($request->dataku as $key => $val) {
-            $mydata = forwarder::join('po', 'po.id', 'forwarder.idpo')
-                ->join('privilege', 'privilege.idforwarder', 'forwarder.idmasterfwd')
-                ->join('mastersupplier', 'mastersupplier.id', 'po.vendor')
-                ->where('po.pideldate', $val)
-                ->where('privilege.privilege_user_nik', Session::get('session')['user_nik'])
+            $mydata = forwarder::with(['poku' => function ($sup) use ($val) {
+                $sup->with(['supplier', 'hscode'])->where('pideldate', $val);
+            }, 'privilege' => function ($priv) {
+                $priv->where('privilege_user_nik', Session::get('session')['user_nik']);
+            }])
+                // ->join('po', 'po.id', 'forwarder.idpo')
+                //     ->join('privilege', 'privilege.idforwarder', 'forwarder.idmasterfwd')
+                //     ->join('mastersupplier', 'mastersupplier.id', 'po.vendor')
+                // ->where('po.pideldate', $val)
+                // ->where('privilege.privilege_user_nik', Session::get('session')['user_nik'])
                 ->where(function ($kus) {
                     $kus->where('forwarder.statusapproval', null)->orWhere('forwarder.statusapproval', 'reject');
                 })
-                ->where('forwarder.aktif', 'Y')->where('privilege.privilege_aktif', 'Y')->where('mastersupplier.aktif', 'Y')
-                ->selectRaw(' forwarder.*, po.id, po.pono, po.matcontents, po.itemdesc, po.colorcode, po.size, po.qtypo, po.pideldate, mastersupplier.nama')
+                ->where('forwarder.aktif', 'Y')
+                // ->where('privilege.privilege_aktif', 'Y')->where('mastersupplier.aktif', 'Y')
+                // ->selectRaw(' forwarder.*, po.id, po.pono, po.matcontents, po.itemdesc, po.colorcode, po.size, po.qtypo, po.pideldate, mastersupplier.nama')
                 ->get();
             // dd($mydata);
 

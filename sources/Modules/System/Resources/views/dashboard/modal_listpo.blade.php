@@ -48,7 +48,7 @@
                 @foreach ($data as $key => $item)
                     <div class="card card-default collapsed-card">
                         <div class="card-header">
-                            <h3 class="card-title">{{ date('d F Y', strtotime($item[0]->pideldate)) }}</h3>
+                            <h3 class="card-title">{{ date('d F Y', strtotime($item[0]['poku']->pideldate)) }}</h3>
                             <div class="card-tools">
                                 <button type="button" class="btn btn-tool" data-card-widget="collapse">
                                     <i class="fas fa-plus"></i>
@@ -72,14 +72,22 @@
                                             </thead>
                                             <tbody>
                                                 @foreach ($item as $key2 => $dat)
+                                                    <?php
+                                                    if ($dat['poku']['hscode'] == null) {
+                                                        $hscode = 'empty';
+                                                    } else {
+                                                        $hscode = $dat['poku']['hscode']->hscode;
+                                                    }
+
+                                                    ?>
                                                     <tr>
                                                         <td>{{ $dat->po_nomor }}</td>
-                                                        <td>{{ $dat->matcontents }}</td>
-                                                        <td>{{ $dat->itemdesc }}</td>
-                                                        <td>{{ 'empty' }}</td>
-                                                        <td>{{ $dat->colorcode }}</td>
-                                                        <td>{{ $dat->size }}</td>
-                                                        <td>{{ $dat->qtypo }}</td>
+                                                        <td>{{ $dat['poku']->matcontents }}</td>
+                                                        <td>{{ $dat['poku']->itemdesc }}</td>
+                                                        <td>{{ $hscode }}</td>
+                                                        <td>{{ $dat['poku']->colorcode }}</td>
+                                                        <td>{{ $dat['poku']->size }}</td>
+                                                        <td>{{ $dat['poku']->qtypo }}</td>
                                                         <td>{{ $dat->statusforwarder }}</td>
                                                     </tr>
                                                 @endforeach
