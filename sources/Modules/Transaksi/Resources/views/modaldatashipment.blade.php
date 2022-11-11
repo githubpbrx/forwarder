@@ -21,8 +21,18 @@
                                     <div class="form-group">
                                         <table>
                                             <thead>
-                                                <th style="text-align:center"><input type="checkbox" class="checkall"
-                                                        style="height:18px;width:18px" checked>
+                                                <?php
+                                                foreach ($item as $key2 => $val) {
+                                                    if ($val->lock == 1) {
+                                                        $locked = 'disabled';
+                                                    } else {
+                                                        $locked = '';
+                                                    }
+                                                }
+                                                ?>
+                                                <th style="text-align:center"><input type="checkbox"
+                                                        class="checkall-{{ $key1 }}"
+                                                        style="height:18px;width:18px" checked {{ $locked }}>
                                                 </th>
                                                 <th>Material</th>
                                                 <th>Material Desc</th>
@@ -42,12 +52,14 @@
                                                     } else {
                                                         $remain = $val->qtypo - $data['remaining'][$key1][$key2]->qtyshipment;
                                                     }
+
                                                     ?>
                                                     <tr>
                                                         <td style="text-align:center">
                                                             <input type="checkbox"
                                                                 class="check-{{ $key1 }}{{ $key2 }}"
-                                                                style="height:18px;width:18px" checked>
+                                                                style="height:18px;width:18px" {{ $locked }}
+                                                                checked>
                                                         </td>
                                                         <td>{{ $val->matcontents }}</td>
                                                         <td>{{ $val->itemdesc }}</td>
@@ -63,7 +75,8 @@
                                                                 data-idpo="{{ $val->idpo }}"
                                                                 data-blku="{{ $val->nomor_bl }}"
                                                                 data-idformshipment="{{ $val->id_shipment }}"
-                                                                data-idformpo="{{ $val->idformpo }}">
+                                                                data-idformpo="{{ $val->idformpo }}"
+                                                                {{ $locked }}>
                                                         </td>
                                                     </tr>
                                                 @endforeach
@@ -159,7 +172,8 @@
                                                     <label class="col-sm-12 control-label">&nbsp;</label>
                                                     <div class="col-sm-12">
                                                         <button type="button" class="btn btn-info"
-                                                            id="btnupdate-{{ $key1 }}">Submit</button>
+                                                            id="btnupdate-{{ $key1 }}"
+                                                            {{ $locked }}>Submit</button>
                                                     </div>
                                                 </div>
                                             </div>
@@ -271,16 +285,24 @@
         yearRange: "-100:+20",
     });
 
-    $('.checkall').change(function(e) {
-        if (this.checked) {
-            $('.trigerinput').prop('disabled', false);
-            $('input[type="checkbox"]').prop('checked', true);
-        } else {
-            // $('.trigerinput').val('');
-            $('.trigerinput').prop('disabled', true);
-            $('input[type="checkbox"]').prop('checked', false);
+    for (let index = 0; index < dataku.length; index++) {
+        for (let index2 = 0; index2 < dataku[index].length; index2++) {
+            $('.checkall-' + index).change(function(e) {
+                if (this.checked) {
+                    $('.check-' + index + index2).prop('checked', true);
+                    // $('input[type="checkbox"]').prop('checked', true);
+                    $('.cekinput-' + index + index2).prop('disabled', false);
+                } else {
+                    // $('.trigerinput').val('');
+                    // $('.trigerinput').prop('disabled', true);
+                    // $('input[type="checkbox"]').prop('checked', false);
+                    $('.check-' + index + index2).prop('checked', false);
+                    $('.cekinput-' + index + index2).prop('disabled', true);
+
+                }
+            });
         }
-    });
+    }
 
     for (let index = 0; index < dataku.length; index++) {
         for (let index2 = 0; index2 < dataku[index].length; index2++) {
@@ -305,6 +327,7 @@
                 let etd = $('.etd-' + index).val();
                 let eta = $('.eta-' + index).val();
                 let nomorbl = $('#nomorbl-' + index).val();
+                let invoice = $('#invoice-' + index).val();
                 let vessel = $('#vessel-' + index).val();
                 let filebl = $('#filebl-' + index).prop('files')[0];
                 let fileinv = $('#fileinv-' + index).prop('files')[0];
@@ -330,6 +353,7 @@
                 form_data.append('etd', etd);
                 form_data.append('eta', eta);
                 form_data.append('nomorbl', nomorbl);
+                form_data.append('inv', invoice);
                 form_data.append('vessel', vessel);
                 form_data.append('filebl', filebl);
                 form_data.append('fileinv', fileinv);

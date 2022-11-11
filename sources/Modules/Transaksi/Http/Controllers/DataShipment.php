@@ -222,39 +222,39 @@ class DataShipment extends Controller
                 $status = 'partial_allocated';
             }
 
-            if ($qtydefault == '0') {
-                $updateship = modelformshipment::where('id_shipment', $val->idshipment)->where('aktif', 'Y')->update([
-                    'noinv'        => $request->inv,
-                    'qty_shipment' => $qtydefault,
-                    'etdfix'       => $request->etd,
-                    'etafix'       => $request->eta,
-                    'file_bl'      => $fileNamebl,
-                    'file_invoice'      => $fileNameinv,
-                    'file_packinglist'      => $fileNamepack,
-                    'nomor_bl'     => $request->nomorbl,
-                    'vessel'       => $request->vessel,
-                    'statusshipment' => $status,
-                    'aktif'        => 'N',
-                    'updated_at'   => date('Y-m-d H:i:s'),
-                    'updated_by'   => Session::get('session')['user_nik']
-                ]);
-            } else {
-                $updateship = modelformshipment::where('id_shipment', $val->idshipment)->where('aktif', 'Y')->update([
-                    'noinv'        => $request->inv,
-                    'qty_shipment' => $jumlahall,
-                    'etdfix'       => $request->etd,
-                    'etafix'       => $request->eta,
-                    'file_bl'      => $fileNamebl,
-                    'file_invoice'      => $fileNameinv,
-                    'file_packinglist'      => $fileNamepack,
-                    'nomor_bl'     => $request->nomorbl,
-                    'vessel'       => $request->vessel,
-                    'statusshipment' => $status,
-                    'aktif'        => 'Y',
-                    'updated_at'   => date('Y-m-d H:i:s'),
-                    'updated_by'   => Session::get('session')['user_nik']
-                ]);
-            }
+            // if ($qtydefault == '0') {
+            //     $updateship = modelformshipment::where('id_shipment', $val->idshipment)->where('aktif', 'Y')->update([
+            //         'noinv'        => $request->inv,
+            //         'qty_shipment' => $qtydefault,
+            //         'etdfix'       => $request->etd,
+            //         'etafix'       => $request->eta,
+            //         'file_bl'      => $fileNamebl,
+            //         'file_invoice'      => $fileNameinv,
+            //         'file_packinglist'      => $fileNamepack,
+            //         'nomor_bl'     => $request->nomorbl,
+            //         'vessel'       => $request->vessel,
+            //         'statusshipment' => $status,
+            //         'aktif'        => 'Y',
+            //         'updated_at'   => date('Y-m-d H:i:s'),
+            //         'updated_by'   => Session::get('session')['user_nik']
+            //     ]);
+            // } else {
+            $updateship = modelformshipment::where('id_shipment', $val->idshipment)->where('aktif', 'Y')->update([
+                'noinv'        => $request->inv,
+                'qty_shipment' => $jumlahall,
+                'etdfix'       => $request->etd,
+                'etafix'       => $request->eta,
+                'file_bl'      => $fileNamebl,
+                'file_invoice'      => $fileNameinv,
+                'file_packinglist'      => $fileNamepack,
+                'nomor_bl'     => $request->nomorbl,
+                'vessel'       => $request->vessel,
+                'statusshipment' => $status,
+                'aktif'        => 'Y',
+                'updated_at'   => date('Y-m-d H:i:s'),
+                'updated_by'   => Session::get('session')['user_nik']
+            ]);
+            // }
 
             if ($updateship) {
                 $sukses[] = "OK";
