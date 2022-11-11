@@ -70,7 +70,7 @@
                                     {{ $block }}{{ $ceked }}></td>
                             <td>{{ $item->matcontents }}</td>
                             <td>{{ $item->itemdesc }}</td>
-                            <td>{{ 'empty' }}</td>
+                            <td>{{ $item->hscode }}</td>
                             <td>{{ $item->colorcode }}</td>
                             <td>{{ $item->size }}</td>
                             <td>{{ $item->qtypo }}</td>

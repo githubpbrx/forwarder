@@ -9,7 +9,7 @@ use Yajra\DataTables\DataTables;
 use Session, Crypt, DB, Mail;
 use Illuminate\Support\Facades\Storage;
 use Modules\Transaksi\Models\mastersupplier;
-use Modules\Transaksi\Models\masterforwarder;
+use Modules\Transaksi\Models\masterhscode;
 use Modules\Transaksi\Models\modelpo;
 use Modules\Transaksi\Models\modelcontainer;
 use Modules\Transaksi\Models\modelformpo;
@@ -133,11 +133,13 @@ class ProcessShipment extends Controller
             ->join('forwarder', 'forwarder.id_forwarder', 'formpo.idforwarder')
             ->join('privilege', 'privilege.idforwarder', 'forwarder.idmasterfwd')
             ->join('mastersupplier', 'mastersupplier.id', 'po.vendor')
+            ->join('masterhscode', 'masterhscode.matcontent', 'po.matcontents')
             ->where('formpo.kode_booking', $request->id)
             ->where('privilege.privilege_user_nik', Session::get('session')['user_nik'])
             ->where('formpo.statusformpo', 'confirm')
             ->where('formpo.aktif', 'Y')->where('forwarder.aktif', 'Y')->where('privilege.privilege_aktif', 'Y')
-            ->selectRaw(' formpo.*, po.pono, po.matcontents, po.itemdesc, po.colorcode, po.size, po.qtypo, forwarder.qty_allocation, forwarder.statusforwarder, mastersupplier.nama')
+            ->where('masterhscode.aktif', 'Y')
+            ->selectRaw(' formpo.*, po.pono, po.matcontents, po.itemdesc, po.colorcode, po.size, po.qtypo, forwarder.qty_allocation, forwarder.statusforwarder, mastersupplier.nama, masterhscode.hscode')
             ->get();
 
         $mydatapo = modelformpo::join('po', 'po.id', 'formpo.idpo')
