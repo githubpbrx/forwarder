@@ -10,8 +10,8 @@ class modelformpo extends Model
     protected $primaryKey = 'id_formpo';
     protected $guarded = [];
 
-    public function shipment()
+    public function withpo()
     {
-        return $this->hasOne('Modules\Transaksi\Models\modelformshipment', 'idformpo', 'id_formpo')->where('aktif', 'Y');
+        return $this->hasOne('Modules\Transaksi\Models\modelpo', 'id', 'idpo');
     }
 }

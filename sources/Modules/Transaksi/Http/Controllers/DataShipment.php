@@ -106,11 +106,18 @@ class DataShipment extends Controller
 
         $ship = [];
         foreach ($getgroup as $key => $lue) {
-            $getshipment = modelformshipment::join('formpo', 'formpo.id_formpo', 'formshipment.idformpo')
-                ->join('po', 'po.id', 'formpo.idpo')
+            $getshipment = modelformshipment::with(['withformpo' => function ($var) {
+                $var->with(['withpo' => function ($hs) {
+                    $hs->with(['hscode']);
+                }]);
+            }])
+                // ->join('formpo', 'formpo.id_formpo', 'formshipment.idformpo')
+                //     ->join('po', 'po.id', 'formpo.idpo')
+                // ->join('masterhscode', 'masterhscode.matcontent', 'po.matcontents')
                 ->where('formshipment.nomor_bl', $lue->nomor_bl)
-                ->where('formpo.aktif', 'Y')
+                // ->where('formpo.aktif', 'Y')
                 ->where('formshipment.aktif', 'Y')
+                // ->where('masterhscode.aktif', 'Y')
                 // ->selectRaw(' sum(qty_shipment) as qtyshipment, po.id, po.pono, po.matcontents, po.colorcode, po.size, po.style, po.qtypo ')
                 ->get();
 

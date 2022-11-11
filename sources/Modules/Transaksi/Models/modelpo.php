@@ -19,4 +19,9 @@ class modelpo extends Model
     {
         return $this->hasMany('Modules\Transaksi\Models\modelforwarder', 'idpo', 'id')->where('aktif', 'Y');
     }
+
+    public function hscode()
+    {
+        return $this->hasOne('Modules\Transaksi\Models\masterhscode', 'matcontent', 'matcontents')->where('aktif', 'Y');
+    }
 }

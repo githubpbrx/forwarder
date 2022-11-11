@@ -1,7 +1,7 @@
 <div class="modal-body" style="font-size: 10pt;">
     <form action="#" class="form-horizontal">
         {{ csrf_field() }}
-        {{-- {{ dd($data['remaining']) }} --}}
+        {{-- {{ dd($data['shipment']) }} --}}
         <hr style="width: 100%; color: rgb(192, 192, 192); height: 0.5px; background-color:rgb(192, 192, 192);" />
         <div class="row">
             <div class="col-md-12">
@@ -19,7 +19,7 @@
                             <div class="row">
                                 <div class="col-12">
                                     <div class="form-group">
-                                        <table>
+                                        <table border="1">
                                             <thead>
                                                 <?php
                                                 foreach ($item as $key2 => $val) {
@@ -36,23 +36,31 @@
                                                 </th>
                                                 <th>Material</th>
                                                 <th>Material Desc</th>
-                                                <th>Color Code</th>
+                                                <th>Hs Code</th>
+                                                <th>Color</th>
                                                 <th>Size</th>
-                                                <th>Qty Item</th>
-                                                <th>Remaining Qty</th>
-                                                <th>Qty Shipment</th>
+                                                <th>Qty PO</th>
+                                                <th>Balance Qty</th>
+                                                <th>Qty Ship</th>
                                             </thead>
                                             <tbody>
                                                 @foreach ($item as $key2 => $val)
                                                     <?php
                                                     if ($data['remaining'][$key1][$key2]->qtyshipment == null) {
-                                                        $remain = $data['shipment']->qtypo;
-                                                    } elseif ($data['remaining'][$key1][$key2]->qtyshipment == $val->qtypo) {
+                                                        $remain = $val['withformpo']['withpo']->qtypo;
+                                                    } elseif ($data['remaining'][$key1][$key2]->qtyshipment == $val['withformpo']['withpo']->qtypo) {
                                                         $remain = '0';
                                                     } else {
-                                                        $remain = $val->qtypo - $data['remaining'][$key1][$key2]->qtyshipment;
+                                                        $remain = $val['withformpo']['withpo']->qtypo - $data['remaining'][$key1][$key2]->qtyshipment;
                                                     }
 
+                                                    if ($val['withformpo']['withpo']['hscode'] == null) {
+                                                        $hscode = 'empty';
+                                                    } else {
+                                                        $hscode = $val['withformpo']['withpo']['hscode']->hscode;
+                                                    }
+
+                                                    $idpo = $val['withformpo']->idpo;
                                                     ?>
                                                     <tr>
                                                         <td style="text-align:center">
@@ -61,18 +69,19 @@
                                                                 style="height:18px;width:18px" {{ $locked }}
                                                                 checked>
                                                         </td>
-                                                        <td>{{ $val->matcontents }}</td>
-                                                        <td>{{ $val->itemdesc }}</td>
-                                                        <td>{{ $val->colorcode }}</td>
-                                                        <td>{{ $val->size }}</td>
-                                                        <td>{{ $val->qtypo }}</td>
+                                                        <td>{{ $val['withformpo']['withpo']->matcontents }}</td>
+                                                        <td>{{ $val['withformpo']['withpo']->itemdesc }}</td>
+                                                        <td>{{ $hscode }}</td>
+                                                        <td>{{ $val['withformpo']['withpo']->colorcode }}</td>
+                                                        <td>{{ $val['withformpo']['withpo']->size }}</td>
+                                                        <td>{{ $val['withformpo']['withpo']->qtypo }}</td>
                                                         <td>{{ $remain }}</td>
                                                         <td>
                                                             <input type="number" min="0"
                                                                 id="qtyship-{{ $key1 }}{{ $key2 }}"
                                                                 name="qtyship" value="{{ $remain }}"
                                                                 class="form-control trigerinput cekinput-{{ $key1 }}{{ $key2 }}"
-                                                                data-idpo="{{ $val->idpo }}"
+                                                                data-idpo="{{ $idpo }}"
                                                                 data-blku="{{ $val->nomor_bl }}"
                                                                 data-idformshipment="{{ $val->id_shipment }}"
                                                                 data-idformpo="{{ $val->idformpo }}"
@@ -106,8 +115,8 @@
                                             </div>
                                             <div class="col-md-3">
                                                 <div class="form-group">
-                                                    <label class="col-sm-12 control-label">ATD (Actual Time Departure)
-                                                        Fix</label>
+                                                    <label class="col-sm-12 control-label">ATD (Actual Time
+                                                        Departure)</label>
                                                     <div class="col-sm-12">
                                                         <input type="text"
                                                             class="form-control etd-{{ $key1 }}" name="etd"
@@ -117,8 +126,8 @@
                                             </div>
                                             <div class="col-md-3">
                                                 <div class="form-group">
-                                                    <label class="col-sm-12 control-label">ATA (Actual Time Arrival)
-                                                        Fix</label>
+                                                    <label class="col-sm-12 control-label">ATA (Actual Time
+                                                        Arrival)</label>
                                                     <div class="col-sm-12">
                                                         <input type="text"
                                                             class="form-control eta-{{ $key1 }}" name="eta"
