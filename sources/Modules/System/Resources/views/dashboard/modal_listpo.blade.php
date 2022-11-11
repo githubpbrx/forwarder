@@ -73,6 +73,7 @@
                                             <tbody>
                                                 @foreach ($item as $key2 => $dat)
                                                     <?php
+                                                    // dd($dat['poku']->matcontents);
                                                     if ($dat['poku']['hscode'] == null) {
                                                         $hscode = 'empty';
                                                     } else {

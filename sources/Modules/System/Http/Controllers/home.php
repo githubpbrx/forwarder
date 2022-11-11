@@ -411,34 +411,35 @@ class home extends Controller
 
     public function formpo(Request $request)
     {
-        // dd($request);
         $datapo = [];
         foreach ($request->dataku as $key => $val) {
-            $mydata = forwarder::with(['poku' => function ($sup) use ($val) {
-                $sup->with(['supplier', 'hscode'])->where('pideldate', $val);
-            }, 'privilege' => function ($priv) {
-                $priv->where('privilege_user_nik', Session::get('session')['user_nik']);
-            }])
-                // ->join('po', 'po.id', 'forwarder.idpo')
-                //     ->join('privilege', 'privilege.idforwarder', 'forwarder.idmasterfwd')
-                //     ->join('mastersupplier', 'mastersupplier.id', 'po.vendor')
-                // ->where('po.pideldate', $val)
-                // ->where('privilege.privilege_user_nik', Session::get('session')['user_nik'])
+
+            //     with(['poku' => function ($sup) use ($val) {
+            //     $sup->with(['supplier', 'hscode'])->where('pideldate', $val);
+            // }, 'privilege' => function ($priv) {
+            //     $priv->where('privilege_user_nik', Session::get('session')['user_nik']);
+            // }])
+            $mydata = forwarder::join('po', 'po.id', 'forwarder.idpo')
+                ->join('privilege', 'privilege.idforwarder', 'forwarder.idmasterfwd')
+                ->join('mastersupplier', 'mastersupplier.id', 'po.vendor')
+                ->join('masterhscode', 'masterhscode.matcontent', 'po.matcontents')
+                ->where('po.pideldate', $val)
+                ->where('privilege.privilege_user_nik', Session::get('session')['user_nik'])
                 ->where(function ($kus) {
                     $kus->where('forwarder.statusapproval', null)->orWhere('forwarder.statusapproval', 'reject');
                 })
-                ->where('forwarder.aktif', 'Y')
-                // ->where('privilege.privilege_aktif', 'Y')->where('mastersupplier.aktif', 'Y')
-                // ->selectRaw(' forwarder.*, po.id, po.pono, po.matcontents, po.itemdesc, po.colorcode, po.size, po.qtypo, po.pideldate, mastersupplier.nama')
+                ->where('forwarder.aktif', 'Y')->where('masterhscode.aktif', 'Y')
+                ->where('privilege.privilege_aktif', 'Y')->where('mastersupplier.aktif', 'Y')
+                ->selectRaw(' forwarder.*, po.id, po.pono, po.matcontents, po.itemdesc, po.colorcode, po.size, po.qtypo, po.pideldate, mastersupplier.nama')
                 ->get();
             // dd($mydata);
 
-            foreach ($mydata as $key => $value) {
-                // dd($value['privilege']);
-                if ($value['privilege'] != null) {
-                    array_push($datapo, $value);
-                }
-            }
+            // foreach ($mydata as $key => $value) {
+            //     // dd($value['privilege']);
+            //     if ($value['privilege'] != null) {
+            array_push($datapo, $mydata);
+            //     }
+            // }
         }
 
         $mypo = forwarder::join('po', 'po.id', 'forwarder.idpo')
@@ -454,7 +455,7 @@ class home extends Controller
             ->groupby('po.pono')
             ->get();
 
-        // dd(collect([$datapo]));
+        // dd($datapo);
 
         // $data = array(
         //     'datapo' => $mydata,
@@ -462,7 +463,7 @@ class home extends Controller
         // );
 
         \LogActivity::addToLog('Web Forwarder :: Forwarder : Process Input Data Approval PO', $this->micro);
-        $form = view('system::dashboard.modal_listpo', ['data' => collect([$datapo]), 'mypo' => $mypo]);
+        $form = view('system::dashboard.modal_listpo', ['data' => $datapo, 'mypo' => $mypo]);
         return $form->render();
         // return response()->json(['status' => 200, 'data' => $datapo, 'message' => 'Berhasil']);
     }
