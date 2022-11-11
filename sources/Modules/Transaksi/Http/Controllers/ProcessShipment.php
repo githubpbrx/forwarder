@@ -128,18 +128,24 @@ class ProcessShipment extends Controller
 
         $mydata = modelformpo::withCount(['shipment as qtyship' => function ($var) {
             $var->select(DB::raw('sum(qty_shipment)'))->groupby('idformpo');
+        }])->with(['withpo' => function ($hs) {
+            $hs->with(['hscode', 'supplier']);
+        }, 'withforwarder' => function ($priv) {
+            $priv->with(['privilege' => function ($lege) {
+                $lege->where('privilege_user_nik', Session::get('session')['user_nik']);
+            }]);
         }])
-            ->join('po', 'po.id', 'formpo.idpo')
-            ->join('forwarder', 'forwarder.id_forwarder', 'formpo.idforwarder')
-            ->join('privilege', 'privilege.idforwarder', 'forwarder.idmasterfwd')
-            ->join('mastersupplier', 'mastersupplier.id', 'po.vendor')
-            ->join('masterhscode', 'masterhscode.matcontent', 'po.matcontents')
+            // ->join('po', 'po.id', 'formpo.idpo')
+            // ->join('forwarder', 'forwarder.id_forwarder', 'formpo.idforwarder')
+            // ->join('privilege', 'privilege.idforwarder', 'forwarder.idmasterfwd')
+            // ->join('mastersupplier', 'mastersupplier.id', 'po.vendor')
+            // ->join('masterhscode', 'masterhscode.matcontent', 'po.matcontents')
             ->where('formpo.kode_booking', $request->id)
-            ->where('privilege.privilege_user_nik', Session::get('session')['user_nik'])
+            // ->where('privilege.privilege_user_nik', Session::get('session')['user_nik'])
             ->where('formpo.statusformpo', 'confirm')
-            ->where('formpo.aktif', 'Y')->where('forwarder.aktif', 'Y')->where('privilege.privilege_aktif', 'Y')
-            ->where('masterhscode.aktif', 'Y')
-            ->selectRaw(' formpo.*, po.pono, po.matcontents, po.itemdesc, po.colorcode, po.size, po.qtypo, forwarder.qty_allocation, forwarder.statusforwarder, mastersupplier.nama, masterhscode.hscode')
+            ->where('formpo.aktif', 'Y')
+            // ->where('forwarder.aktif', 'Y')->where('privilege.privilege_aktif', 'Y')->where('masterhscode.aktif', 'Y')
+            // ->selectRaw(' formpo.*, po.pono, po.matcontents, po.itemdesc, po.colorcode, po.size, po.qtypo, forwarder.qty_allocation, forwarder.statusforwarder, mastersupplier.nama, masterhscode.hscode')
             ->get();
 
         $mydatapo = modelformpo::join('po', 'po.id', 'formpo.idpo')
@@ -153,7 +159,7 @@ class ProcessShipment extends Controller
             ->groupby('po.pono')
             ->get();
 
-        // dd($mydatapo);
+        // dd($mydata);
         $data = array(
             'dataku' => $mydata,
             'datapo' => $mydatapo

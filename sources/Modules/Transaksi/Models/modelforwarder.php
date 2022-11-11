@@ -25,4 +25,9 @@ class modelforwarder extends Model
     {
         return $this->belongsTo('Modules\Transaksi\Models\modelpo', 'id', 'idpo');
     }
+
+    public function privilege()
+    {
+        return $this->hasOne('Modules\Transaksi\Models\modelprivilege', 'idforwarder', 'idmasterfwd')->where('privilege_aktif', 'Y');
+    }
 }

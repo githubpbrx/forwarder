@@ -1,7 +1,7 @@
 <div class="modal-body" style="font-size: 10pt;">
     <form action="#" class="form-horizontal" enctype="multipart/form-data">
         {{ csrf_field() }}
-        {{-- {{ dd($data['datapo']) }} --}}
+        {{-- {{ dd($data['dataku'][0]) }} --}}
         <?php
         $nopo = [];
         $supname = [];
@@ -49,31 +49,38 @@
                     @foreach ($data['dataku'] as $key => $item)
                         <?php
                         if ($item->qtyship == null) {
-                            $remain = $item->qtypo;
-                            $inputalok = $item->qtypo;
+                            $remain = $item['withpo']->qtypo;
+                            $inputalok = $item['withpo']->qtypo;
                             $block = '';
                             $ceked = 'checked';
-                        } elseif ($item->qtyship == $item->qtypo) {
+                        } elseif ($item->qtyship == $item['withpo']->qtypo) {
                             $remain = 0;
                             $inputalok = '';
                             $block = 'disabled';
                             $ceked = '';
                         } else {
-                            $remain = $item->qtypo - $item->qtyship;
-                            $inputalok = $item->qtypo - $item->qtyship;
+                            $remain = $item['withpo']->qtypo - $item->qtyship;
+                            $inputalok = $item['withpo']->qtypo - $item->qtyship;
                             $block = '';
                             $ceked = 'checked';
                         }
+
+                        if ($item['withpo']['hscode'] == null) {
+                            $hscode = 'empty';
+                        } else {
+                            $hscode = $item['withpo']['hscode']->hscode;
+                        }
+
                         ?>
                         <tr>
                             <td><input type="checkbox" id="check-{{ $key }}" style="height:18px;width:18px"
                                     {{ $block }}{{ $ceked }}></td>
-                            <td>{{ $item->matcontents }}</td>
-                            <td>{{ $item->itemdesc }}</td>
-                            <td>{{ $item->hscode }}</td>
-                            <td>{{ $item->colorcode }}</td>
-                            <td>{{ $item->size }}</td>
-                            <td>{{ $item->qtypo }}</td>
+                            <td>{{ $item['withpo']->matcontents }}</td>
+                            <td>{{ $item['withpo']->itemdesc }}</td>
+                            <td>{{ $hscode }}</td>
+                            <td>{{ $item['withpo']->colorcode }}</td>
+                            <td>{{ $item['withpo']->size }}</td>
+                            <td>{{ $item['withpo']->qtypo }}</td>
                             <td>{{ $remain }}</td>
                             <td><input type="number" min="0"
                                     class="form-control trigerinput cekinput-{{ $key }}" id="qty_allocation"
