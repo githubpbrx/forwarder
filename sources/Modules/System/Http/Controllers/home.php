@@ -57,13 +57,31 @@ class home extends Controller
             ->groupby('po.pono')
             ->get();
 
-        $datareject = formpo::join('privilege', 'privilege.idforwarder', 'formpo.idmasterfwd')
-            ->join('po', 'po.id', 'formpo.idpo')
+        $datareject = formpo::join('po', 'po.id', 'formpo.idpo')
+            ->join('mastersupplier', 'mastersupplier.id', 'po.vendor')
+            ->join('masterhscode', 'masterhscode.matcontent', 'po.matcontents')
+            ->join('privilege', 'privilege.idforwarder', 'formpo.idmasterfwd')
             ->where('privilege.privilege_user_nik', Session::get('session')['user_nik'])
             ->where('privilege.privilege_aktif', 'Y')
             ->where('formpo.statusformpo', '=', 'reject')
             ->where('formpo.aktif', 'Y')
-            ->selectRaw(' po.pono, po.matcontents, po.itemdesc, formpo.kode_booking, formpo.date_booking, formpo.etd, formpo.eta, formpo.shipmode, formpo.subshipmode, formpo.ket_tolak ')
+            ->where('mastersupplier.aktif', 'Y')
+            ->where('masterhscode.aktif', 'Y')
+            ->groupby('po.pono')
+            ->selectRaw(' po.pono, po.matcontents, po.itemdesc, po.qtypo, po.pino, formpo.kode_booking, formpo.date_booking, formpo.etd, formpo.eta, formpo.shipmode, formpo.subshipmode, formpo.ket_tolak, mastersupplier.nama, masterhscode.hscode ')
+            ->get();
+
+        $datarejecttabel = formpo::join('po', 'po.id', 'formpo.idpo')
+            ->join('mastersupplier', 'mastersupplier.id', 'po.vendor')
+            ->join('masterhscode', 'masterhscode.matcontent', 'po.matcontents')
+            ->join('privilege', 'privilege.idforwarder', 'formpo.idmasterfwd')
+            ->where('privilege.privilege_user_nik', Session::get('session')['user_nik'])
+            ->where('privilege.privilege_aktif', 'Y')
+            ->where('formpo.statusformpo', '=', 'reject')
+            ->where('formpo.aktif', 'Y')
+            ->where('mastersupplier.aktif', 'Y')
+            ->where('masterhscode.aktif', 'Y')
+            ->selectRaw(' po.pono, po.matcontents, po.itemdesc, po.qtypo, po.colorcode, po.size, po.pino, formpo.kode_booking, formpo.date_booking, formpo.etd, formpo.eta, formpo.shipmode, formpo.subshipmode, formpo.ket_tolak, mastersupplier.nama, masterhscode.hscode ')
             ->get();
         // dd($datareject);
 
@@ -112,6 +130,7 @@ class home extends Controller
             'totalshipment'  => count($cekshipment),
             'totalreject'   => count($totalreject),
             'datareject'    => $datareject,
+            'datarejecttabel'    => $datarejecttabel,
             'totalapproval' => count($dataapproval),
             'datauser'      => $datauser,
             'totalkyc'      => count($userkyc),
@@ -542,7 +561,7 @@ class home extends Controller
 
     public function saveformpo(Request $request)
     {
-        // dd($request);
+        dd($request);
         DB::beginTransaction();
 
         if ($request->shipmode == 'fcl') {

@@ -92,11 +92,40 @@
                     <form action="#" class="form-horizontal">
                         {{ csrf_field() }}
                         <div class="row">
-                            <div class="col-md-6">
+                            <?php
+                            $nopo = [];
+                            $namasup = [];
+                            $nopi = [];
+                            foreach ($datareject as $po) {
+                                array_push($nopo, $po->pono);
+                                array_push($namasup, $po->nama);
+                                array_push($nopi, $po->pino);
+                            }
+                            ?>
+                            <div class="col-md-4">
                                 <div class="form-group">
                                     <label class="col-sm-12 control-label">PO Number</label>
                                     <div class="col-sm-12">
-                                        <input type="text" class="form-control" id="nomorpo" name="nomorpo" readonly>
+                                        <input type="text" class="form-control" id="nomorpo" name="nomorpo"
+                                            value="{{ implode(', ', $nopo) }}" readonly>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label class="col-sm-12 control-label">PI Number</label>
+                                    <div class="col-sm-12">
+                                        <input type="text" class="form-control" id="pinomor" name="pinomor"
+                                            value="{{ implode(', ', $nopi) }}" readonly>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label class="col-sm-12 control-label">Supplier</label>
+                                    <div class="col-sm-12">
+                                        <input type="text" class="form-control" id="supplier" name="supplier"
+                                            value="{{ implode(', ', $namasup) }}" readonly>
                                     </div>
                                 </div>
                             </div>
@@ -151,15 +180,77 @@
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label class="col-sm-12 control-label">Ship Mode</label>
                                     <div class="col-sm-12">
                                         <div class="row">
-                                            <div class="col-sm-6">
-                                                <input type="text" class="form-control" id="shipmode" readonly>
+                                            <?php
+                                            $exp = explode('-', $datareject[0]->subshipmode);
+                                            $expkg = explode('KG', $exp[1]);
+                                            // dd($expkg);
+                                            ?>
+                                            <div class="col-sm-4">
+                                                <label class="control-label">Ship Mode</label>
+                                                <input type="text" class="form-control"
+                                                    value="{{ $datareject[0]->shipmode }}" readonly>
                                             </div>
-                                            <div class="col-sm-6">
-                                                <input type="text" class="form-control" id="subshipmode" readonly>
-                                            </div>
+                                            @if ($datareject[0]->shipmode == 'fcl')
+                                                <div class="col-sm-4">
+                                                    <label class="control-label">Size</label>
+                                                    <input type="text" class="form-control"
+                                                        value="{{ $exp[0] }}&Prime;" readonly>
+                                                </div>
+                                                <div class="col-sm-4">
+                                                    <label class="control-label">Weight</label>
+                                                    <div class="input-group">
+                                                        <input type="number" min="0" class="form-control"
+                                                            autocomplete="off" value="{{ $expkg[0] }}" readonly>
+                                                        <div class="input-group-append">
+                                                            <span class="input-group-text">KG</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            @elseif($datareject[0]->shipmode == 'lcl')
+                                                <div class="col-sm-4">
+                                                    <label class="control-label">LCL</label>
+                                                    <div class="input-group">
+                                                        <input type="number" min="0" class="form-control"
+                                                            autocomplete="off" value="{{ $exp[0] }}" readonly>
+                                                        <div class="input-group-append">
+                                                            <span class="input-group-text">CBM</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-sm-4">
+                                                    <label class="control-label">Weight</label>
+                                                    <div class="input-group">
+                                                        <input type="number" min="0" class="form-control"
+                                                            autocomplete="off" value="{{ $expkg[0] }}" readonly>
+                                                        <div class="input-group-append">
+                                                            <span class="input-group-text">KG</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            @else
+                                                <div class="col-sm-4">
+                                                    <label class="control-label">Volume</label>
+                                                    <div class="input-group">
+                                                        <input type="number" min="0" class="form-control"
+                                                            autocomplete="off" value="{{ $exp[0] }}" readonly>
+                                                        <div class="input-group-append">
+                                                            <span class="input-group-text">M3</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-sm-4">
+                                                    <label class="control-label">Weight</label>
+                                                    <div class="input-group">
+                                                        <input type="number" min="0" class="form-control"
+                                                            autocomplete="off" value="{{ $expkg[0] }}" readonly>
+                                                        <div class="input-group-append">
+                                                            <span class="input-group-text">KG</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            @endif
                                         </div>
                                     </div>
                                 </div>
@@ -193,22 +284,23 @@
         $(document).ready(function() {
 
             var poreject = @JSON($datareject);
-            console.log('poreject :>> ', poreject);
+            var tabelreject = @JSON($datarejecttabel);
             $('#detailreject').click(function(e) {
-                console.log('object :>> ', poreject);
                 $('#formreject').modal({
                     show: true,
                     backdrop: 'static'
                 });
 
                 html =
-                    '<table border="0" style="width:100%"><tr><th>Material Contents</th><th>Material Description</th></tr>';
-                for (let index = 0; index < poreject.length; index++) {
+                    '<table border="1" style="width:100%"><tr><th>PO Number</th><th>Material</th><th>Material Desc</th><th>HS Code</th><th>Color</th><th>Size</th><th>Qty Item</th></tr>';
+                for (let index = 0; index < tabelreject.length; index++) {
 
                     html +=
-                        '<tr><td>' +
-                        poreject[index].matcontents + '</td><td>' +
-                        poreject[index].itemdesc + '</td></tr>';
+                        '<tr><td>' + tabelreject[index].pono + '</td><td>' + tabelreject[index]
+                        .matcontents + '</td><td>' + tabelreject[index].itemdesc + '</td><td>' +
+                        tabelreject[index].hscode + '</td><td>' + tabelreject[index].colorcode +
+                        '</td><td>' + tabelreject[index].size + '</td><td>' + tabelreject[index].qtypo +
+                        '</td></tr>';
                 }
 
                 html += "</table>";
