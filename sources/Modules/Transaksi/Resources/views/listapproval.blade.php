@@ -44,13 +44,19 @@
                     <form action="#" class="form-horizontal">
                         {{ csrf_field() }}
                         <div class="row">
-                            <div class="col-md-6">
+                            <div class="col-md-4">
                                 <label class="col-sm-12 control-label">PO Number</label>
                                 <div class="col-sm-12">
                                     <input type="text" class="form-control" id="nomorpo" name="nomorpo" readonly>
                                 </div>
                             </div>
-                            <div class="col-md-6">
+                            <div class="col-md-4">
+                                <label class="col-sm-12 control-label">PI Number</label>
+                                <div class="col-sm-12">
+                                    <input type="text" class="form-control" id="nomorpi" name="nomorpi" readonly>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
                                 <label class="col-sm-12 control-label">Supplier</label>
                                 <div class="col-sm-12">
                                     <input type="text" class="form-control" id="supplier" name="supplier" readonly>
@@ -115,6 +121,26 @@
                                     <label class="col-sm-12 control-label">Forwarder</label>
                                     <div class="col-sm-12">
                                         <input type="text" class="form-control" id="forwarder" name="forwarder" readonly>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <div class="col-sm-12">
+                                        <div class="row">
+                                            <div class="col-sm-6">
+                                                <label class="control-label">Route Code</label>
+                                                <input type="text" class="form-control" id="routecode"
+                                                    name="routecode" readonly>
+                                            </div>
+                                            <div class="col-sm-6">
+                                                <label class="control-label">Route Description</label>
+                                                <input type="text" class="form-control" id="routedesc"
+                                                    name="routedesc" readonly>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -269,7 +295,8 @@
                     for (let index = 0; index < mydata.length; index++) {
                         html +=
                             '<tr><td>' + mydata[index].matcontents + '</td><td>' + mydata[index]
-                            .itemdesc + '</td><td>' + 'kosong' + '</td><td>' +
+                            .itemdesc + '</td><td>' + mydata[index]
+                            .hscode + '</td><td>' +
                             mydata[index].qtypo + '</td><td>' + mydata[index].qty_allocation +
                             '</td><td>' + mydata[index].statusforwarder +
                             '</td><td><input type="hidden" id="dataid-' + index + '" data-idpo="' +
@@ -285,27 +312,41 @@
 
                     if ((mydata[0].shipmode == 'fcl')) {
                         let exp = mydata[0].subshipmode.split("-");
+                        let exp1 = exp[1].split("KG");
+                        console.log('exp :>> ', exp1);
+                        $('#datashipmode').append(
+                            '<div class="row">  <div class="col-sm-3"><label class="control-label">Ship Mode</label><input type="text" class="form-control" value="' +
+                            mydata[0].shipmode +
+                            '" readonly></div><div class="col-sm-3"><label class="control-label">Size</label><input type="text" class="form-control" value="' +
+                            exp[0] +
+                            '" readonly></div><div class="col-sm-3"><label class="control-label">Weight</label><div class="input-group"><input type="number" min="0" class="form-control" autocomplete="off" value="' +
+                            exp1[0] +
+                            '" readonly><div class="input-group-append"><span class="input-group-text">KG</span></div></div></div></div>'
+                        );
+                    } else if ((mydata[0].shipmode == 'lcl')) {
                         $('#datashipmode').append(
                             '<div class="row"><div class="col-sm-3"><label class="control-label">Ship Mode</label><input type="text" class="form-control" value="' +
                             mydata[0].shipmode +
-                            '" readonly></div><div class="col-sm-3"><label class="control-label">SubShipmode</label><input type="text" class="form-control" value="' +
+                            '" readonly></div><div class="col-sm-3"><label class="control-label">Volume</label><div class="input-group"><input type="number" min="0" class="form-control" autocomplete="off" value="' +
                             exp[0] +
-                            '&Prime;" readonly></div><div class="col-sm-3"><label class="control-label">Amount</label><input type="text" class="form-control" value="' +
-                            exp[1] +
-                            '" readonly></div><div class="col-sm-3"><label class="control-label">Weight</label><input type="text" class="form-control" value="' +
-                            exp[2] + '" readonly></div></div>'
+                            '" readonly><div class="input-group-append"><span class="input-group-text">CBM</span></div></div></div><div class="col-sm-3"><label class="control-label">Weight</label><div class="input-group"><input type="number" min="0" class="form-control" autocomplete="off" value="' +
+                            exp1[0] +
+                            '" readonly><div class="input-group-append"><span class="input-group-text">KG</span></div></div></div></div>'
                         );
                     } else {
                         $('#datashipmode').append(
-                            '<div class="row"><div class="col-sm-6"><label class="control-label">Ship Mode</label><input type="text" class="form-control" value="' +
+                            '<div class="row"><div class="col-sm-3"><label class="control-label">Ship Mode</label><input type="text" class="form-control" value="' +
                             mydata[0].shipmode +
-                            '" readonly></div><div class="col-sm-6"><label class="control-label">SubShipmode</label><input type="text" class="form-control" value="' +
-                            mydata[0].subshipmode +
-                            '" readonly></div></div>'
+                            '" readonly></div><div class="col-sm-3"><label class="control-label">Volume</label><div class="input-group"><input type="number" min="0" class="form-control" autocomplete="off" value="' +
+                            exp[0] +
+                            '" readonly><div class="input-group-append"><span class="input-group-text">M3</span></div></div></div><div class="col-sm-3"><label class="control-label">Weight</label><div class="input-group"><input type="number" min="0" class="form-control" autocomplete="off" value="' +
+                            exp1[0] +
+                            '" readonly><div class="input-group-append"><span class="input-group-text">KG</span></div></div></div></div>'
                         );
                     }
 
                     $('#nomorpo').val(mydata[0].pono);
+                    $('#nomorpi').val(mydata[0].pino);
                     $('#supplier').val(mydata[0].nama);
                     $('#nobook').val(mydata[0].kode_booking);
                     $('#datebook').val(mydata[0].date_booking);
@@ -314,6 +355,8 @@
                     $('#forwarder').val(mydata[0].name);
                     $('#pengajunama').html(mydata[0].privilege_user_name);
                     $('#pengajunik').val(mydata[0].privilege_user_nik);
+                    $('#routecode').val(mydata[0].route_code);
+                    $('#routedesc').val(mydata[0].route_desc);
                 })
             });
 

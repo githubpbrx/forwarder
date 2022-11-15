@@ -155,7 +155,7 @@ class ApprovalConfirmation extends Controller
             ->where('privilege.nikfinance', Session::get('session')['user_nik'])
             ->where('formpo.statusformpo', 'waiting')
             ->where('formpo.aktif', 'Y')
-            ->groupby('po.pono')
+            ->groupby('po.pideldate')
             ->get();
         // dd($data);
         return DataTables::of($data)
@@ -169,7 +169,7 @@ class ApprovalConfirmation extends Controller
             ->addColumn('action', function ($data) {
                 $button = '';
 
-                $button = '<a href="#" data-id="' . $data->pono . '" id="prosesapproval"><i data-tooltip="tooltip" title="Proses Approval" class="fa fa-arrow-circle-right fa-lg text-green"></i></a>';
+                $button = '<a href="#" data-id="' . $data->pideldate . '" id="prosesapproval"><i data-tooltip="tooltip" title="Proses Approval" class="fa fa-arrow-circle-right fa-lg text-green"></i></a>';
 
                 return $button;
             })
@@ -187,10 +187,12 @@ class ApprovalConfirmation extends Controller
             ->join('masterforwarder', 'masterforwarder.id', 'formpo.idmasterfwd')->where('masterforwarder.aktif', 'Y')
             ->join('privilege', 'privilege.idforwarder', 'formpo.idmasterfwd')->where('privilege_aktif', 'Y')
             ->join('mastersupplier', 'mastersupplier.id', 'po.vendor')->where('mastersupplier.aktif', 'Y')
-            ->where('po.pono', $request->id)
+            ->join('masterhscode', 'masterhscode.matcontent', 'po.matcontents')->where('masterhscode.aktif', 'Y')
+            ->join('masterroute', 'masterroute.id_route', 'formpo.idroute')->where('masterroute.aktif', 'Y')
+            ->where('po.pideldate', $request->id)
             ->where('formpo.statusformpo', 'waiting')
             ->where('privilege.nikfinance', Session::get('session')['user_nik'])
-            ->selectRaw(' po.id, po.pono, po.matcontents, po.itemdesc, po.qtypo, po.statusalokasi, forwarder.qty_allocation, forwarder.statusforwarder, forwarder.id_forwarder, formpo.id_formpo, formpo.kode_booking, formpo.date_booking, formpo.etd, formpo.eta, formpo.shipmode, formpo.subshipmode, masterforwarder.name, privilege.privilege_user_name, privilege.privilege_user_nik, mastersupplier.nama')
+            ->selectRaw(' po.id, po.pono, po.matcontents, po.itemdesc, po.qtypo, po.statusalokasi, po.pino, forwarder.qty_allocation, forwarder.statusforwarder, forwarder.id_forwarder, formpo.id_formpo, formpo.kode_booking, formpo.date_booking, formpo.etd, formpo.eta, formpo.shipmode, formpo.subshipmode, masterforwarder.name, privilege.privilege_user_name, privilege.privilege_user_nik, mastersupplier.nama, masterhscode.hscode, masterroute.route_code, masterroute.route_desc')
             ->get();
         // dd($dataku);
 
