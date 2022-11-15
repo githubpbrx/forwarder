@@ -22,6 +22,7 @@ Route::prefix('')->group(function () {
     Route::get('/pageupdate', 'home@pageupdate')->name('page_update');
     Route::get('/pagekyc', 'home@pagekyc')->name('page_kyc');
     Route::get('/listpo', 'home@listpo')->name('list_po');
+    Route::post('/getroute', 'home@getroute')->name('get_route');
     Route::post('/getpidate', 'home@getpi')->name('get_pi');
     Route::get('/listupdate', 'home@listupdate')->name('list_update');
     Route::get('/listkyc', 'home@listkyc')->name('list_kyc');

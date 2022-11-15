@@ -15,7 +15,7 @@ use Modules\System\Models\modelpo as po;
 use Modules\System\Models\modelprivilege as privilege;
 use Modules\System\Models\modelformpo as formpo;
 use Modules\System\Models\modelformshipment as shipment;
-use Modules\System\Models\modelcoc as coc;
+use Modules\System\Models\masterroute as route;
 use Modules\System\Models\modelkyc as kyc;
 use Modules\System\Models\modelforwarder as forwarder;
 
@@ -43,7 +43,7 @@ class home extends Controller
             ->where('po.statusalokasi', 'waiting')
             ->where('forwarder.statusapproval', '=', null)
             ->where('forwarder.aktif', 'Y')->where('privilege.privilege_aktif', 'Y')
-            ->groupby('po.pono')
+            ->groupby('po.pideldate')
             ->get();
         // dd($datapo);
 
@@ -411,12 +411,14 @@ class home extends Controller
 
     public function formpo(Request $request)
     {
+        // dd($request);
         $datapo = [];
         foreach ($request->dataku as $key => $val) {
-
-            //     with(['poku' => function ($sup) use ($val) {
-            //     $sup->with(['supplier', 'hscode'])->where('pideldate', $val);
-            // }, 'privilege' => function ($priv) {
+            // $mydata = forwarder::with(['poku' => function ($sup) use ($val) {
+            //     $sup->where('pideldate', $val);
+            //     $sup->with(['supplier', 'hscode']);
+            // }])
+            // , 'privilege' => function ($priv) {
             //     $priv->where('privilege_user_nik', Session::get('session')['user_nik']);
             // }])
             $mydata = forwarder::join('po', 'po.id', 'forwarder.idpo')
@@ -428,8 +430,10 @@ class home extends Controller
                 ->where(function ($kus) {
                     $kus->where('forwarder.statusapproval', null)->orWhere('forwarder.statusapproval', 'reject');
                 })
-                ->where('forwarder.aktif', 'Y')->where('masterhscode.aktif', 'Y')
-                ->where('privilege.privilege_aktif', 'Y')->where('mastersupplier.aktif', 'Y')
+                ->where('forwarder.aktif', 'Y')
+                ->where('masterhscode.aktif', 'Y')
+                ->where('privilege.privilege_aktif', 'Y')
+                ->where('mastersupplier.aktif', 'Y')
                 ->selectRaw(' forwarder.*, po.id, po.pono, po.matcontents, po.itemdesc, po.colorcode, po.size, po.qtypo, po.pideldate, mastersupplier.nama')
                 ->get();
             // dd($mydata);
@@ -466,6 +470,24 @@ class home extends Controller
         $form = view('system::dashboard.modal_listpo', ['data' => $datapo, 'mypo' => $mypo]);
         return $form->render();
         // return response()->json(['status' => 200, 'data' => $datapo, 'message' => 'Berhasil']);
+    }
+
+    public function getroute(Request $request)
+    {
+        header("Access-Control-Allow-Origin: *");
+        header("Access-Control-Allow-Headers: *");
+
+        if (!$request->ajax()) return;
+        $po = route::selectRaw(' id_route, route_code, route_desc');
+
+        if ($request->has('q')) {
+            $search = $request->q;
+            $po = $po->whereRaw(' (route_desc like "%' . $search . '%") ');
+        }
+
+        $po = $po->where('aktif', 'Y')->orderby('route_code', 'asc')->paginate(10, $request->page);
+        // dd($po);
+        return response()->json($po);
     }
 
     public function formupdate(Request $request)
@@ -590,6 +612,7 @@ class home extends Controller
                 'idpo'          => $val['idpo'],
                 'idmasterfwd'   => $val['idmasterfwd'],
                 'idforwarder'   => $val['idforwarder'],
+                'idroute'       => $request->route,
                 'kode_booking'  => strtoupper($request->nobooking),
                 'date_booking'  => $request->datebooking,
                 'etd'           => $request->etd,

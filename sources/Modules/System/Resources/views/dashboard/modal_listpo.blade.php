@@ -237,6 +237,18 @@
                 </div>
             </div>
         </div>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label class="col-sm-12 control-label">Route</label>
+                    <div class="col-sm-12">
+                        <select class="form-control select2" name="route" id="route">
+                            <option value=""></option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
     </form>
 </div>
 <div class="modal-footer">
@@ -312,6 +324,40 @@
             }
         });
 
+        $('#route').select2({
+            placeholder: '-- Choose Route --',
+            ajax: {
+                url: "{!! route('get_route') !!}",
+                dataType: 'json',
+                delay: 500,
+                type: 'post',
+                data: function(params) {
+                    var query = {
+                        q: params.term,
+                        page: params.page || 1,
+                        _token: $('meta[name=csrf-token]').attr('content')
+                    }
+                    return query;
+                },
+                processResults: function(data, params) {
+                    console.log('data :>> ', data);
+                    return {
+                        results: $.map(data.data, function(item) {
+                            return {
+                                text: item.route_code + '-' + item.route_desc,
+                                id: item.id_route,
+                                selected: true,
+                            }
+                        }),
+                        pagination: {
+                            more: data.to < data.total
+                        }
+                    };
+                },
+                cache: true
+            }
+        });
+
         $('#btnsubmit').click(function(e) {
             $('#btnsubmit').html('<i class="fas fa-hourglass"></i> Please Wait')
             $('#btnsubmit').prop('disabled', true)
@@ -326,7 +372,7 @@
             let lclweight = $('#lclweight').val();
             let myair = $('#airku').val();
             let airweight = $('#airweight').val();
-
+            let myroute = $('#route').val();
 
             var arraysave = [];
             for (let index = 0; index < dataku.length; index++) {
@@ -385,6 +431,10 @@
                 notifalert('AIR Weight');
                 $('#btnsubmit').html('Submit')
                 $('#btnsubmit').prop('disabled', false)
+            } else if (myroute == null || myroute == '') {
+                notifalert('Route');
+                $('#btnsubmit').html('Submit')
+                $('#btnsubmit').prop('disabled', false)
             } else {
                 $.ajax({
                     type: "post",
@@ -402,7 +452,8 @@
                         'lcl': mylcl,
                         'lclweight': lclweight,
                         'air': myair,
-                        'airweight': airweight
+                        'airweight': airweight,
+                        'route': myroute
                     },
                     dataType: "json",
                     success: function(response) {
