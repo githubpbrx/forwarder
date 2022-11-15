@@ -89,186 +89,189 @@
                     </button>
                 </div>
                 <div class="modal-body" style="font-size: 10pt;">
-                    <form action="#" class="form-horizontal">
-                        {{ csrf_field() }}
-                        <div class="row">
-                            <?php
-                            $nopo = [];
-                            $namasup = [];
-                            $nopi = [];
-                            foreach ($datareject as $po) {
-                                array_push($nopo, $po->pono);
-                                array_push($namasup, $po->nama);
-                                array_push($nopi, $po->pino);
-                            }
-                            ?>
-                            <div class="col-md-4">
-                                <div class="form-group">
-                                    <label class="col-sm-12 control-label">PO Number</label>
-                                    <div class="col-sm-12">
-                                        <input type="text" class="form-control" id="nomorpo" name="nomorpo"
-                                            value="{{ implode(', ', $nopo) }}" readonly>
+
+                    @if ($totalreject >= 1)
+                        <form action="#" class="form-horizontal">
+                            {{ csrf_field() }}
+                            <div class="row">
+                                <?php
+                                $nopo = [];
+                                $namasup = [];
+                                $nopi = [];
+                                foreach ($datareject as $po) {
+                                    array_push($nopo, $po->pono);
+                                    array_push($namasup, $po->nama);
+                                    array_push($nopi, $po->pino);
+                                }
+                                ?>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label class="col-sm-12 control-label">PO Number</label>
+                                        <div class="col-sm-12">
+                                            <input type="text" class="form-control" id="nomorpo" name="nomorpo"
+                                                value="{{ implode(', ', $nopo) }}" readonly>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="form-group">
-                                    <label class="col-sm-12 control-label">PI Number</label>
-                                    <div class="col-sm-12">
-                                        <input type="text" class="form-control" id="pinomor" name="pinomor"
-                                            value="{{ implode(', ', $nopi) }}" readonly>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label class="col-sm-12 control-label">PI Number</label>
+                                        <div class="col-sm-12">
+                                            <input type="text" class="form-control" id="pinomor" name="pinomor"
+                                                value="{{ implode(', ', $nopi) }}" readonly>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="form-group">
-                                    <label class="col-sm-12 control-label">Supplier</label>
-                                    <div class="col-sm-12">
-                                        <input type="text" class="form-control" id="supplier" name="supplier"
-                                            value="{{ implode(', ', $namasup) }}" readonly>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <hr
-                            style="width: 100%; color: rgb(192, 192, 192); height: 0.5px; background-color:rgb(192, 192, 192);" />
-                        <div class="row">
-                            <div class="col-md-12">
-                                <div id="detailitem"></div>
-                            </div>
-                        </div>
-                        <hr
-                            style="width: 100%; color: rgb(192, 192, 192); height: 0.5px; background-color:rgb(192, 192, 192);" />
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label class="col-sm-12 control-label">Booking Number</label>
-                                    <div class="col-sm-12">
-                                        <input type="text" class="form-control" id="nobook" name="nobook"
-                                            autocomplete="off" readonly>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label class="col-sm-12 control-label">Date Booking</label>
-                                    <div class="col-sm-12">
-                                        <input type="text" class="form-control" id="datebook" name="datebook"
-                                            autocomplete="off" readonly>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label class="col-sm-12 control-label">ETD (Estimate Delivery Date)</label>
-                                    <div class="col-sm-12">
-                                        <input type="text" class="form-control" id="etd" name="etd"
-                                            autocomplete="off" readonly>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label class="col-sm-12 control-label">ETA (Estimate Acutal Delivery Date)</label>
-                                    <div class="col-sm-12">
-                                        <input type="text" class="form-control" id="eta" name="eta"
-                                            autocomplete="off" readonly>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <div class="col-sm-12">
-                                        <div class="row">
-                                            <?php
-                                            $exp = explode('-', $datareject[0]->subshipmode);
-                                            $expkg = explode('KG', $exp[1]);
-                                            // dd($expkg);
-                                            ?>
-                                            <div class="col-sm-4">
-                                                <label class="control-label">Ship Mode</label>
-                                                <input type="text" class="form-control"
-                                                    value="{{ $datareject[0]->shipmode }}" readonly>
-                                            </div>
-                                            @if ($datareject[0]->shipmode == 'fcl')
-                                                <div class="col-sm-4">
-                                                    <label class="control-label">Size</label>
-                                                    <input type="text" class="form-control"
-                                                        value="{{ $exp[0] }}&Prime;" readonly>
-                                                </div>
-                                                <div class="col-sm-4">
-                                                    <label class="control-label">Weight</label>
-                                                    <div class="input-group">
-                                                        <input type="number" min="0" class="form-control"
-                                                            autocomplete="off" value="{{ $expkg[0] }}" readonly>
-                                                        <div class="input-group-append">
-                                                            <span class="input-group-text">KG</span>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            @elseif($datareject[0]->shipmode == 'lcl')
-                                                <div class="col-sm-4">
-                                                    <label class="control-label">LCL</label>
-                                                    <div class="input-group">
-                                                        <input type="number" min="0" class="form-control"
-                                                            autocomplete="off" value="{{ $exp[0] }}" readonly>
-                                                        <div class="input-group-append">
-                                                            <span class="input-group-text">CBM</span>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="col-sm-4">
-                                                    <label class="control-label">Weight</label>
-                                                    <div class="input-group">
-                                                        <input type="number" min="0" class="form-control"
-                                                            autocomplete="off" value="{{ $expkg[0] }}" readonly>
-                                                        <div class="input-group-append">
-                                                            <span class="input-group-text">KG</span>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            @else
-                                                <div class="col-sm-4">
-                                                    <label class="control-label">Volume</label>
-                                                    <div class="input-group">
-                                                        <input type="number" min="0" class="form-control"
-                                                            autocomplete="off" value="{{ $exp[0] }}" readonly>
-                                                        <div class="input-group-append">
-                                                            <span class="input-group-text">M3</span>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="col-sm-4">
-                                                    <label class="control-label">Weight</label>
-                                                    <div class="input-group">
-                                                        <input type="number" min="0" class="form-control"
-                                                            autocomplete="off" value="{{ $expkg[0] }}" readonly>
-                                                        <div class="input-group-append">
-                                                            <span class="input-group-text">KG</span>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            @endif
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label class="col-sm-12 control-label">Supplier</label>
+                                        <div class="col-sm-12">
+                                            <input type="text" class="form-control" id="supplier" name="supplier"
+                                                value="{{ implode(', ', $namasup) }}" readonly>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-12">
-                                <div class="form-group">
-                                    <label class="col-sm-12 control-label">Description</label>
-                                    <div class="col-sm-12">
-                                        {{-- <input type="text" class="form-control" id="deskripsi" name="deskripsi"
-                                            autocomplete="off" readonly> --}}
-                                        <textarea name="deskripsi" id="deskripsi" cols="104" rows="2" disabled></textarea>
+                            <hr
+                                style="width: 100%; color: rgb(192, 192, 192); height: 0.5px; background-color:rgb(192, 192, 192);" />
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div id="detailitem"></div>
+                                </div>
+                            </div>
+                            <hr
+                                style="width: 100%; color: rgb(192, 192, 192); height: 0.5px; background-color:rgb(192, 192, 192);" />
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="col-sm-12 control-label">Booking Number</label>
+                                        <div class="col-sm-12">
+                                            <input type="text" class="form-control" id="nobook" name="nobook"
+                                                autocomplete="off" readonly>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="col-sm-12 control-label">Date Booking</label>
+                                        <div class="col-sm-12">
+                                            <input type="text" class="form-control" id="datebook" name="datebook"
+                                                autocomplete="off" readonly>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    </form>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="col-sm-12 control-label">ETD (Estimate Delivery Date)</label>
+                                        <div class="col-sm-12">
+                                            <input type="text" class="form-control" id="etd" name="etd"
+                                                autocomplete="off" readonly>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="col-sm-12 control-label">ETA (Estimate Acutal Delivery Date)</label>
+                                        <div class="col-sm-12">
+                                            <input type="text" class="form-control" id="eta" name="eta"
+                                                autocomplete="off" readonly>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <div class="col-sm-12">
+                                            <div class="row">
+                                                <?php
+                                                $exp = explode('-', $datareject[0]->subshipmode);
+                                                $expkg = explode('KG', $exp[1]);
+                                                // dd($expkg);
+                                                ?>
+                                                <div class="col-sm-4">
+                                                    <label class="control-label">Ship Mode</label>
+                                                    <input type="text" class="form-control"
+                                                        value="{{ $datareject[0]->shipmode }}" readonly>
+                                                </div>
+                                                @if ($datareject[0]->shipmode == 'fcl')
+                                                    <div class="col-sm-4">
+                                                        <label class="control-label">Size</label>
+                                                        <input type="text" class="form-control"
+                                                            value="{{ $exp[0] }}&Prime;" readonly>
+                                                    </div>
+                                                    <div class="col-sm-4">
+                                                        <label class="control-label">Weight</label>
+                                                        <div class="input-group">
+                                                            <input type="number" min="0" class="form-control"
+                                                                autocomplete="off" value="{{ $expkg[0] }}" readonly>
+                                                            <div class="input-group-append">
+                                                                <span class="input-group-text">KG</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                @elseif($datareject[0]->shipmode == 'lcl')
+                                                    <div class="col-sm-4">
+                                                        <label class="control-label">LCL</label>
+                                                        <div class="input-group">
+                                                            <input type="number" min="0" class="form-control"
+                                                                autocomplete="off" value="{{ $exp[0] }}" readonly>
+                                                            <div class="input-group-append">
+                                                                <span class="input-group-text">CBM</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-sm-4">
+                                                        <label class="control-label">Weight</label>
+                                                        <div class="input-group">
+                                                            <input type="number" min="0" class="form-control"
+                                                                autocomplete="off" value="{{ $expkg[0] }}" readonly>
+                                                            <div class="input-group-append">
+                                                                <span class="input-group-text">KG</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                @else
+                                                    <div class="col-sm-4">
+                                                        <label class="control-label">Volume</label>
+                                                        <div class="input-group">
+                                                            <input type="number" min="0" class="form-control"
+                                                                autocomplete="off" value="{{ $exp[0] }}" readonly>
+                                                            <div class="input-group-append">
+                                                                <span class="input-group-text">M3</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-sm-4">
+                                                        <label class="control-label">Weight</label>
+                                                        <div class="input-group">
+                                                            <input type="number" min="0" class="form-control"
+                                                                autocomplete="off" value="{{ $expkg[0] }}" readonly>
+                                                            <div class="input-group-append">
+                                                                <span class="input-group-text">KG</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                @endif
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label class="col-sm-12 control-label">Description</label>
+                                        <div class="col-sm-12">
+                                            {{-- <input type="text" class="form-control" id="deskripsi" name="deskripsi"
+                                            autocomplete="off" readonly> --}}
+                                            <textarea name="deskripsi" id="deskripsi" cols="104" rows="2" disabled></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    @endif
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Cancel</button>

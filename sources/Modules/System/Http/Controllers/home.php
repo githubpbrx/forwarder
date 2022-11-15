@@ -83,7 +83,7 @@ class home extends Controller
             ->where('masterhscode.aktif', 'Y')
             ->selectRaw(' po.pono, po.matcontents, po.itemdesc, po.qtypo, po.colorcode, po.size, po.pino, formpo.kode_booking, formpo.date_booking, formpo.etd, formpo.eta, formpo.shipmode, formpo.subshipmode, formpo.ket_tolak, mastersupplier.nama, masterhscode.hscode ')
             ->get();
-        // dd($datareject);
+        // dd($totalreject, $datareject, $datareject);
 
         $dataconfirm = formpo::join('privilege', 'privilege.idforwarder', 'formpo.idmasterfwd')
             ->join('po', 'po.id', 'formpo.idpo')
@@ -561,11 +561,11 @@ class home extends Controller
 
     public function saveformpo(Request $request)
     {
-        dd($request);
+        // dd($request);
         DB::beginTransaction();
 
         if ($request->shipmode == 'fcl') {
-            $submode = $request->fcl . '-' . $request->weight . 'KG';
+            $submode = $request->fcl . '-' . $request->fclweight . 'KG';
         } else if ($request->shipmode == 'lcl') {
             $submode = $request->lcl . 'CBM' . '-' . $request->lclweight . 'KG';
         } else {

@@ -448,7 +448,7 @@
                         'eta': myeta,
                         'shipmode': mode,
                         'fcl': myfcl,
-                        'lclweight': myweight,
+                        'fclweight': myweight,
                         'lcl': mylcl,
                         'lclweight': lclweight,
                         'air': myair,
