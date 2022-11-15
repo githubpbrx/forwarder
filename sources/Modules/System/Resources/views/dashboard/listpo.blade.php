@@ -12,7 +12,7 @@
         <div class="card-body">
             <div class="row">
                 <div class="col-md-3">
-                    <label class="control-label">Choose PI Date :</label>
+                    <label class="control-label">Choose PI Delivery Date :</label>
                     <div class="col-sm-12">
                         {{-- <select class="select2" style="width: 100%;" name="pidate" id="pidate">
                             <option value=""></option>

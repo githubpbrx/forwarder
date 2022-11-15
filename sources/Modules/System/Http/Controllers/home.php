@@ -565,7 +565,7 @@ class home extends Controller
         DB::beginTransaction();
 
         if ($request->shipmode == 'fcl') {
-            $submode = $request->fcl . '-' . $request->fclweight . 'KG';
+            $submode = $request->fcl . '-' . $request->fclvol . '-' . $request->fclweight . 'KG';
         } else if ($request->shipmode == 'lcl') {
             $submode = $request->lcl . 'CBM' . '-' . $request->lclweight . 'KG';
         } else {

@@ -158,7 +158,7 @@
                 <div class="form-group" id="datafcl" style="display: none">
                     <div class="col-sm-12">
                         <div class="row">
-                            <div class="col-sm-6">
+                            <div class="col-sm-4">
                                 <label class="control-label">Size</label>
                                 <select class="form-control select2" style="width: 100%;" name="fclku"
                                     id="fclku">
@@ -167,11 +167,21 @@
                                     <option value="40hq">40HQ</option>
                                 </select>
                             </div>
-                            <div class="col-sm-6">
+                            <div class="col-sm-4">
+                                <label class="control-label">Volume</label>
+                                <div class="input-group">
+                                    <input type="number" min="0" class="form-control" name="fclvol"
+                                        id="fclvol" autocomplete="off">
+                                    <div class="input-group-append">
+                                        <span class="input-group-text">M3</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-4">
                                 <label class="control-label">Weight</label>
                                 <div class="input-group">
-                                    <input type="number" min="0" class="form-control" name="weight"
-                                        id="weight" autocomplete="off">
+                                    <input type="number" min="0" class="form-control" name="fclweight"
+                                        id="fclweight" autocomplete="off">
                                     <div class="input-group-append">
                                         <span class="input-group-text">KG</span>
                                     </div>
@@ -187,7 +197,7 @@
                     </select> --}}
                         <div class="row">
                             <div class="col-sm-6">
-                                <label class="control-label">LCL</label>
+                                <label class="control-label">Volume</label>
                                 <div class="input-group">
                                     <input type="number" min="0" class="form-control" name="lclku"
                                         id="lclku" autocomplete="off">
@@ -367,7 +377,8 @@
             let myeta = $('#eta').val();
             let mode = $('#shipmode').val();
             let myfcl = $('#fclku').val();
-            let myweight = $('#weight').val();
+            let myweight = $('#fclweight').val();
+            let fclvol = $('#fclvol').val();
             let mylcl = $('#lclku').val();
             let lclweight = $('#lclweight').val();
             let myair = $('#airku').val();
@@ -415,6 +426,10 @@
                 notifalert('Weight');
                 $('#btnsubmit').html('Submit')
                 $('#btnsubmit').prop('disabled', false)
+            } else if (mode == 'fcl' && fclvol == '') {
+                notifalert('Volume');
+                $('#btnsubmit').html('Submit')
+                $('#btnsubmit').prop('disabled', false)
             } else if (mode == 'lcl' && mylcl == '') {
                 notifalert('LCL');
                 $('#btnsubmit').html('Submit')
@@ -449,6 +464,7 @@
                         'shipmode': mode,
                         'fcl': myfcl,
                         'fclweight': myweight,
+                        'fclvol': fclvol,
                         'lcl': mylcl,
                         'lclweight': lclweight,
                         'air': myair,
