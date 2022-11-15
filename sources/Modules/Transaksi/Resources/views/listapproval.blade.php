@@ -312,14 +312,16 @@
 
                     if ((mydata[0].shipmode == 'fcl')) {
                         let exp = mydata[0].subshipmode.split("-");
-                        let exp1 = exp[1].split("KG");
+                        let exp1 = exp[2].split("KG");
                         console.log('exp :>> ', exp1);
                         $('#datashipmode').append(
-                            '<div class="row">  <div class="col-sm-3"><label class="control-label">Ship Mode</label><input type="text" class="form-control" value="' +
+                            '<div class="row"><div class="col-sm-3"><label class="control-label">Ship Mode</label><input type="text" class="form-control" value="' +
                             mydata[0].shipmode +
                             '" readonly></div><div class="col-sm-3"><label class="control-label">Size</label><input type="text" class="form-control" value="' +
                             exp[0] +
-                            '" readonly></div><div class="col-sm-3"><label class="control-label">Weight</label><div class="input-group"><input type="number" min="0" class="form-control" autocomplete="off" value="' +
+                            '" readonly></div><div class="col-sm-3"><label class="control-label">Volume</label><div class="input-group"><input type="number" min="0" class="form-control" autocomplete="off" value="' +
+                            exp[1] +
+                            '" readonly><div class="input-group-append"><span class="input-group-text">M3</span></div></div></div><div class="col-sm-3"><label class="control-label">Weight</label><div class="input-group"><input type="number" min="0" class="form-control" autocomplete="off" value="' +
                             exp1[0] +
                             '" readonly><div class="input-group-append"><span class="input-group-text">KG</span></div></div></div></div>'
                         );
