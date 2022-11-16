@@ -54,7 +54,7 @@ class home extends Controller
             ->where('formpo.statusformpo', '=', 'reject')
             ->where('formpo.aktif', 'Y')
             ->selectRaw(' po.pono, formpo.kode_booking, formpo.date_booking, formpo.etd, formpo.eta, formpo.shipmode, formpo.subshipmode, formpo.ket_tolak ')
-            ->groupby('po.pono')
+            ->groupby('po.pideldate')
             ->get();
 
         $datareject = formpo::join('po', 'po.id', 'formpo.idpo')
@@ -83,7 +83,7 @@ class home extends Controller
             ->where('masterhscode.aktif', 'Y')
             ->selectRaw(' po.pono, po.matcontents, po.itemdesc, po.qtypo, po.colorcode, po.size, po.pino, formpo.kode_booking, formpo.date_booking, formpo.etd, formpo.eta, formpo.shipmode, formpo.subshipmode, formpo.ket_tolak, mastersupplier.nama, masterhscode.hscode ')
             ->get();
-        // dd($totalreject, $datareject, $datareject);
+        // dd($totalreject, $datareject, $datarejecttabel);
 
         $dataconfirm = formpo::join('privilege', 'privilege.idforwarder', 'formpo.idmasterfwd')
             ->join('po', 'po.id', 'formpo.idpo')
@@ -117,7 +117,7 @@ class home extends Controller
             ->where('privilege.nikfinance', Session::get('session')['user_nik'])
             ->where('formpo.statusformpo', '=', 'waiting')
             ->where('formpo.aktif', 'Y')
-            ->groupby('po.pono')
+            ->groupby('po.pideldate')
             ->get();
         // dd($dataapproval);
 

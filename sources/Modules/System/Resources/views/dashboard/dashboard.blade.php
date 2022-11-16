@@ -94,22 +94,12 @@
                         <form action="#" class="form-horizontal">
                             {{ csrf_field() }}
                             <div class="row">
-                                <?php
-                                $nopo = [];
-                                $namasup = [];
-                                $nopi = [];
-                                foreach ($datareject as $po) {
-                                    array_push($nopo, $po->pono);
-                                    array_push($namasup, $po->nama);
-                                    array_push($nopi, $po->pino);
-                                }
-                                ?>
                                 <div class="col-md-4">
                                     <div class="form-group">
                                         <label class="col-sm-12 control-label">PO Number</label>
                                         <div class="col-sm-12">
                                             <input type="text" class="form-control" id="nomorpo" name="nomorpo"
-                                                value="{{ implode(', ', $nopo) }}" readonly>
+                                                readonly>
                                         </div>
                                     </div>
                                 </div>
@@ -118,7 +108,7 @@
                                         <label class="col-sm-12 control-label">PI Number</label>
                                         <div class="col-sm-12">
                                             <input type="text" class="form-control" id="pinomor" name="pinomor"
-                                                value="{{ implode(', ', $nopi) }}" readonly>
+                                                readonly>
                                         </div>
                                     </div>
                                 </div>
@@ -127,7 +117,7 @@
                                         <label class="col-sm-12 control-label">Supplier</label>
                                         <div class="col-sm-12">
                                             <input type="text" class="form-control" id="supplier" name="supplier"
-                                                value="{{ implode(', ', $namasup) }}" readonly>
+                                                readonly>
                                         </div>
                                     </div>
                                 </div>
@@ -184,38 +174,54 @@
                                     <div class="form-group">
                                         <div class="col-sm-12">
                                             <div class="row">
-                                                <?php
-                                                $exp = explode('-', $datareject[0]->subshipmode);
-                                                $expkg = explode('KG', $exp[1]);
-                                                // dd($expkg);
-                                                ?>
                                                 <div class="col-sm-4">
                                                     <label class="control-label">Ship Mode</label>
                                                     <input type="text" class="form-control"
                                                         value="{{ $datareject[0]->shipmode }}" readonly>
                                                 </div>
                                                 @if ($datareject[0]->shipmode == 'fcl')
+                                                    <?php
+                                                    $exp = explode('-', $datareject[0]->subshipmode);
+                                                    $fclexp = explode('KG', $exp[2]);
+                                                    // dd($exp);
+                                                    ?>
                                                     <div class="col-sm-4">
                                                         <label class="control-label">Size</label>
                                                         <input type="text" class="form-control"
-                                                            value="{{ $exp[0] }}&Prime;" readonly>
+                                                            value="{{ $exp[0] }}" readonly>
+                                                    </div>
+                                                    <div class="col-sm-4">
+                                                        <label class="control-label">Volume</label>
+                                                        <div class="input-group">
+                                                            <input type="number" min="0" class="form-control"
+                                                                autocomplete="off" value="{{ $exp[1] }}" readonly>
+                                                            <div class="input-group-append">
+                                                                <span class="input-group-text">M3</span>
+                                                            </div>
+                                                        </div>
                                                     </div>
                                                     <div class="col-sm-4">
                                                         <label class="control-label">Weight</label>
                                                         <div class="input-group">
                                                             <input type="number" min="0" class="form-control"
-                                                                autocomplete="off" value="{{ $expkg[0] }}" readonly>
+                                                                autocomplete="off" value="{{ $fclexp[0] }}" readonly>
                                                             <div class="input-group-append">
                                                                 <span class="input-group-text">KG</span>
                                                             </div>
                                                         </div>
                                                     </div>
                                                 @elseif($datareject[0]->shipmode == 'lcl')
+                                                    <?php
+                                                    $exp = explode('-', $datareject[0]->subshipmode);
+                                                    $expkg = explode('KG', $exp[1]);
+                                                    $lclexp = explode('CBM', $exp[0]);
+                                                    // dd($exp);
+                                                    ?>
                                                     <div class="col-sm-4">
                                                         <label class="control-label">LCL</label>
                                                         <div class="input-group">
                                                             <input type="number" min="0" class="form-control"
-                                                                autocomplete="off" value="{{ $exp[0] }}" readonly>
+                                                                autocomplete="off" value="{{ $lclexp[0] }}" readonly>
                                                             <div class="input-group-append">
                                                                 <span class="input-group-text">CBM</span>
                                                             </div>
@@ -232,11 +238,17 @@
                                                         </div>
                                                     </div>
                                                 @else
+                                                    <?php
+                                                    $exp = explode('-', $datareject[0]->subshipmode);
+                                                    $expkg = explode('KG', $exp[1]);
+                                                    $airexp = explode('M3', $exp[0]);
+                                                    // dd($exp);
+                                                    ?>
                                                     <div class="col-sm-4">
                                                         <label class="control-label">Volume</label>
                                                         <div class="input-group">
                                                             <input type="number" min="0" class="form-control"
-                                                                autocomplete="off" value="{{ $exp[0] }}" readonly>
+                                                                autocomplete="off" value="{{ $airexp[0] }}" readonly>
                                                             <div class="input-group-append">
                                                                 <span class="input-group-text">M3</span>
                                                             </div>
@@ -309,7 +321,23 @@
                 html += "</table>";
                 $('#detailitem').html(html);
 
-                $('#nomorpo').val(poreject[0].pono);
+                var arraypo = [];
+                var arraypi = [];
+                var arraysup = [];
+                for (let indexpo = 0; indexpo < poreject.length; indexpo++) {
+                    arraypo.push(poreject[indexpo]['pono']);
+                    arraypi.push(poreject[indexpo]['pino']);
+                    arraysup.push(poreject[indexpo]['nama']);
+                }
+
+                let implodepo = arraypo.join(', ');
+                let implodepi = arraypi.join(', ');
+                let implodesup = arraysup.join(', ');
+
+                $('#nomorpo').val(implodepo);
+                $('#pinomor').val(implodepi);
+                $('#supplier').val(implodesup);
+
                 $('#nobook').val(poreject[0].kode_booking);
                 $('#datebook').val(poreject[0].date_booking);
                 $('#etd').val(poreject[0].etd);
