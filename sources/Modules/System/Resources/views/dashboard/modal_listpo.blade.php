@@ -46,12 +46,12 @@
         <div class="row">
             <div class="col-md-12">
                 @foreach ($data as $key => $item)
-                    <div class="card card-default collapsed-card">
+                    <div class="card card-default">
                         <div class="card-header">
                             <h3 class="card-title">{{ $item[0]['poku']->pino }}</h3>
                             <div class="card-tools">
                                 <button type="button" class="btn btn-tool" data-card-widget="collapse">
-                                    <i class="fas fa-plus"></i>
+                                    <i class="fas fa-minus"></i>
                                 </button>
                             </div>
                         </div>
