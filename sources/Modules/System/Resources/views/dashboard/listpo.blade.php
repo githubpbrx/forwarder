@@ -215,7 +215,7 @@
                     let data = oTable.data();
 
                     for (let index = 0; index < Number(lengthtable); index++) {
-                        multi_id.push(data[index]['pideldate']);
+                        multi_id.push(data[index]['pino']);
                     }
                 } else {
                     $('input[type="checkbox"]').prop('checked', false);

@@ -249,14 +249,14 @@ class home extends Controller
                 ->addIndexColumn()
                 ->addColumn('cekbok', function ($query) {
                     $cekbox = '';
-                    $cekbox = '<center><input type="checkbox" name="mycekbok" id="mycekbok" value="' . $query->pideldate . '" ></center>';
+                    $cekbox = '<center><input type="checkbox" name="mycekbok" id="mycekbok" value="' . $query->pino . '" ></center>';
                     return  $cekbox;
                 })
                 ->addColumn('listpo', function ($query) {
                     $mypo = forwarder::join('po', 'po.id', 'forwarder.idpo')
                         ->join('privilege', 'privilege.idforwarder', 'forwarder.idmasterfwd')
                         ->join('mastersupplier', 'mastersupplier.id', 'po.vendor')
-                        ->where('po.pideldate', $query->pideldate)
+                        ->where('po.pino', $query->pino)
                         ->where('privilege.privilege_user_nik', Session::get('session')['user_nik'])
                         ->where(function ($kus) {
                             $kus->where('forwarder.statusapproval', null)->orWhere('forwarder.statusapproval', 'reject');
@@ -272,7 +272,7 @@ class home extends Controller
                     $mypo = forwarder::join('po', 'po.id', 'forwarder.idpo')
                         ->join('privilege', 'privilege.idforwarder', 'forwarder.idmasterfwd')
                         ->join('mastersupplier', 'mastersupplier.id', 'po.vendor')
-                        ->where('po.pideldate', $query->pideldate)
+                        ->where('po.pino', $query->pino)
                         ->where('privilege.privilege_user_nik', Session::get('session')['user_nik'])
                         ->where(function ($kus) {
                             $kus->where('forwarder.statusapproval', null)->orWhere('forwarder.statusapproval', 'reject');
@@ -291,7 +291,7 @@ class home extends Controller
                     $mypo = forwarder::join('po', 'po.id', 'forwarder.idpo')
                         ->join('privilege', 'privilege.idforwarder', 'forwarder.idmasterfwd')
                         ->join('mastersupplier', 'mastersupplier.id', 'po.vendor')
-                        ->where('po.pideldate', $query->pideldate)
+                        ->where('po.pino', $query->pino)
                         ->where('privilege.privilege_user_nik', Session::get('session')['user_nik'])
                         ->where(function ($kus) {
                             $kus->where('forwarder.statusapproval', null)->orWhere('forwarder.statusapproval', 'reject');
@@ -444,7 +444,7 @@ class home extends Controller
                 ->join('privilege', 'privilege.idforwarder', 'forwarder.idmasterfwd')
                 ->join('mastersupplier', 'mastersupplier.id', 'po.vendor')
                 ->join('masterhscode', 'masterhscode.matcontent', 'po.matcontents')
-                ->where('po.pideldate', $val)
+                ->where('po.pino', $val)
                 ->where('privilege.privilege_user_nik', Session::get('session')['user_nik'])
                 ->where(function ($kus) {
                     $kus->where('forwarder.statusapproval', null)->orWhere('forwarder.statusapproval', 'reject');
@@ -453,7 +453,7 @@ class home extends Controller
                 ->where('masterhscode.aktif', 'Y')
                 ->where('privilege.privilege_aktif', 'Y')
                 ->where('mastersupplier.aktif', 'Y')
-                ->selectRaw(' forwarder.*, po.id, po.pono, po.matcontents, po.itemdesc, po.colorcode, po.size, po.qtypo, po.pideldate, mastersupplier.nama')
+                ->selectRaw(' forwarder.*, po.id, po.pono, po.matcontents, po.itemdesc, po.colorcode, po.size, po.qtypo, po.pideldate, po.pino, mastersupplier.nama')
                 ->get();
             // dd($mydata);
 
@@ -468,7 +468,7 @@ class home extends Controller
         $mypo = forwarder::join('po', 'po.id', 'forwarder.idpo')
             ->join('privilege', 'privilege.idforwarder', 'forwarder.idmasterfwd')
             ->join('mastersupplier', 'mastersupplier.id', 'po.vendor')
-            ->whereIn('po.pideldate', $request->dataku)
+            ->whereIn('po.pino', $request->dataku)
             ->where('privilege.privilege_user_nik', Session::get('session')['user_nik'])
             ->where(function ($kus) {
                 $kus->where('forwarder.statusapproval', null)->orWhere('forwarder.statusapproval', 'reject');
