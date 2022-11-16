@@ -170,7 +170,7 @@
                     <div class="col-sm-12">
                         <div class="row" id="datafcl" style="display: none; padding-bottom: 2.5%">
                             <div class="col-sm-2" class="radiocontainer">
-                                <label class="control-label">Container Number</label>
+                                <label class="control-label">Container Size</label>
                                 <?php
                                 $dat = $data['dataku'][0]->subshipmode;
                                 $exp = explode('-', $dat);
@@ -205,7 +205,8 @@
                             </div>
                             <div class="col-sm-3">
                                 <label class="control-label">Number Of Container</label>
-                                <input type="number" class="form-control" name="noc[]" value="">
+                                <input type="number" min="0" class="form-control" name="noc[]"
+                                    value="">
                             </div>
                             <div class="col-sm-2">
                                 <label class="control-label">Weight</label>
@@ -233,7 +234,7 @@
                                         <input type="number" min="0" class="form-control" name="lclvol"
                                             id="lclvol" autocomplete="off">
                                         <div class="input-group-append">
-                                            <span class="input-group-text">CBM</span>
+                                            <span class="input-group-text">M3</span>
                                         </div>
                                     </div>
                                 </div>
