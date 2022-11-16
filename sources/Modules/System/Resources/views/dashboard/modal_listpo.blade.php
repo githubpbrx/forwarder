@@ -202,7 +202,7 @@
                                     <input type="number" min="0" class="form-control" name="lclku"
                                         id="lclku" autocomplete="off">
                                     <div class="input-group-append">
-                                        <span class="input-group-text">CBM</span>
+                                        <span class="input-group-text">M3</span>
                                     </div>
                                 </div>
                             </div>

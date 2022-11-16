@@ -223,7 +223,7 @@ class home extends Controller
                     })
                     ->where('forwarder.aktif', 'Y')->where('privilege.privilege_aktif', 'Y')->where('mastersupplier.aktif', 'Y')
                     ->selectRaw(' forwarder.statusforwarder, forwarder.statusapproval, po.id, po.pono, po.itemdesc, po.pino, po.pideldate, mastersupplier.nama ')
-                    ->groupby('po.pideldate')
+                    ->groupby('po.pino')
                     ->get();
             } else {
                 $query = forwarder::join('privilege', 'privilege.idforwarder', 'forwarder.idmasterfwd')
@@ -240,7 +240,7 @@ class home extends Controller
                     ->where('pideldate', $request->pidate)
                     ->where('forwarder.aktif', 'Y')->where('privilege.privilege_aktif', 'Y')->where('mastersupplier.aktif', 'Y')
                     ->selectRaw(' forwarder.statusforwarder, forwarder.statusapproval, po.id, po.pono, po.itemdesc, po.pino, po.pideldate, mastersupplier.nama ')
-                    ->groupby('po.pideldate')
+                    ->groupby('po.pino')
                     ->get();
             }
 
