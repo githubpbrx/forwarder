@@ -162,7 +162,7 @@ class DataShipment extends Controller
         // dd($request);
         header("Access-Control-Allow-Origin: *");
         header("Access-Control-Allow-Headers: *");
-
+        DB::beginTransaction();
         $decode = json_decode($request->dataform);
         // dd($request, $decode);
 
@@ -218,7 +218,8 @@ class DataShipment extends Controller
             $jumlahfix = $jumlahall - $cekdata->qty_shipment;
             // dd($qtypo, $jumlahall, $jumlahfix);
 
-            if ($jumlahfix > $qtypo) {
+            if ($jumlahall > $qtypo) {
+                DB::rollback();
                 $status = ['title' => 'Error!', 'status' => 'error', 'message' => 'Data Quantity Allocation Over Quantity PO'];
                 return response()->json($status, 200);
             }
@@ -271,10 +272,12 @@ class DataShipment extends Controller
         }
 
         if (empty($gagal)) {
+            DB::commit();
             \LogActivity::addToLog('Web Forwarder :: Forwarder : Save Update Shipment', $this->micro);
             $status = ['title' => 'Success', 'status' => 'success', 'message' => 'Data Successfully Saved'];
             return response()->json($status, 200);
         } else {
+            DB::rollback();
             $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'Data Failed Saved'];
             return response()->json($status, 200);
         }

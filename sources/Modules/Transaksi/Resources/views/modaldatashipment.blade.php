@@ -120,7 +120,8 @@
                                                     <div class="col-sm-12">
                                                         <input type="text"
                                                             class="form-control etd-{{ $key1 }}" name="etd"
-                                                            value="{{ $item[0]->etdfix }}" autocomplete="off">
+                                                            id="etd" value="{{ $item[0]->etdfix }}"
+                                                            autocomplete="off">
                                                     </div>
                                                 </div>
                                             </div>
@@ -131,7 +132,8 @@
                                                     <div class="col-sm-12">
                                                         <input type="text"
                                                             class="form-control eta-{{ $key1 }}" name="eta"
-                                                            value="{{ $item[0]->etafix }}" autocomplete="off">
+                                                            id="eta" value="{{ $item[0]->etafix }}"
+                                                            autocomplete="off">
                                                     </div>
                                                 </div>
                                             </div>
@@ -280,14 +282,14 @@
 
     submit();
 
-    $('.etd').datepicker({
+    $('#etd').datepicker({
         changeYear: true,
         changeMonth: true,
         dateFormat: "yy-m-dd",
         yearRange: "-100:+20",
     });
 
-    $('.eta').datepicker({
+    $('#eta').datepicker({
         changeYear: true,
         changeMonth: true,
         dateFormat: "yy-m-dd",
