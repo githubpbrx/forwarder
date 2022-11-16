@@ -35,7 +35,7 @@
         <div class="modal-dialog modal-xl">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h4 class="modal-title"><span id="modaltitle">Detail Approval Forwarder</span></h4>
+                    <h4 class="modal-title"><span id="modaltitle">Detail Booking Approval</span></h4>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -286,17 +286,22 @@
                     console.log('data :>> ', data.data);
 
                     let mydata = data.data.dataku;
+                    let mypo = data.data.datapo;
 
                     length = mydata.length;
                     $('#detailitem').empty();
+                    $('#datashipmode').empty();
 
                     html =
-                        '<table border="0" style="width:100%"><tr><th>Material</th><th>Material Description</th><th>HS Code</th><th>Qty Item</th><th>Qty Allocation</th><th>Status Allocation</th></tr>';
+                        '<table border="1" style="width:100%"><tr><th>PO Number</th><th>Material</th><th>Material Description</th><th>HS Code</th><th>Color</th><th>Size</th><th>Qty PO</th><th>Qty Book</th><th>Status</th></tr>';
                     for (let index = 0; index < mydata.length; index++) {
                         html +=
-                            '<tr><td>' + mydata[index].matcontents + '</td><td>' + mydata[index]
+                            '<tr><td>' + mydata[index].pono + '</td><td>' + mydata[index]
+                            .matcontents + '</td><td>' + mydata[index]
                             .itemdesc + '</td><td>' + mydata[index]
-                            .hscode + '</td><td>' +
+                            .hscode + '</td><td>' + mydata[index]
+                            .colorcode + '</td><td>' + mydata[index]
+                            .size + '</td><td>' +
                             mydata[index].qtypo + '</td><td>' + mydata[index].qty_allocation +
                             '</td><td>' + mydata[index].statusforwarder +
                             '</td><td><input type="hidden" id="dataid-' + index + '" data-idpo="' +
@@ -309,47 +314,65 @@
                     html += "</table>";
                     $('#detailitem').html(html);
 
-
                     if ((mydata[0].shipmode == 'fcl')) {
-                        let exp = mydata[0].subshipmode.split("-");
-                        let exp1 = exp[2].split("KG");
-                        console.log('exp :>> ', exp1);
+                        let expfcl = mydata[0].subshipmode.split("-");
+                        let expfcl1 = expfcl[2].split("KG");
                         $('#datashipmode').append(
                             '<div class="row"><div class="col-sm-3"><label class="control-label">Ship Mode</label><input type="text" class="form-control" value="' +
                             mydata[0].shipmode +
                             '" readonly></div><div class="col-sm-3"><label class="control-label">Size</label><input type="text" class="form-control" value="' +
-                            exp[0] +
+                            expfcl[0] +
                             '" readonly></div><div class="col-sm-3"><label class="control-label">Volume</label><div class="input-group"><input type="number" min="0" class="form-control" autocomplete="off" value="' +
-                            exp[1] +
+                            expfcl[1] +
                             '" readonly><div class="input-group-append"><span class="input-group-text">M3</span></div></div></div><div class="col-sm-3"><label class="control-label">Weight</label><div class="input-group"><input type="number" min="0" class="form-control" autocomplete="off" value="' +
-                            exp1[0] +
+                            expfcl1[0] +
                             '" readonly><div class="input-group-append"><span class="input-group-text">KG</span></div></div></div></div>'
                         );
                     } else if ((mydata[0].shipmode == 'lcl')) {
+                        let explcl = mydata[0].subshipmode.split("-");
+                        let explcl1 = explcl[0].split("CBM");
+                        let explcl2 = explcl[1].split("KG");
                         $('#datashipmode').append(
                             '<div class="row"><div class="col-sm-3"><label class="control-label">Ship Mode</label><input type="text" class="form-control" value="' +
                             mydata[0].shipmode +
                             '" readonly></div><div class="col-sm-3"><label class="control-label">Volume</label><div class="input-group"><input type="number" min="0" class="form-control" autocomplete="off" value="' +
-                            exp[0] +
+                            explcl1[0] +
                             '" readonly><div class="input-group-append"><span class="input-group-text">CBM</span></div></div></div><div class="col-sm-3"><label class="control-label">Weight</label><div class="input-group"><input type="number" min="0" class="form-control" autocomplete="off" value="' +
-                            exp1[0] +
+                            explcl2[0] +
                             '" readonly><div class="input-group-append"><span class="input-group-text">KG</span></div></div></div></div>'
                         );
                     } else {
+                        let expair = mydata[0].subshipmode.split("-");
+                        let expair1 = expair[0].split("M3");
+                        let expair2 = expair[1].split("KG");
                         $('#datashipmode').append(
                             '<div class="row"><div class="col-sm-3"><label class="control-label">Ship Mode</label><input type="text" class="form-control" value="' +
                             mydata[0].shipmode +
                             '" readonly></div><div class="col-sm-3"><label class="control-label">Volume</label><div class="input-group"><input type="number" min="0" class="form-control" autocomplete="off" value="' +
-                            exp[0] +
+                            expair1[0] +
                             '" readonly><div class="input-group-append"><span class="input-group-text">M3</span></div></div></div><div class="col-sm-3"><label class="control-label">Weight</label><div class="input-group"><input type="number" min="0" class="form-control" autocomplete="off" value="' +
-                            exp1[0] +
+                            expair2[0] +
                             '" readonly><div class="input-group-append"><span class="input-group-text">KG</span></div></div></div></div>'
                         );
                     }
 
-                    $('#nomorpo').val(mydata[0].pono);
-                    $('#nomorpi').val(mydata[0].pino);
-                    $('#supplier').val(mydata[0].nama);
+                    var arraypo = [];
+                    var arraypi = [];
+                    var arraysup = [];
+                    for (let indexpo = 0; indexpo < mypo.length; indexpo++) {
+                        arraypo.push(mypo[indexpo]['pono']);
+                        arraypi.push(mypo[indexpo]['pino']);
+                        arraysup.push(mypo[indexpo]['nama']);
+                    }
+
+                    let implodepo = arraypo.join(', ');
+                    let implodepi = arraypi.join(', ');
+                    let implodesup = arraysup.join(', ');
+
+                    $('#nomorpo').val(implodepo);
+                    $('#nomorpi').val(implodepi);
+                    $('#supplier').val(implodesup);
+
                     $('#nobook').val(mydata[0].kode_booking);
                     $('#datebook').val(mydata[0].date_booking);
                     $('#etd').val(mydata[0].etd);

@@ -161,7 +161,16 @@ class ApprovalConfirmation extends Controller
         return DataTables::of($data)
             ->addIndexColumn()
             ->addColumn('nomorpo', function ($data) {
-                return $data->pono;
+                $datapo = formpo::join('privilege', 'privilege.idforwarder', 'formpo.idmasterfwd')
+                    ->join('po', 'po.id', 'formpo.idpo')
+                    ->where('po.pideldate', $data->pideldate)
+                    ->where('privilege.nikfinance', Session::get('session')['user_nik'])
+                    ->where('formpo.statusformpo', 'waiting')
+                    ->where('formpo.aktif', 'Y')
+                    ->groupby('po.pono')
+                    ->pluck('po.pono');
+                // dd($datapo);
+                return str_replace("]", "", str_replace("[", "", str_replace('"', "", $datapo)));
             })
             ->addColumn('nobooking', function ($data) {
                 return $data->kode_booking;
@@ -192,12 +201,25 @@ class ApprovalConfirmation extends Controller
             ->where('po.pideldate', $request->id)
             ->where('formpo.statusformpo', 'waiting')
             ->where('privilege.nikfinance', Session::get('session')['user_nik'])
-            ->selectRaw(' po.id, po.pono, po.matcontents, po.itemdesc, po.qtypo, po.statusalokasi, po.pino, forwarder.qty_allocation, forwarder.statusforwarder, forwarder.id_forwarder, formpo.id_formpo, formpo.kode_booking, formpo.date_booking, formpo.etd, formpo.eta, formpo.shipmode, formpo.subshipmode, masterforwarder.name, privilege.privilege_user_name, privilege.privilege_user_nik, mastersupplier.nama, masterhscode.hscode, masterroute.route_code, masterroute.route_desc')
+            ->selectRaw(' po.id, po.pono, po.matcontents, po.itemdesc, po.qtypo, po.colorcode, po.size, po.statusalokasi, po.pino, forwarder.qty_allocation, forwarder.statusforwarder, forwarder.id_forwarder, formpo.id_formpo, formpo.kode_booking, formpo.date_booking, formpo.etd, formpo.eta, formpo.shipmode, formpo.subshipmode, masterforwarder.name, privilege.privilege_user_name, privilege.privilege_user_nik, mastersupplier.nama, masterhscode.hscode, masterroute.route_code, masterroute.route_desc')
             ->get();
         // dd($dataku);
 
+        $podata = po::join('forwarder', 'forwarder.idpo', 'po.id')->where('forwarder.aktif', 'Y')
+            ->join('formpo', 'formpo.idforwarder', 'forwarder.id_forwarder')->where('formpo.aktif', 'Y')
+            ->join('privilege', 'privilege.idforwarder', 'formpo.idmasterfwd')->where('privilege_aktif', 'Y')
+            ->join('mastersupplier', 'mastersupplier.id', 'po.vendor')->where('mastersupplier.aktif', 'Y')
+            ->where('po.pideldate', $request->id)
+            ->where('formpo.statusformpo', 'waiting')
+            ->groupby('po.pono')
+            ->where('privilege.nikfinance', Session::get('session')['user_nik'])
+            ->selectRaw(' po.id, po.pono, po.pino, mastersupplier.nama')
+            ->get();
+        // dd($podata);
+
         $data = [
-            'dataku' => $dataku
+            'dataku' => $dataku,
+            'datapo' => $podata
         ];
 
         \LogActivity::addToLog('Web Forwarder :: Logistik : Process Approval Data PO by Logistik', $this->micro);
