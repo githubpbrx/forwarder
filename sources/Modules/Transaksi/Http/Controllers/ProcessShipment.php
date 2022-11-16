@@ -65,7 +65,15 @@ class ProcessShipment extends Controller
             ->selectRaw(' sum(formshipment.qty_shipment) as qtyshipall ')
             ->first();
 
-        // dd($query);
+        // $dataqty = modelformshipment::join('formpo', 'formpo.id_formpo', 'formshipment.idformpo')
+        // ->join('privilege', 'privilege.idforwarder', 'formpo.idmasterfwd')
+        // ->where('privilege.privilege_user_nik', Session::get('session')['user_nik'])
+        // ->where('formpo.statusformpo', '=', 'confirm')
+        // ->where('privilege.privilege_aktif', 'Y')->where('formpo.aktif', 'Y')->where('formshipment.aktif', 'Y')
+        // ->selectRaw(' sum(formshipment.qty_shipment) as qtyshipall ')
+        // ->first();
+
+        // dd($query,  $dataqty);
         return Datatables::of($query)
             ->addIndexColumn()
             ->addColumn('listpo', function ($query) {
@@ -87,6 +95,47 @@ class ProcessShipment extends Controller
                 return  $query->qtypoall;
             })
             ->addColumn('status', function ($query) use ($dataqty) {
+                // $mydatapo = modelformpo::join('po', 'po.id', 'formpo.idpo')
+                //     ->join('privilege', 'privilege.idforwarder', 'formpo.idmasterfwd')
+                //     ->where('formpo.kode_booking', $query->kode_booking)
+                //     ->where('privilege.privilege_user_nik', Session::get('session')['user_nik'])
+                //     ->where('formpo.statusformpo', 'confirm')
+                //     ->where('formpo.aktif', 'Y')->where('privilege.privilege_aktif', 'Y')
+                //     ->selectRaw('po.pono')
+                //     ->groupby('po.pono')
+                //     ->first();
+                // $datac = modelformshipment::where('idformpo', $query->id_formpo)->get();
+
+                // $datac = modelformshipment::join('formpo', 'formpo.id_formpo', 'formshipment.idformpo')
+                //     ->join('privilege', 'privilege.idforwarder', 'formpo.idmasterfwd')
+                //     ->where('formpo.id_formpo', $query->id_formpo)
+                //     ->where('privilege.privilege_user_nik', Session::get('session')['user_nik'])
+                //     ->where('formpo.statusformpo', '=', 'confirm')
+                //     ->where('privilege.privilege_aktif', 'Y')->where('formpo.aktif', 'Y')->where('formshipment.aktif', 'Y')
+                //     // ->selectRaw(' sum(formshipment.qty_shipment) as qtyshipall ')
+                //     ->get();
+
+                // modelformpo::join('privilege', 'privilege.idforwarder', 'formpo.idmasterfwd')
+                //     ->join('formshipment', 'formshipment.idformpo', 'formpo.id_formpo')
+                //     ->where('privilege.privilege_user_nik', Session::get('session')['user_nik'])
+                //     ->where('formpo.statusformpo', '=', 'confirm')
+                //     ->where('formshipment.idformpo', $query->id_formpo)
+                //     ->where('privilege.privilege_aktif', 'Y')->where('formpo.aktif', 'Y')->where('formshipment.aktif', 'Y')
+                //     ->selectRaw(' idformpo ')
+                //     ->get();
+
+                // dd($datac);
+                // if ($datac == null || $datac == []) {
+                //     $status = 'No Status';
+                // } else {
+
+                // foreach ($datac as $key => $value) {
+                // if ($value->qtyshipall == $query->qtypoall) {
+                //     $status = 'Full Allocated';
+                // } else {
+                // $status = 'Partial Allocated';
+                // }
+
                 if ($dataqty->qtyshipall == null) {
                     $status = 'No Status';
                 } else {
@@ -96,7 +145,8 @@ class ProcessShipment extends Controller
                         $status = 'Partial Allocated';
                     }
                 }
-
+                // }
+                // }
                 return  $status;
             })
             ->addColumn('action', function ($query) use ($dataqty) {
@@ -134,7 +184,7 @@ class ProcessShipment extends Controller
             $priv->with(['privilege' => function ($lege) {
                 $lege->where('privilege_user_nik', Session::get('session')['user_nik']);
             }]);
-        }])
+        }, 'withroute'])
             // ->join('po', 'po.id', 'formpo.idpo')
             // ->join('forwarder', 'forwarder.id_forwarder', 'formpo.idforwarder')
             // ->join('privilege', 'privilege.idforwarder', 'forwarder.idmasterfwd')
@@ -155,7 +205,7 @@ class ProcessShipment extends Controller
             ->where('privilege.privilege_user_nik', Session::get('session')['user_nik'])
             ->where('formpo.statusformpo', 'confirm')
             ->where('formpo.aktif', 'Y')->where('privilege.privilege_aktif', 'Y')
-            ->selectRaw('po.pono, mastersupplier.nama')
+            ->selectRaw('po.pono, po.pino, mastersupplier.nama')
             ->groupby('po.pono')
             ->get();
 

@@ -24,4 +24,9 @@ class modelformpo extends Model
     {
         return $this->hasOne('Modules\Transaksi\Models\modelformshipment', 'idformpo', 'id_formpo')->where('aktif', 'Y');
     }
+
+    public function withroute()
+    {
+        return $this->hasOne('Modules\Transaksi\Models\masterroute', 'id_route', 'idroute')->where('aktif', 'Y');
+    }
 }

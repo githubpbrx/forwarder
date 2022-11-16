@@ -4,23 +4,34 @@
         {{-- {{ dd($data['dataku'][0]) }} --}}
         <?php
         $nopo = [];
+        $nopi = [];
         $supname = [];
         foreach ($data['datapo'] as $key => $value) {
             array_push($nopo, $value->pono);
+            array_push($nopi, $value->pino);
             array_push($supname, $value->nama);
         }
         ?>
         <div class="row">
-            <div class="col-md-6">
+            <div class="col-md-4">
                 <div class="form-group">
-                    <label class="col-sm-12 control-label">PO</label>
+                    <label class="col-sm-12 control-label">PO Number</label>
                     <div class="col-sm-12">
                         <input type="text" class="form-control" id="nomorpo" name="nomorpo"
                             value="{{ implode(', ', $nopo) }}" readonly>
                     </div>
                 </div>
             </div>
-            <div class="col-md-6">
+            <div class="col-md-4">
+                <div class="form-group">
+                    <label class="col-sm-12 control-label">PI Number</label>
+                    <div class="col-sm-12">
+                        <input type="text" class="form-control" id="nomorpo" name="nomorpo"
+                            value="{{ implode(', ', $nopi) }}" readonly>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
                 <div class="form-group">
                     <label class="col-sm-12 control-label">Supplier</label>
                     <div class="col-sm-12">
@@ -130,7 +141,16 @@
                     </div>
                 </div>
             </div>
-            <div class="col-md-2">
+            <div class="col-md-4">
+                <div class="form-group">
+                    <label class="col-sm-12 control-label">Route</label>
+                    <div class="col-sm-12">
+                        <input type="text" class="form-control" id="route" name="route"
+                            value="{{ $data['dataku'][0]['withroute']->route_desc }}" readonly>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
                 <div class="form-group">
                     <div class="col-sm-12">
                         <label class="col-sm-12 control-label">Shipmode</label>
@@ -143,17 +163,20 @@
                     </div>
                 </div>
             </div>
-            <div class="col-md-6">
+        </div>
+        <div class="row">
+            <div class="col-md-12">
                 <div class="form-group">
                     <div class="col-sm-12">
                         <div class="row" id="datafcl" style="display: none; padding-bottom: 2.5%">
-                            <div class="col-sm-3" class="radiocontainer">
+                            <div class="col-sm-2" class="radiocontainer">
                                 <label class="control-label">Container Number</label>
                                 <?php
                                 $dat = $data['dataku'][0]->subshipmode;
                                 $exp = explode('-', $dat);
                                 $exp2 = explode('KG', $exp[1]);
                                 ?>
+                                <br>
                                 <div class="form-check form-check-inline">
                                     <input class="form-check-input" type="radio" name="inlineRadioOptions"
                                         id="inlineRadio1" value="20" {{ $exp[0] == '20' ? 'checked' : '' }}>
@@ -164,12 +187,27 @@
                                         id="inlineRadio2" value="40" {{ $exp[0] == '40' ? 'checked' : '' }}>
                                     <label class="form-check-label" for="inlineRadio2">40"</label>
                                 </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="inlineRadioOptions"
+                                        id="inlineRadio2" value="40hq" {{ $exp[0] == '40hq' ? 'checked' : '' }}>
+                                    <label class="form-check-label" for="inlineRadio2">40 HQ</label>
+                                </div>
                             </div>
-                            <div class="col-sm-4">
+                            <div class="col-sm-2">
+                                <label class="control-label">Volume</label>
+                                <div class="input-group">
+                                    <input type="number" min="0" class="form-control" name="fclvol"
+                                        id="fclvol" value="{{ $exp[1] }}" autocomplete="off">
+                                    <div class="input-group-append">
+                                        <span class="input-group-text">M3</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-3">
                                 <label class="control-label">Number Of Container</label>
                                 <input type="number" class="form-control" name="noc[]" value="">
                             </div>
-                            <div class="col-sm-3">
+                            <div class="col-sm-2">
                                 <label class="control-label">Weight</label>
                                 <div class="input-group">
                                     <input type="number" min="0" class="form-control" name="weight[]"
@@ -188,14 +226,52 @@
                         </div>
                         <span id="fclinput"></span>
                         <div id="datalcl" style="display: none">
-                            <label class="col-sm-12 control-label">Sub Shipmode</label>
-                            <input type="text" class="form-control"
-                                value="{{ $data['dataku'][0]->subshipmode }}">
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    <label class="col-sm-12 control-label">Volume</label>
+                                    <div class="input-group">
+                                        <input type="number" min="0" class="form-control" name="lclvol"
+                                            id="lclvol" autocomplete="off">
+                                        <div class="input-group-append">
+                                            <span class="input-group-text">CBM</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-4">
+                                    <label class="col-sm-12 control-label">Weight</label>
+                                    <div class="input-group">
+                                        <input type="number" min="0" class="form-control" name="lclweight"
+                                            id="lclweight" autocomplete="off">
+                                        <div class="input-group-append">
+                                            <span class="input-group-text">Kg</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                         <div id="dataair" style="display: none">
-                            <label class="col-sm-12 control-label">Sub Shipmode</label>
-                            <input type="text" class="form-control"
-                                value="{{ $data['dataku'][0]->subshipmode }}">
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    <label class="col-sm-12 control-label">Volume</label>
+                                    <div class="input-group">
+                                        <input type="number" min="0" class="form-control" name="airvol"
+                                            id="airvol" autocomplete="off">
+                                        <div class="input-group-append">
+                                            <span class="input-group-text">M3</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-4">
+                                    <label class="col-sm-12 control-label">Weight</label>
+                                    <div class="input-group">
+                                        <input type="number" min="0" class="form-control" name="airweight"
+                                            id="airweight" autocomplete="off">
+                                        <div class="input-group-append">
+                                            <span class="input-group-text">Kg</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -261,7 +337,7 @@
         <div class="row">
             <div class="col-md-4">
                 <div class="form-group">
-                    <label class="col-sm-12 control-label">ATD (Actual Time Departure) Fix</label>
+                    <label class="col-sm-12 control-label">ATD (Actual Time Departure)</label>
                     <div class="col-sm-12">
                         <input type="text" class="form-control" id="etdfix" name="etdfix"
                             value="{{ $data['dataku'][0]->etd }}" autocomplete="off">
@@ -270,7 +346,7 @@
             </div>
             <div class="col-md-4">
                 <div class="form-group">
-                    <label class="col-sm-12 control-label">ATA (Actual Time Arrival) Fix</label>
+                    <label class="col-sm-12 control-label">ATA (Actual Time Arrival)</label>
                     <div class="col-sm-12">
                         <input type="text" class="form-control" id="etafix" name="etafix"
                             value="{{ $data['dataku'][0]->eta }}" autocomplete="off">
@@ -288,6 +364,7 @@
 <script type="text/javascript">
     var current = 1;
     var dataku = @JSON($data['dataku']);
+    console.log('dataku :>> ', dataku);
 
     var radiovalue = $("input[name='inlineRadioOptions']:checked").val();
     var cekrad;
@@ -338,8 +415,9 @@
         });
     }
 
+    var mode;
     $('#shipmode').on('change', function() {
-        let mode = $(this).val();
+        mode = $(this).val();
         console.log('training :>> ', mode);
         if (mode == 'fcl') {
             console.log('object :>> ', 'klikfcl');
@@ -348,12 +426,22 @@
             $('#dataair').hide()
         } else if (mode == 'lcl') {
             console.log('object :>> ', 'kliklcl');
+            let explcl = dataku[0].subshipmode.split("-");
+            let lclcbm = explcl[0].split("CBM");
+            let lclkg = explcl[1].split("KG");
+            $('#lclvol').val(lclcbm[0]);
+            $('#lclweight').val(lclkg[0]);
             $('#fclinput').empty();
             $('#datalcl').show()
             $('#datafcl').hide()
             $('#dataair').hide()
         } else {
             console.log('object :>> ', 'kliksir');
+            let expair = dataku[0].subshipmode.split("-");
+            let aircbm = expair[0].split("M3");
+            let airkg = expair[1].split("KG");
+            $('#airvol').val(aircbm[0]);
+            $('#airweight').val(airkg[0]);
             $('#fclinput').empty();
             $('#dataair').show()
             $('#datafcl').hide()
@@ -378,11 +466,11 @@
             `<div class="form-group pilgan-` + current + `">
                 <div class="col-md-12">
                     <div class="form-group row">
-                        <div class="col-sm-3"></div>
-                        <div class="col-sm-4">
+                        <div class="col-sm-4"></div>
+                        <div class="col-sm-3">
                             <input type="number" class="form-control" name="noc[]" value="">
                         </div>
-                        <div class="col-sm-3">
+                        <div class="col-sm-2">
                             <div class="input-group">
                                 <input type="number" min="0" class="form-control" name="weight[]"
                                     id="weight" autocomplete="off">
@@ -458,9 +546,9 @@
 
         if (arrayku == null || arrayku == '') {
             notifalert('Quantity Allocation');
-        } else if (numbofcont == null || numbofcont == '') {
+        } else if (mode == 'fcl' && (numbofcont == null || numbofcont == '')) {
             notifalert('Number Of Container');
-        } else if (weight == null || weight == '') {
+        } else if (mode == 'fcl' && (weight == null || weight == '')) {
             notifalert('Weight');
         } else if (filebl == null || filebl == '') {
             notifalert('File BL');
