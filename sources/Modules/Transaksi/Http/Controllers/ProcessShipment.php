@@ -140,9 +140,9 @@ class ProcessShipment extends Controller
                     $status = 'No Status';
                 } else {
                     if ($dataqty->qtyshipall == $query->qtypoall) {
-                        $status = 'Full Allocated';
+                        $status = 'Full Shipment';
                     } else {
-                        $status = 'Partial Allocated';
+                        $status = 'Partial Shipment';
                     }
                 }
                 // }
@@ -318,8 +318,8 @@ class ProcessShipment extends Controller
             // dd($jumlahall, $qtypo);
 
             if ($jumlahall > $qtypo) {
-                // DB::rollback();
-                $status = ['title' => 'Error!', 'status' => 'error', 'message' => 'Data Quantity Allocation Over Quantity PO'];
+                DB::rollback();
+                $status = ['title' => 'Error!', 'status' => 'error', 'message' => 'Qty Ship Over Than Balance Qty'];
                 return response()->json($status, 200);
             }
 
