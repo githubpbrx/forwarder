@@ -28,24 +28,97 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-2">
+        <div class="col-md-6">
             <div class="form-group">
-                <label class="col-sm-12 control-label">Ship Mode</label>
                 <div class="col-sm-12">
                     <div class="row">
-                        <div class="col-sm-6">
+                        <div class="col-sm-2">
+                            <label class="col-sm-12 control-label">Ship Mode</label>
                             <input type="text" class="form-control" id="shipmode" name="shipmode"
                                 value="{{ $data[0]->shipmode }}" readonly>
                         </div>
-                        <div class="col-sm-6">
+                        @if ($data[0]->shipmode == 'fcl')
+                            <?php
+                            $exp = explode('-', $data[0]->subshipmode);
+                            $fclsize = $exp[0];
+                            $fclvol = $exp[1];
+                            $expkg = explode('KG', $exp[2]);
+                            $fclkg = $expkg[0];
+                            ?>
+                            <div class="col-sm-3">
+                                <label class="col-sm-12 control-label">Container Size</label>
+                                <input type="number" class="form-control" value="{{ $fclsize }}" readonly>
+                            </div>
+                            <div class="col-sm-3">
+                                <label class="col-sm-12 control-label">Volume</label>
+                                <div class="input-group">
+                                    <input type="number" class="form-control" value="{{ $fclvol }}" readonly>
+                                    <div class="input-group-append">
+                                        <span class="input-group-text">M3</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-3">
+                                <label class="col-sm-12 control-label">Weight</label>
+                                <div class="input-group">
+                                    <input type="number" class="form-control" value="{{ $fclkg }}" readonly>
+                                    <div class="input-group-append">
+                                        <span class="input-group-text">Kg</span>
+                                    </div>
+                                </div>
+                            </div>
+                        @elseif($data[0]->shipmode == 'lcl')
+                            <div class="col-sm-4">
+                                <label class="col-sm-12 control-label">Volume</label>
+                                <div class="input-group">
+                                    <input type="number" min="0" class="form-control" name="lclvol"
+                                        id="lclvol" autocomplete="off" readonly>
+                                    <div class="input-group-append">
+                                        <span class="input-group-text">M3</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-4">
+                                <label class="col-sm-12 control-label">Weight</label>
+                                <div class="input-group">
+                                    <input type="number" min="0" class="form-control" name="lclweight"
+                                        id="lclweight" autocomplete="off" readonly>
+                                    <div class="input-group-append">
+                                        <span class="input-group-text">Kg</span>
+                                    </div>
+                                </div>
+                            </div>
+                        @else
+                            <div class="col-sm-4">
+                                <label class="col-sm-12 control-label">Volume</label>
+                                <div class="input-group">
+                                    <input type="number" min="0" class="form-control" name="lclvol"
+                                        id="lclvol" autocomplete="off" readonly>
+                                    <div class="input-group-append">
+                                        <span class="input-group-text">M3</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-4">
+                                <label class="col-sm-12 control-label">Weight</label>
+                                <div class="input-group">
+                                    <input type="number" min="0" class="form-control" name="lclweight"
+                                        id="lclweight" autocomplete="off" readonly>
+                                    <div class="input-group-append">
+                                        <span class="input-group-text">Kg</span>
+                                    </div>
+                                </div>
+                            </div>
+                        @endif
+                        {{-- <div class="col-sm-6">
                             <input type="text" class="form-control" id="subshipmode" name="subshipmode"
                                 value="{{ $data[0]->subshipmode }}" readonly>
-                        </div>
+                        </div> --}}
                     </div>
                 </div>
             </div>
         </div>
-        <div class="col-md-2">
+        {{-- <div class="col-md-2">
             <div class="form-group">
                 <label class="col-sm-12 control-label">Invoice</label>
                 <div class="col-sm-12">
@@ -62,7 +135,7 @@
                         value="{{ $data[0]->vessel }}" readonly>
                 </div>
             </div>
-        </div>
+        </div> --}}
     </div>
     <div class="row">
         <div class="col-md-2">
