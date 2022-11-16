@@ -19,6 +19,9 @@
                                     <center>Booking Number</center>
                                 </th>
                                 <th>
+                                    <center>Invoice</center>
+                                </th>
+                                <th>
                                     <center>Action</center>
                                 </th>
                             </tr>
@@ -72,6 +75,10 @@
                     {
                         data: 'kodebook',
                         name: 'kodebook'
+                    },
+                    {
+                        data: 'inv',
+                        name: 'inv'
                     },
                     {
                         data: 'action',

@@ -58,6 +58,7 @@ class DataShipment extends Controller
                 ->where('formpo.statusformpo', '=', 'confirm')
                 ->where('privilege.privilege_aktif', 'Y')->where('formshipment.aktif', 'Y')->where('formpo.aktif', 'Y')
                 ->groupby('formpo.kode_booking')
+                ->groupby('formshipment.noinv')
                 ->get();
             // dd($data);
             return DataTables::of($data)
@@ -67,6 +68,9 @@ class DataShipment extends Controller
                 })
                 ->addColumn('kodebook', function ($data) {
                     return $data->kode_booking;
+                })
+                ->addColumn('inv', function ($data) {
+                    return $data->noinv;
                 })
                 ->addColumn('action', function ($data) {
                     $idku = $data->pono;
