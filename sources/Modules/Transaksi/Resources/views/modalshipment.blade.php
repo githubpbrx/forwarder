@@ -193,7 +193,7 @@
                                     <label class="form-check-label" for="inlineRadio2">40 HQ</label>
                                 </div>
                             </div>
-                            <div class="col-sm-2">
+                            {{-- <div class="col-sm-2">
                                 <label class="control-label">Volume</label>
                                 <div class="input-group">
                                     <input type="number" min="0" class="form-control" name="fclvol"
@@ -202,9 +202,9 @@
                                         <span class="input-group-text">M3</span>
                                     </div>
                                 </div>
-                            </div>
+                            </div> --}}
                             <div class="col-sm-3">
-                                <label class="control-label">Number Of Container</label>
+                                <label class="control-label">Container Number</label>
                                 <input type="number" min="0" class="form-control" name="noc[]"
                                     value="">
                             </div>
@@ -467,7 +467,7 @@
             `<div class="form-group pilgan-` + current + `">
                 <div class="col-md-12">
                     <div class="form-group row">
-                        <div class="col-sm-4"></div>
+                        <div class="col-sm-2"></div>
                         <div class="col-sm-3">
                             <input type="number" class="form-control" name="noc[]" value="">
                         </div>
