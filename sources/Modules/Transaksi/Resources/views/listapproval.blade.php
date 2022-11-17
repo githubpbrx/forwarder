@@ -330,14 +330,14 @@
                         );
                     } else if ((mydata[0].shipmode == 'lcl')) {
                         let explcl = mydata[0].subshipmode.split("-");
-                        let explcl1 = explcl[0].split("CBM");
+                        let explcl1 = explcl[0].split("M3");
                         let explcl2 = explcl[1].split("KG");
                         $('#datashipmode').append(
                             '<div class="row"><div class="col-sm-3"><label class="control-label">Ship Mode</label><input type="text" class="form-control" value="' +
                             mydata[0].shipmode +
                             '" readonly></div><div class="col-sm-3"><label class="control-label">Volume</label><div class="input-group"><input type="number" min="0" class="form-control" autocomplete="off" value="' +
                             explcl1[0] +
-                            '" readonly><div class="input-group-append"><span class="input-group-text">CBM</span></div></div></div><div class="col-sm-3"><label class="control-label">Weight</label><div class="input-group"><input type="number" min="0" class="form-control" autocomplete="off" value="' +
+                            '" readonly><div class="input-group-append"><span class="input-group-text">M3</span></div></div></div><div class="col-sm-3"><label class="control-label">Weight</label><div class="input-group"><input type="number" min="0" class="form-control" autocomplete="off" value="' +
                             explcl2[0] +
                             '" readonly><div class="input-group-append"><span class="input-group-text">KG</span></div></div></div></div>'
                         );
