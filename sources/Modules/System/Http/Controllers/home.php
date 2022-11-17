@@ -567,7 +567,7 @@ class home extends Controller
         if ($request->shipmode == 'fcl') {
             $submode = $request->fcl . '-' . $request->fclvol . '-' . $request->fclweight . 'KG';
         } else if ($request->shipmode == 'lcl') {
-            $submode = $request->lcl . 'CBM' . '-' . $request->lclweight . 'KG';
+            $submode = $request->lcl . 'M3' . '-' . $request->lclweight . 'KG';
         } else {
             $submode = $request->air . 'M3' . '-' . $request->airweight . 'KG';
         }
