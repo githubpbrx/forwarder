@@ -68,11 +68,18 @@
                                 </div>
                             </div>
                         @elseif($data[0]->shipmode == 'lcl')
+                            <?php
+                            $explcl = explode('-', $data[0]->subshipmode);
+                            $lclvolexp = explode('M3', $explcl[0]);
+                            $lclvol = $lclvolexp[0];
+                            $explclkg = explode('KG', $explcl[1]);
+                            $lclkg = $explclkg[0];
+                            ?>
                             <div class="col-sm-4">
                                 <label class="col-sm-12 control-label">Volume</label>
                                 <div class="input-group">
-                                    <input type="number" min="0" class="form-control" name="lclvol"
-                                        id="lclvol" autocomplete="off" readonly>
+                                    <input type="number" min="0" class="form-control"
+                                        value="{{ $lclvol }}" readonly>
                                     <div class="input-group-append">
                                         <span class="input-group-text">M3</span>
                                     </div>
@@ -81,19 +88,26 @@
                             <div class="col-sm-4">
                                 <label class="col-sm-12 control-label">Weight</label>
                                 <div class="input-group">
-                                    <input type="number" min="0" class="form-control" name="lclweight"
-                                        id="lclweight" autocomplete="off" readonly>
+                                    <input type="number" min="0" class="form-control"
+                                        value="{{ $lclkg }}" readonly>
                                     <div class="input-group-append">
                                         <span class="input-group-text">Kg</span>
                                     </div>
                                 </div>
                             </div>
                         @else
+                            <?php
+                            $expair = explode('-', $data[0]->subshipmode);
+                            $airvolexp = explode('M3', $expair[0]);
+                            $airvol = $airvolexp[0];
+                            $expairkg = explode('KG', $expair[1]);
+                            $airkg = $expairkg[0];
+                            ?>
                             <div class="col-sm-4">
                                 <label class="col-sm-12 control-label">Volume</label>
                                 <div class="input-group">
-                                    <input type="number" min="0" class="form-control" name="lclvol"
-                                        id="lclvol" autocomplete="off" readonly>
+                                    <input type="number" min="0" class="form-control"
+                                        value="{{ $airvol }}" readonly>
                                     <div class="input-group-append">
                                         <span class="input-group-text">M3</span>
                                     </div>
@@ -102,8 +116,8 @@
                             <div class="col-sm-4">
                                 <label class="col-sm-12 control-label">Weight</label>
                                 <div class="input-group">
-                                    <input type="number" min="0" class="form-control" name="lclweight"
-                                        id="lclweight" autocomplete="off" readonly>
+                                    <input type="number" min="0" class="form-control"
+                                        value="{{ $airkg }}" readonly>
                                     <div class="input-group-append">
                                         <span class="input-group-text">Kg</span>
                                     </div>
