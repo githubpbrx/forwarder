@@ -94,71 +94,71 @@ class ProcessShipment extends Controller
             ->addColumn('qtypo', function ($query) {
                 return  $query->qtypoall;
             })
-            ->addColumn('status', function ($query) use ($dataqty) {
-                // $mydatapo = modelformpo::join('po', 'po.id', 'formpo.idpo')
-                //     ->join('privilege', 'privilege.idforwarder', 'formpo.idmasterfwd')
-                //     ->where('formpo.kode_booking', $query->kode_booking)
-                //     ->where('privilege.privilege_user_nik', Session::get('session')['user_nik'])
-                //     ->where('formpo.statusformpo', 'confirm')
-                //     ->where('formpo.aktif', 'Y')->where('privilege.privilege_aktif', 'Y')
-                //     ->selectRaw('po.pono')
-                //     ->groupby('po.pono')
-                //     ->first();
-                // $datac = modelformshipment::where('idformpo', $query->id_formpo)->get();
+            ->addColumn('status', function ($query) {
+                $datac = modelformpo::where('formpo.kode_booking', $query->kode_booking)
+                    ->where('formpo.statusformpo', 'confirm')
+                    ->where('formpo.aktif', 'Y')
+                    ->get();
 
-                // $datac = modelformshipment::join('formpo', 'formpo.id_formpo', 'formshipment.idformpo')
-                //     ->join('privilege', 'privilege.idforwarder', 'formpo.idmasterfwd')
-                //     ->where('formpo.id_formpo', $query->id_formpo)
-                //     ->where('privilege.privilege_user_nik', Session::get('session')['user_nik'])
-                //     ->where('formpo.statusformpo', '=', 'confirm')
-                //     ->where('privilege.privilege_aktif', 'Y')->where('formpo.aktif', 'Y')->where('formshipment.aktif', 'Y')
-                //     // ->selectRaw(' sum(formshipment.qty_shipment) as qtyshipall ')
-                //     ->get();
-
-                // modelformpo::join('privilege', 'privilege.idforwarder', 'formpo.idmasterfwd')
-                //     ->join('formshipment', 'formshipment.idformpo', 'formpo.id_formpo')
-                //     ->where('privilege.privilege_user_nik', Session::get('session')['user_nik'])
-                //     ->where('formpo.statusformpo', '=', 'confirm')
-                //     ->where('formshipment.idformpo', $query->id_formpo)
-                //     ->where('privilege.privilege_aktif', 'Y')->where('formpo.aktif', 'Y')->where('formshipment.aktif', 'Y')
-                //     ->selectRaw(' idformpo ')
-                //     ->get();
-
-                // dd($datac);
-                // if ($datac == null || $datac == []) {
-                //     $status = 'No Status';
-                // } else {
-
-                // foreach ($datac as $key => $value) {
-                // if ($value->qtyshipall == $query->qtypoall) {
-                //     $status = 'Full Allocated';
-                // } else {
-                // $status = 'Partial Allocated';
-                // }
-
-                if ($dataqty->qtyshipall == null) {
-                    $status = 'No Status';
-                } else {
-                    if ($dataqty->qtyshipall == $query->qtypoall) {
-                        $status = 'Full Shipment';
-                    } else {
+                $arr = [];
+                $arrFull = [];
+                foreach ($datac as $key => $val) {
+                    $dd =  modelformshipment::where('idformpo', $val->id_formpo)->where('aktif', 'Y')->first();
+                    if ($dd) {
                         $status = 'Partial Shipment';
+                        array_push($arr, $status);
+                        array_push($arrFull, $dd->qty_shipment);
                     }
                 }
+
+                $sum = array_sum($arrFull);
+                // dd((float)$sum, $query->qtypoall);
+                // if ($dataqty->qtyshipall == null) {
+                // $status = 'No Status';
+                // } else {
+                //     if ($dataqty->qtyshipall == $query->qtypoall) {
+                //         $status = 'Full Shipment';
+                //     } else {
+                //         $status = 'Partial Shipment';
+                //     }
                 // }
-                // }
-                return  $status;
+                if ((float)$sum == $query->qtypoall) {
+                    return 'Full Shipment';
+                } elseif ($arr) {
+                    return  $arr[0];
+                } else {
+                    return  'No Status';
+                }
             })
-            ->addColumn('action', function ($query) use ($dataqty) {
+            ->addColumn('action', function ($query) {
+                $datac = modelformpo::where('formpo.kode_booking', $query->kode_booking)
+                    ->where('formpo.statusformpo', 'confirm')
+                    ->where('formpo.aktif', 'Y')
+                    ->get();
+
+                $arr = [];
+                $arrFull = [];
+                foreach ($datac as $key => $val) {
+                    $dd =  modelformshipment::where('idformpo', $val->id_formpo)->where('aktif', 'Y')->first();
+                    if ($dd) {
+                        $status = 'Partial Shipment';
+                        array_push($arr, $status);
+                        array_push($arrFull, $dd->qty_shipment);
+                    }
+                }
+
+                $sum = array_sum($arrFull);
+
                 $process    = '';
-                if ($dataqty->qtyshipall == null) {
+
+                if ((float)$sum != $query->qtypoall) {
                     $process    = '<a href="#" data-id="' . $query->kode_booking . '" id="updateship"><i class="fa fa-angle-double-right text-green"></i></a>';
                 } else {
-                    if ($dataqty->qtyshipall != $query->qtypoall) {
-                        $process    = '<a href="#" data-id="' . $query->kode_booking . '" id="updateship"><i class="fa fa-angle-double-right text-green"></i></a>';
-                    } else {
-                        $process = '';
-                    }
+                    // if ($dataqty->qtyshipall != $query->qtypoall) {
+                    //     $process    = '<a href="#" data-id="' . $query->kode_booking . '" id="updateship"><i class="fa fa-angle-double-right text-green"></i></a>';
+                    // } else {
+                    $process = '';
+                    // }
                 }
 
                 return $process;
