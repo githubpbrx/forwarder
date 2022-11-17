@@ -67,7 +67,7 @@
                                                 <th>HS Code</th>
                                                 <th>Color Code</th>
                                                 <th>Size</th>
-                                                <th>Quantity Item</th>
+                                                <th>Qty PO</th>
                                                 <th>Status</th>
                                             </thead>
                                             <tbody>
