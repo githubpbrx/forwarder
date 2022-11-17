@@ -428,7 +428,7 @@
         } else if (mode == 'lcl') {
             console.log('object :>> ', 'kliklcl');
             let explcl = dataku[0].subshipmode.split("-");
-            let lclcbm = explcl[0].split("CBM");
+            let lclcbm = explcl[0].split("M3");
             let lclkg = explcl[1].split("KG");
             $('#lclvol').val(lclcbm[0]);
             $('#lclweight').val(lclkg[0]);
