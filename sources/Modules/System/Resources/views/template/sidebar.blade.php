@@ -72,6 +72,16 @@
                                 </li>
                             @endif
                         </ul>
+                        <ul class="nav nav-treeview">
+                            @if (RoleAccess::whereMenu(14) > 0)
+                                <li class="nav-item">
+                                    <a href="{{ route('masterhscode') }}" class="nav-link">
+                                        <i class="fas fa-dot-circle nav-icon"></i>
+                                        <p>Master HSCode</p>
+                                    </a>
+                                </li>
+                            @endif
+                        </ul>
                     </li>
                 @endif
 
