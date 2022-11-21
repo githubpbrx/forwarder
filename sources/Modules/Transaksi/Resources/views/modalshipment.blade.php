@@ -453,8 +453,6 @@
     function removefield() {
         $('.deletefcl').click(function(e) {
             let idku = $(this).data('id')
-            console.log('klik :>> ', idku);
-
             $('.pilgan-' + idku).remove();
         });
     }
@@ -508,6 +506,11 @@
                 }
             }).get();
         let fclfeet = (cekrad == null) ? radiovalue : cekrad;
+        let shipmode = $('#shipmode').val();
+        let lclvol = $('#lclvol').val();
+        let lclweight = $('#lclweight').val();
+        let airvol = $('#airvol').val();
+        let airweight = $('#airweight').val();
         let nomorbl = $('#nobl').val();
         let noinv = $('#invoice').val();
         let vessel = $('#vessel').val();
@@ -531,10 +534,23 @@
             }
         }
 
+        var vol;
+        var updateweight;
+        if (shipmode == 'lcl') {
+            vol = lclvol;
+            updateweight = lclweight;
+        } else if (shipmode == 'air') {
+            vol = airvol;
+            updateweight = airweight;
+        }
+
         let form_data = new FormData();
         form_data.append('dataid', JSON.stringify(arrayku));
         form_data.append('datacontainer', JSON.stringify(numbofcont));
         form_data.append('dataweight', JSON.stringify(weight));
+        form_data.append('shipmode', shipmode);
+        form_data.append('volume', vol);
+        form_data.append('updateweight', updateweight);
         form_data.append('fclfeet', fclfeet);
         form_data.append('nomorbl', nomorbl);
         form_data.append('noinv', noinv);

@@ -329,11 +329,11 @@ class ProcessShipment extends Controller
                 $status = 'partial_allocated';
             }
 
+            $subshipmode = $request->volume . 'M3' . '-' . $request->updateweight . 'KG';
             $save1 = modelformshipment::insert([
                 'idformpo'         => $val->idformpo,
                 'qty_shipment'     => $val->value,
                 'noinv'            => strtoupper($request->noinv),
-
                 'etdfix'           => $request->etdfix,
                 'etafix'           => $request->etafix,
                 'file_bl'          => $fileNamebl,
@@ -342,6 +342,8 @@ class ProcessShipment extends Controller
                 'nomor_bl'         => strtoupper($request->nomorbl),
                 'vessel'           => strtoupper($request->vessel),
                 'statusshipment'   => $status,
+                'shipmode'         => $request->shipmode,
+                'subshipmode'      => $subshipmode,
                 'aktif'            => 'Y',
                 'created_at'       => date('Y-m-d H:i:s'),
                 'created_by'       => Session::get('session')['user_nik']
@@ -354,11 +356,13 @@ class ProcessShipment extends Controller
             }
         }
 
+        $getinv = modelformshipment::latest('id_shipment')->first();
         foreach ($decodecont as $key => $lue) {
             foreach ($decode as $key2 => $value) {
                 $savecont = modelcontainer::insert([
                     'idformpo'          => $value->idformpo,
-                    'containernumber'   => $request->fclfeet . '"',
+                    'noinv'             => $getinv->noinv,
+                    'containernumber'   => ($request->fclfeet == '40hq') ? $request->fclfeet : $request->fclfeet . '"',
                     'numberofcontainer' => $lue,
                     'weight'            => $decodeweight[$key] . 'KG',
                     'aktif'             => 'Y',
