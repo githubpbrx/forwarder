@@ -23,4 +23,12 @@ Route::prefix('master')->group(function () {
         Route::post('/updatefwd', 'MasterForwarder@updatefwd')->name('masterfwd_update');
         Route::get('/deletefwd/{id}', 'MasterForwarder@destroyfwd')->name('masterfwd_delete');
     });
+
+    Route::group(['prefix' => 'hscode'], function () {
+        Route::get('/', 'MasterHscode@index')->name('masterhscode');
+        Route::get('/listhscode', 'MasterHscode@listhscode')->name('list_hscode');
+        Route::post('/hscodeedit', 'MasterHscode@edit')->name('masterhscode_edit');
+        Route::post('/updatehscode', 'MasterHscode@update')->name('masterhscode_update');
+        Route::get('/deletehscode/{id}', 'MasterHscode@destroy')->name('masterhscode_delete');
+    });
 });
