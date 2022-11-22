@@ -76,7 +76,7 @@ class DataShipment extends Controller
                     $idku = $data->pono;
                     $button = '';
 
-                    $button = '<a href="#" data-id="' . $data->kode_booking . '" id="detailbtn"><i data-tooltip="tooltip" title="Edit Shipment" class="fa fa-edit fa-lg"></i></a>';
+                    $button = '<a href="#" data-id="' . $data->noinv . '" id="detailbtn"><i data-tooltip="tooltip" title="Edit Shipment" class="fa fa-edit fa-lg"></i></a>';
 
                     // $button = '<a href="' . route('detail_allocation', ['id' => $idku]) . '" id="detailbtn"><i data-tooltip="tooltip" title="Detail Allocation" class="fa fa-info-circle fa-lg"></i></a>';
                     return $button;
@@ -101,11 +101,12 @@ class DataShipment extends Controller
 
         $getgroup = modelformshipment::join('formpo', 'formpo.id_formpo', 'formshipment.idformpo')
             ->join('po', 'po.id', 'formpo.idpo')
-            ->where('formpo.kode_booking', $request->id)
+            ->where('formshipment.noinv', $request->id)
+            // ->where('formpo.kode_booking', $request->id)
             ->where('formpo.aktif', 'Y')
             ->where('formshipment.aktif', 'Y')
-            ->groupby('formshipment.nomor_bl')
-            ->selectRaw(' formshipment.idformpo, formshipment.nomor_bl ')
+            ->groupby('formshipment.noinv')
+            ->selectRaw(' formshipment.idformpo, formshipment.noinv, formshipment.nomor_bl ')
             ->get();
 
         $ship = [];
@@ -118,7 +119,7 @@ class DataShipment extends Controller
                 // ->join('formpo', 'formpo.id_formpo', 'formshipment.idformpo')
                 //     ->join('po', 'po.id', 'formpo.idpo')
                 // ->join('masterhscode', 'masterhscode.matcontent', 'po.matcontents')
-                ->where('formshipment.nomor_bl', $lue->nomor_bl)
+                ->where('formshipment.noinv', $lue->noinv)
                 // ->where('formpo.aktif', 'Y')
                 ->where('formshipment.aktif', 'Y')
                 // ->where('masterhscode.aktif', 'Y')
@@ -134,7 +135,7 @@ class DataShipment extends Controller
         foreach ($getgroup as $key => $val) {
             $getdataremain = modelformshipment::join('formpo', 'formpo.id_formpo', 'formshipment.idformpo')
                 ->join('po', 'po.id', 'formpo.idpo')
-                ->where('formshipment.nomor_bl', $val->nomor_bl)
+                ->where('formshipment.noinv', $val->noinv)
                 ->where('formpo.aktif', 'Y')
                 ->where('formshipment.aktif', 'Y')
                 ->groupby('idformpo')
@@ -142,7 +143,7 @@ class DataShipment extends Controller
                 ->get();
             array_push($arr, $getdataremain);
         }
-        // dd($ship, $arr);
+        // dd($arr);
 
         $data = [
             'shipment' => $ship,
