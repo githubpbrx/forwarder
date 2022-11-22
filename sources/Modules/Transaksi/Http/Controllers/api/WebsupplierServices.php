@@ -5,9 +5,10 @@ namespace Modules\Transaksi\Http\Controllers\api;
 use App\Http\Controllers\Controller;
 use DateTime;
 use Illuminate\Http\Request;
-use Exception;
+// use Exception;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Mail;
+// use Illuminate\Support\Facades\Mail;
+use Mail;
 use Modules\Selfservice\Http\Controllers\CutiController;
 use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Support\Facades\Hash;
@@ -19,6 +20,7 @@ use Modules\Transaksi\Models\modelpo as po;
 use Modules\Transaksi\Models\modelforwarder as fwd;
 use Modules\Transaksi\Models\modelformpo as formpo;
 use Modules\Transaksi\Models\modelformshipment as shipment;
+use Modules\Transaksi\Models\modelprivilege as privilege;
 
 class WebsupplierServices extends Controller
 {
@@ -141,7 +143,20 @@ class WebsupplierServices extends Controller
         }
     }
 
-
+    public static function sendEmail($email, $nama, $link, $subject)
+    {
+        // dd($email, $nama, $link, $subject);
+        try {
+            Mail::send('transaksi::layouts/notifpoemail', ['nama' => $nama, 'link' => $link], function ($message) use ($subject, $email) {
+                // dd($subject, $email, $message);
+                $message->subject($subject);
+                $message->to($email);
+            });
+            return 1;
+        } catch (Exception $e) {
+            return 0;
+        }
+    }
 
     public function updatepi(Request $req)
     {
@@ -213,7 +228,11 @@ class WebsupplierServices extends Controller
             $getqtypo = po::where('pono', $pono)->where('line_id', $lineid)->first();
             $insertdatafwd = fwd::insert(['idpo' => $getqtypo->id, 'idmasterfwd' => $insert, 'po_nomor' => $getqtypo->pono, 'qty_allocation' => $getqtypo->qtypo, 'statusforwarder' => 'full_allocated', 'aktif' => 'Y', 'created_at' => date('Y-m-d H:i:s')]);
 
-            // dd($getqtypo);
+            //for notif email
+            $getemail = privilege::where('idforwarder', $insert)->where('privilege_aktif', 'Y')->first();
+            $url = '192.168.100.109/forwarder';
+            WebsupplierServices::sendEmail($getemail->privilege_user_nik, $getemail->privilege_user_name, $url, "Notification Forwarder Get PO");
+
             modellogproses::insert(['typelog' => 'prosesupdatepi', 'activity' => '=== SUCCESS UPDATE PI NUMBER ===', 'status' => true, 'datetime' => date('Y-m-d H:i:s'), 'from' => 'api_updatepi', 'created_at' => date('Y-m-d H:i:s')]);
             $failed['message'] = "Data Pi Number Successfully Updated";
             $failed['success'] = true;
