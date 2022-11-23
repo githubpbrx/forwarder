@@ -146,9 +146,11 @@ class ReportAlokasi extends Controller
             ->join('po', 'po.id', 'formpo.idpo')
             ->join('masterforwarder', 'masterforwarder.id', 'formpo.idmasterfwd')
             ->join('mastersupplier', 'mastersupplier.id', 'po.vendor')
+            ->join('masterhscode', 'masterhscode.matcontent', 'po.matcontents')
             ->where('formshipment.noinv', $request->id)
             ->where('formshipment.aktif', 'Y')->where('formpo.aktif', 'Y')->where('masterforwarder.aktif', 'Y')->where('mastersupplier.aktif', 'Y')
-            ->selectRaw(' formshipment.*, po.pono, po.matcontents, po.itemdesc, po.qtypo, po.colorcode, po.size, po.style, po.plant, formpo.*, masterforwarder.name, mastersupplier.nama ')
+            ->where('masterhscode.aktif', 'Y')
+            ->selectRaw(' formshipment.*, po.pono, po.matcontents, po.itemdesc, po.qtypo, po.colorcode, po.size, po.style, po.plant, formpo.*, masterforwarder.name, mastersupplier.nama, masterhscode.hscode ')
             ->get();
 
         $getdate = modelformshipment::join('formpo', 'formpo.id_formpo', 'formshipment.idformpo')
