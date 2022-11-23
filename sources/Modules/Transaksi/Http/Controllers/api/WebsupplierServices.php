@@ -234,7 +234,7 @@ class WebsupplierServices extends Controller
             WebsupplierServices::sendEmail($getemail->privilege_user_nik, $getemail->privilege_user_name, $url, "Notification Forwarder Get PO");
 
             modellogproses::insert(['typelog' => 'prosesupdatepi', 'activity' => '=== SUCCESS UPDATE PI NUMBER ===', 'status' => true, 'datetime' => date('Y-m-d H:i:s'), 'from' => 'api_updatepi', 'created_at' => date('Y-m-d H:i:s')]);
-            $failed['message'] = "Data Pi Number Successfully Updated";
+            $failed['message'] = "Done";
             $failed['success'] = true;
             $failed['title'] = "Success!";
             $failed['type'] = "success";
@@ -242,7 +242,7 @@ class WebsupplierServices extends Controller
         } else {
             modellogproses::insert(['typelog' => 'prosesupdatepi', 'activity' => 'FAILED alert => Data Pi Number failed update', 'status' => false, 'datetime' => date('Y-m-d H:i:s'), 'from' => 'api_updatepi', 'created_at' => date('Y-m-d H:i:s')]);
             modellogproses::insert(['typelog' => 'prosesupdatepi', 'activity' => '=== END PROSES => ROLLBACK ===', 'status' => false, 'datetime' => date('Y-m-d H:i:s'), 'from' => 'api_updatepi', 'created_at' => date('Y-m-d H:i:s')]);
-            $failed['message'] = "Data Pi Number failed update";
+            $failed['message'] = "Failed";
             $failed['success'] = false;
             $failed['title'] = "Warning!";
             $failed['type'] = "warning";
