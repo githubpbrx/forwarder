@@ -147,6 +147,11 @@ class SyncSap extends Controller
                         $ven = mastersupplier::where('nama', $vendor)->first();
                         $idvendor = $ven->id;
 
+                        if (!isset($row_data[62]) || !isset($row_data[63])) {
+                            echo 'Garmentdeldate or LCO is Empty!! Please Check Your Data';
+                            return;
+                        }
+
                         //cekpo
                         $p = modelpo::where('pono', $row_data[0])->where('line_id', $row_data[1])->first();
                         if ($p == null) {
