@@ -95,23 +95,31 @@ class ProcessShipment extends Controller
                 return  $query->qtypoall;
             })
             ->addColumn('status', function ($query) {
-                $datac = modelformpo::where('formpo.kode_booking', $query->kode_booking)
+                // $datac = modelformpo::where('formpo.kode_booking', $query->kode_booking)
+                //     ->where('formpo.statusformpo', 'confirm')
+                //     ->where('formpo.aktif', 'Y')
+                //     ->select('id_formpo')
+                //     ->get();
+                $datac = modelformshipment::join('formpo', 'formpo.id_formpo', 'formshipment.idformpo')
+                    ->where('formpo.kode_booking', $query->kode_booking)
                     ->where('formpo.statusformpo', 'confirm')
-                    ->where('formpo.aktif', 'Y')
-                    ->get();
-
-                $arr = [];
-                $arrFull = [];
-                foreach ($datac as $key => $val) {
-                    $dd =  modelformshipment::where('idformpo', $val->id_formpo)->where('aktif', 'Y')->first();
-                    if ($dd) {
-                        $status = 'Partial Shipment';
-                        array_push($arr, $status);
-                        array_push($arrFull, $dd->qty_shipment);
-                    }
-                }
-
-                $sum = array_sum($arrFull);
+                    ->where('formpo.aktif', 'Y')->where('formshipment.aktif', 'Y')
+                    // ->groupby('formshipment.idformpo')
+                    ->selectRaw(' sum(qty_shipment) as qtyship')
+                    ->first();
+                // dd($datac);
+                // $arr = [];
+                // $arrFull = [];
+                // foreach ($datac as $key => $val) {
+                //     $dd =  modelformshipment::where('idformpo', $val->id_formpo)->where('aktif', 'Y')->first();
+                //     if ($dd) {
+                //         $status = 'Partial Shipment';
+                //         array_push($arr, $status);
+                //         array_push($arrFull, $dd->qty_shipment);
+                //     }
+                // }
+                // dd($arrFull);
+                // $sum = array_sum($arrFull);
                 // dd((float)$sum, $query->qtypoall);
                 // if ($dataqty->qtyshipall == null) {
                 // $status = 'No Status';
@@ -122,36 +130,45 @@ class ProcessShipment extends Controller
                 //         $status = 'Partial Shipment';
                 //     }
                 // }
-                if ((float)$sum == $query->qtypoall) {
+
+                if ($datac->qtyship == $query->qtypoall) {
                     return 'Full Shipment';
-                } elseif ($arr) {
-                    return  $arr[0];
+                } elseif ($datac->qtyship != $query->qtypoall) {
+                    // return  $arr[0];
+                    return  'Partial Shipment';
                 } else {
                     return  'No Status';
                 }
             })
             ->addColumn('action', function ($query) {
-                $datac = modelformpo::where('formpo.kode_booking', $query->kode_booking)
+                // $datac = modelformpo::where('formpo.kode_booking', $query->kode_booking)
+                //     ->where('formpo.statusformpo', 'confirm')
+                //     ->where('formpo.aktif', 'Y')
+                //     ->get();
+                $datac = modelformshipment::join('formpo', 'formpo.id_formpo', 'formshipment.idformpo')
+                    ->where('formpo.kode_booking', $query->kode_booking)
                     ->where('formpo.statusformpo', 'confirm')
-                    ->where('formpo.aktif', 'Y')
-                    ->get();
+                    ->where('formpo.aktif', 'Y')->where('formshipment.aktif', 'Y')
+                    // ->groupby('formshipment.idformpo')
+                    ->selectRaw(' sum(qty_shipment) as qtyship')
+                    ->first();
 
-                $arr = [];
-                $arrFull = [];
-                foreach ($datac as $key => $val) {
-                    $dd =  modelformshipment::where('idformpo', $val->id_formpo)->where('aktif', 'Y')->first();
-                    if ($dd) {
-                        $status = 'Partial Shipment';
-                        array_push($arr, $status);
-                        array_push($arrFull, $dd->qty_shipment);
-                    }
-                }
+                // $arr = [];
+                // $arrFull = [];
+                // foreach ($datac as $key => $val) {
+                //     $dd =  modelformshipment::where('idformpo', $val->id_formpo)->where('aktif', 'Y')->first();
+                //     if ($dd) {
+                //         $status = 'Partial Shipment';
+                //         array_push($arr, $status);
+                //         array_push($arrFull, $dd->qty_shipment);
+                //     }
+                // }
 
-                $sum = array_sum($arrFull);
+                // $sum = array_sum($arrFull);
 
                 $process    = '';
 
-                if ((float)$sum != $query->qtypoall) {
+                if ($datac->qtyship != $query->qtypoall) {
                     $process    = '<a href="#" data-id="' . $query->kode_booking . '" id="updateship"><i class="fa fa-angle-double-right text-green"></i></a>';
                 } else {
                     // if ($dataqty->qtyshipall != $query->qtypoall) {
