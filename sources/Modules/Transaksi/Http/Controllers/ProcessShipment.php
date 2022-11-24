@@ -268,6 +268,13 @@ class ProcessShipment extends Controller
         $fileNamepack = time() . '_' . $originalNamepack;
         Storage::disk('local')->put($fileNamepack, file_get_contents($request->filepack));
 
+        $cekdata = modelformshipment::where('noinv', $request->noinv)->where('aktif', 'Y')->first();
+        if ($cekdata != null) {
+            DB::rollback();
+            $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'Invoice Already Exist'];
+            return response()->json($status, 200);
+        }
+
         foreach ($decode as $key => $val) {
             if ($filebl == '' || $filebl == null) {
                 DB::rollback();
@@ -317,12 +324,7 @@ class ProcessShipment extends Controller
                 return response()->json($status, 200);
             }
 
-            // $cekdata = modelformshipment::where('noinv', $request->invoice)->where('aktif', 'Y')->first();
-            // if ($cekdata != null) {
-            //     // DB::rollback();
-            //     $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'Invoice Already Exist'];
-            //     return response()->json($status, 200);
-            // }
+
 
             $cekpo = modelpo::where('id', $val->idpo)->first();
             $rep = str_replace('.', '', $cekpo->qtypo);
