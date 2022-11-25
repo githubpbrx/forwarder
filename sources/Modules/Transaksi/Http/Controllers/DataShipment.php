@@ -63,8 +63,21 @@ class DataShipment extends Controller
             // dd($data);
             return DataTables::of($data)
                 ->addIndexColumn()
-                ->addColumn('po', function ($data) {
-                    return $data->pono;
+                ->addColumn('pono', function ($data) {
+                    $mydatapo = modelformshipment::join('formpo', 'formpo.id_formpo', 'formshipment.idformpo')
+                        ->join('po', 'po.id', 'formpo.idpo')
+                        ->join('privilege', 'privilege.idforwarder', 'formpo.idmasterfwd')
+                        ->where('formpo.kode_booking', $data->kode_booking)
+                        ->where('formshipment.noinv', $data->noinv)
+                        ->where('privilege.privilege_user_nik', Session::get('session')['user_nik'])
+                        ->where('formpo.statusformpo', 'confirm')
+                        ->where('formpo.aktif', 'Y')->where('privilege.privilege_aktif', 'Y')->where('formshipment.aktif', 'Y')
+                        ->selectRaw('po.pono')
+                        ->groupby('po.pono')
+                        ->pluck('po.pono');
+                    // dd($mydatapo);
+                    return  str_replace("]", "", str_replace("[", "", str_replace('"', " ", $mydatapo)));
+                    // return $data->pono;
                 })
                 ->addColumn('kodebook', function ($data) {
                     return $data->kode_booking;
@@ -128,27 +141,47 @@ class DataShipment extends Controller
 
             array_push($ship, $getshipment);
         }
-
         // dd($ship);
-
-        $arr = [];
-        foreach ($getgroup as $key => $val) {
-            $getdataremain = modelformshipment::join('formpo', 'formpo.id_formpo', 'formshipment.idformpo')
-                ->join('po', 'po.id', 'formpo.idpo')
-                ->where('formshipment.noinv', $val->noinv)
-                ->where('formpo.aktif', 'Y')
+        $newship = [];
+        foreach ($ship[0] as $key => $valu) {
+            $shipmentnew = modelformshipment::with(['withformpo' => function ($var) {
+                $var->with(['withpo' => function ($hs) {
+                    $hs->with(['hscode']);
+                }]);
+            }])
+                // ->join('formpo', 'formpo.id_formpo', 'formshipment.idformpo')
+                //     ->join('po', 'po.id', 'formpo.idpo')
+                // ->join('masterhscode', 'masterhscode.matcontent', 'po.matcontents')
+                ->where('formshipment.idformpo', $valu->idformpo)
+                // ->where('formpo.aktif', 'Y')
                 ->where('formshipment.aktif', 'Y')
-                ->groupby('idformpo')
-                ->selectRaw(' sum(qty_shipment) as qtyshipment ')
+                // ->where('masterhscode.aktif', 'Y')
+                ->selectRaw(' sum(qty_shipment) as qtyshipment, idformpo ')
                 ->get();
-            array_push($arr, $getdataremain);
+
+            array_push($newship, $shipmentnew);
         }
+
+        // dd($ship, $newship);
+
+        // $arr = [];
+        // foreach ($getgroup as $key => $val) {
+        //     $getdataremain = modelformshipment::join('formpo', 'formpo.id_formpo', 'formshipment.idformpo')
+        //         ->join('po', 'po.id', 'formpo.idpo')
+        //         ->where('formshipment.noinv', $val->noinv)
+        //         ->where('formpo.aktif', 'Y')
+        //         ->where('formshipment.aktif', 'Y')
+        //         ->groupby('idformpo')
+        //         ->selectRaw(' sum(qty_shipment) as qtyshipment ')
+        //         ->get();
+        //     array_push($arr, $getdataremain);
+        // }
         // dd($arr);
 
         $data = [
             'shipment' => $ship,
             'groupbl' => $getgroup,
-            'remaining' => $arr
+            'remaining' => $newship
         ];
 
         // return response()->json(['status' => 200, 'data' => $data, 'message' => 'Berhasil']);
@@ -180,6 +213,7 @@ class DataShipment extends Controller
 
         foreach ($decode as $key => $val) {
             $qtydefault = ($val->value == '') ? '0' : $val->value;
+            // dd($qtydefault);
             $filebl = $request->file('filebl');
             if ($filebl != null) {
                 $originalNamebl = str_replace(' ', '_', $filebl->getClientOriginalName());
@@ -214,11 +248,23 @@ class DataShipment extends Controller
             $cekpo = modelpo::where('id', $cekformpo->idpo)->first();
             $qtypo = (float)$cekpo->qtypo;
 
+            //mengambil data qty_shipment berdasarkan idformpo
             $cekqtyshipment = modelformshipment::where('idformpo', $val->idformpo)->where('aktif', 'Y')->selectRaw(' sum(qty_shipment) as jml ')->first();
             $jumlahexist = ($cekqtyshipment->jml == null) ? 0 : $cekqtyshipment->jml;
 
-            $jumlahall = $qtydefault + $jumlahexist;
+            //mengambil data qty_shipment berdasarkan idformpo dan invoice
+            $shipmentinv = modelformshipment::where('idformpo', $val->idformpo)->where('noinv', $request->inv)->where('aktif', 'Y')->selectRaw(' sum(qty_shipment) as jml ')->first();
 
+            $shipku = '';
+            if ($qtydefault == $shipmentinv->jml) {
+                $jumlahall = $jumlahexist;
+                $shipku = $qtydefault;
+            } else {
+                $jumlahall = $qtydefault + $jumlahexist;
+                $shipku = $shipmentinv->jml + $qtydefault;
+            }
+
+            // dd($qtydefault, $jumlahexist);
             $cekdata = modelformshipment::where('id_shipment', $val->idshipment)->where('aktif', 'Y')->select('qty_shipment')->first();
             $jumlahfix = $jumlahall - $cekdata->qty_shipment;
             // dd($qtypo, $jumlahall, $jumlahfix);
@@ -253,19 +299,19 @@ class DataShipment extends Controller
             //     ]);
             // } else {
             $updateship = modelformshipment::where('id_shipment', $val->idshipment)->where('aktif', 'Y')->update([
-                'noinv'        => $request->inv,
-                'qty_shipment' => $jumlahall,
-                'etdfix'       => $request->etd,
-                'etafix'       => $request->eta,
-                'file_bl'      => $fileNamebl,
-                'file_invoice'      => $fileNameinv,
-                'file_packinglist'      => $fileNamepack,
-                'nomor_bl'     => $request->nomorbl,
-                'vessel'       => $request->vessel,
-                'statusshipment' => $status,
-                'aktif'        => 'Y',
-                'updated_at'   => date('Y-m-d H:i:s'),
-                'updated_by'   => Session::get('session')['user_nik']
+                'noinv'            => $request->inv,
+                'qty_shipment'     => $shipku,
+                'etdfix'           => $request->etd,
+                'etafix'           => $request->eta,
+                'file_bl'          => $fileNamebl,
+                'file_invoice'     => $fileNameinv,
+                'file_packinglist' => $fileNamepack,
+                'nomor_bl'         => $request->nomorbl,
+                'vessel'           => $request->vessel,
+                'statusshipment'   => $status,
+                'aktif'            => 'Y',
+                'updated_at'       => date('Y-m-d H:i:s'),
+                'updated_by'       => Session::get('session')['user_nik']
             ]);
             // }
 

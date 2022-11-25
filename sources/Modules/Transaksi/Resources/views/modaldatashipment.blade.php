@@ -1,7 +1,7 @@
 <div class="modal-body" style="font-size: 10pt;">
     <form action="#" class="form-horizontal">
         {{ csrf_field() }}
-        {{-- {{ dd($data['shipment']) }} --}}
+        {{-- {{ dd($data['remaining']) }} --}}
         <hr style="width: 100%; color: rgb(192, 192, 192); height: 0.5px; background-color:rgb(192, 192, 192);" />
         <div class="row">
             <div class="col-md-12">
@@ -46,12 +46,14 @@
                                             <tbody>
                                                 @foreach ($item as $key2 => $val)
                                                     <?php
-                                                    if ($data['remaining'][$key1][$key2]->qtyshipment == null) {
-                                                        $remain = $val['withformpo']['withpo']->qtypo;
-                                                    } elseif ($data['remaining'][$key1][$key2]->qtyshipment == $val['withformpo']['withpo']->qtypo) {
-                                                        $remain = '0';
-                                                    } else {
-                                                        $remain = $val['withformpo']['withpo']->qtypo - $data['remaining'][$key1][$key2]->qtyshipment;
+                                                    if ($val->idformpo == $data['remaining'][$key2][0]->idformpo) {
+                                                        if ($data['remaining'][$key2][0]->qtyshipment == null) {
+                                                            $remain = $val['withformpo']['withpo']->qtypo;
+                                                        } elseif ($data['remaining'][$key2][0]->qtyshipment == $val['withformpo']['withpo']->qtypo) {
+                                                            $remain = '0';
+                                                        } else {
+                                                            $remain = $val['withformpo']['withpo']->qtypo - $data['remaining'][$key2][0]->qtyshipment;
+                                                        }
                                                     }
 
                                                     if ($val['withformpo']['withpo']['hscode'] == null) {
@@ -79,8 +81,10 @@
                                                         <td>
                                                             <input type="number" min="0"
                                                                 id="qtyship-{{ $key1 }}{{ $key2 }}"
-                                                                name="qtyship" value="{{ $remain }}"
+                                                                name="qtyship"
+                                                                value="{{ $remain == 0 ? 0 : $val->qty_shipment }}"
                                                                 class="form-control trigerinput cekinput-{{ $key1 }}{{ $key2 }}"
+                                                                data-remain="{{ $remain }}"
                                                                 data-idpo="{{ $idpo }}"
                                                                 data-blku="{{ $val->nomor_bl }}"
                                                                 data-idformshipment="{{ $val->id_shipment }}"
@@ -331,6 +335,20 @@
         }
     }
 
+    // memvalidasi inputan supaya tidak bisa lebih dari balance
+    for (let index = 0; index < dataku.length; index++) {
+        for (let index2 = 0; index2 < dataku[index].length; index2++) {
+            $('.cekinput-' + index + index2).keyup(function(e) {
+                let valinput = $('.cekinput-' + index + index2).val();
+                let rem = $('.cekinput-' + index + index2).attr('data-remain');
+
+                if (Number(valinput) >= Number(rem)) {
+                    $('.cekinput-' + index + index2).val(rem);
+                }
+            });
+        }
+    }
+
     function submit() {
         for (let index = 0; index < dataku.length; index++) {
             $('#btnupdate-' + index).click(function(e) {
@@ -346,16 +364,20 @@
 
                 var arrayku = [];
                 for (let index2 = 0; index2 < dataku[index].length; index2++) {
+                    var cekdisabled = $('.cekinput-' + index + index2).prop('disabled');
                     let val = $('.cekinput-' + index + index2).val();
 
-                    let data = {
-                        'idpo': $('.cekinput-' + index + index2).attr('data-idpo'),
-                        'idbl': $('.cekinput-' + index + index2).attr('data-blku'),
-                        'idshipment': $('.cekinput-' + index + index2).attr('data-idformshipment'),
-                        'idformpo': $('.cekinput-' + index + index2).attr('data-idformpo'),
-                        'value': val,
-                    };
-                    arrayku.push(data);
+                    if (!cekdisabled) {
+                        let data = {
+                            'idpo': $('.cekinput-' + index + index2).attr('data-idpo'),
+                            'idbl': $('.cekinput-' + index + index2).attr('data-blku'),
+                            'idshipment': $('.cekinput-' + index + index2).attr('data-idformshipment'),
+                            'idformpo': $('.cekinput-' + index + index2).attr('data-idformpo'),
+                            'value': val,
+                        };
+                        arrayku.push(data);
+                    }
+
                 }
                 console.log('arrayku :>> ', arrayku);
 
