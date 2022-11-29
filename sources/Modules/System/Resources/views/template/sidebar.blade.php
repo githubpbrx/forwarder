@@ -176,6 +176,15 @@
                         </a>
                     </li>
                 @endif
+
+                @if (RoleAccess::whereMenu(15) > 0)
+                    <li class="nav-item">
+                        <a href="{{ url('privilege/accessfwd') }}" class="nav-link">
+                            <i class="fa fa-users nav-icon"></i>
+                            <p>Manage User Forwarder</p>
+                        </a>
+                    </li>
+                @endif
                 {{-- end for forwarder --}}
 
 

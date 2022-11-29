@@ -79,8 +79,6 @@ Route::prefix('')->group(function () {
 
     Route::get('/', 'login@index');
 
-
-
     // setting routes
     Route::get('changepassword', 'settings@changepassword');
     Route::post('changepasswordaction', 'settings@changepasswordaction');
@@ -98,8 +96,6 @@ Route::prefix('')->group(function () {
     Route::post('/settings/sbu/createaction', 'sbu@createaction');
     Route::post('/settings/sbu/updateaction', 'sbu@updateaction');
     Route::get('/settings/sbu/delete/{sbu_id}', 'sbu@delete');
-
-
 
     #IMPORTAN SISTEM SETTINGS
     Route::get('/app/settings/panel', 'configuration@settingspanel');
@@ -133,9 +129,16 @@ Route::prefix('privilege')->group(function () {
     Route::get('group_access/checkgroupaccess', 'Privileges\group_access@checkgroupaccess');
 
     Route::get('get/{nik}', 'Privileges\privilege@getPrivilege');
-    //
 
     Route::post('getnamaku', 'Privileges\privilege@getnama')->name('privileggetnama');
 
     Route::post('createsave', 'Privileges\privilege@createsave')->name('privilegcreatesave');
+
+    //for forwarder
+    Route::get('accessfwd', 'Privileges\privilegefwd@index');
+    Route::get('fwd_access/datatablefwd', 'Privileges\privilegefwd@datatablefwd');
+    Route::post('fwd_access/saveuserfwd', 'Privileges\privilegefwd@saveuserfwd');
+    Route::post('fwd_access/edituserfwd', 'Privileges\privilegefwd@edituserfwd');
+    Route::post('fwd_access/updateuserfwd', 'Privileges\privilegefwd@updateuserfwd');
+    Route::get('fwd_access/deleteuserfwd/{id}', 'Privileges\privilegefwd@deleteuserfwd');
 });
