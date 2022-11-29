@@ -23,6 +23,7 @@
 
             @php
                 $session = Session::get('session');
+                $fwdses = Session::get('sessionfwd');
             @endphp
 
             <div class="info">
@@ -177,7 +178,7 @@
                     </li>
                 @endif
 
-                @if (RoleAccess::whereMenu(15) > 0)
+                @if ($fwdses == 1 && RoleAccess::whereMenu(15) > 0)
                     <li class="nav-item">
                         <a href="{{ url('privilege/accessfwd') }}" class="nav-link">
                             <i class="fa fa-users nav-icon"></i>
@@ -186,7 +187,6 @@
                     </li>
                 @endif
                 {{-- end for forwarder --}}
-
 
                 @if ($menu_session != '')
                     @include($menu_session . '::template/' . $menu_session . '_sidebar')
