@@ -12,11 +12,12 @@
                     <tr>
                         <th>#</th>
                         <th>Email</th>
-                        <th>Nama</th>
-                        <th>Nama Finance</th>
-                        <th>Nik Finance</th>
+                        <th>Name</th>
+                        <th>Name Finance</th>
+                        <th>NIK Finance</th>
                         <th>Email Finance</th>
-                        <th>Aksi</th>
+                        <th>Status</th>
+                        <th>Action</th>
                     </tr>
                 </thead>
             </table>
@@ -24,6 +25,7 @@
     </div>
 
     {{-- ----------------- modal content ----------------- --}}
+    {{-- modal for add user --}}
     <div class="modal fade" id="adduser">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -97,6 +99,58 @@
             </div>
         </div>
     </div>
+
+    {{-- modal for detail reject --}}
+    <div class="modal fade" id="detailreject">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title"><span id="modaltitle">Detail Reject User</span></h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form action="#" class="form-horizontal">
+                        {{ csrf_field() }}
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="col-sm-12 control-label">Email User Forwarder</label>
+                                    <div class="col-sm-12">
+                                        <input type="text" class="form-control" id="emailuserreject"
+                                            name="emailuserreject" autocomplete="off" readonly>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="col-sm-12 control-label">Name Forwarder</label>
+                                    <div class="col-sm-12">
+                                        <input type="email" class="form-control" id="namefwdreject"
+                                            name="namefwdreject" autocomplete="off" readonly>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label class="col-sm-12 control-label">Description</label>
+                                    <div class="col-sm-12">
+                                        <textarea name="deskripsi" id="deskripsi" cols="60" rows="3" disabled></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
     {{-- ----------------- /.modal content ----------------- --}}
 @endsection
 
@@ -140,12 +194,10 @@
                     data: 'email_finance',
                     name: 'email_finance'
                 },
-                // {
-                //     data: 'reset',
-                //     name: 'reset',
-                //     orderable: false,
-                //     searchable: false
-                // },
+                {
+                    data: 'status',
+                    name: 'status'
+                },
                 {
                     data: 'action',
                     name: 'action',
@@ -317,6 +369,32 @@
                     });
                     return false;
                 }
+            })
+        });
+
+        $('body').on('click', '#detailuser', function() {
+            console.log('objectproses :>> ', 'klik');
+            $('#detailreject').modal({
+                show: true,
+                backdrop: 'static'
+            });
+            let idku = $(this).attr('data-id');
+
+            $.ajax({
+                url: "{!! url('privilege/fwd_access/detailuserfwd') !!}",
+                type: 'POST',
+                dataType: 'json',
+                data: {
+                    _token: $('meta[name=csrf-token]').attr('content'),
+                    id: idku,
+                },
+            }).done(function(data) {
+                let dataku = data.data;
+                console.log('data :>> ', dataku);
+
+                $('#emailuserreject').val(dataku.privilege_user_nik);
+                $('#namefwdreject').val(dataku.privilege_user_name);
+                $('#deskripsi').val(dataku.ket_tolak);
             })
         });
     </script>

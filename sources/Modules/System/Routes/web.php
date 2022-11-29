@@ -145,4 +145,5 @@ Route::prefix('privilege')->group(function () {
     Route::post('fwd_access/edituserfwd', 'Privileges\privilegefwd@edituserfwd');
     Route::post('fwd_access/updateuserfwd', 'Privileges\privilegefwd@updateuserfwd');
     Route::get('fwd_access/deleteuserfwd/{id}', 'Privileges\privilegefwd@deleteuserfwd');
+    Route::post('fwd_access/detailuserfwd', 'Privileges\privilegefwd@detailuserfwd');
 });

@@ -46,8 +46,10 @@ class privilegefwd extends Controller
 
         $query = modelprivilege::with(['group_access'])
             ->where('idforwarder', $getidfwd->idforwarder)
-            ->orderBy('privilege_user_nik', 'ASC')
-            ->where('privilege_aktif', 'Y')
+            ->where('leadforwarder', null)
+            ->where('deleted_at', null)
+            // ->orderBy('privilege_user_nik', 'ASC')
+            // ->where('privilege_aktif', 'Y')
             ->get();
         // dd($query);
         return Datatables::of($query)
@@ -79,6 +81,15 @@ class privilegefwd extends Controller
                     return '<span class="badge bg-info">Not Set</span>';
                 }
             })
+            ->addColumn('status', function ($q) {
+                if ($q->status == 'confirm') {
+                    return '<span class="badge bg-success">Confirmed</span>';
+                } else if ($q->status == 'reject') {
+                    return '<span class="badge bg-danger">Rejected</span>';
+                } else {
+                    return '<span class="badge bg-info">Waiting</span>';
+                }
+            })
             ->addColumn('action', function ($q) {
                 // $process    = '';
 
@@ -90,13 +101,21 @@ class privilegefwd extends Controller
 
                 $button = '';
 
-                $button .= '<a href="#" data-tooltip="tooltip" data-id="' . $q->privilege_id . '" id="edituserfwd" title="Edit Data"><i class="fa fa-edit fa-lg text-orange actiona"></i></a>';
-                $button .= '&nbsp;';
-                $button .= '<a href="#" data-id="' . encrypt($q->privilege_id) . '" id="deleteuser" data-tooltip="tooltip" title="Delete Data"><i class="fa fa-trash fa-lg text-red actiona"></i></a>';
+                if ($q->status == 'reject') {
+                    $button .= '<a href="#" data-tooltip="tooltip" data-id="' . $q->privilege_id . '" id="edituserfwd" title="Edit Data"><i class="fa fa-edit fa-lg text-orange actiona"></i></a>';
+                    $button .= '&nbsp;';
+                    $button .= '<a href="#" data-id="' . encrypt($q->privilege_id) . '" id="deleteuser" data-tooltip="tooltip" title="Delete Data"><i class="fa fa-trash fa-lg text-red actiona"></i></a>';
+                    $button .= '&nbsp;';
+                    $button .= '<a href="#" data-id="' . $q->privilege_id . '" id="detailuser" data-tooltip="tooltip" title="Delete Data"><i class="fa fa-info-circle fa-lg text-blue actiona"></i></a>';
+                } else {
+                    $button .= '<a href="#" data-tooltip="tooltip" data-id="' . $q->privilege_id . '" id="edituserfwd" title="Edit Data"><i class="fa fa-edit fa-lg text-orange actiona"></i></a>';
+                    $button .= '&nbsp;';
+                    $button .= '<a href="#" data-id="' . encrypt($q->privilege_id) . '" id="deleteuser" data-tooltip="tooltip" title="Delete Data"><i class="fa fa-trash fa-lg text-red actiona"></i></a>';
+                }
 
                 return $button;
             })
-            ->rawColumns(['nama_finance', 'nik_finance', 'email_finance', 'action'])
+            ->rawColumns(['nama_finance', 'nik_finance', 'email_finance', 'status', 'action'])
             ->make(true);
     }
 
@@ -112,7 +131,7 @@ class privilegefwd extends Controller
         //make token
         $token = Hash::make('ittetapsemangant');
 
-        $cekemail = modelprivilege::where('privilege_user_nik', $request->emailuser)->where('privilege_aktif', 'Y')->first();
+        $cekemail = modelprivilege::where('privilege_user_nik', $request->emailuser)->where('deleted_at', null)->first();
         if ($cekemail) {
             $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'User Email is available, please check again'];
             return response()->json($status, 200);
@@ -127,7 +146,7 @@ class privilegefwd extends Controller
             'privilege_user_name'       => $request->namefwd,
             'privilege_password'        => $pass,
             'privilege_group_access_id' => '1',
-            'privilege_aktif'           => 'Y',
+            'privilege_aktif'           => 'N',
             'privilege_hrips'           => 'N',
             'created_at'                => date('Y-m-d H:i:s'),
             'coc'                       => $getprivbefore->coc,
@@ -140,7 +159,8 @@ class privilegefwd extends Controller
             'emailfinance'              => $getprivbefore->emailfinance,
             'nikfinance'                => $getprivbefore->nikfinance,
             'namafinance'               => $getprivbefore->namafinance,
-            'idforwarder'               => $getid->id
+            'idforwarder'               => $getid->id,
+            'status'                    => 'waiting'
         ]);
 
         if ($save) {
@@ -189,7 +209,7 @@ class privilegefwd extends Controller
     {
         // dd(decrypt($id));
 
-        $delete = modelprivilege::where('privilege_id', decrypt($id))->update(['privilege_aktif' => 'N', 'updated_at' => date("Y-m-d H:i:s")]);
+        $delete = modelprivilege::where('privilege_id', decrypt($id))->update(['privilege_aktif' => 'N', 'updated_at' => date("Y-m-d H:i:s"), 'deleted_at' => date("Y-m-d H:i:s")]);
 
         if ($delete) {
             \LogActivity::addToLog('Web Forwarder :: Forwarder : Delete User Forwarder', $this->micro);
@@ -199,5 +219,14 @@ class privilegefwd extends Controller
             $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'Data Failed Delete'];
             return response()->json($status, 200);
         }
+    }
+
+    public function detailuserfwd(Request $request)
+    {
+        // dd($request);
+
+        $detail = modelprivilege::where('privilege_id', $request->id)->first();
+
+        return response()->json(['status' => 200, 'data' => $detail, 'message' => 'Berhasil']);
     }
 }
