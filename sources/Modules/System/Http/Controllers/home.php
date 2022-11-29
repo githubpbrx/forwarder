@@ -31,8 +31,8 @@ class home extends Controller
 
     public function index()
     {
-        $datauser = privilege::where('privilege_user_nik', Session::get('session')['user_nik'])->first();
-
+        $datauser = privilege::where('privilege_user_nik', Session::get('session')['user_nik'])->where('privilege_aktif', 'Y')->first();
+        // dd($datauser);
         // Start For Forwarder
         $datapo = forwarder::join('privilege', 'privilege.idforwarder', 'forwarder.idmasterfwd')
             ->join('po', 'po.id', 'forwarder.idpo')
@@ -119,7 +119,16 @@ class home extends Controller
             ->where('formpo.aktif', 'Y')
             ->groupby('po.pideldate')
             ->get();
-        // dd($dataapproval);
+
+        $datauserfwd = privilege::where('nikfinance', Session::get('session')['user_nik'])->where('privilege_aktif', 'N')->where('status', 'waiting')->get();
+        // dd(count($datauserfwd));
+        // $arrayfwd = [];
+        // foreach ($datauserfwd as $key => $vue) {
+        //     if ($vue->leadforwarder != 1) {
+        //         array_push($arrayfwd, $vue);
+        //     }
+        // }
+        // dd($arrayfwd);
 
         $data = array(
             'title'         => 'Dashboard',
@@ -134,6 +143,7 @@ class home extends Controller
             'totalapproval' => count($dataapproval),
             'datauser'      => $datauser,
             'totalkyc'      => count($userkyc),
+            'newuser'       => count($datauserfwd)
         );
 
         \LogActivity::addToLog('Web Forwarder : Access Menu Dashboard', $this->micro);
@@ -182,6 +192,17 @@ class home extends Controller
         );
 
         return view('system::dashboard/listkyc', $data);
+    }
+
+    public function pagenewfwd()
+    {
+        $data = array(
+            'title' => 'Data List New User Forwarder',
+            'menu'  => 'listnewfwd',
+            'box'   => '',
+        );
+
+        return view('system::dashboard/listnewfwd', $data);
     }
 
     public function getpi(Request $request)
@@ -428,6 +449,33 @@ class home extends Controller
             ->make(true);
     }
 
+    public function listnewfwd()
+    {
+        $query = privilege::join('masterforwarder', 'masterforwarder.id', 'privilege.idforwarder')
+            ->where('nikfinance', Session::get('session')['user_nik'])
+            ->where('privilege.privilege_aktif', 'N')->where('masterforwarder.aktif', 'Y')
+            ->where('privilege.status', 'waiting')
+            ->get();
+        // dd($query);
+        return Datatables::of($query)
+            ->addIndexColumn()
+            ->addColumn('name', function ($query) {
+                return  $query->privilege_user_nik;
+            })
+            ->addColumn('namefwd', function ($query) {
+                return  $query->name;
+            })
+            ->addColumn('action', function ($query) {
+                $process    = '';
+
+                $process    = '<a href="#" data-id="' . $query->privilege_id . '" id="processnew"><i class="fa fa-angle-double-right text-green"></i></a>';
+
+                return $process;
+            })
+            // ->rawColumns(['listpo', 'action'])
+            ->make(true);
+    }
+
     public function formpo(Request $request)
     {
         // dd($request);
@@ -556,6 +604,19 @@ class home extends Controller
         );
 
         \LogActivity::addToLog('Web Forwarder :: Logistik : Process Approval KYC by Logistik', $this->micro);
+        return response()->json(['status' => 200, 'data' => $data, 'message' => 'Berhasil']);
+    }
+
+    public function formnewfwd(Request $request)
+    {
+        // dd($request);
+        $datanewuser = privilege::join('masterforwarder', 'masterforwarder.id', 'privilege.idforwarder')->where('masterforwarder.aktif', 'Y')->where('privilege_id', $request->id)->first();
+
+        $data = array(
+            'datanewuser' => $datanewuser
+        );
+
+        \LogActivity::addToLog('Web Forwarder :: Logistik : Process Approval New User Forwarder by Logistik', $this->micro);
         return response()->json(['status' => 200, 'data' => $data, 'message' => 'Berhasil']);
     }
 
@@ -822,6 +883,41 @@ class home extends Controller
                 'ket_tolak' => $request->tolak,
                 'updated_at' => date('Y-m-d H:i:s'),
                 'updated_by' => Session::get('session')['user_nik']
+            ]);
+
+            if ($statusupdate) {
+                \LogActivity::addToLog('Web Forwarder :: Logistik : Status KYC Rejected by Logistik', $this->micro);
+                $status = ['title' => 'Success', 'status' => 'success', 'message' => 'Data Successfully Saved'];
+                return response()->json($status, 200);
+            } else {
+                $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'Data Failed Saved'];
+                return response()->json($status, 200);
+            }
+        }
+    }
+
+    public function statusnewfwd(Request $request, $approval)
+    {
+        // dd($request, $approval);
+        if ($approval == 'disetujui') {
+            $statusupdate = privilege::where('privilege_id', $request->idfwd)->update([
+                'privilege_aktif' => 'Y',
+                'status' => 'confirm',
+                'updated_at' => date('Y-m-d H:i:s')
+            ]);
+            if ($statusupdate) {
+                \LogActivity::addToLog('Web Forwarder :: Logistik : Status KYC Confirmed by Logistik', $this->micro);
+                $status = ['title' => 'Success', 'status' => 'success', 'message' => 'Data Successfully Saved'];
+                return response()->json($status, 200);
+            } else {
+                $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'Data Failed Saved'];
+                return response()->json($status, 200);
+            }
+        } else {
+            $statusupdate = privilege::where('privilege_id', $request->idfwd)->update([
+                'status' => 'reject',
+                'ket_tolak' => $request->tolak,
+                'updated_at' => date('Y-m-d H:i:s'),
             ]);
 
             if ($statusupdate) {
