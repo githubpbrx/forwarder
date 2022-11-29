@@ -23,7 +23,7 @@
         <div class="modal-dialog modal-xl">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h4 class="modal-title"><span id="modaltitle">Data KYC</span></h4>
+                    <h4 class="modal-title"><span id="modaltitle">Data New User Forwarder</span></h4>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
