@@ -140,6 +140,8 @@ class login extends Controller
                         $this->choosemenu();
                         // Session::flash('alert', 'sweetAlert("success", "Successfully Login")');
                         Session::flash('toast', 'sweetAlert("success", "Successfully Login")');
+                        $priv = modelprivilege::where('privilege_user_nik', $nik)->where('privilege_aktif', 'Y')->first();
+                        Session::put('sessionfwd', $priv->leadforwarder);
                         return redirect('dashboard');
                     }
                 } else {
