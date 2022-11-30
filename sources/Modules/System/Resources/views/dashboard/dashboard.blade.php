@@ -13,6 +13,17 @@
                     <h3 class="text-center">DASHBOARD</h3>
                 </div>
                 @if ($datauser->privilege_group_access_id == '1')
+                    @if ($cocexp)
+                        <div class="alert alert-info" style="background-color: rgb(140, 232, 255)">
+                            <h5><i class="icon fas fa-info"></i> Notification For COC</h5>
+                            <p style="color:black">Your COC is Expired, Please Input Again!!
+                                <span class="badge badge-info">{{ $viewdays }}</span>
+                                <br>
+                                <a href="{{ route('validasicoc') }}"><button type="button"
+                                        class="btn btn-primary btn-xs">Update COC</button></a>
+                            </p>
+                        </div>
+                    @endif
                     @if ($totalpo >= 1)
                         <div class="alert alert-danger" style="background-color: rgb(253, 181, 181)">
                             {{-- <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button> --}}

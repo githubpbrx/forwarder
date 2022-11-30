@@ -2,6 +2,7 @@
 
 namespace Modules\System\Http\Controllers;
 
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
@@ -107,6 +108,7 @@ class login extends Controller
 
         //cek
         $ceklogin = modelprivilege::where('privilege_user_nik', $nik)->where('privilege_aktif', 'Y')->first();
+
         if ($ceklogin == null) {
             $this->loginChance();
             Session::flash('alert', 'sweetAlert("error", "Access Denied", "Chance : ' . $this->loginChance() . ' time")');
@@ -142,7 +144,16 @@ class login extends Controller
                         Session::flash('toast', 'sweetAlert("success", "Successfully Login")');
                         $priv = modelprivilege::where('privilege_user_nik', $nik)->where('privilege_aktif', 'Y')->first();
                         Session::put('sessionfwd', $priv->leadforwarder);
-                        return redirect('dashboard');
+
+                        $cocdate =  Carbon::parse($ceklogin->coc_date)->subDays(1)->addYear();
+                        $now =  Carbon::now();
+                        $bool = $now->gt($cocdate);
+                        if ($bool) {
+                            Session::flash('alert', 'sweetAlert("error", "COC is Expired, Please Input Again!!")');
+                            return redirect('validasicoc');
+                        } else {
+                            return redirect('dashboard');
+                        }
                     }
                 } else {
                     $this->loginChance();
@@ -518,6 +529,7 @@ class login extends Controller
     public function validasicoc()
     {
         $ses = Session::get('session');
+        // dd($ses);
         $user = $ses['user_nik'];
         $nama = $ses['user_nama'];
 

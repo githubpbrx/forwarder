@@ -2,6 +2,7 @@
 
 namespace Modules\System\Http\Controllers;
 
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use File;
@@ -120,30 +121,38 @@ class home extends Controller
             ->groupby('po.pideldate')
             ->get();
 
+        // untuk notifikasi forwarder add new user
         $datauserfwd = privilege::where('nikfinance', Session::get('session')['user_nik'])->where('privilege_aktif', 'N')->where('status', 'waiting')->get();
-        // dd(count($datauserfwd));
-        // $arrayfwd = [];
-        // foreach ($datauserfwd as $key => $vue) {
-        //     if ($vue->leadforwarder != 1) {
-        //         array_push($arrayfwd, $vue);
-        //     }
-        // }
-        // dd($arrayfwd);
+
+        // start untuk mengecek expired coc
+        $ceklogin = privilege::where('privilege_user_nik', Session::get('session')['user_nik'])->where('privilege_aktif', 'Y')->first();
+        $datecoc =  Carbon::parse($ceklogin->coc_date)->subDays(7)->addYear();
+        $now =  Carbon::now();
+        $bool = $now->gt($datecoc);
+
+        //menampilkan sisa hari untuk expired
+        $strnow = Carbon::now()->format('m/d/Y');
+        $strdb = Carbon::parse($ceklogin->coc_date)->subDays(0)->addYear()->format('m/d/Y');
+        $newDate = Carbon::createFromFormat('m/d/Y', $strdb);
+        $result = Carbon::createFromFormat('m/d/Y', $strnow)->diffForHumans($newDate);
+        // end expired coc
 
         $data = array(
-            'title'         => 'Dashboard',
-            'menu'          => 'dashboard',
-            'box'           => '',
-            'totalpo'       => count($datapo),
-            'totalconfirm'  => count($dataconfirm),
-            'totalshipment'  => count($cekshipment),
-            'totalreject'   => count($totalreject),
-            'datareject'    => $datareject,
-            'datarejecttabel'    => $datarejecttabel,
-            'totalapproval' => count($dataapproval),
-            'datauser'      => $datauser,
-            'totalkyc'      => count($userkyc),
-            'newuser'       => count($datauserfwd)
+            'title'           => 'Dashboard',
+            'menu'            => 'dashboard',
+            'box'             => '',
+            'totalpo'         => count($datapo),
+            'totalconfirm'    => count($dataconfirm),
+            'totalshipment'   => count($cekshipment),
+            'totalreject'     => count($totalreject),
+            'datareject'      => $datareject,
+            'datarejecttabel' => $datarejecttabel,
+            'totalapproval'   => count($dataapproval),
+            'datauser'        => $datauser,
+            'totalkyc'        => count($userkyc),
+            'newuser'         => count($datauserfwd),
+            'cocexp'          => $bool,
+            'viewdays'        => $result
         );
 
         \LogActivity::addToLog('Web Forwarder : Access Menu Dashboard', $this->micro);
