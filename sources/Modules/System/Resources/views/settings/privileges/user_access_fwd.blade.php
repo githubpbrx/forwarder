@@ -13,9 +13,6 @@
                         <th>#</th>
                         <th>Email</th>
                         <th>Name</th>
-                        <th>Name Finance</th>
-                        <th>NIK Finance</th>
-                        <th>Email Finance</th>
                         <th>Status</th>
                         <th>Action</th>
                     </tr>
@@ -59,37 +56,6 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label class="col-sm-12 control-label">Name Finance</label>
-                                    <div class="col-sm-12">
-                                        <input type="text" class="form-control" id="namefinance" name="namefinance"
-                                            autocomplete="off" readonly>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label class="col-sm-12 control-label">NIK Finance</label>
-                                    <div class="col-sm-12">
-                                        <input type="email" class="form-control" id="nikfinance" name="nikfinance"
-                                            autocomplete="off" readonly>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-12">
-                                <div class="form-group">
-                                    <label class="col-sm-12 control-label">Email Finance</label>
-                                    <div class="col-sm-12">
-                                        <input type="text" class="form-control" id="emailfinance" name="emailfinance"
-                                            autocomplete="off" readonly>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
                     </form>
                 </div>
                 <div class="modal-footer">
@@ -127,8 +93,8 @@
                                 <div class="form-group">
                                     <label class="col-sm-12 control-label">Name Forwarder</label>
                                     <div class="col-sm-12">
-                                        <input type="email" class="form-control" id="namefwdreject"
-                                            name="namefwdreject" autocomplete="off" readonly>
+                                        <input type="email" class="form-control" id="namefwdreject" name="namefwdreject"
+                                            autocomplete="off" readonly>
                                     </div>
                                 </div>
                             </div>
@@ -181,18 +147,6 @@
                 {
                     data: 'privilege_user_name',
                     name: 'privilege_user_name'
-                },
-                {
-                    data: 'nama_finance',
-                    name: 'nama_finance'
-                },
-                {
-                    data: 'nik_finance',
-                    name: 'nik_finance'
-                },
-                {
-                    data: 'email_finance',
-                    name: 'email_finance'
                 },
                 {
                     data: 'status',

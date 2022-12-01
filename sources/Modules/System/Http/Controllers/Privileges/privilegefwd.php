@@ -60,27 +60,6 @@ class privilegefwd extends Controller
             ->addColumn('privilege_user_name', function ($q) {
                 return  $q->privilege_user_name;
             })
-            ->addColumn('nama_finance', function ($q) {
-                if ($q->namafinance) {
-                    return $q->namafinance;
-                } else {
-                    return '<span class="badge bg-info">Not Set</span>';
-                }
-            })
-            ->addColumn('nik_finance', function ($q) {
-                if ($q->nikfinance) {
-                    return $q->nikfinance;
-                } else {
-                    return '<span class="badge bg-info">Not Set</span>';
-                }
-            })
-            ->addColumn('email_finance', function ($q) {
-                if ($q->emailfinance) {
-                    return $q->emailfinance;
-                } else {
-                    return '<span class="badge bg-info">Not Set</span>';
-                }
-            })
             ->addColumn('status', function ($q) {
                 if ($q->status == 'confirm') {
                     return '<span class="badge bg-success">Confirmed</span>';
@@ -91,14 +70,6 @@ class privilegefwd extends Controller
                 }
             })
             ->addColumn('action', function ($q) {
-                // $process    = '';
-
-                // $process    = '<a href="' . url("privilege/user_access/update/" . Crypt::encrypt($q->privilege_id)) . '"><i class="fas fa-edit text-orange"></i></a>';
-
-                // $process    = '<a href="#"><i class="fas fa-trash text-red"></i></a>';
-
-                // return $process;
-
                 $button = '';
 
                 if ($q->status == 'reject') {
