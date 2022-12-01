@@ -188,7 +188,7 @@ class WebsupplierServices extends Controller
         if ($lineid == "") {
             modellogproses::insert(['typelog' => 'prosesupdatepi', 'activity' => 'FAILED alert => The Items your send cannot be empty', 'status' => false, 'datetime' => date('Y-m-d H:i:s'), 'from' => 'api_updatepi', 'created_at' => date('Y-m-d H:i:s')]);
             modellogproses::insert(['typelog' => 'prosesupdatepi', 'activity' => '=== END PROSES => ROLLBACK ===', 'status' => false, 'datetime' => date('Y-m-d H:i:s'), 'from' => 'api_updatepi', 'created_at' => date('Y-m-d H:i:s')]);
-            $failed['message'] = "The Items your send cannot be empty";
+            $failed['message'] = "The Line Id your send cannot be empty";
             $failed['success'] = false;
             $failed['title'] = "Warning!";
             $failed['type'] = "warning";
