@@ -232,8 +232,10 @@ class WebsupplierServices extends Controller
 
             //for notif email
             // $getemail = privilege::where('idforwarder', $insert)->where('privilege_aktif', 'Y')->first();
-            // $url = 'pbrx.web.id/forwarder';
-            // WebsupplierServices::sendEmail($getemail->privilege_user_nik, $getemail->privilege_user_name, $url, "Notification Forwarder Get PO");
+            // if ($getemail) {
+            //     $url = 'pbrx.web.id/forwarder';
+            //     WebsupplierServices::sendEmail($getemail->privilege_user_nik, $getemail->privilege_user_name, $url, "Notification Forwarder Get PO");
+            // }
 
             modellogproses::insert(['typelog' => 'prosesupdatepi', 'activity' => '=== SUCCESS UPDATE PI NUMBER ===', 'status' => true, 'datetime' => date('Y-m-d H:i:s'), 'from' => 'api_updatepi', 'created_at' => date('Y-m-d H:i:s')]);
             $failed['message'] = "Done";
