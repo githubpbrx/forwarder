@@ -218,7 +218,7 @@ class WebsupplierServices extends Controller
 
         $update = po::where('pono', $pono)->where('line_id', $lineid)->update(['pino' => $pino, 'pirecdate' => $pirecdate, 'pideldate' => $pideldate, 'updated_at' => date('Y-m-d H:i:s')]);
         if ($update) {
-            $cekforwarder = forward::where('name', $forwarder)->first();
+            $cekforwarder = forward::where('name', $forwarder)->where('aktif', 'Y')->first();
             if ($cekforwarder == null) {
                 forward::insert(['name' => $forwarder, 'aktif' => 'Y', 'created_at' => date('Y-m-d H:i:s')]);
                 $forwarderku = forward::latest('id')->first();
@@ -231,9 +231,9 @@ class WebsupplierServices extends Controller
             $insertdatafwd = fwd::insert(['idpo' => $getqtypo->id, 'idmasterfwd' => $insert, 'po_nomor' => $getqtypo->pono, 'qty_allocation' => $getqtypo->qtypo, 'statusforwarder' => 'full_allocated', 'aktif' => 'Y', 'created_at' => date('Y-m-d H:i:s')]);
 
             //for notif email
-            $getemail = privilege::where('idforwarder', $insert)->where('privilege_aktif', 'Y')->first();
-            $url = 'pbrx.web.id/forwarder';
-            WebsupplierServices::sendEmail($getemail->privilege_user_nik, $getemail->privilege_user_name, $url, "Notification Forwarder Get PO");
+            // $getemail = privilege::where('idforwarder', $insert)->where('privilege_aktif', 'Y')->first();
+            // $url = 'pbrx.web.id/forwarder';
+            // WebsupplierServices::sendEmail($getemail->privilege_user_nik, $getemail->privilege_user_name, $url, "Notification Forwarder Get PO");
 
             modellogproses::insert(['typelog' => 'prosesupdatepi', 'activity' => '=== SUCCESS UPDATE PI NUMBER ===', 'status' => true, 'datetime' => date('Y-m-d H:i:s'), 'from' => 'api_updatepi', 'created_at' => date('Y-m-d H:i:s')]);
             $failed['message'] = "Done";
