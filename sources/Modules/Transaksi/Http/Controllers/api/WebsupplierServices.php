@@ -185,6 +185,7 @@ class WebsupplierServices extends Controller
             $failed['type'] = "warning";
             return response()->json($failed, Response::HTTP_UNPROCESSABLE_ENTITY);
         }
+
         if ($lineid == "") {
             modellogproses::insert(['typelog' => 'prosesupdatepi', 'activity' => 'FAILED alert => The Items your send cannot be empty', 'status' => false, 'datetime' => date('Y-m-d H:i:s'), 'from' => 'api_updatepi', 'created_at' => date('Y-m-d H:i:s')]);
             modellogproses::insert(['typelog' => 'prosesupdatepi', 'activity' => '=== END PROSES => ROLLBACK ===', 'status' => false, 'datetime' => date('Y-m-d H:i:s'), 'from' => 'api_updatepi', 'created_at' => date('Y-m-d H:i:s')]);
@@ -204,6 +205,7 @@ class WebsupplierServices extends Controller
             $failed['type'] = "warning";
             return response()->json($failed, Response::HTTP_UNPROCESSABLE_ENTITY);
         }
+
         if ($pirecdate == "" || $pideldate == "") {
             modellogproses::insert(['typelog' => 'prosesupdatepi', 'activity' => 'FAILED alert => The PI Rec Date/PI Delivery Date your send cannot be empty', 'status' => false, 'datetime' => date('Y-m-d H:i:s'), 'from' => 'api_updatepi', 'created_at' => date('Y-m-d H:i:s')]);
             modellogproses::insert(['typelog' => 'prosesupdatepi', 'activity' => '=== END PROSES => ROLLBACK ===', 'status' => false, 'datetime' => date('Y-m-d H:i:s'), 'from' => 'api_updatepi', 'created_at' => date('Y-m-d H:i:s')]);
@@ -214,7 +216,7 @@ class WebsupplierServices extends Controller
             return response()->json($failed, Response::HTTP_UNPROCESSABLE_ENTITY);
         }
 
-        $update = po::where('pono', $pono)->where('line_id', $lineid)->update(['pino' => $pino, 'pirecdate' => $pirecdate, 'pideldate' => $pideldate]);
+        $update = po::where('pono', $pono)->where('line_id', $lineid)->update(['pino' => $pino, 'pirecdate' => $pirecdate, 'pideldate' => $pideldate, 'updated_at' => date('Y-m-d H:i:s')]);
         if ($update) {
             $cekforwarder = forward::where('name', $forwarder)->first();
             if ($cekforwarder == null) {
@@ -230,7 +232,7 @@ class WebsupplierServices extends Controller
 
             //for notif email
             $getemail = privilege::where('idforwarder', $insert)->where('privilege_aktif', 'Y')->first();
-            $url = '192.168.100.109/forwarder';
+            $url = 'pbrx.web.id/forwarder';
             WebsupplierServices::sendEmail($getemail->privilege_user_nik, $getemail->privilege_user_name, $url, "Notification Forwarder Get PO");
 
             modellogproses::insert(['typelog' => 'prosesupdatepi', 'activity' => '=== SUCCESS UPDATE PI NUMBER ===', 'status' => true, 'datetime' => date('Y-m-d H:i:s'), 'from' => 'api_updatepi', 'created_at' => date('Y-m-d H:i:s')]);
