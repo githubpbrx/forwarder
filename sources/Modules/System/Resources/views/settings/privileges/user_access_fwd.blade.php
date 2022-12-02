@@ -167,7 +167,7 @@
 
         $('#add_user').click(function(e) {
             let data = oTable.data();
-
+            $('#emailuser').val('');
             $('#namefwd').val(data[0]['privilege_user_name']);
             $('#namefinance').val(data[0]['nama_finance']);
             $('#nikfinance').val(data[0]['nik_finance']);
