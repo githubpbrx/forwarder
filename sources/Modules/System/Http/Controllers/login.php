@@ -666,7 +666,7 @@ class login extends Controller
 
     public function validasikycaction(Request $request)
     {
-
+        // dd($request);
         $datafwd = masterforwarder::where('name', Session::get('session')['user_nama'])->where('aktif', 'Y')->first();
         // dd($datafwd);
 
@@ -677,20 +677,35 @@ class login extends Controller
 
         // dd($request);
         if ($file == '' || $file == null) {
-            $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'Nomor BL is required, please input Nomor BL'];
+            $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'File KYC is required, please input File KYC'];
             return response()->json($status, 200);
         }
 
-        $save1 = modelkyc::insert([
-            'idmasterfwd' => $datafwd->id,
-            'name_kyc'   => $datafwd->name,
-            'nik_kyc'  => Session::get('session')['user_nik'],
-            'file_kyc'    => $fileName,
-            'status'    => 'waiting',
-            'aktif'     => 'Y',
-            'created_at' => date('Y-m-d H:i:s'),
-            'created_by' => Session::get('session')['user_nik']
-        ]);
+        $ceknama = modelkyc::where('name_kyc', $request->nama)->where('aktif', 'Y')->first();
+        // dd($ceknama);
+        if ($ceknama == null) {
+            $save1 = modelkyc::insert([
+                'idmasterfwd' => $datafwd->id,
+                'name_kyc'   => $datafwd->name,
+                'nik_kyc'  => Session::get('session')['user_nik'],
+                'file_kyc'    => $fileName,
+                'status'    => 'waiting',
+                'aktif'     => 'Y',
+                'created_at' => date('Y-m-d H:i:s'),
+                'created_by' => Session::get('session')['user_nik']
+            ]);
+        } else {
+            $save1 = modelkyc::where('id_kyc', $ceknama->id_kyc)->update([
+                'idmasterfwd' => $datafwd->id,
+                'name_kyc'   => $datafwd->name,
+                'nik_kyc'  => Session::get('session')['user_nik'],
+                'file_kyc'    => $fileName,
+                'status'    => 'waiting',
+                'aktif'     => 'Y',
+                'created_at' => date('Y-m-d H:i:s'),
+                'created_by' => Session::get('session')['user_nik']
+            ]);
+        }
 
         if ($save1) {
             \LogActivity::addToLog('Web Forwarde :: Forwarder : Insert Data Validation KYC ', $this->micro);

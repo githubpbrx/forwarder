@@ -43,6 +43,12 @@
                                 </h3>
                                 {{-- <br>
                                 <a href="#" id="sendemail" class="btn btn-Info">Send Email to Finance</a> --}}
+                                <hr>
+                                <div class="form-group">
+                                    <label>Re-Upload KYC</label>
+                                    <input id="filekyc" name="filekyc" type="file" class="form-control "
+                                        placeholder="Enter File..." required>
+                                </div>
                             </center>
                         </div>
                     @else
@@ -67,7 +73,7 @@
                     <div class="float-left">
                         <a href="{{ url('logout') }}"><i class="btn btn-danger float-left">Exit</i></a>
                     </div>
-                    @if ($statuskyc == '0')
+                    @if ($statuskyc != '2')
                         <div class="float-right">
                             <button id="upload" type="button" class="btn btn-success float-right">Upload</button>
                         </div>
