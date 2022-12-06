@@ -40,9 +40,9 @@ class ReportPo extends Controller
 
         if ($request->ajax()) {
             if ($request->po == null) {
-                $data = modelpo::get();
+                $data = modelpo::select('id', 'pono', 'matcontents', 'statusconfirm')->get();
             } else {
-                $data = modelpo::where('pono', $request->po)->get();
+                $data = modelpo::where('pono', $request->po)->select('id', 'pono', 'matcontents', 'statusconfirm')->get();
             }
 
             // dd($data);
