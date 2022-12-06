@@ -35,7 +35,7 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label class="col-sm-12 control-label">Name</label>
+                                    <label class="col-sm-12 control-label">Name Forwarder</label>
                                     <div class="col-sm-12">
                                         <input type="text" class="form-control" id="namekyc" name="namekyc" readonly>
                                     </div>
@@ -289,23 +289,6 @@
                     });
             }
 
-            // $('.btndownload').click(function(e) {
-            //     console.log('klik :>> ', 'klik');
-
-            //     $.ajax({
-            //         type: "post",
-            //         url: "{!! route('downloadkyc') !!}",
-            //         data: {
-            //             _token: $('meta[name=csrf-token]').attr('content'),
-            //             filekyc: datafile
-            //         },
-            //         dataType: "json",
-            //         success: function(response) {
-            //             return;
-            //         }
-            //     });
-            // });
-
             function notifalert(params) {
                 Swal.fire({
                     title: 'Information',
@@ -314,12 +297,10 @@
                 });
                 return;
             }
+
             $('#kycdownload').click(function(e) {
-                // e.preventDefault();
                 var base = "{!! url('sources/storage/app') !!}" + "/" + datafile;
                 $('#kycdownload').attr('href', base);
-
-
             });
 
         });

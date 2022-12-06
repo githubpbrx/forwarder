@@ -103,15 +103,16 @@ class home extends Controller
             ->groupby('po.pono')
             ->get();
         // dd($dataconfirm, $cekshipment);
+        // End For Forwarder
 
         $userkyc = privilege::join('kyc', 'kyc.idmasterfwd', 'privilege.idforwarder')
-            ->where('nikfinance', Session::get('session')['user_nik'])
+            ->where('privilege.nikfinance', Session::get('session')['user_nik'])
+            ->where('leadforwarder', '1')
             ->where('kyc.aktif', 'Y')
             ->where('kyc.status', 'waiting')
             ->where('privilege.privilege_aktif', 'Y')
             ->get();
         // dd($userkyc);
-        // End For Forwarder
 
         $dataapproval = formpo::join('privilege', 'privilege.idforwarder', 'formpo.idmasterfwd')
             ->join('po', 'po.id', 'formpo.idpo')
@@ -430,7 +431,8 @@ class home extends Controller
     {
         // $query = coc::where('status', '=', 'waiting')->where('aktif', 'Y')->get();
         $query = privilege::join('kyc', 'kyc.idmasterfwd', 'privilege.idforwarder')
-            ->where('nikfinance', Session::get('session')['user_nik'])
+            ->where('privilege.nikfinance', Session::get('session')['user_nik'])
+            ->where('privilege.leadforwarder', '1')
             ->where('kyc.aktif', 'Y')
             ->where('kyc.status', 'waiting')
             ->where('privilege.privilege_aktif', 'Y')
@@ -606,7 +608,7 @@ class home extends Controller
     public function formkyc(Request $request)
     {
         // dd($request);
-        $datakyc = kyc::where('idmasterfwd', $request->id)->first();
+        $datakyc = kyc::where('idmasterfwd', $request->id)->where('aktif', 'Y')->first();
 
         $data = array(
             'datakyc' => $datakyc
