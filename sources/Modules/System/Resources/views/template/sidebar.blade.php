@@ -95,16 +95,16 @@
                                 <i class="fas fa-angle-left right"></i>
                             </p>
                         </a>
-                        {{-- <ul class="nav nav-treeview">
+                        <ul class="nav nav-treeview">
                             @if (RoleAccess::whereMenu(6) > 0)
                                 <li class="nav-item">
-                                    <a href="{{ route('allocationforwarder') }}" class="nav-link">
+                                    <a href="{{ route('data_allocation') }}" class="nav-link">
                                         <i class="fas fa-share nav-icon"></i>
-                                        <p>Allocation Forwarder</p>
+                                        <p>Data Allocation</p>
                                     </a>
                                 </li>
                             @endif
-                        </ul> --}}
+                        </ul>
                         <ul class="nav nav-treeview">
                             @if (RoleAccess::whereMenu(7) > 0)
                                 <li class="nav-item">
