@@ -1,7 +1,17 @@
 @extends('system::template/master')
 @section('title', $title)
 @section('link_href')
+    <style>
+        .blink_me {
+            animation: blinker 1s linear infinite;
+        }
 
+        @keyframes blinker {
+            20% {
+                opacity: 0.5;
+            }
+        }
+    </style>
 @endsection
 
 @section('content')
@@ -32,6 +42,18 @@
                                 <span class="badge badge-info">{{ $totalpo }}</span>
                                 <br>
                                 <a href="{{ route('page_po') }}"><button type="button"
+                                        class="btn btn-primary btn-xs">Process</button></a>
+                            </p>
+                        </div>
+                    @endif
+                    @if ($totaltimeout >= 1)
+                        <div class="alert alert-danger" style="background-color: rgb(253, 181, 181)">
+                            {{-- <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button> --}}
+                            <h5><i class="icon fas fa-info"></i> Notification</h5>
+                            <p style="color:black;">Your PO will expire soon, please process it immediately!
+                                <span class="badge badge-info">{{ $totaltimeout }}</span>
+                                <br>
+                                <a href="{{ route('page_potimeout') }}"><button type="button"
                                         class="btn btn-primary btn-xs">Process</button></a>
                             </p>
                         </div>
