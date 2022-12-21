@@ -258,15 +258,19 @@ class ProcessShipment extends Controller
         $fileNamebl = time() . '_' . $originalNamebl;
         Storage::disk('local')->put($fileNamebl, file_get_contents($request->filebl));
 
-        $fileinv = $request->file('fileinv');
-        $originalNameinv = str_replace(' ', '_', $fileinv->getClientOriginalName());
-        $fileNameinv = time() . '_' . $originalNameinv;
-        Storage::disk('local')->put($fileNameinv, file_get_contents($request->fileinv));
+        if ($request->file('fileinv')) {
+            $fileinv = $request->file('fileinv');
+            $originalNameinv = str_replace(' ', '_', $fileinv->getClientOriginalName());
+            $fileNameinv = time() . '_' . $originalNameinv;
+            Storage::disk('local')->put($fileNameinv, file_get_contents($request->fileinv));
+        }
 
-        $filepack = $request->file('filepack');
-        $originalNamepack = str_replace(' ', '_', $filepack->getClientOriginalName());
-        $fileNamepack = time() . '_' . $originalNamepack;
-        Storage::disk('local')->put($fileNamepack, file_get_contents($request->filepack));
+        if ($request->file('filepack')) {
+            $filepack = $request->file('filepack');
+            $originalNamepack = str_replace(' ', '_', $filepack->getClientOriginalName());
+            $fileNamepack = time() . '_' . $originalNamepack;
+            Storage::disk('local')->put($fileNamepack, file_get_contents($request->filepack));
+        }
 
         $cekdata = modelformshipment::where('noinv', $request->noinv)->where('aktif', 'Y')->first();
         if ($cekdata != null) {
@@ -277,18 +281,6 @@ class ProcessShipment extends Controller
 
         foreach ($decode as $key => $val) {
             if ($filebl == '' || $filebl == null) {
-                DB::rollback();
-                $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'File BL is required, please input File BL'];
-                return response()->json($status, 200);
-            }
-
-            if ($fileinv == '' || $fileinv == null) {
-                DB::rollback();
-                $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'File BL is required, please input File BL'];
-                return response()->json($status, 200);
-            }
-
-            if ($filepack == '' || $filepack == null) {
                 DB::rollback();
                 $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'File BL is required, please input File BL'];
                 return response()->json($status, 200);
@@ -306,12 +298,6 @@ class ProcessShipment extends Controller
                 return response()->json($status, 200);
             }
 
-            if ($fileinv == '' || $fileinv == null) {
-                DB::rollback();
-                $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'Invoice is required, please input Invoice'];
-                return response()->json($status, 200);
-            }
-
             if ($request->etdfix == '' || $request->etdfix == null) {
                 DB::rollback();
                 $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'ETD Fix is required, please input ETD Fix'];
@@ -323,8 +309,6 @@ class ProcessShipment extends Controller
                 $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'ETA Fix is required, please input ETA Fix'];
                 return response()->json($status, 200);
             }
-
-
 
             $cekpo = modelpo::where('id', $val->idpo)->first();
             $rep = str_replace('.', '', $cekpo->qtypo);
@@ -356,8 +340,8 @@ class ProcessShipment extends Controller
                 'etdfix'           => $request->etdfix,
                 'etafix'           => $request->etafix,
                 'file_bl'          => $fileNamebl,
-                'file_invoice'     => $fileNameinv,
-                'file_packinglist' => $fileNamepack,
+                'file_invoice'     => ($request->file('fileinv') == null) ? null : $fileNameinv,
+                'file_packinglist' => ($request->file('filepack') == null) ? null : $fileNamepack,
                 'nomor_bl'         => strtoupper($request->nomorbl),
                 'vessel'           => strtoupper($request->vessel),
                 'statusshipment'   => $status,

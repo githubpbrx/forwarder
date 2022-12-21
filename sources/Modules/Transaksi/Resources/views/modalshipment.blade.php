@@ -569,16 +569,12 @@
             notifalert('Weight');
         } else if (filebl == null || filebl == '') {
             notifalert('File BL');
-        } else if (nomorbl == null || nomorbl == '') {
-            notifalert('BL Number');
         } else if (noinv == null || noinv == '') {
             notifalert('Invoice');
+        } else if (nomorbl == null || nomorbl == '') {
+            notifalert('BL Number');
         } else if (vessel == null || vessel == '') {
             notifalert('Vessel');
-        } else if (fileinv == null || fileinv == '') {
-            notifalert('File Invoice');
-        } else if (filepack == null || filepack == '') {
-            notifalert('File Packing List');
         } else if (etdfix == null || etdfix == '') {
             notifalert('ETD Fix');
         } else if (etafix == null || etafix == '') {
