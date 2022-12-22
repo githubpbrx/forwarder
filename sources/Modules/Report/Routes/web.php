@@ -40,4 +40,13 @@ Route::prefix('report')->group(function () {
         Route::get('/getexcelforwarder/{id}', 'ReportForwarder@excelforwarder')->name('report_excelforwarder');
         Route::get('/getexcelforwarderall/', 'ReportForwarder@excelforwarderall')->name('report_excelforwarderall');
     });
+
+    Route::group(['prefix' => 'allocation'], function () {
+        Route::get('/', 'HistoryAllocation@index')->name('historyallocation');
+        Route::get('/datatables', 'HistoryAllocation@datatable');
+        Route::post('/getpo/', 'HistoryAllocation@getpo')->name('report_getpo');
+        Route::post('/getdetailforwarder/', 'HistoryAllocation@detailforwarder')->name('report_detailforwarder');
+        Route::get('/getexcelforwarder/{id}', 'HistoryAllocation@excelforwarder')->name('report_excelforwarder');
+        Route::get('/getexcelforwarderall/', 'HistoryAllocation@excelforwarderall')->name('report_excelforwarderall');
+    });
 });
