@@ -186,6 +186,15 @@
                         </a>
                     </li>
                 @endif
+
+                @if (RoleAccess::whereMenu(16) > 0)
+                    <li class="nav-item">
+                        <a href="{{ route('historyallocation') }}" class="nav-link">
+                            <i class="fa fa-history nav-icon"></i>
+                            <p>History List PO</p>
+                        </a>
+                    </li>
+                @endif
                 {{-- end for forwarder --}}
 
                 @if ($menu_session != '')
