@@ -15,14 +15,15 @@ Route::prefix('transaksi')->group(function () {
     Route::get('/', 'TransaksiController@index');
 
     Route::group(['prefix' => 'allocation'], function () {
-        Route::get('/', 'AllocationForwarder@index')->name('allocationforwarder');
-        Route::get('search', 'AllocationForwarder@create');
-        Route::post('getsupplier/', 'AllocationForwarder@getsupplier')->name('allocation_getsupplier');
+        Route::get('/', 'DataAllocation@index')->name('data_allocation');
+        Route::get('datatables', 'DataAllocation@datatables');
+        Route::get('cancelallocation/{id}', 'DataAllocation@cancelallocation')->name('allocation_cancelallocation');
 
-        // Route::get('getdetail/{id}', 'AllocationForwarder@show_detail')->name('detail_allocation');
-        Route::post('/getdetail', 'AllocationForwarder@show_detail')->name('detail_allocation');
-        Route::post('detailaction/', 'AllocationForwarder@store_detail')->name('detailaction');
-        Route::post('getfwd/', 'AllocationForwarder@getforwarder')->name('get_forwarder');
+        Route::post('getsupplier/', 'DataAllocation@getsupplier')->name('allocation_getsupplier');
+        Route::post('/getdetail', 'DataAllocation@show_detail')->name('allocation_detail');
+        Route::post('detailaction/', 'DataAllocation@store_detail')->name('detailaction');
+        Route::post('getfwd/', 'DataAllocation@getforwarder')->name('get_forwarder');
+        Route::post('movefwd/', 'DataAllocation@movefwd')->name('allocation_movefwd');
     });
 
     Route::group(['prefix' => 'approval'], function () {

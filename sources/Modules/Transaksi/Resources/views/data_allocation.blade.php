@@ -12,7 +12,7 @@
                 <div class="row">
                     <div class="col-md-12">
                         <div id="fullscreen-container" class="card-body" style="overflow-y: auto;">
-                            <form action="#" class="form-horizontal" enctype="multipart/form-data" method="post">
+                            {{-- <form action="#" class="form-horizontal" enctype="multipart/form-data" method="post">
                                 {{ csrf_field() }}
                                 <div class="row">
                                     <div class="col-md-3">
@@ -61,7 +61,7 @@
                                     </div>
                                 </div>
 
-                            </form>
+                            </form> --}}
 
                             <div class="table-responsive" style="padding-top: 20px;">
                                 <table id="dataTables" class="table table-bordered table-striped table-hover"
@@ -72,7 +72,13 @@
                                                 <center>PO#</center>
                                             </th>
                                             <th>
-                                                <center>Date</center>
+                                                <center>Forwarder</center>
+                                            </th>
+                                            <th>
+                                                <center>Status</center>
+                                            </th>
+                                            <th>
+                                                <center>Move To</center>
                                             </th>
                                             <th>
                                                 <center>Action</center>
@@ -90,12 +96,12 @@
         </div>
     </div>
 
-    <!-- Modal Detail Allocation -->
-    <div class="modal fade" id="modal-detail">
-        <div class="modal-dialog modal-dialog-centered" style="max-width: 80%;">
+    <!-- Modal Move Forwarder -->
+    <div class="modal fade" id="modal-movefwd">
+        <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h4 class="modal-title"><span id="modaltitle"></span> Data Detail Allocation Forwarder</h4>
+                    <h4 class="modal-title"><span id="modaltitle"></span> Data Allocation Move Forwarder</h4>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -103,77 +109,13 @@
                 <div class="modal-body" style="font-size: 10pt">
                     <form class="form-horizontal" id="form-detail">
                         {{ csrf_field() }}
-                        <div class="row">
-                            <div class="col-md-4">
-                                <div class="form-group">
-                                    <label class="col-sm-12 control-label">PO</label>
-                                    <div class="col-sm-12">
-                                        <input type="text" class="form-control" value="#" id="po"
-                                            name="po" readonly>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-
-                                <div class="form-group">
-                                    <label class="col-sm-8 control-label">Quantity PO</label>
-                                    <div class="col-sm-12">
-                                        <input type="text" class="form-control" value="#" id="qtypo"
-                                            name="qtypo" readonly>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-
-                                <div class="form-group">
-                                    <label class="col-sm-12 control-label">Supplier</label>
-                                    <div class="col-sm-12">
-                                        <input type="text" class="form-control" value="#" id="detailsup"
-                                            name="detailsup" readonly>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <hr
-                            style="width: 100%; color: rgb(192, 192, 192); height: 0.5px; background-color:rgb(192, 192, 192);" />
+                        <input type="hidden" id="idmasterfwd">
                         <div class="row">
                             <div class="col-md-12">
-                                <div id="detailhtml"></div>
-                            </div>
-                            {{-- <div class="col-md-4">
-                                <div id="detailstyle"></div>
-                            </div> --}}
-                        </div>
-                        <hr
-                            style="width: 100%; color: rgb(192, 192, 192); height: 0.5px; background-color:rgb(192, 192, 192);" />
-
-                        {{-- <label class="col-sm-12 control-label">Please input allocation</label>
-                        <hr> --}}
-                        <div class="row">
-                            {{-- <div class="col-md-6">
-                                <div class="form-group">
-                                    <label class="col-sm-12 control-label">Quantity Allocation</label>
-                                    <div class="col-sm-12">
-                                        <div class="row">
-                                            <div class="col-sm-6">
-                                                <input type="checkbox" class="" name="" id="">
-                                            </div>
-                                            <div class="col-sm-6">
-                                                <input type="text" class="form-control" id="qty_allocation"
-                                                    name="qty_allocation" autocomplete="off">
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-sm-12">
-                                        <div id="qtyall"></div>
-                                    </div>
-                                </div>
-                            </div> --}}
-                            <div class="col-md-6">
                                 <div class="form-group">
                                     <label class="col-sm-12 control-label">Forwarder</label>
                                     <div class="col-sm-12">
-                                        <select class="select2" style="width: 100%;" name="forwarder" id="forwarder">
+                                        <select class="select2" style="width: 100%;" name="datafwd" id="datafwd">
                                             <option value=""></option>
                                         </select>
                                     </div>
@@ -184,7 +126,44 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-info" id="btnsubmit">Submit</button>
+                    <button type="button" class="btn btn-info" id="btnsubmit">Move</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Detail Allocation -->
+    <div class="modal fade" id="modal-detailallocation">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title"><span id="modaltitle"></span> Data Detail Allocation</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body" style="font-size: 10pt">
+                    <form class="form-horizontal" id="form-detail">
+                        {{ csrf_field() }}
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label class="col-sm-12 control-label">Forwarder</label>
+                                    <div class="col-sm-12">
+                                        <input type="text" class="form-control" id="namafwddetail" readonly>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div id="datapo"></div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Cancel</button>
                 </div>
             </div>
         </div>
@@ -205,21 +184,29 @@
                 processing: true,
                 serverSide: true,
                 ajax: {
-                    url: "{{ url('transaksi/allocation/search') }}",
-                    data: function(d) {
-                        d.supplier = $('#supplier').val(),
-                            d.tanggal1 = $('#tanggal1').val(),
-                            d.tanggal2 = $('#tanggal2').val(),
-                            d.status = $('#status').val()
-                    }
+                    url: "{{ url('transaksi/allocation/datatables') }}",
+                    // data: function(d) {
+                    //     d.supplier = $('#supplier').val(),
+                    //         d.tanggal1 = $('#tanggal1').val(),
+                    //         d.tanggal2 = $('#tanggal2').val(),
+                    //         d.status = $('#status').val()
+                    // }
                 },
                 columns: [{
                         data: 'poku',
                         name: 'poku'
                     },
                     {
-                        data: 'date',
-                        name: 'date'
+                        data: 'namafwd',
+                        name: 'namafwd'
+                    },
+                    {
+                        data: 'status',
+                        name: 'status'
+                    },
+                    {
+                        data: 'moveto',
+                        name: 'moveto'
                     },
                     {
                         data: 'action',
@@ -229,8 +216,53 @@
             });
 
             // $(".searchEmail").keyup(function() {
-            $('#searchdata').click(function(e) {
-                table.draw();
+            // $('#searchdata').click(function(e) {
+            //     table.draw();
+            // });
+
+            $('#dataTables').on('draw.dt', function() {
+                $('[data-toggle="tooltip"]').tooltip();
+            });
+
+            $('body').on('click', '#cancelbtn', function() {
+                let idku = $(this).attr('data-id');
+                let url = '{!! route('allocation_cancelallocation', ['params']) !!}';
+                url = url.replace('params', idku);
+                console.log('idku :>> ', url);
+                Swal.fire({
+                    title: 'Validation cancel data!',
+                    text: 'Are you sure you want to cancel the data  ?',
+                    type: 'question',
+                    showConfirmButton: true,
+                    showCancelButton: true,
+                }).then((result) => {
+                    if (result.value) {
+                        $.ajax({
+                            type: "GET",
+                            url: url,
+                            dataType: "JSON",
+                            success: function(response) {
+                                Swal.fire({
+                                    title: response.title,
+                                    text: response.message,
+                                    type: (response.status != 'error') ?
+                                        'success' : 'error'
+                                }).then(() => {
+                                    $('#dataTables').DataTable().ajax.reload();
+                                })
+                            },
+                            error: function(xhr, status, error) {
+                                Swal.fire({
+                                    title: 'Unsuccessfully Saved Data',
+                                    text: 'Check Your Data',
+                                    type: 'error'
+                                });
+                                return;
+                            }
+                        });
+                        return false;
+                    }
+                })
             });
 
             $('#supplier').select2({
@@ -264,18 +296,24 @@
                 }
             });
 
-            var qtypoku;
-            var poid;
-            var ponumb;
-            var length;
+            $('body').on('click', '#editbtn', function() {
+                $('#modal-movefwd').modal({
+                    show: true,
+                    backdrop: 'static'
+                });
+                let idku = $(this).attr('data-id');
+                console.log('idku :>> ', idku);
+                $('#idmasterfwd').val(idku);
+            });
+
             $('body').on('click', '#detailbtn', function() {
-                $('#modal-detail').modal({
+                $('#modal-detailallocation').modal({
                     show: true,
                     backdrop: 'static'
                 });
                 let idku = $(this).attr('data-id');
                 $.ajax({
-                    url: "{!! route('detail_allocation') !!}",
+                    url: "{!! route('allocation_detail') !!}",
                     type: 'POST',
                     dataType: 'json',
                     data: {
@@ -284,61 +322,35 @@
                     },
                 }).done(function(data) {
                     console.log('data :>> ', data.data);
-                    let dataku = data.data;
-                    let poku = dataku.datapo;
-                    // let fwdku = dataku.datafwd;
-                    // console.log('fwdku :>> ', fwdku);
-                    console.log('poku :>> ', poku[0].supplier.nama);
-                    $('#detailhtml').empty();
-                    $('#detailstyle').empty();
-                    $('#forwarder').empty();
+                    let dataku = data.data.datadetail;
 
-                    var tot = 0;
-                    length = poku.length;
+                    $('#datapo').empty();
+
+                    // var tot = 0;
+                    // length = poku.length;
                     html =
-                        '<table border="0" style="width:100%"><tr><th style="text-align:center"><input type="checkbox" class="checkall" style="height:18px;width:18px"></th><th>Material</th><th>Style</th><th>Qty Item</th><th>Remaining Qty</th><th>Qty Allocation</th></tr>';
-                    for (let index = 0; index < poku.length; index++) {
-                        let nullku;
+                        '<table border="1" style="width:100%"><tr><th>PO Number</th></tr>';
+                    for (let index = 0; index < dataku.length; index++) {
+                        // let nullku;
 
-                        if (poku[index].qtyall == null) {
-                            nullku = poku[index].qtypo;
-                        } else if (poku[index].qtyall == poku[index].qtypo) {
-                            nullku = '0';
-                        } else {
-                            nullku = poku[index].qtypo - poku[index].qtyall;
-                        }
+                        // if (poku[index].qtyall == null) {
+                        //     nullku = poku[index].qtypo;
+                        // } else if (poku[index].qtyall == poku[index].qtypo) {
+                        //     nullku = '0';
+                        // } else {
+                        //     nullku = poku[index].qtypo - poku[index].qtyall;
+                        // }
 
-                        tot = tot + Number(poku[index].qtypo);
+                        // tot = tot + Number(poku[index].qtypo);
                         html +=
-                            '<tr><td style="text-align:center"><input type="checkbox" class="check-' +
-                            index + '" style="height:18px;width:18px"></td><td>' + poku[index]
-                            .matcontents + '</td><td>' + poku[index]
-                            .style + '</td><td>' + poku[index].qtypo +
-                            '</td><td>' + nullku +
-                            '</td><td><input type="number" min="0" id="qty_allocation" name="qty_allocation" class="form-control trigerinput cekinput-' +
-                            index + '" data-id="' + poku[index].id + '" data-pono="' + poku[index]
-                            .pono + '" data-qty="' + poku[index].qtypo + '" disabled></td></tr>';
-
-                        // $('#detailhtml').append(
-                        //     `<table style="width:100%" border="1"><tr style="width:100%"><td></td><td>
-                    //         <label>Material</label><i>` + poku[index].matcontents +
-                        //     `</i></td><td><label>Style</label><i>` + poku[index]
-                        //     .style +
-                        //     `</i></td><td></td></tr></table>`
-                        // );
-
+                            '<tr><td>' + dataku[index]
+                            .po_nomor + '</td></tr>';
                     }
                     html += "</table>";
-                    $('#detailhtml').html(html);
-                    checkqtyall();
+                    $('#datapo').html(html);
 
-                    qtypoku = poku.qtypo;
-                    poid = poku.id;
-                    ponumb = poku.pono;
 
-                    $('#po').val(poku[0].pono);
-                    $('#qtypo').val(tot);
-                    $('#detailsup').val(poku[0].supplier.nama);
+                    $('#namafwddetail').val(dataku[0].name);
                 })
             });
 
@@ -370,7 +382,7 @@
                 }
             }
 
-            $('#forwarder').select2({
+            $('#datafwd').select2({
                 placeholder: '-- Choose Forwarder --',
                 ajax: {
                     url: "{!! route('get_forwarder') !!}",
@@ -402,73 +414,48 @@
             });
 
             $('#btnsubmit').click(function(e) {
-                let idku = poid;
-                let fwd = $('#forwarder').val();
+                let idku = $('#idmasterfwd').val();;
+                let fwd = $('#datafwd').val();
 
-                var arrayqty = [];
-                for (let index = 0; index < Number(length); index++) {
-                    let dataqtypo = $('.cekinput-' + index).attr('data-qty');
-                    let val = $('.cekinput-' + index).val();
-
-                    if (Number(dataqtypo) < Number(val)) {
-                        Swal.fire({
-                            title: 'Informasi',
-                            text: 'Data Quantity Allocation Over Quantity PO',
-                            type: 'warning'
-                        });
-                    }
-
-                    if (val) {
-                        let data = {
-                            'id': $('.cekinput-' + index).attr('data-id'),
-                            'pono': $('.cekinput-' + index).attr('data-pono'),
-                            'value': val,
-                        };
-
-                        arrayqty.push(data)
-                    }
-                }
-                console.log('dataaray :>> ', arrayqty);
-
-                $.ajax({
-                    type: "post",
-                    url: "{{ route('detailaction') }}",
-                    data: {
-                        _token: $('meta[name=csrf-token]').attr('content'),
-                        forwarder: fwd,
-                        arrayqty: arrayqty
-                    },
-                    dataType: "json",
-                    success: function(response) {
-                        if (response.status == "error") {
+                if (fwd == '' || fwd == []) {
+                    Swal.fire({
+                        title: 'Information!',
+                        text: 'Forwarder Not Be Empty, please input data',
+                        type: 'warning'
+                    });
+                    return;
+                } else {
+                    $.ajax({
+                        type: "post",
+                        url: "{{ route('allocation_movefwd') }}",
+                        data: {
+                            _token: $('meta[name=csrf-token]').attr('content'),
+                            idmasterfwd: idku,
+                            datamasterfwd: fwd
+                        },
+                        dataType: "json",
+                        success: function(response) {
                             Swal.fire({
                                 title: response.title,
                                 text: response.message,
                                 type: (response.status != 'error') ? 'success' : 'error'
+                            }).then((result) => {
+
+                                $('#modal-movefwd').modal('hide');
+                                table.ajax.reload();
+                            });
+                            return;
+                        },
+                        error: function(xhr, status, error) {
+                            Swal.fire({
+                                title: 'Unsuccessfully Saved Data',
+                                text: 'Check Your Data',
+                                type: 'error'
                             });
                             return;
                         }
-
-                        Swal.fire({
-                            title: response.title,
-                            text: response.message,
-                            type: (response.status != 'error') ? 'success' : 'error'
-                        }).then((result) => {
-
-                            $('#modal-detail').modal('hide');
-                            table.ajax.reload();
-                        });
-                        return;
-                    },
-                    error: function(xhr, status, error) {
-                        Swal.fire({
-                            title: 'Unsuccessfully Saved Data',
-                            text: 'Check Your Data',
-                            type: 'error'
-                        });
-                        return;
-                    }
-                });
+                    });
+                }
             });
         });
     </script>
