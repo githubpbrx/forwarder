@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 // use Illuminate\Support\Facades\Mail;
 use Mail;
+use Carbon\Carbon;
 use Modules\Selfservice\Http\Controllers\CutiController;
 use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Support\Facades\Hash;
@@ -158,6 +159,7 @@ class WebsupplierServices extends Controller
         }
     }
 
+
     public function updatepi(Request $req)
     {
         // $2y$10$gpwr15S9I67MHEx0gCD0jeIYovjwl6ymv7zfu4QaaZjVEufbXItl6
@@ -268,5 +270,58 @@ class WebsupplierServices extends Controller
 
         $update = shipment::wherein('idformpo', $form)->where('noinv', $inv)->update(['lock' => 1]);
         return;
+    }
+
+    public function getemailnotif()
+    {
+        $cekdata = fwd::join('po', 'po.id', 'forwarder.idpo')
+            ->where('forwarder.statusapproval', '=', null)
+            ->where('forwarder.statusallocation', null)
+            ->where('forwarder.aktif', 'Y')
+            ->select('po.statusalokasi', 'po.pono', 'po.pideldate', 'forwarder.statusapproval', 'forwarder.idmasterfwd')
+            // ->groupby('po.pideldate')
+            ->groupby('po.pono')
+            ->get();
+        // dd($cekdata);
+
+        $exp = [];
+        $masterfwd = [];
+        foreach ($cekdata as $key => $value) {
+            $datepo =  Carbon::parse($value->pideldate)->subDays(7);
+            $now =  Carbon::now();
+            $result = $now->gt($datepo);
+
+            if ($result) {
+                // dd($datecoc->format('Y-m-d'));
+                array_push($exp, $value->pono);
+                array_push($masterfwd, $value->idmasterfwd);
+            }
+        }
+
+        $getuser = privilege::whereIn('idforwarder', $masterfwd)->where('privilege_aktif', 'Y')->select('privilege_user_nik', 'privilege_user_name')->get();
+
+        foreach ($getuser as $key => $lue) {
+            $url = 'pbrx.web.id/forwarder';
+            $this->reminderEmail($lue->privilege_user_nik, $lue->privilege_user_name, $url, "Notification Forwarder Reminder PO");
+        }
+
+        echo "DONE";
+        return;
+        // dd($getuser);
+    }
+
+    public static function reminderEmail($email, $nama, $link, $subject)
+    {
+        // dd($email, $nama, $link, $subject);
+        try {
+            Mail::send('transaksi::layouts/reminderemail', ['nama' => $nama, 'link' => $link], function ($message) use ($subject, $email) {
+                // dd($subject, $email, $message);
+                $message->subject($subject);
+                $message->to($email);
+            });
+            return 1;
+        } catch (Exception $e) {
+            return 0;
+        }
     }
 }

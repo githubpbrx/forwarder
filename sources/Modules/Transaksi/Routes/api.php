@@ -16,8 +16,9 @@ use Illuminate\Http\Request;
 Route::group(['prefix' => 'websupplier'], function () {
     Route::post('/shipping', 'api\WebsupplierServices@shipping');
 
-
     Route::post('/updatepi', 'api\WebsupplierServices@updatepi');
 
     Route::get('/lockshipment/{inv}/{namasuplier}', 'api\WebsupplierServices@lockshipment');
+
+    Route::get('/getemailnotif/', 'api\WebsupplierServices@getemailnotif');
 });
