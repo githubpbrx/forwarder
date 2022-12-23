@@ -62,7 +62,7 @@ class DataAllocation extends Controller
             // }
 
             $data = modelforwarder::join('masterforwarder', 'masterforwarder.id', 'forwarder.idmasterfwd')
-                ->where('statusapproval', null)
+                // ->where('statusapproval', null)
                 ->where('forwarder.aktif', 'Y')
                 ->where('masterforwarder.aktif', 'Y')
                 ->groupby('forwarder.idmasterfwd')
@@ -79,7 +79,13 @@ class DataAllocation extends Controller
                     return $data->name;
                 })
                 ->addColumn('status', function ($data) {
-                    return $data->statusallocation;
+                    if ($data->statusallocation == 'confirmed') {
+                        $stat = 'Continued To Shipment';
+                    } else {
+                        $stat = $data->statusallocation;
+                    }
+
+                    return $stat;
                 })
                 ->addColumn('moveto', function ($data) {
                     $namefwd = masterforwarder::where('id', $data->movetofwd)->where('aktif', 'Y')->selectRaw('name')->pluck('name');
@@ -90,7 +96,7 @@ class DataAllocation extends Controller
                 ->addColumn('action', function ($data) {
                     $button = '';
 
-                    if ($data->movetofwd) {
+                    if ($data->movetofwd || $data->statusallocation == 'confirmed') {
                         $button .= '<a href="#" data-id="' . encrypt($data->idmasterfwd) . '" id="detailbtn"><i data-tooltip="tooltip" title="Detail Allocation" class="fa fa-info-circle fa-lg"></i></a>';
                     } else if (isset($data->statusallocation)) {
                         $button .= '<a href="#" data-id="' . encrypt($data->idmasterfwd) . '" id="editbtn"><i data-tooltip="tooltip" title="Edit Forwarder Allocation" class="fa fa-edit fa-lg"></i></a>';
