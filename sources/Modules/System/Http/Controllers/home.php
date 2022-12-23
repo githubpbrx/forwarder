@@ -42,11 +42,11 @@ class home extends Controller
             //     $qq->where('po.statusalokasi', 'partial_allocated')->orWhere('po.statusalokasi', 'full_allocated');
             // })
             ->where('po.statusalokasi', 'waiting')
-            ->where('forwarder.statusapproval', '=', null)
+            ->where('forwarder.statusapproval', null)
             ->where('forwarder.statusallocation', null)
             ->where('forwarder.aktif', 'Y')->where('privilege.privilege_aktif', 'Y')
-            ->select('privilege.privilege_user_nik', 'po.statusalokasi', 'po.pono', 'po.pideldate', 'forwarder.statusapproval')
-            ->groupby('po.pideldate')
+            ->select('privilege.privilege_user_nik', 'po.statusalokasi', 'po.pono', 'po.pideldate', 'po.pino', 'forwarder.statusapproval')
+            ->groupby('po.pino')
             ->get();
         // dd($datapo);
 
@@ -316,6 +316,7 @@ class home extends Controller
                     ->where(function ($kus) {
                         $kus->where('forwarder.statusapproval', null)->orWhere('forwarder.statusapproval', 'reject');
                     })
+                    ->where('forwarder.statusallocation', null)
                     ->where('forwarder.aktif', 'Y')->where('privilege.privilege_aktif', 'Y')->where('mastersupplier.aktif', 'Y')
                     ->selectRaw(' forwarder.statusforwarder, forwarder.statusapproval, po.id, po.pono, po.itemdesc, po.pino, po.pideldate, mastersupplier.nama ')
                     ->groupby('po.pino')
