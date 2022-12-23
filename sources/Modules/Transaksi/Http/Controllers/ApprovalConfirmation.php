@@ -271,6 +271,7 @@ class ApprovalConfirmation extends Controller
 
                 $updatefwd = fwd::where('id_forwarder', $val['idfwd'])->update([
                     'statusapproval' => 'confirm',
+                    'statusallocation' => 'confirmed',
                     'date_fwd'   => date('Y-m-d H:i:s'),
                     'updated_at' => date('Y-m-d H:i:s'),
                     'updated_by' => Session::get('session')['user_nik']
