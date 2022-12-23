@@ -20,11 +20,13 @@ Route::prefix('')->group(function () {
     Route::get('/dashboard', 'home@index')->name('dashcam');
     Route::get('/pagepo', 'home@pagepo')->name('page_po');
     Route::get('/pagepotimeout', 'home@pagepotimeout')->name('page_potimeout');
+    Route::get('/pagecancel', 'home@pagecancel')->name('page_cancel');
     Route::get('/pageupdate', 'home@pageupdate')->name('page_update');
     Route::get('/pagekyc', 'home@pagekyc')->name('page_kyc');
     Route::get('/pagenewfwd', 'home@pagenewfwd')->name('page_newfwd');
     Route::get('/listpo', 'home@listpo')->name('list_po');
     Route::get('/listpotimeout', 'home@listpotimeout')->name('list_potimeout');
+    Route::get('/listcancel', 'home@listcancel')->name('list_cancel');
     Route::post('/getroute', 'home@getroute')->name('get_route');
     Route::post('/getpidate', 'home@getpi')->name('get_pi');
     Route::get('/listupdate', 'home@listupdate')->name('list_update');

@@ -43,15 +43,12 @@ class home extends Controller
             // })
             ->where('po.statusalokasi', 'waiting')
             ->where('forwarder.statusapproval', '=', null)
+            ->where('forwarder.statusallocation', null)
             ->where('forwarder.aktif', 'Y')->where('privilege.privilege_aktif', 'Y')
             ->select('privilege.privilege_user_nik', 'po.statusalokasi', 'po.pono', 'po.pideldate', 'forwarder.statusapproval')
             ->groupby('po.pideldate')
             ->get();
-        // dd($datapo[0]);
-        // $datecoc =  Carbon::parse($datapo[1]->pideldate)->subDays(7);
-        // $now =  Carbon::now();
-        // $bool = $now->gt($datecoc);
-        // dd($datapo[1], $datecoc, $now, $bool);
+        // dd($datapo);
 
         //data h-7 sebelum PI Delivery habis
         $exp = [];
@@ -67,6 +64,18 @@ class home extends Controller
         }
         Session::put('datetimeout', $exp);
         // dd($exp);
+
+        $datacancel = forwarder::join('privilege', 'privilege.idforwarder', 'forwarder.idmasterfwd')
+            // ->join('po', 'po.id', 'forwarder.idpo')
+            ->where('privilege.privilege_user_nik', Session::get('session')['user_nik'])
+            // ->where('po.statusalokasi', 'waiting')
+            ->where('forwarder.statusallocation', 'cancelled')
+            ->where('viewcancel', null)
+            ->where('forwarder.aktif', 'Y')->where('privilege.privilege_aktif', 'Y')
+            ->select('privilege.privilege_user_nik', 'forwarder.id_forwarder', 'forwarder.statusallocation')
+            // ->groupby('po.pideldate')
+            ->get();
+        // dd($datacancel);
 
         $totalreject = formpo::join('privilege', 'privilege.idforwarder', 'formpo.idmasterfwd')
             ->join('po', 'po.id', 'formpo.idpo')
@@ -174,7 +183,8 @@ class home extends Controller
             'newuser'         => count($datauserfwd),
             'cocexp'          => $bool,
             'viewdays'        => $result,
-            'totaltimeout'    => count($exp)
+            'totaltimeout'    => count($exp),
+            'totalcancel'     => count($datacancel)
         );
 
         \LogActivity::addToLog('Web Forwarder : Access Menu Dashboard', $this->micro);
@@ -201,6 +211,28 @@ class home extends Controller
         );
 
         return view('system::dashboard/listpotimeout', $data);
+    }
+
+    public function pagecancel()
+    {
+        $view = forwarder::join('privilege', 'privilege.idforwarder', 'forwarder.idmasterfwd')
+            ->where('privilege.privilege_user_nik', Session::get('session')['user_nik'])
+            ->where('statusallocation', 'cancelled')
+            ->where('forwarder.aktif', 'Y')->where('privilege.privilege_aktif', 'Y')
+            ->select('forwarder.id_forwarder', 'forwarder.idmasterfwd')
+            ->first();
+        // dd($view);
+        // foreach ($view as $key => $value) {
+        forwarder::where('idmasterfwd', $view->idmasterfwd)->update(['viewcancel' => 1]);
+        // }
+
+        $data = array(
+            'title' => 'Data Cancelled',
+            'menu'  => 'pagecancel',
+            'box'   => '',
+        );
+
+        return view('system::dashboard/listcancel', $data);
     }
 
     public function pageupdate()
@@ -495,6 +527,73 @@ class home extends Controller
                 //     return $process;
                 // })
                 ->rawColumns(['cekbok'])
+                ->make(true);
+        }
+    }
+
+    public function listcancel(Request $request)
+    {
+        if ($request->ajax()) {
+
+            // if ($request->pidate == null) {
+            $query = forwarder::join('privilege', 'privilege.idforwarder', 'forwarder.idmasterfwd')
+                ->join('po', 'po.id', 'forwarder.idpo')
+                ->join('mastersupplier', 'mastersupplier.id', 'po.vendor')
+                ->where('privilege.privilege_user_nik', Session::get('session')['user_nik'])
+                ->where('statusallocation', 'cancelled')
+                ->where('forwarder.aktif', 'Y')->where('privilege.privilege_aktif', 'Y')->where('mastersupplier.aktif', 'Y')
+                ->selectRaw(' forwarder.statusallocation, forwarder.statusapproval, po.id, po.pono,  po.matcontents, po.itemdesc, po.pino, po.pideldate, mastersupplier.nama ')
+                // ->groupby('po.pino')
+                ->get();
+            // } else {
+            //     $query = forwarder::join('privilege', 'privilege.idforwarder', 'forwarder.idmasterfwd')
+            //         ->join('po', 'po.id', 'forwarder.idpo')
+            //         ->join('mastersupplier', 'mastersupplier.id', 'po.vendor')
+            //         ->where('privilege.privilege_user_nik', Session::get('session')['user_nik'])
+            //         ->where(function ($kus) {
+            //             $kus->where('forwarder.statusapproval', null)->orWhere('forwarder.statusapproval', 'reject');
+            //         })
+            //         ->where('pideldate', $request->pidate)
+            //         ->where('forwarder.aktif', 'Y')->where('privilege.privilege_aktif', 'Y')->where('mastersupplier.aktif', 'Y')
+            //         ->selectRaw(' forwarder.statusforwarder, forwarder.statusapproval, po.id, po.pono, po.itemdesc, po.pino, po.pideldate, mastersupplier.nama ')
+            //         ->groupby('po.pino')
+            //         ->get();
+            // }
+
+            // dd($query);
+            return Datatables::of($query)
+                ->addIndexColumn()
+                ->addColumn('listpo', function ($query) {
+                    return $query->pono;
+                })
+                ->addColumn('material', function ($query) {
+                    return $query->matcontents;
+                })
+                ->addColumn('pidel', function ($query) {
+                    return  $query->pideldate;
+                })
+                ->addColumn('supplier', function ($query) {
+                    return $query->nama;
+                })
+                ->addColumn('status', function ($query) {
+                    return $query->statusallocation;
+                })
+                // ->addColumn('statusalokasi', function ($query) {
+                //     if ($query->statusforwarder == 'full_allocated') {
+                //         $alokasi = 'Full Allocation';
+                //     } else {
+                //         $alokasi = 'Partial Allocation';
+                //     }
+                //     return  $alokasi;
+                // })
+                // ->addColumn('action', function ($query) {
+                //     $process    = '';
+
+                //     $process    = '<a href="#" data-id="' . $query->pono . '" id="formpo"><i class="fa fa-angle-double-right text-orange"></i></a>';
+
+                //     return $process;
+                // })
+                // ->rawColumns(['cekbok'])
                 ->make(true);
         }
     }
