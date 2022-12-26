@@ -333,6 +333,7 @@ class home extends Controller
                     ->where(function ($kus) {
                         $kus->where('forwarder.statusapproval', null)->orWhere('forwarder.statusapproval', 'reject');
                     })
+                    ->where('forwarder.statusallocation', null)
                     ->where('pideldate', $request->pidate)
                     ->where('forwarder.aktif', 'Y')->where('privilege.privilege_aktif', 'Y')->where('mastersupplier.aktif', 'Y')
                     ->selectRaw(' forwarder.statusforwarder, forwarder.statusapproval, po.id, po.pono, po.itemdesc, po.pino, po.pideldate, mastersupplier.nama ')
@@ -357,6 +358,7 @@ class home extends Controller
                         ->where(function ($kus) {
                             $kus->where('forwarder.statusapproval', null)->orWhere('forwarder.statusapproval', 'reject');
                         })
+                        ->where('forwarder.statusallocation', null)
                         ->where('forwarder.aktif', 'Y')->where('privilege.privilege_aktif', 'Y')->where('mastersupplier.aktif', 'Y')
                         ->selectRaw('po.pono')
                         ->groupby('po.pono')
@@ -373,6 +375,7 @@ class home extends Controller
                         ->where(function ($kus) {
                             $kus->where('forwarder.statusapproval', null)->orWhere('forwarder.statusapproval', 'reject');
                         })
+                        ->where('forwarder.statusallocation', null)
                         ->where('forwarder.aktif', 'Y')->where('privilege.privilege_aktif', 'Y')->where('mastersupplier.aktif', 'Y')
                         ->selectRaw('po.pino')
                         ->groupby('po.pono')
@@ -392,6 +395,7 @@ class home extends Controller
                         ->where(function ($kus) {
                             $kus->where('forwarder.statusapproval', null)->orWhere('forwarder.statusapproval', 'reject');
                         })
+                        ->where('forwarder.statusallocation', null)
                         ->where('forwarder.aktif', 'Y')->where('privilege.privilege_aktif', 'Y')->where('mastersupplier.aktif', 'Y')
                         ->selectRaw('mastersupplier.nama')
                         ->groupby('po.pono')
@@ -753,6 +757,7 @@ class home extends Controller
                 ->where(function ($kus) {
                     $kus->where('forwarder.statusapproval', null)->orWhere('forwarder.statusapproval', 'reject');
                 })
+                ->where('forwarder.statusallocation', null)
                 ->where('forwarder.aktif', 'Y')
                 ->where('masterhscode.aktif', 'Y')
                 ->where('privilege.privilege_aktif', 'Y')
@@ -777,6 +782,7 @@ class home extends Controller
             ->where(function ($kus) {
                 $kus->where('forwarder.statusapproval', null)->orWhere('forwarder.statusapproval', 'reject');
             })
+            ->where('forwarder.statusallocation', null)
             ->where('forwarder.aktif', 'Y')->where('privilege.privilege_aktif', 'Y')->where('mastersupplier.aktif', 'Y')
             ->selectRaw(' forwarder.*, po.id, po.pono, po.matcontents, po.itemdesc, po.colorcode, po.size, po.qtypo, po.pino, mastersupplier.nama')
             ->groupby('po.pono')
