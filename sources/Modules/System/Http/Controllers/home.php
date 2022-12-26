@@ -219,12 +219,12 @@ class home extends Controller
             ->where('privilege.privilege_user_nik', Session::get('session')['user_nik'])
             ->where('statusallocation', 'cancelled')
             ->where('forwarder.aktif', 'Y')->where('privilege.privilege_aktif', 'Y')
-            ->select('forwarder.id_forwarder', 'forwarder.idmasterfwd')
-            ->first();
+            ->select('forwarder.id_forwarder', 'forwarder.idmasterfwd', 'forwarder.po_nomor')
+            ->get();
         // dd($view);
-        // foreach ($view as $key => $value) {
-        forwarder::where('idmasterfwd', $view->idmasterfwd)->update(['viewcancel' => 1]);
-        // }
+        foreach ($view as $key => $value) {
+            forwarder::where('id_forwarder', $value->id_forwarder)->update(['viewcancel' => 1]);
+        }
 
         $data = array(
             'title' => 'Data Cancelled',
