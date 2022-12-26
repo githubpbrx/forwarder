@@ -47,167 +47,119 @@ class DataAllocation extends Controller
         header("Access-Control-Allow-Origin: *");
         header("Access-Control-Allow-Headers: *");
 
-        if ($request->ajax()) {
-            // if ($request->supplier == null) {
-            //     $data = array();
-            // } else {
-            //     $where = '';
-            //     if ($request->status != "all") {
-            //         $where .= ' AND statusalokasi="' . $request->status . '" ';
-            //     }
-            //     if ($request->tanggal1 != "" and $request->tanggal2 != "") {
-            //         $where .= ' AND (podate BETWEEN "' . $request->tanggal1 . '" AND "' . $request->tanggal2 . '") ';
-            //     }
-            //     $data = po::whereRaw(' vendor="' . $request->supplier . '"   ' . $where . ' ')->groupby('pono')->get();
-            // }
+        // if ($request->ajax()) {
+        // if ($request->supplier == null) {
+        //     $data = array();
+        // } else {
+        //     $where = '';
+        //     if ($request->status != "all") {
+        //         $where .= ' AND statusalokasi="' . $request->status . '" ';
+        //     }
+        //     if ($request->tanggal1 != "" and $request->tanggal2 != "") {
+        //         $where .= ' AND (podate BETWEEN "' . $request->tanggal1 . '" AND "' . $request->tanggal2 . '") ';
+        //     }
+        //     $data = po::whereRaw(' vendor="' . $request->supplier . '"   ' . $where . ' ')->groupby('pono')->get();
+        // }
 
-            $data = modelforwarder::join('masterforwarder', 'masterforwarder.id', 'forwarder.idmasterfwd')
-                // ->where('statusapproval', null)
-                ->where('forwarder.aktif', 'Y')
-                ->where('masterforwarder.aktif', 'Y')
-                ->groupby('forwarder.idmasterfwd')
-                ->get();
-            // dd($data);
-            return DataTables::of($data)
-                ->addIndexColumn()
-                ->addColumn('poku', function ($data) {
-                    // $datapo = modelforwarder::where('idmasterfwd', $data->id)->groupby('po_nomor')->pluck('po_nomor');
-                    // return $datapo;
-                    return $data->po_nomor;
-                })
-                ->addColumn('namafwd', function ($data) {
-                    return $data->name;
-                })
-                ->addColumn('status', function ($data) {
-                    if ($data->statusallocation == 'confirmed') {
-                        $stat = 'Continued To Shipment';
-                    } else {
-                        $stat = $data->statusallocation;
-                    }
+        // $datatanggal = modelforwarder::where('aktif', 'Y')->selectRaw(' DATE_FORMAT(created_at, "%Y-%m-%d") as dateku')->groupby(DB::raw("DATE_FORMAT(created_at, '%Y-%m-%d')"))->pluck('dateku');
 
-                    return $stat;
-                })
-                ->addColumn('moveto', function ($data) {
-                    $namefwd = masterforwarder::where('id', $data->movetofwd)->where('aktif', 'Y')->selectRaw('name')->pluck('name');
+        // $datanull = modelforwarder::join('masterforwarder', 'masterforwarder.id', 'forwarder.idmasterfwd')
+        //     ->where('forwarder.statusallocation', null)
+        //     ->where('forwarder.aktif', 'Y')
+        //     ->where('masterforwarder.aktif', 'Y')
+        //     ->groupby('forwarder.idmasterfwd')
+        //     ->get();
 
-                    // return $namefwd;
-                    return  str_replace("[", "", str_replace("]", "", str_replace('"', " ", $namefwd)));
-                })
-                ->addColumn('action', function ($data) {
-                    $button = '';
+        // $datacancel = modelforwarder::join('masterforwarder', 'masterforwarder.id', 'forwarder.idmasterfwd')
+        //     ->whereIn(DB::raw("DATE_FORMAT(forwarder.created_at, '%Y-%m-%d')"), $datatanggal)
+        //     ->where('forwarder.statusallocation', 'cancelled')
+        //     ->where('forwarder.aktif', 'Y')
+        //     ->where('masterforwarder.aktif', 'Y')
+        //     ->groupby('forwarder.idmasterfwd')
+        //     ->groupby('forwarder.po_nomor')
+        //     ->get();
 
-                    if ($data->movetofwd || $data->statusallocation == 'confirmed') {
-                        $button .= '<a href="#" data-id="' . encrypt($data->idmasterfwd) . '" id="detailbtn"><i data-tooltip="tooltip" title="Detail Allocation" class="fa fa-info-circle fa-lg"></i></a>';
-                    } else if (isset($data->statusallocation)) {
-                        $button .= '<a href="#" data-id="' . encrypt($data->idmasterfwd) . '" id="editbtn"><i data-tooltip="tooltip" title="Edit Forwarder Allocation" class="fa fa-edit fa-lg"></i></a>';
-                        $button .= '&nbsp';
-                        $button .= '<a href="#" data-id="' . encrypt($data->idmasterfwd) . '" id="detailbtn"><i data-tooltip="tooltip" title="Detail Allocation" class="fa fa-info-circle fa-lg"></i></a>';
-                    } else {
-                        $button .= '<a href="#" data-id="' . encrypt($data->idmasterfwd) . '" id="cancelbtn"><i data-tooltip="tooltip" title="Cancel Allocation" class="fa fa-ban fa-lg text-danger"></i></a>';
-                        $button .= '&nbsp';
-                        $button .= '<a href="#" data-id="' . encrypt($data->idmasterfwd) . '" id="detailbtn"><i data-tooltip="tooltip" title="Detail Allocation" class="fa fa-info-circle fa-lg"></i></a>';
-                    }
+        // $grouped = $datacancel->mapToGroups(function ($item, $key) {
+        //     return [$item['idmasterfwd'] => $item['name']];
+        // });
 
-                    return $button;
-                })
-                // ->rawColumns(['poku', 'date', 'material', 'status', 'action'])
-                // ->rawColumns(['status'])
-                ->make(true);
-        }
+        // $grouped->toArray();
+        // dd($grouped->all());
+        // $dataconfirmed = modelforwarder::join('masterforwarder', 'masterforwarder.id', 'forwarder.idmasterfwd')
+        //     ->where('forwarder.statusallocation', 'confirmed')
+        //     ->where('forwarder.aktif', 'Y')
+        //     ->where('masterforwarder.aktif', 'Y')
+        //     ->groupby('forwarder.idmasterfwd')
+        //     ->get();
+
+        // $flattennull = $datanull->flatten();
+        // $flattencancel = $datacancel->flatten();
+        // $flattenconfirmed = $dataconfirmed->flatten();
+
+        // $dataAwal = $flattencancel->merge($flattennull);
+        // $data = $dataAwal->merge($flattenconfirmed);
+
+        $data = modelforwarder::join('masterforwarder', 'masterforwarder.id', 'forwarder.idmasterfwd')
+            ->where('forwarder.aktif', 'Y')
+            ->where('masterforwarder.aktif', 'Y')
+            ->select('forwarder.id_forwarder', 'forwarder.idmasterfwd', 'forwarder.po_nomor', 'forwarder.statusallocation', 'forwarder.movetofwd', 'forwarder.created_at', 'masterforwarder.name')
+            ->groupby('forwarder.po_nomor')
+            ->groupby('forwarder.idmasterfwd')
+            ->orderBy('forwarder.idmasterfwd', 'desc')
+            ->get();
+
+        // dd($data);
+        return DataTables::of($data)
+            ->addIndexColumn()
+            ->addColumn('poku', function ($data) {
+                // $datapo = modelforwarder::where('idmasterfwd', $data->id)->groupby('po_nomor')->pluck('po_nomor');
+                // return $datapo;
+                return $data->po_nomor;
+            })
+            ->addColumn('dateallocation', function ($data) {
+                $date = date('d/m/Y', strtotime($data->created_at));
+                return $date;
+            })
+            ->addColumn('namafwd', function ($data) {
+                return $data->name;
+            })
+            ->addColumn('status', function ($data) {
+                if ($data->statusallocation == 'confirmed') {
+                    $stat = 'Continued To Shipment';
+                } else {
+                    $stat = $data->statusallocation;
+                }
+
+                return $stat;
+            })
+            ->addColumn('moveto', function ($data) {
+                $namefwd = masterforwarder::where('id', $data->movetofwd)->where('aktif', 'Y')->selectRaw('name')->pluck('name');
+
+                // return $namefwd;
+                return  str_replace("[", "", str_replace("]", "", str_replace('"', " ", $namefwd)));
+            })
+            ->addColumn('action', function ($data) {
+                $button = '';
+
+                if ($data->movetofwd || $data->statusallocation == 'confirmed') {
+                    $button .= '<a href="#" data-id="' . encrypt($data->po_nomor) . '" data-fwd="' . encrypt($data->idmasterfwd) . '" id="detailbtn"><i data-tooltip="tooltip" title="Detail Allocation" class="fa fa-info-circle fa-lg"></i></a>';
+                } else if (isset($data->statusallocation)) {
+                    $button .= '<a href="#" data-id="' . encrypt($data->po_nomor) . '" data-fwd="' . encrypt($data->idmasterfwd) . '" id="editbtn"><i data-tooltip="tooltip" title="Edit Forwarder Allocation" class="fa fa-edit fa-lg"></i></a>';
+                    $button .= '&nbsp';
+                    $button .= '<a href="#" data-id="' . encrypt($data->po_nomor) . '" data-fwd="' . encrypt($data->idmasterfwd) . '" id="detailbtn"><i data-tooltip="tooltip" title="Detail Allocation" class="fa fa-info-circle fa-lg"></i></a>';
+                } else {
+                    $button .= '<a href="#" data-id="' . encrypt($data->po_nomor) . '" data-fwd="' . encrypt($data->idmasterfwd) . '" id="cancelbtn"><i data-tooltip="tooltip" title="Cancel Allocation" class="fa fa-ban fa-lg text-danger"></i></a>';
+                    $button .= '&nbsp';
+                    $button .= '<a href="#" data-id="' . encrypt($data->po_nomor) . '" data-fwd="' . encrypt($data->idmasterfwd) . '" id="detailbtn"><i data-tooltip="tooltip" title="Detail Allocation" class="fa fa-info-circle fa-lg"></i></a>';
+                }
+
+                return $button;
+            })
+            // ->rawColumns(['poku', 'date', 'material', 'status', 'action'])
+            // ->rawColumns(['status'])
+            ->make(true);
+        // }
         // return view('transaksi::create');
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     * @param Request $request
-     * @return Response
-     */
-    public function store_detail(Request $request)
-    {
-        header("Access-Control-Allow-Origin: *");
-        header("Access-Control-Allow-Headers: *");
-
-        // dd($request->arrayqty);
-
-        DB::beginTransaction();
-        if ($request->forwarder == null or $request->forwarder == "") {
-            DB::rollback();
-            $status = ['title' => 'Error!', 'status' => 'error', 'message' => 'Forwarder is required, please select one forwarder'];
-            return response()->json($status, 200);
-        }
-
-        foreach ($request->arrayqty as $key => $val) {
-            // dd($val['value']);
-            // if (!$val->value) {
-
-            // if ($request->qtyallocation == null or $request->qtyallocation == "") {
-            //     DB::rollback();
-            //     $status = ['title' => 'Error!', 'status' => 'error', 'message' => 'Qty allocation is required, please input qty allocation'];
-            //     return response()->json($status, 200);
-            // }
-
-            $datapo = po::where('id', $val['id'])->first();
-            if ($datapo == null) {
-                DB::rollback();
-                $status = ['title' => 'Error!', 'status' => 'error', 'message' => 'Data PO Not Found, please check your data'];
-                return response()->json($status, 200);
-            }
-            $qtypo = (float)$datapo->qtypo;
-
-            $cek = fwd::where('idpo', $val['id'])->selectRaw(' sum(qty_allocation) as jml, id_forwarder  ')->where('aktif', 'Y')->first();
-            $jumlahexist = ($cek == null) ? 0 : $cek->jml;
-
-            $jumlahall = $val['value'] + $jumlahexist;
-            // dd($jumlahall, $qtypo, $jumlahexist);
-
-            if ($jumlahall > $qtypo) {
-                DB::rollback();
-                $status = ['title' => 'Error!', 'status' => 'error', 'message' => 'Data Quantity Allocation Over Quantity PO'];
-                return response()->json($status, 200);
-            }
-
-            if ($jumlahall == $qtypo) {
-                $status = 'full_allocated';
-            } else {
-                $status = 'partial_allocated';
-            }
-
-            $submit2 = fwd::insert([
-                'idpo' => $val['id'],
-                'idmasterfwd' => $request->forwarder,
-                'po_nomor'    => $val['pono'],
-                'qty_allocation' => $val['value'],
-                'statusforwarder' => $status,
-                'date_fwd' => date('Y-m-d H:i:s'),
-                'aktif' => 'Y',
-                'created_at' => date('Y-m-d H:i:s'),
-                'created_by' => Session::get('session')['user_nik']
-            ]);
-
-            $submit1 = po::where('id', $val['id'])->update([
-                'statusalokasi' => $status,
-                'updated_at' => date('Y-m-d H:i:s'),
-            ]);
-
-            if ($submit1 and $submit2) {
-                $sukses[] = "OK";
-            } else {
-                $gagal[] = "OK";
-            }
-
-            // }
-        }
-
-        if (empty($gagal)) {
-            DB::commit();
-            \LogActivity::addToLog('Save Allocation Forwarder', $this->micro);
-            $status = ['title' => 'Success', 'status' => 'success', 'message' => 'Data Successfully Saved'];
-            return response()->json($status, 200);
-        } else {
-            DB::rollback();
-            $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'Data Failed Saved'];
-            return response()->json($status, 200);
-        }
     }
 
     /**
@@ -221,13 +173,16 @@ class DataAllocation extends Controller
         header("Access-Control-Allow-Headers: *");
 
         $id = decrypt($request->id);
-
+        $idfwd = decrypt($request->idfwd);
+        // dd($id, $idfwd);
         $getdetail = modelforwarder::join('masterforwarder', 'masterforwarder.id', 'forwarder.idmasterfwd')
-            ->where('forwarder.idmasterfwd', $id)
+            ->join('po', 'po.id', 'forwarder.idpo')
+            ->where('forwarder.po_nomor', $id)
+            ->where('forwarder.idmasterfwd', $idfwd)
             ->where('forwarder.aktif', 'Y')
             ->where('masterforwarder.aktif', 'Y')
-            ->selectRaw(' forwarder.id_forwarder, forwarder.po_nomor, masterforwarder.name')
-            ->groupby('forwarder.po_nomor')
+            ->selectRaw(' forwarder.id_forwarder, forwarder.po_nomor, masterforwarder.name, po.pono, po.line_id, po.matcontents, po.colorcode, po.size, po.qtypo')
+            // ->groupby('forwarder.po_nomor')
             ->get();
         // dd($getdetail);
 
@@ -283,12 +238,13 @@ class DataAllocation extends Controller
         return response()->json($po);
     }
 
-    public function cancelallocation($id)
+    public function cancelallocation($id, $idfwd)
     {
         $id = decrypt($id);
-        // dd($id);
+        $idfwd = decrypt($idfwd);
+        // dd($id, $idfwd);
 
-        $cancel = modelforwarder::where('idmasterfwd', $id)->update([
+        $cancel = modelforwarder::where('po_nomor', $id)->where('idmasterfwd', $idfwd)->update([
             'statusallocation' => 'cancelled',
             'updated_at' => date('Y-m-d H:i:s'),
             'updated_by' => Session::get('session')['user_nik']
@@ -306,13 +262,14 @@ class DataAllocation extends Controller
 
     public function movefwd(Request $request)
     {
-
+        // dd($request);
+        $pono = decrypt($request->pono);
         $idmasterfwd = decrypt($request->idmasterfwd);
 
-        $getdataold = modelforwarder::where('idmasterfwd', $idmasterfwd)->where('statusallocation', 'cancelled')->where('movetofwd', null)->where('aktif', 'Y')->get();
+        $getdataold = modelforwarder::where('po_nomor', $pono)->where('idmasterfwd', $idmasterfwd)->where('statusallocation', 'cancelled')->where('movetofwd', null)->where('aktif', 'Y')->get();
         // dd($getdataold);
         DB::beginTransaction();
-        $update = modelforwarder::where('idmasterfwd', $idmasterfwd)->where('statusallocation', 'cancelled')->where('movetofwd', null)->where('aktif', 'Y')->update([
+        $update = modelforwarder::where('po_nomor', $pono)->where('idmasterfwd', $idmasterfwd)->where('statusallocation', 'cancelled')->where('movetofwd', null)->where('aktif', 'Y')->update([
             'movetofwd' => $request->datamasterfwd,
             'updated_at' => date('Y-m-d H:i:s'),
             'updated_by' => Session::get('session')['user_nik']

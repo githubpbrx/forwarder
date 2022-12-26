@@ -72,6 +72,9 @@
                                                 <center>PO#</center>
                                             </th>
                                             <th>
+                                                <center>Date Allocation</center>
+                                            </th>
+                                            <th>
                                                 <center>Forwarder</center>
                                             </th>
                                             <th>
@@ -110,6 +113,7 @@
                     <form class="form-horizontal" id="form-detail">
                         {{ csrf_field() }}
                         <input type="hidden" id="idmasterfwd">
+                        <input type="hidden" id="ponomor">
                         <div class="row">
                             <div class="col-md-12">
                                 <div class="form-group">
@@ -183,6 +187,7 @@
             var table = $('#dataTables').DataTable({
                 processing: true,
                 serverSide: true,
+                "ordering": false,
                 ajax: {
                     url: "{{ url('transaksi/allocation/datatables') }}",
                     // data: function(d) {
@@ -195,6 +200,10 @@
                 columns: [{
                         data: 'poku',
                         name: 'poku'
+                    },
+                    {
+                        data: 'dateallocation',
+                        name: 'dateallocation'
                     },
                     {
                         data: 'namafwd',
@@ -226,9 +235,8 @@
 
             $('body').on('click', '#cancelbtn', function() {
                 let idku = $(this).attr('data-id');
-                let url = '{!! route('allocation_cancelallocation', ['params']) !!}';
-                url = url.replace('params', idku);
-                console.log('idku :>> ', url);
+                let idfwd = $(this).attr('data-fwd');
+                // console.log('idku :>> ', url);
                 Swal.fire({
                     title: 'Validation cancel data!',
                     text: 'Are you sure you want to cancel the data  ?',
@@ -239,7 +247,8 @@
                     if (result.value) {
                         $.ajax({
                             type: "GET",
-                            url: url,
+                            // url: url,
+                            url: "{!! url('transaksi/allocation/cancelallocation/') !!}" + "/" + idku + "/" + idfwd,
                             dataType: "JSON",
                             success: function(response) {
                                 Swal.fire({
@@ -302,8 +311,10 @@
                     backdrop: 'static'
                 });
                 let idku = $(this).attr('data-id');
-                console.log('idku :>> ', idku);
-                $('#idmasterfwd').val(idku);
+                let idfwd = $(this).attr('data-fwd');
+
+                $('#ponomor').val(idku);
+                $('#idmasterfwd').val(idfwd);
             });
 
             $('body').on('click', '#detailbtn', function() {
@@ -311,14 +322,16 @@
                     show: true,
                     backdrop: 'static'
                 });
-                let idku = $(this).attr('data-id');
+                let pono = $(this).attr('data-id');
+                let idfwd = $(this).attr('data-fwd');
                 $.ajax({
                     url: "{!! route('allocation_detail') !!}",
                     type: 'POST',
                     dataType: 'json',
                     data: {
                         _token: $('meta[name=csrf-token]').attr('content'),
-                        id: idku,
+                        id: pono,
+                        idfwd: idfwd
                     },
                 }).done(function(data) {
                     console.log('data :>> ', data.data);
@@ -329,7 +342,7 @@
                     // var tot = 0;
                     // length = poku.length;
                     html =
-                        '<table border="1" style="width:100%"><tr><th>PO Number</th></tr>';
+                        '<table border="1" style="width:100%"><tr><th>PO Number</th><th>Id Line</th><th>Material</th><th>Color</th><th>Size</th><th>Qty PO</th></tr>';
                     for (let index = 0; index < dataku.length; index++) {
                         // let nullku;
 
@@ -343,8 +356,11 @@
 
                         // tot = tot + Number(poku[index].qtypo);
                         html +=
-                            '<tr><td>' + dataku[index]
-                            .po_nomor + '</td></tr>';
+                            '<tr><td>' + dataku[index].po_nomor + '</td> <td>' + dataku[index]
+                            .line_id + '</td><td>' + dataku[index].matcontents + '</td><td>' +
+                            dataku[index]
+                            .colorcode + '</td><td>' + dataku[index].size + '</td><td>' + dataku[
+                                index].qtypo + '</td></tr>';
                     }
                     html += "</table>";
                     $('#datapo').html(html);
@@ -414,7 +430,8 @@
             });
 
             $('#btnsubmit').click(function(e) {
-                let idku = $('#idmasterfwd').val();;
+                let pono = $('#ponomor').val();
+                let idku = $('#idmasterfwd').val();
                 let fwd = $('#datafwd').val();
 
                 if (fwd == '' || fwd == []) {
@@ -430,6 +447,7 @@
                         url: "{{ route('allocation_movefwd') }}",
                         data: {
                             _token: $('meta[name=csrf-token]').attr('content'),
+                            pono: pono,
                             idmasterfwd: idku,
                             datamasterfwd: fwd
                         },

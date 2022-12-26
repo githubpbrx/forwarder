@@ -17,7 +17,7 @@ Route::prefix('transaksi')->group(function () {
     Route::group(['prefix' => 'allocation'], function () {
         Route::get('/', 'DataAllocation@index')->name('data_allocation');
         Route::get('datatables', 'DataAllocation@datatables');
-        Route::get('cancelallocation/{id}', 'DataAllocation@cancelallocation')->name('allocation_cancelallocation');
+        Route::get('cancelallocation/{id}/{idfwd}', 'DataAllocation@cancelallocation')->name('allocation_cancelallocation');
 
         Route::post('getsupplier/', 'DataAllocation@getsupplier')->name('allocation_getsupplier');
         Route::post('/getdetail', 'DataAllocation@show_detail')->name('allocation_detail');
