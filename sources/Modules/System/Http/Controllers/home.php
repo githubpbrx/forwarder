@@ -152,7 +152,11 @@ class home extends Controller
             ->get();
 
         // untuk notifikasi forwarder add new user
-        $datauserfwd = privilege::where('nikfinance', Session::get('session')['user_nik'])->where('privilege_aktif', 'N')->where('status', 'waiting')->get();
+        $datauserfwd = privilege::where('nikfinance', Session::get('session')['user_nik'])
+            ->where('privilege_aktif', 'N')
+            ->where('status', 'waiting')
+            ->where('deleted_at', null)
+            ->get();
 
         // start untuk mengecek expired coc
         $ceklogin = privilege::where('privilege_user_nik', Session::get('session')['user_nik'])->where('privilege_aktif', 'Y')->first();
@@ -713,8 +717,10 @@ class home extends Controller
     {
         $query = privilege::join('masterforwarder', 'masterforwarder.id', 'privilege.idforwarder')
             ->where('nikfinance', Session::get('session')['user_nik'])
-            ->where('privilege.privilege_aktif', 'N')->where('masterforwarder.aktif', 'Y')
+            ->where('privilege.privilege_aktif', 'N')
+            ->where('masterforwarder.aktif', 'Y')
             ->where('privilege.status', 'waiting')
+            ->where('privilege.deleted_at', null)
             ->get();
         // dd($query);
         return Datatables::of($query)
