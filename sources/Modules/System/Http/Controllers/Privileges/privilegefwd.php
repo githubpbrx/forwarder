@@ -32,6 +32,7 @@ class privilegefwd extends Controller
         $data = array(
             'title' => 'Manage User Forwarder',
             'menu'  => '',
+            'namafwd' => Session::get('session')['user_nama']
             // 'group_access_data'     => modelgroup_access::all(),
             // 'factory_data'          => modelfactory::whereNotNull('factory_code')->get(),
         );
@@ -73,8 +74,6 @@ class privilegefwd extends Controller
                 $button = '';
 
                 if ($q->status == 'reject') {
-                    $button .= '<a href="#" data-tooltip="tooltip" data-id="' . $q->privilege_id . '" id="edituserfwd" title="Edit Data"><i class="fa fa-edit fa-lg text-orange actiona"></i></a>';
-                    $button .= '&nbsp;';
                     $button .= '<a href="#" data-id="' . encrypt($q->privilege_id) . '" id="deleteuser" data-tooltip="tooltip" title="Delete Data"><i class="fa fa-trash fa-lg text-red actiona"></i></a>';
                     $button .= '&nbsp;';
                     $button .= '<a href="#" data-id="' . $q->privilege_id . '" id="detailuser" data-tooltip="tooltip" title="Delete Data"><i class="fa fa-info-circle fa-lg text-blue actiona"></i></a>';
@@ -101,8 +100,8 @@ class privilegefwd extends Controller
 
         //make token
         $token = Hash::make('ittetapsemangant');
-
-        $cekemail = modelprivilege::where('privilege_user_nik', $request->emailuser)->where('deleted_at', null)->first();
+        $getidfwd = masterforwarder::where('name', Session::get('session')['user_nama'])->where('aktif', 'Y')->first();
+        $cekemail = modelprivilege::where('privilege_user_nik', $request->emailuser)->where('idforwarder', $getidfwd->id)->where('deleted_at', null)->first();
         if ($cekemail) {
             $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'User Email is available, please check again'];
             return response()->json($status, 200);
@@ -146,7 +145,7 @@ class privilegefwd extends Controller
 
     public function edituserfwd(Request $request)
     {
-        $cekprivilege = modelprivilege::where('privilege_id', $request->id)->where('privilege_aktif', 'Y')->first();
+        $cekprivilege = modelprivilege::where('privilege_id', $request->id)->first();
 
         return response()->json(['status' => 200, 'data' => $cekprivilege, 'message' => 'Berhasil']);
     }
@@ -155,7 +154,9 @@ class privilegefwd extends Controller
     {
         // dd($request);
 
-        $cekuseremail = modelprivilege::where('privilege_id', '!=', $request->id)->where('privilege_user_nik', $request->emailuser)->where('privilege_aktif', 'Y')->first();
+        $getidfwd = masterforwarder::where('name', Session::get('session')['user_nama'])->where('aktif', 'Y')->first();
+
+        $cekuseremail = modelprivilege::where('privilege_id', '!=', $request->id)->where('privilege_user_nik', $request->emailuser)->where('idforwarder', $getidfwd->id)->where('deleted_at', null)->first();
         if ($cekuseremail) {
             $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'User Email is available, please check again'];
             return response()->json($status, 200);

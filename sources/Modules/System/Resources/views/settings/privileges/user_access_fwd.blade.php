@@ -50,8 +50,8 @@
                                 <div class="form-group">
                                     <label class="col-sm-12 control-label">Name Forwarder</label>
                                     <div class="col-sm-12">
-                                        <input type="email" class="form-control" id="namefwd" name="namefwd"
-                                            autocomplete="off" readonly>
+                                        <input type="text" class="form-control" id="namefwd" name="namefwd"
+                                            value="{{ $namafwd }}" readonly>
                                     </div>
                                 </div>
                             </div>
@@ -166,12 +166,8 @@
         })
 
         $('#add_user').click(function(e) {
-            let data = oTable.data();
+            $('#idku').val('');
             $('#emailuser').val('');
-            $('#namefwd').val(data[0]['privilege_user_name']);
-            $('#namefinance').val(data[0]['nama_finance']);
-            $('#nikfinance').val(data[0]['nik_finance']);
-            $('#emailfinance').val(data[0]['email_finance']);
             $('#adduser').modal({
                 show: true,
                 backdrop: 'static'
@@ -259,12 +255,11 @@
                             text: response.message,
                             type: (response.status != 'error') ? 'success' : 'error'
                         }).then((result) => {
-                            // $('#modal_tolak').modal('hide');
-                            // $('#approvalfwd').modal('hide');
-                            // table.ajax.reload();
-                            (response.status == 'success') ? window.location
-                                .replace("{{ url('privilege/accessfwd') }}"):
-                                ''
+                            oTable.ajax.reload();
+                            $('#adduser').modal('hide');
+                            // (response.status == 'success') ? window.location
+                            //     .replace("{{ url('privilege/accessfwd') }}"):
+                            //     ''
                         });
                         return;
                     },
@@ -305,11 +300,11 @@
                                 type: (response.status != 'error') ?
                                     'success' : 'error'
                             }).then(() => {
-                                // oTable.ajax.reload();
-                                (response.status == 'success') ? window
-                                    .location
-                                    .replace("{{ url('privilege/accessfwd') }}"):
-                                    ''
+                                oTable.ajax.reload();
+                                // (response.status == 'success') ? window
+                                //     .location
+                                //     .replace("{{ url('privilege/accessfwd') }}"):
+                                //     ''
                             })
                         },
                         error: function(xhr, status, error) {
