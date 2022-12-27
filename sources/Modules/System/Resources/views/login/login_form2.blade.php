@@ -29,7 +29,7 @@
                 {{-- {{$time_chance}} --}}
                 @if ($chance > 0)
                     <p class="login-box-msg">Login to access </p>
-                    <form action="{{ url('loginaction') }}" method="post">
+                    <form action="{{ url('loginitgoaction') }}" method="post">
                         {{ csrf_field() }}
                         <label for="">Username</label>
                         <div class="input-group mb-3">

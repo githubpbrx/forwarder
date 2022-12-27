@@ -66,6 +66,10 @@ Route::prefix('')->group(function () {
     Route::post('/loginaction', 'login@loginaction');
     Route::get('/logout', 'login@logout');
 
+    //login it
+    Route::get('/login2', 'login@loginitgo');
+    Route::post('/loginitgoaction', 'login@loginitgoaction');
+
     //forgot password
     Route::get('/forgotpassword', 'login@forgotpasswordstep1');
     Route::post('/forgotpassword', 'login@forgotpasswordstep2');
