@@ -107,7 +107,7 @@
         <div class="row">
             <div class="col-md-6">
                 <div class="form-group">
-                    <label class="col-sm-12 control-label">Booking Number</label>
+                    <label class="col-sm-12 control-label">Booking Number<code>*</code></label>
                     <div class="col-sm-12">
                         <input type="text" class="form-control" id="nobook" name="nobook" autocomplete="off">
                     </div>
@@ -115,7 +115,7 @@
             </div>
             <div class="col-md-6">
                 <div class="form-group">
-                    <label class="col-sm-12 control-label">Date Booking</label>
+                    <label class="col-sm-12 control-label">Date Booking<code>*</code></label>
                     <div class="col-sm-12">
                         <input type="text" class="form-control" id="datebook" name="datebook" autocomplete="off">
                     </div>
@@ -125,7 +125,7 @@
         <div class="row">
             <div class="col-md-6">
                 <div class="form-group">
-                    <label class="col-sm-12 control-label">ETD (Estimated Time Departure)</label>
+                    <label class="col-sm-12 control-label">ETD (Estimated Time Departure)<code>*</code></label>
                     <div class="col-sm-12">
                         <input type="text" class="form-control" id="etd" name="etd" autocomplete="off">
                     </div>
@@ -133,7 +133,7 @@
             </div>
             <div class="col-md-6">
                 <div class="form-group">
-                    <label class="col-sm-12 control-label">ETA (Estimated Time Arrival)</label>
+                    <label class="col-sm-12 control-label">ETA (Estimated Time Arrival)<code>*</code></label>
                     <div class="col-sm-12">
                         <input type="text" class="form-control" id="eta" name="eta" autocomplete="off">
                     </div>
@@ -143,7 +143,7 @@
         <div class="row">
             <div class="col-md-6">
                 <div class="form-group">
-                    <label class="col-sm-12 control-label">Ship Mode</label>
+                    <label class="col-sm-12 control-label">Ship Mode<code>*</code></label>
                     <div class="col-sm-12">
                         <select class="form-control select2" style="width: 100%;" name="shipmode" id="shipmode">
                             <option value="-1" selected disabled>-- Choose Mode --</option>
@@ -159,7 +159,7 @@
                     <div class="col-sm-12">
                         <div class="row">
                             <div class="col-sm-4">
-                                <label class="control-label">Size</label>
+                                <label class="control-label">Size<code>*</code></label>
                                 <select class="form-control select2" style="width: 100%;" name="fclku"
                                     id="fclku">
                                     <option value="20">20"</option>
@@ -168,7 +168,7 @@
                                 </select>
                             </div>
                             <div class="col-sm-4">
-                                <label class="control-label">Volume</label>
+                                <label class="control-label">Volume<code>*</code></label>
                                 <div class="input-group">
                                     <input type="number" min="0" class="form-control" name="fclvol"
                                         id="fclvol" autocomplete="off">
@@ -178,7 +178,7 @@
                                 </div>
                             </div>
                             <div class="col-sm-4">
-                                <label class="control-label">Weight</label>
+                                <label class="control-label">Weight<code>*</code></label>
                                 <div class="input-group">
                                     <input type="number" min="0" class="form-control" name="fclweight"
                                         id="fclweight" autocomplete="off">
@@ -197,7 +197,7 @@
                     </select> --}}
                         <div class="row">
                             <div class="col-sm-6">
-                                <label class="control-label">Volume</label>
+                                <label class="control-label">Volume<code>*</code></label>
                                 <div class="input-group">
                                     <input type="number" min="0" class="form-control" name="lclku"
                                         id="lclku" autocomplete="off">
@@ -207,7 +207,7 @@
                                 </div>
                             </div>
                             <div class="col-sm-6">
-                                <label class="control-label">Weight</label>
+                                <label class="control-label">Weight<code>*</code></label>
                                 <div class="input-group">
                                     <input type="number" min="0" class="form-control" name="lclweight"
                                         id="lclweight" autocomplete="off">
@@ -223,7 +223,7 @@
                     <div class="col-sm-12">
                         <div class="row">
                             <div class="col-sm-6">
-                                <label class="control-label">Volume</label>
+                                <label class="control-label">Volume<code>*</code></label>
                                 <div class="input-group">
                                     <input type="number" min="0" class="form-control" name="airku"
                                         id="airku" autocomplete="off">
@@ -233,7 +233,7 @@
                                 </div>
                             </div>
                             <div class="col-sm-6">
-                                <label class="control-label">Weight</label>
+                                <label class="control-label">Weight<code>*</code></label>
                                 <div class="input-group">
                                     <input type="number" min="0" class="form-control" name="airweight"
                                         id="airweight" autocomplete="off">
@@ -250,7 +250,7 @@
         <div class="row">
             <div class="col-md-6">
                 <div class="form-group">
-                    <label class="col-sm-12 control-label">Route</label>
+                    <label class="col-sm-12 control-label">Route<code>*</code></label>
                     <div class="col-sm-12">
                         <select class="form-control select2" name="route" id="route">
                             <option value=""></option>
@@ -407,11 +407,11 @@
                 $('#btnsubmit').html('Submit')
                 $('#btnsubmit').prop('disabled', false)
             } else if (myetd == null || myetd == '') {
-                notifalert('ETD (Estimate Delivery Date)');
+                notifalert('ETD (Estimated Time Departure)');
                 $('#btnsubmit').html('Submit')
                 $('#btnsubmit').prop('disabled', false)
             } else if (myeta == null || myeta == '') {
-                notifalert('ETA (Estimate Acutal Delivery Date)');
+                notifalert('ETA (Estimated Time Arrival)');
                 $('#btnsubmit').html('Submit')
                 $('#btnsubmit').prop('disabled', false)
             } else if (mode == null || mode == '') {
