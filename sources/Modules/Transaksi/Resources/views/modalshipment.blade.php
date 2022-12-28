@@ -43,7 +43,7 @@
         </div>
         <hr style="width: 100%; color: rgb(192, 192, 192); height: 0.5px; background-color:rgb(192, 192, 192);" />
         <div class="row">
-            <table border="1">
+            <table border="1" width="100%">
                 <thead>
                     <th><input type="checkbox" class="checkall" style="height:18px;width:18px" checked>
                     </th>
@@ -281,7 +281,7 @@
         <div class="row">
             <div class="col-md-4">
                 <div class="form-group">
-                    <label class="col-sm-12 control-label">BL</label>
+                    <label class="col-sm-12 control-label">BL<code>*</code></label>
                     <div class="col-sm-12">
                         <input type="file" class="form-control" id="bl" name="bl">
                     </div>
@@ -309,7 +309,7 @@
         <div class="row">
             <div class="col-md-4">
                 <div class="form-group">
-                    <label class="col-sm-12 control-label">Invoice</label>
+                    <label class="col-sm-12 control-label">Invoice<code>*</code></label>
                     <div class="col-sm-12">
                         <input type="text" class="form-control" id="invoice" name="invoice"
                             autocomplete="off">
@@ -318,7 +318,7 @@
             </div>
             <div class="col-md-4">
                 <div class="form-group">
-                    <label class="col-sm-12 control-label">BL Number</label>
+                    <label class="col-sm-12 control-label">BL Number<code>*</code></label>
                     <div class="col-sm-12">
                         <input type="text" class="form-control" id="nobl" name="nobl"
                             autocomplete="off">
@@ -327,7 +327,7 @@
             </div>
             <div class="col-md-4">
                 <div class="form-group">
-                    <label class="col-sm-12 control-label">Vessel</label>
+                    <label class="col-sm-12 control-label">Vessel<code>*</code></label>
                     <div class="col-sm-12">
                         <input type="text" class="form-control" id="vessel" name="vessel"
                             autocomplete="off">
@@ -338,7 +338,7 @@
         <div class="row">
             <div class="col-md-4">
                 <div class="form-group">
-                    <label class="col-sm-12 control-label">ATD (Actual Time Departure)</label>
+                    <label class="col-sm-12 control-label">ATD (Actual Time Departure)<code>*</code></label>
                     <div class="col-sm-12">
                         <input type="text" class="form-control" id="etdfix" name="etdfix"
                             value="{{ $data['dataku'][0]->etd }}" autocomplete="off">
@@ -347,7 +347,7 @@
             </div>
             <div class="col-md-4">
                 <div class="form-group">
-                    <label class="col-sm-12 control-label">ATA (Actual Time Arrival)</label>
+                    <label class="col-sm-12 control-label">ATA (Actual Time Arrival)<code>*</code></label>
                     <div class="col-sm-12">
                         <input type="text" class="form-control" id="etafix" name="etafix"
                             value="{{ $data['dataku'][0]->eta }}" autocomplete="off">
