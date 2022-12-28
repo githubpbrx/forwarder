@@ -19,6 +19,7 @@ use Modules\System\Models\modelformshipment as shipment;
 use Modules\System\Models\masterroute as route;
 use Modules\System\Models\modelkyc as kyc;
 use Modules\System\Models\modelforwarder as forwarder;
+use Modules\System\Models\Privileges\modelgroup_access;
 
 class home extends Controller
 {
@@ -143,21 +144,31 @@ class home extends Controller
             ->get();
         // dd($userkyc);
 
-        $dataapproval = formpo::join('privilege', 'privilege.idforwarder', 'formpo.idmasterfwd')
-            ->join('po', 'po.id', 'formpo.idpo')
-            ->where('privilege.nikfinance', Session::get('session')['user_nik'])
-            ->where('formpo.statusformpo', '=', 'waiting')
-            ->where('formpo.aktif', 'Y')
-            ->groupby('po.pideldate')
-            ->get();
+        $grouplogistik = modelgroup_access::where('group_access_name', 'Logistik')->select('group_access_id')->first();
+        $getprivilege = privilege::where('privilege_user_nik', Session::get('session')['user_nik'])->where('privilege_group_access_id', $grouplogistik->group_access_id)->where('privilege_aktif', 'Y')->get();
+        if (count($getprivilege) >= 1) {
+            $dataapproval = formpo::join('po', 'po.id', 'formpo.idpo')
+                // ->join('privilege', 'privilege.idforwarder', 'formpo.idmasterfwd')
+                // ->where('privilege.privilege_group_access_id', $grouplogistik->group_access_id)
+                ->where('formpo.statusformpo', 'waiting')
+                ->where('formpo.aktif', 'Y')
+                ->groupby('po.pideldate')
+                ->get();
+        } else {
+            $dataapproval = [];
+        }
+        // dd($dataapproval, $getprivilege);
 
         // untuk notifikasi forwarder add new user
-        $datauserfwd = privilege::where('nikfinance', Session::get('session')['user_nik'])
-            ->where('privilege_aktif', 'N')
-            ->where('status', 'waiting')
-            ->where('deleted_at', null)
-            ->get();
-
+        if (count($getprivilege) >= 1) {
+            $datauserfwd = privilege::where('privilege_aktif', 'N')
+                ->where('status', 'waiting')
+                ->where('deleted_at', null)
+                ->get();
+        } else {
+            $datauserfwd = [];
+        }
+        // dd($datauserfwd);
         // start untuk mengecek expired coc
         $ceklogin = privilege::where('privilege_user_nik', Session::get('session')['user_nik'])->where('privilege_aktif', 'Y')->first();
         $datecoc =  Carbon::parse($ceklogin->coc_date)->subDays(7)->addYear();
@@ -715,13 +726,19 @@ class home extends Controller
 
     public function listnewfwd()
     {
-        $query = privilege::join('masterforwarder', 'masterforwarder.id', 'privilege.idforwarder')
-            ->where('nikfinance', Session::get('session')['user_nik'])
-            ->where('privilege.privilege_aktif', 'N')
-            ->where('masterforwarder.aktif', 'Y')
-            ->where('privilege.status', 'waiting')
-            ->where('privilege.deleted_at', null)
-            ->get();
+        $grouplogistik = modelgroup_access::where('group_access_name', 'Logistik')->select('group_access_id')->first();
+        $getprivilege = privilege::where('privilege_user_nik', Session::get('session')['user_nik'])->where('privilege_group_access_id', $grouplogistik->group_access_id)->where('privilege_aktif', 'Y')->get();
+        if (count($getprivilege) >= 1) {
+            $query = privilege::join('masterforwarder', 'masterforwarder.id', 'privilege.idforwarder')
+                // ->where('nikfinance', Session::get('session')['user_nik'])
+                ->where('privilege.privilege_aktif', 'N')
+                ->where('masterforwarder.aktif', 'Y')
+                ->where('privilege.status', 'waiting')
+                ->where('privilege.deleted_at', null)
+                ->get();
+        } else {
+            $query = [];
+        }
         // dd($query);
         return Datatables::of($query)
             ->addIndexColumn()
