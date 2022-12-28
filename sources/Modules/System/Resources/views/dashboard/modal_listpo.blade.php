@@ -59,13 +59,13 @@
                             <div class="row">
                                 <div class="col-12">
                                     <div class="form-group">
-                                        <table border="1">
+                                        <table border="1" width="100%">
                                             <thead>
                                                 <th>PO Nomor</th>
                                                 <th>Material</th>
                                                 <th>Material Description</th>
                                                 <th>HS Code</th>
-                                                <th>Color Code</th>
+                                                <th>Color</th>
                                                 <th>Size</th>
                                                 <th>Qty PO</th>
                                                 <th>Status</th>
