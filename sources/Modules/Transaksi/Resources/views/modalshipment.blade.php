@@ -153,7 +153,7 @@
             <div class="col-md-4">
                 <div class="form-group">
                     <div class="col-sm-12">
-                        <label class="col-sm-12 control-label">Shipmode</label>
+                        <label class="col-sm-12 control-label">Shipmode<code>*</code></label>
                         <select class="form-control select2" style="width: 100%;" name="shipmode" id="shipmode">
                             <option value="-1" selected disabled>-- Choose Mode --</option>
                             <option value="fcl">FCL</option>
@@ -170,7 +170,7 @@
                     <div class="col-sm-12">
                         <div class="row" id="datafcl" style="display: none; padding-bottom: 2.5%">
                             <div class="col-sm-2" class="radiocontainer">
-                                <label class="control-label">Container Size</label>
+                                <label class="control-label">Container Size<code>*</code></label>
                                 <?php
                                 $dat = $data['dataku'][0]->subshipmode;
                                 $exp = explode('-', $dat);
@@ -204,12 +204,12 @@
                                 </div>
                             </div> --}}
                             <div class="col-sm-3">
-                                <label class="control-label">Container Number</label>
+                                <label class="control-label">Container Number<code>*</code></label>
                                 <input type="number" min="0" class="form-control" name="noc[]"
                                     value="">
                             </div>
                             <div class="col-sm-2">
-                                <label class="control-label">Weight</label>
+                                <label class="control-label">Weight<code>*</code></label>
                                 <div class="input-group">
                                     <input type="number" min="0" class="form-control" name="weight[]"
                                         id="weight" value="{{ $exp2[0] }}" autocomplete="off">
@@ -229,7 +229,7 @@
                         <div id="datalcl" style="display: none">
                             <div class="row">
                                 <div class="col-sm-4">
-                                    <label class="col-sm-12 control-label">Volume</label>
+                                    <label class="col-sm-12 control-label">Volume<code>*</code></label>
                                     <div class="input-group">
                                         <input type="number" min="0" class="form-control" name="lclvol"
                                             id="lclvol" autocomplete="off">
@@ -239,7 +239,7 @@
                                     </div>
                                 </div>
                                 <div class="col-sm-4">
-                                    <label class="col-sm-12 control-label">Weight</label>
+                                    <label class="col-sm-12 control-label">Weight<code>*</code></label>
                                     <div class="input-group">
                                         <input type="number" min="0" class="form-control" name="lclweight"
                                             id="lclweight" autocomplete="off">
@@ -253,7 +253,7 @@
                         <div id="dataair" style="display: none">
                             <div class="row">
                                 <div class="col-sm-4">
-                                    <label class="col-sm-12 control-label">Volume</label>
+                                    <label class="col-sm-12 control-label">Volume<code>*</code></label>
                                     <div class="input-group">
                                         <input type="number" min="0" class="form-control" name="airvol"
                                             id="airvol" autocomplete="off">
@@ -263,7 +263,7 @@
                                     </div>
                                 </div>
                                 <div class="col-sm-4">
-                                    <label class="col-sm-12 control-label">Weight</label>
+                                    <label class="col-sm-12 control-label">Weight<code>*</code></label>
                                     <div class="input-group">
                                         <input type="number" min="0" class="form-control" name="airweight"
                                             id="airweight" autocomplete="off">
@@ -309,7 +309,7 @@
         <div class="row">
             <div class="col-md-4">
                 <div class="form-group">
-                    <label class="col-sm-12 control-label">Invoice<code>*</code></label>
+                    <label class="col-sm-12 control-label">Invoice Number<code>*</code></label>
                     <div class="col-sm-12">
                         <input type="text" class="form-control" id="invoice" name="invoice"
                             autocomplete="off">
