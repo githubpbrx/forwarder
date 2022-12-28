@@ -135,7 +135,7 @@ class privilegefwd extends Controller
 
         if ($save) {
             \LogActivity::addToLog('Web Forwarder :: Forwarder : Save Add User Forwarder', $this->micro);
-            $status = ['title' => 'Success', 'status' => 'success', 'message' => 'Data Successfully Saved'];
+            $status = ['title' => 'Success', 'status' => 'success', 'message' => 'Data Successfully Saved, (Password Default: "password123")'];
             return response()->json($status, 200);
         } else {
             $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'Data Failed Saved'];
