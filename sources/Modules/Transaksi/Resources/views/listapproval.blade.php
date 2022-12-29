@@ -149,7 +149,7 @@
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label class="col-sm-12 control-label">User Applicant</label>
-                                    <div class="col-sm-8">
+                                    <div class="col-sm-12">
                                         {{-- <input class="form-control" type="text" name="" id="pengajunama"
                                             disabled> --}}
                                         <div id="pengajunama"></div>
@@ -286,7 +286,9 @@
                     console.log('data :>> ', data.data);
 
                     let mydata = data.data.dataku;
+                    console.log('mydata :>> ', mydata);
                     let mypo = data.data.datapo;
+                    console.log('mypo :>> ', mypo);
 
                     length = mydata.length;
                     $('#detailitem').empty();
@@ -314,74 +316,95 @@
                     html += "</table>";
                     $('#detailitem').html(html);
 
-                    if ((mydata[0].shipmode == 'fcl')) {
-                        let expfcl = mydata[0].subshipmode.split("-");
-                        let expfcl1 = expfcl[2].split("KG");
-                        $('#datashipmode').append(
-                            '<div class="row"><div class="col-sm-3"><label class="control-label">Ship Mode</label><input type="text" class="form-control" value="' +
-                            mydata[0].shipmode +
-                            '" readonly></div><div class="col-sm-3"><label class="control-label">Size</label><input type="text" class="form-control" value="' +
-                            expfcl[0] +
-                            '" readonly></div><div class="col-sm-3"><label class="control-label">Volume</label><div class="input-group"><input type="number" min="0" class="form-control" autocomplete="off" value="' +
-                            expfcl[1] +
-                            '" readonly><div class="input-group-append"><span class="input-group-text">M3</span></div></div></div><div class="col-sm-3"><label class="control-label">Weight</label><div class="input-group"><input type="number" min="0" class="form-control" autocomplete="off" value="' +
-                            expfcl1[0] +
-                            '" readonly><div class="input-group-append"><span class="input-group-text">KG</span></div></div></div></div>'
-                        );
-                    } else if ((mydata[0].shipmode == 'lcl')) {
-                        let explcl = mydata[0].subshipmode.split("-");
-                        let explcl1 = explcl[0].split("M3");
-                        let explcl2 = explcl[1].split("KG");
-                        $('#datashipmode').append(
-                            '<div class="row"><div class="col-sm-3"><label class="control-label">Ship Mode</label><input type="text" class="form-control" value="' +
-                            mydata[0].shipmode +
-                            '" readonly></div><div class="col-sm-3"><label class="control-label">Volume</label><div class="input-group"><input type="number" min="0" class="form-control" autocomplete="off" value="' +
-                            explcl1[0] +
-                            '" readonly><div class="input-group-append"><span class="input-group-text">M3</span></div></div></div><div class="col-sm-3"><label class="control-label">Weight</label><div class="input-group"><input type="number" min="0" class="form-control" autocomplete="off" value="' +
-                            explcl2[0] +
-                            '" readonly><div class="input-group-append"><span class="input-group-text">KG</span></div></div></div></div>'
-                        );
-                    } else {
-                        let expair = mydata[0].subshipmode.split("-");
-                        let expair1 = expair[0].split("M3");
-                        let expair2 = expair[1].split("KG");
-                        $('#datashipmode').append(
-                            '<div class="row"><div class="col-sm-3"><label class="control-label">Ship Mode</label><input type="text" class="form-control" value="' +
-                            mydata[0].shipmode +
-                            '" readonly></div><div class="col-sm-3"><label class="control-label">Volume</label><div class="input-group"><input type="number" min="0" class="form-control" autocomplete="off" value="' +
-                            expair1[0] +
-                            '" readonly><div class="input-group-append"><span class="input-group-text">M3</span></div></div></div><div class="col-sm-3"><label class="control-label">Weight</label><div class="input-group"><input type="number" min="0" class="form-control" autocomplete="off" value="' +
-                            expair2[0] +
-                            '" readonly><div class="input-group-append"><span class="input-group-text">KG</span></div></div></div></div>'
-                        );
-                    }
-
                     var arraypo = [];
                     var arraypi = [];
                     var arraysup = [];
+                    var arraykodebook = [];
+                    var arraydatebook = [];
+                    var arrayetd = [];
+                    var arrayeta = [];
+                    var arraycreatedby = [];
+                    var arrayroutecode = [];
+                    var arrayroutedesc = [];
                     for (let indexpo = 0; indexpo < mypo.length; indexpo++) {
                         arraypo.push(mypo[indexpo]['pono']);
                         arraypi.push(mypo[indexpo]['pino']);
                         arraysup.push(mypo[indexpo]['nama']);
+                        arraykodebook.push(mypo[indexpo]['kode_booking']);
+                        arraydatebook.push(mypo[indexpo]['date_booking']);
+                        arrayetd.push(mypo[indexpo]['etd']);
+                        arrayeta.push(mypo[indexpo]['eta']);
+                        arraycreatedby.push(mypo[indexpo]['created_by']);
+                        arrayroutecode.push(mypo[indexpo]['route_code']);
+                        arrayroutedesc.push(mypo[indexpo]['route_desc']);
+
+                        if ((mypo[indexpo].shipmode == 'fcl')) {
+                            let expfcl = mypo[indexpo].subshipmode.split("-");
+                            let expfcl1 = expfcl[2].split("KG");
+                            $('#datashipmode').append(
+                                '<div class="row"><div class="col-sm-3"><label class="control-label">Ship Mode</label><input type="text" class="form-control" value="' +
+                                mypo[indexpo].shipmode +
+                                '" readonly></div><div class="col-sm-3"><label class="control-label">Size</label><input type="text" class="form-control" value="' +
+                                expfcl[0] +
+                                '" readonly></div><div class="col-sm-3"><label class="control-label">Volume</label><div class="input-group"><input type="number" min="0" class="form-control" autocomplete="off" value="' +
+                                expfcl[1] +
+                                '" readonly><div class="input-group-append"><span class="input-group-text">M3</span></div></div></div><div class="col-sm-3"><label class="control-label">Weight</label><div class="input-group"><input type="number" min="0" class="form-control" autocomplete="off" value="' +
+                                expfcl1[0] +
+                                '" readonly><div class="input-group-append"><span class="input-group-text">KG</span></div></div></div></div>'
+                            );
+                        } else if ((mypo[indexpo].shipmode == 'lcl')) {
+                            let explcl = mypo[indexpo].subshipmode.split("-");
+                            let explcl1 = explcl[0].split("M3");
+                            let explcl2 = explcl[1].split("KG");
+                            $('#datashipmode').append(
+                                '<div class="row"><div class="col-sm-3"><label class="control-label">Ship Mode</label><input type="text" class="form-control" value="' +
+                                mypo[indexpo].shipmode +
+                                '" readonly></div><div class="col-sm-3"><label class="control-label">Volume</label><div class="input-group"><input type="number" min="0" class="form-control" autocomplete="off" value="' +
+                                explcl1[0] +
+                                '" readonly><div class="input-group-append"><span class="input-group-text">M3</span></div></div></div><div class="col-sm-3"><label class="control-label">Weight</label><div class="input-group"><input type="number" min="0" class="form-control" autocomplete="off" value="' +
+                                explcl2[0] +
+                                '" readonly><div class="input-group-append"><span class="input-group-text">KG</span></div></div></div></div>'
+                            );
+                        } else {
+                            let expair = mypo[indexpo].subshipmode.split("-");
+                            let expair1 = expair[0].split("M3");
+                            let expair2 = expair[1].split("KG");
+                            $('#datashipmode').append(
+                                '<div class="row"><div class="col-sm-3"><label class="control-label">Ship Mode</label><input type="text" class="form-control" value="' +
+                                mypo[indexpo].shipmode +
+                                '" readonly></div><div class="col-sm-3"><label class="control-label">Volume</label><div class="input-group"><input type="number" min="0" class="form-control" autocomplete="off" value="' +
+                                expair1[0] +
+                                '" readonly><div class="input-group-append"><span class="input-group-text">M3</span></div></div></div><div class="col-sm-3"><label class="control-label">Weight</label><div class="input-group"><input type="number" min="0" class="form-control" autocomplete="off" value="' +
+                                expair2[0] +
+                                '" readonly><div class="input-group-append"><span class="input-group-text">KG</span></div></div></div></div>'
+                            );
+                        }
                     }
 
                     let implodepo = arraypo.join(', ');
                     let implodepi = arraypi.join(', ');
                     let implodesup = arraysup.join(', ');
+                    let implodekodebook = arraykodebook.join(', ');
+                    let implodedatebook = arraydatebook.join(', ');
+                    let implodeetd = arrayetd.join(', ');
+                    let implodeeta = arrayeta.join(', ');
+                    let implodecreatedby = arraycreatedby.join(', ');
+                    let imploderoutecode = arrayroutecode.join(', ');
+                    let imploderoutedesc = arrayroutedesc.join(', ');
 
                     $('#nomorpo').val(implodepo);
                     $('#nomorpi').val(implodepi);
                     $('#supplier').val(implodesup);
 
-                    $('#nobook').val(mydata[0].kode_booking);
-                    $('#datebook').val(mydata[0].date_booking);
-                    $('#etd').val(mydata[0].etd);
-                    $('#eta').val(mydata[0].eta);
+                    $('#nobook').val(implodekodebook);
+                    $('#datebook').val(implodedatebook);
+                    $('#etd').val(implodeetd);
+                    $('#eta').val(implodeeta);
                     $('#forwarder').val(mydata[0].name);
                     $('#pengajunama').html(mydata[0].privilege_user_name);
-                    $('#pengajunik').val(mydata[0].privilege_user_nik);
-                    $('#routecode').val(mydata[0].route_code);
-                    $('#routedesc').val(mydata[0].route_desc);
+                    $('#pengajunik').val(implodecreatedby);
+                    $('#routecode').val(imploderoutecode);
+                    $('#routedesc').val(imploderoutedesc);
                 })
             });
 
