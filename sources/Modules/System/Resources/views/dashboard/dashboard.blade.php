@@ -23,75 +23,87 @@
                     <h3 class="text-center">DASHBOARD</h3>
                 </div>
                 @if ($datauser->privilege_group_access_id == '1')
-                    @if ($cocexp)
-                        <div class="alert alert-info" style="background-color: rgb(140, 232, 255)">
-                            <h5><i class="icon fas fa-info"></i> Notification For COC</h5>
-                            <p style="color:black">Your COC is Expired, Please Input Again!!
-                                <span class="badge badge-info">{{ $viewdays }}</span>
-                                <br>
-                                <a href="{{ route('validasicoc') }}"><button type="button"
-                                        class="btn btn-primary btn-xs">Update COC</button></a>
-                            </p>
-                        </div>
-                    @endif
-                    @if ($totalpo >= 1)
-                        <div class="alert alert-danger" style="background-color: rgb(253, 181, 181)">
-                            {{-- <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button> --}}
-                            <h5><i class="icon fas fa-info"></i> Notification</h5>
-                            <p style="color:black">You got a new PO
-                                <span class="badge badge-info">{{ $totalpo }}</span>
-                                <br>
-                                <a href="{{ route('page_po') }}"><button type="button"
-                                        class="btn btn-primary btn-xs">Process</button></a>
-                            </p>
-                        </div>
-                    @endif
-                    @if ($totaltimeout >= 1)
-                        <div class="alert alert-danger" style="background-color: rgb(253, 181, 181)">
-                            {{-- <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button> --}}
-                            <h5><i class="icon fas fa-info"></i> Notification</h5>
-                            <p style="color:black;">Your PO will expire soon, please process it immediately!
-                                <span class="badge badge-info">{{ $totaltimeout }}</span>
-                                <br>
-                                <a href="{{ route('page_potimeout') }}"><button type="button"
-                                        class="btn btn-primary btn-xs">Process</button></a>
-                            </p>
-                        </div>
-                    @endif
-                    @if ($totalconfirm >= 1 && $totalshipment == 0)
-                        <div class="alert alert-danger" style="background-color: rgb(253, 181, 181)">
-                            {{-- <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button> --}}
-                            <h5><i class="icon fas fa-info"></i> Notification</h5>
-                            <p style="color:black">You got a new Update Shipment
-                                {{-- <span class="badge badge-info">{{ $totalconfirm }}</span> --}}
-                                <br>
-                                <a href="{{ route('process_shipment') }}"><button type="button"
-                                        class="btn btn-primary btn-xs">Process</button></a>
-                            </p>
-                        </div>
-                    @endif
-                    @if ($totalreject >= 1)
+                    @if ($mysystem == null)
                         <div class="alert alert-danger" style="background-color: rgb(253, 181, 181)">
                             <h5><i class="icon fas fa-info"></i> Notification</h5>
-                            <p style="color:black">Your PO is rejected, please check again!
-                                <span class="badge badge-info">{{ $totalreject }}</span>
+                            <p style="color:black"> Please re-Login
                                 <br>
-                                <button type="button" class="btn btn-info btn-xs" id="detailreject">Check Detail</button>
-                                <a href="{{ route('page_po') }}"><button type="button"
-                                        class="btn btn-primary btn-xs">Process</button></a>
+                                <a href="{{ url('logout') }}"><button type="button"
+                                        class="btn btn-primary btn-xs">Logout</button></a>
                             </p>
                         </div>
-                    @endif
-                    @if ($totalcancel >= 1)
-                        <div class="alert alert-danger" style="background-color: rgb(253, 181, 181)">
-                            <h5><i class="icon fas fa-info"></i> Notification</h5>
-                            <p style="color:black">Your PO is Cancelled by Logistik
-                                <span class="badge badge-info">{{ $totalcancel }}</span>
-                                <br>
-                                <a href="{{ route('page_cancel') }}"><button type="button"
-                                        class="btn btn-primary btn-xs">Show</button></a>
-                            </p>
-                        </div>
+                    @else
+                        @if ($cocexp)
+                            <div class="alert alert-info" style="background-color: rgb(140, 232, 255)">
+                                <h5><i class="icon fas fa-info"></i> Notification For COC</h5>
+                                <p style="color:black">Your COC is Expired, Please Input Again!!
+                                    <span class="badge badge-info">{{ $viewdays }}</span>
+                                    <br>
+                                    <a href="{{ route('validasicoc') }}"><button type="button"
+                                            class="btn btn-primary btn-xs">Update COC</button></a>
+                                </p>
+                            </div>
+                        @endif
+                        @if ($totalpo >= 1)
+                            <div class="alert alert-danger" style="background-color: rgb(253, 181, 181)">
+                                {{-- <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button> --}}
+                                <h5><i class="icon fas fa-info"></i> Notification</h5>
+                                <p style="color:black">You got a new PO
+                                    <span class="badge badge-info">{{ $totalpo }}</span>
+                                    <br>
+                                    <a href="{{ route('page_po') }}"><button type="button"
+                                            class="btn btn-primary btn-xs">Process</button></a>
+                                </p>
+                            </div>
+                        @endif
+                        @if ($totaltimeout >= 1)
+                            <div class="alert alert-danger" style="background-color: rgb(253, 181, 181)">
+                                {{-- <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button> --}}
+                                <h5><i class="icon fas fa-info"></i> Notification</h5>
+                                <p style="color:black;">Your PO will expire soon, please process it immediately!
+                                    <span class="badge badge-info">{{ $totaltimeout }}</span>
+                                    <br>
+                                    <a href="{{ route('page_potimeout') }}"><button type="button"
+                                            class="btn btn-primary btn-xs">Process</button></a>
+                                </p>
+                            </div>
+                        @endif
+                        @if ($totalconfirm >= 1 && $totalshipment == 0)
+                            <div class="alert alert-danger" style="background-color: rgb(253, 181, 181)">
+                                {{-- <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button> --}}
+                                <h5><i class="icon fas fa-info"></i> Notification</h5>
+                                <p style="color:black">You got a new Update Shipment
+                                    {{-- <span class="badge badge-info">{{ $totalconfirm }}</span> --}}
+                                    <br>
+                                    <a href="{{ route('process_shipment') }}"><button type="button"
+                                            class="btn btn-primary btn-xs">Process</button></a>
+                                </p>
+                            </div>
+                        @endif
+                        @if ($totalreject >= 1)
+                            <div class="alert alert-danger" style="background-color: rgb(253, 181, 181)">
+                                <h5><i class="icon fas fa-info"></i> Notification</h5>
+                                <p style="color:black">Your PO is rejected, please check again!
+                                    <span class="badge badge-info">{{ $totalreject }}</span>
+                                    <br>
+                                    <button type="button" class="btn btn-info btn-xs" id="detailreject">Check
+                                        Detail</button>
+                                    <a href="{{ route('page_po') }}"><button type="button"
+                                            class="btn btn-primary btn-xs">Process</button></a>
+                                </p>
+                            </div>
+                        @endif
+                        @if ($totalcancel >= 1)
+                            <div class="alert alert-danger" style="background-color: rgb(253, 181, 181)">
+                                <h5><i class="icon fas fa-info"></i> Notification</h5>
+                                <p style="color:black">Your PO is Cancelled by Logistik
+                                    <span class="badge badge-info">{{ $totalcancel }}</span>
+                                    <br>
+                                    <a href="{{ route('page_cancel') }}"><button type="button"
+                                            class="btn btn-primary btn-xs">Show</button></a>
+                                </p>
+                            </div>
+                        @endif
                     @endif
                 @else
                     @if ($totalapproval >= 1)

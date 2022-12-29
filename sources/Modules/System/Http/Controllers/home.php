@@ -33,6 +33,8 @@ class home extends Controller
 
     public function index()
     {
+        $system = Session::get('system');
+
         $datauser = privilege::where('privilege_user_nik', Session::get('session')['user_nik'])->where('privilege_aktif', 'Y')->first();
         // dd($datauser);
         // Start For Forwarder
@@ -119,18 +121,20 @@ class home extends Controller
         $dataconfirm = formpo::join('privilege', 'privilege.idforwarder', 'formpo.idmasterfwd')
             ->join('po', 'po.id', 'formpo.idpo')
             ->where('privilege.privilege_user_nik', Session::get('session')['user_nik'])
-            ->where('formpo.statusformpo', '=', 'confirm')
+            ->where('formpo.statusformpo', 'confirm')
             ->where('formpo.aktif', 'Y')->where('privilege.privilege_aktif', 'Y')
             ->groupby('po.pono')
+            ->select('formpo.id_formpo', 'formpo.idforwarder', 'po.pono')
             ->get();
 
         $cekshipment = formpo::join('formshipment', 'formshipment.idformpo', 'formpo.id_formpo')
             ->join('privilege', 'privilege.idforwarder', 'formpo.idmasterfwd')
             ->join('po', 'po.id', 'formpo.idpo')
             ->where('privilege.privilege_user_nik', Session::get('session')['user_nik'])
-            ->where('formpo.statusformpo', '=', 'confirm')
+            ->where('formpo.statusformpo', 'confirm')
             ->where('formpo.aktif', 'Y')->where('privilege.privilege_aktif', 'Y')->where('formshipment.aktif', 'Y')
             ->groupby('po.pono')
+            ->select('formpo.id_formpo', 'formpo.idforwarder', 'po.pono', 'formshipment.id_shipment', 'formshipment.noinv')
             ->get();
         // dd($dataconfirm, $cekshipment);
         // End For Forwarder
@@ -199,7 +203,8 @@ class home extends Controller
             'cocexp'          => $bool,
             'viewdays'        => $result,
             'totaltimeout'    => count($exp),
-            'totalcancel'     => count($datacancel)
+            'totalcancel'     => count($datacancel),
+            'mysystem'        => $system
         );
 
         \LogActivity::addToLog('Web Forwarder : Access Menu Dashboard', $this->micro);
