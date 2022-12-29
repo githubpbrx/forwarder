@@ -570,15 +570,15 @@
         } else if (filebl == null || filebl == '') {
             notifalert('File BL');
         } else if (noinv == null || noinv == '') {
-            notifalert('Invoice');
+            notifalert('Invoice Number');
         } else if (nomorbl == null || nomorbl == '') {
             notifalert('BL Number');
         } else if (vessel == null || vessel == '') {
             notifalert('Vessel');
         } else if (etdfix == null || etdfix == '') {
-            notifalert('ETD Fix');
+            notifalert('ATD Fix');
         } else if (etafix == null || etafix == '') {
-            notifalert('ETA Fix');
+            notifalert('ATA Fix');
         } else {
             $.ajax({
                 type: "post",
