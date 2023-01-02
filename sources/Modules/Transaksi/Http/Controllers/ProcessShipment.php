@@ -249,7 +249,9 @@ class ProcessShipment extends Controller
         $decode = json_decode($request->dataid);
         $decodecont = json_decode($request->datacontainer);
         $decodeweight = json_decode($request->dataweight);
-        // dd($decode, $request);
+        $decodematcontent = json_decode($request->datamatcontent);
+        $decodehscode = json_decode($request->datahscode);
+        // dd($request);
         // DB::beginTransaction();
         DB::beginTransaction();
 
@@ -378,6 +380,32 @@ class ProcessShipment extends Controller
                 } else {
                     $gagal[] = "OK";
                 }
+            }
+        }
+
+        foreach ($decodematcontent as $keymat => $valmat) {
+            $cekhs = masterhscode::where('matcontent', $valmat)->where('aktif', 'Y')->first();
+            if ($cekhs) {
+                $simpan = masterhscode::where('matcontent', $valmat)->update([
+                    'hscode'      => $decodehscode[$keymat],
+                    'matcontent'  => $valmat,
+                    'updated_at'  => date('Y-m-d H:i:s'),
+                    'updated_by'  => Session::get('session')['user_nik']
+                ]);
+            } else {
+                $simpan = masterhscode::insert([
+                    'hscode'      => $decodehscode[$keymat],
+                    'matcontent'  => $valmat,
+                    'aktif'       => 'Y',
+                    'created_at'  => date('Y-m-d H:i:s'),
+                    'created_by'  => Session::get('session')['user_nik']
+                ]);
+            }
+
+            if ($simpan) {
+                $sukses[] = "OK";
+            } else {
+                $gagal[] = "OK";
             }
         }
 

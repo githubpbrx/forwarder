@@ -77,7 +77,7 @@
                         }
 
                         if ($item['withpo']['hscode'] == null) {
-                            $hscode = 'empty';
+                            $hscode = '';
                         } else {
                             $hscode = $item['withpo']['hscode']->hscode;
                         }
@@ -86,9 +86,10 @@
                         <tr>
                             <td><input type="checkbox" id="check-{{ $key }}" style="height:18px;width:18px"
                                     {{ $block }}{{ $ceked }}></td>
-                            <td>{{ $item['withpo']->matcontents }}</td>
+                            <td data-name="mat[]">{{ $item['withpo']->matcontents }}</td>
                             <td>{{ $item['withpo']->itemdesc }}</td>
-                            <td>{{ $hscode }}</td>
+                            <td> <input type="text" class="form-control" value="{{ $hscode }}"
+                                    id="inputhscode[]" name="inputhscode[]" autocomplete="off"></td>
                             <td>{{ $item['withpo']->colorcode }}</td>
                             <td>{{ $item['withpo']->size }}</td>
                             <td>{{ $item['withpo']->qtypo }}</td>
@@ -489,6 +490,22 @@
     });
 
     $('#btnsubmit').click(function(e) {
+        let matcontent = $("td[data-name='mat[]']")
+            .map(function() {
+                if ($(this).html() == '') {
+                    return;
+                } else {
+                    return $(this).html();
+                }
+            }).get();
+        let hscode = $("input[name='inputhscode[]']")
+            .map(function() {
+                if ($(this).val() == '') {
+                    return;
+                } else {
+                    return $(this).val();
+                }
+            }).get();
         let numbofcont = $("input[name='noc[]']")
             .map(function() {
                 if ($(this).val() == '') {
@@ -548,6 +565,8 @@
         form_data.append('dataid', JSON.stringify(arrayku));
         form_data.append('datacontainer', JSON.stringify(numbofcont));
         form_data.append('dataweight', JSON.stringify(weight));
+        form_data.append('datamatcontent', JSON.stringify(matcontent));
+        form_data.append('datahscode', JSON.stringify(hscode));
         form_data.append('shipmode', shipmode);
         form_data.append('volume', vol);
         form_data.append('updateweight', updateweight);
