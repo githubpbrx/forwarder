@@ -75,7 +75,7 @@
                                                     <?php
                                                     // dd($dat['poku']->matcontents);
                                                     if ($dat['poku']['hscode'] == null) {
-                                                        $hscode = 'empty';
+                                                        $hscode = '';
                                                     } else {
                                                         $hscode = $dat['poku']['hscode']->hscode;
                                                     }
@@ -83,9 +83,11 @@
                                                     ?>
                                                     <tr>
                                                         <td>{{ $dat->po_nomor }}</td>
-                                                        <td>{{ $dat['poku']->matcontents }}</td>
+                                                        <td data-name="mat[]">{{ $dat['poku']->matcontents }}</td>
                                                         <td>{{ $dat['poku']->itemdesc }}</td>
-                                                        <td>{{ $hscode }}</td>
+                                                        <td> <input type="text" class="form-control"
+                                                                value="{{ $hscode }}" id="inputhscode[]"
+                                                                name="inputhscode[]" autocomplete="off"></td>
                                                         <td>{{ $dat['poku']->colorcode }}</td>
                                                         <td>{{ $dat['poku']->size }}</td>
                                                         <td>{{ $dat['poku']->qtypo }}</td>
@@ -371,6 +373,12 @@
         $('#btnsubmit').click(function(e) {
             $('#btnsubmit').html('<i class="fas fa-hourglass"></i> Please Wait')
             $('#btnsubmit').prop('disabled', true)
+            var matcontent = $('td[data-name^=mat]').map(function(idx, elem) {
+                return $(elem).html();
+            }).get();
+            var hscode = $('input[name^=inputhscode]').map(function(idx, elem) {
+                return $(elem).val();
+            }).get();
             let nobook = $('#nobook').val();
             let datebook = $('#datebook').val();
             let myetd = $('#etd').val();
@@ -397,6 +405,7 @@
                     arraysave.push(val)
                 }
             }
+
 
             if (nobook == null || nobook == '') {
                 notifalert('Nomor Booking');
@@ -457,6 +466,8 @@
                     data: {
                         _token: $('meta[name=csrf-token]').attr('content'),
                         'dataid': arraysave,
+                        'hscode': hscode,
+                        'matcontent': matcontent,
                         'nobooking': nobook,
                         'datebooking': datebook,
                         'etd': myetd,

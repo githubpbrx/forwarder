@@ -20,6 +20,7 @@ use Modules\System\Models\masterroute as route;
 use Modules\System\Models\modelkyc as kyc;
 use Modules\System\Models\modelforwarder as forwarder;
 use Modules\System\Models\Privileges\modelgroup_access;
+use Modules\System\Models\masterhscode;
 
 class home extends Controller
 {
@@ -769,17 +770,10 @@ class home extends Controller
         // dd($request);
         $datapo = [];
         foreach ($request->dataku as $key => $val) {
-            // $mydata = forwarder::with(['poku' => function ($sup) use ($val) {
-            //     $sup->where('pideldate', $val);
-            //     $sup->with(['supplier', 'hscode']);
-            // }])
-            // , 'privilege' => function ($priv) {
-            //     $priv->where('privilege_user_nik', Session::get('session')['user_nik']);
-            // }])
             $mydata = forwarder::join('po', 'po.id', 'forwarder.idpo')
                 ->join('privilege', 'privilege.idforwarder', 'forwarder.idmasterfwd')
                 ->join('mastersupplier', 'mastersupplier.id', 'po.vendor')
-                ->join('masterhscode', 'masterhscode.matcontent', 'po.matcontents')
+                ->leftjoin('masterhscode', 'masterhscode.matcontent', 'po.matcontents')
                 ->where('po.pino', $val)
                 ->where('privilege.privilege_user_nik', Session::get('session')['user_nik'])
                 ->where(function ($kus) {
@@ -787,20 +781,17 @@ class home extends Controller
                 })
                 ->where('forwarder.statusallocation', null)
                 ->where('forwarder.aktif', 'Y')
-                ->where('masterhscode.aktif', 'Y')
+                ->where(function ($hs) {
+                    $hs->where('masterhscode.aktif', null)->orWhere('masterhscode.aktif', 'N')->orWhere('masterhscode.aktif', 'Y');
+                })
                 ->where('privilege.privilege_aktif', 'Y')
                 ->where('mastersupplier.aktif', 'Y')
-                ->selectRaw(' forwarder.*, po.id, po.pono, po.matcontents, po.itemdesc, po.colorcode, po.size, po.qtypo, po.pideldate, po.pino, mastersupplier.nama')
+                ->selectRaw(' forwarder.*, po.id, po.pono, po.matcontents, po.itemdesc, po.colorcode, po.size, po.qtypo, po.pideldate, po.pino, mastersupplier.nama, masterhscode.hscode')
                 ->get();
             // dd($mydata);
-
-            // foreach ($mydata as $key => $value) {
-            //     // dd($value['privilege']);
-            //     if ($value['privilege'] != null) {
             array_push($datapo, $mydata);
-            //     }
-            // }
         }
+        // dd($datapo);
 
         $mypo = forwarder::join('po', 'po.id', 'forwarder.idpo')
             ->join('privilege', 'privilege.idforwarder', 'forwarder.idmasterfwd')
@@ -921,6 +912,35 @@ class home extends Controller
             $submode = $request->lcl . 'M3' . '-' . $request->lclweight . 'KG';
         } else {
             $submode = $request->air . 'M3' . '-' . $request->airweight . 'KG';
+        }
+
+        $val_matcontent = $request->matcontent;
+        $val_hscode = $request->hscode;
+
+        foreach ($val_matcontent as $key => $hs) {
+            $cekhs = masterhscode::where('matcontent', $hs)->where('aktif', 'Y')->first();
+            if ($cekhs) {
+                $simpan = masterhscode::where('matcontent', $hs)->update([
+                    'hscode'      => $val_hscode[$key],
+                    'matcontent'  => $hs,
+                    'updated_at'  => date('Y-m-d H:i:s'),
+                    'updated_by'  => Session::get('session')['user_nik']
+                ]);
+            } else {
+                $simpan = masterhscode::insert([
+                    'hscode'      => $val_hscode[$key],
+                    'matcontent'  => $hs,
+                    'aktif'       => 'Y',
+                    'created_at'  => date('Y-m-d H:i:s'),
+                    'created_by'  => Session::get('session')['user_nik']
+                ]);
+            }
+
+            if ($simpan) {
+                $sukses[] = "OK";
+            } else {
+                $gagal[] = "OK";
+            }
         }
 
         foreach ($request->dataid as $key => $val) {
