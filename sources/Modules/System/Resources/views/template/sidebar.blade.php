@@ -142,7 +142,7 @@
                                 <li class="nav-item">
                                     <a href="{{ route('reportalokasi') }}" class="nav-link">
                                         <i class="fa fa-file nav-icon"></i>
-                                        <p>Outstanding Allocation</p>
+                                        <p>Ready Allocation</p>
                                     </a>
                                 </li>
                             @endif

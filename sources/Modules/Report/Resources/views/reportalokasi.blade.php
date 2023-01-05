@@ -36,16 +36,25 @@
                                     <thead>
                                         <tr>
                                             <th>
+                                                <center>NO</center>
+                                            </th>
+                                            <th>
                                                 <center>PO</center>
                                             </th>
                                             <th>
-                                                <center>Invoice</center>
+                                                <center>Date</center>
                                             </th>
                                             <th>
-                                                <center>Code Booking</center>
+                                                <center>Amount</center>
                                             </th>
                                             <th>
-                                                <center>BL Number</center>
+                                                <center>Supplier</center>
+                                            </th>
+                                            <th>
+                                                <center>Shipmode</center>
+                                            </th>
+                                            <th>
+                                                <center>Date Allocation</center>
                                             </th>
                                             <th>
                                                 <center>Forwarder</center>
@@ -100,7 +109,6 @@
                 }
             });
 
-
             var tabel = $('#dataTables').DataTable({
                 order: [],
                 processing: true,
@@ -112,33 +120,36 @@
                     }
                 },
                 columns: [{
+                        data: 'DT_RowIndex'
+                    },
+                    {
                         data: 'po',
                         name: 'po'
                     },
                     {
-                        data: 'invoice',
-                        name: 'invoice'
+                        data: 'date',
+                        name: 'date'
                     },
                     {
-                        data: 'kodebook',
-                        name: 'kodebook'
+                        data: 'amount',
+                        name: 'amount'
                     },
                     {
-                        data: 'blnumber',
-                        name: 'blnumber'
+                        data: 'supplier',
+                        name: 'supplier'
+                    },
+                    {
+                        data: 'shipmode',
+                        name: 'shipmode'
+                    },
+                    {
+                        data: 'dateallocation',
+                        name: 'dateallocation'
                     },
                     {
                         data: 'forwarder',
                         name: 'forwarder'
                     },
-                    // {
-                    //     data: 'statusallocation',
-                    //     name: 'statusallocation'
-                    // },
-                    // {
-                    //     data: 'statusconfirm',
-                    //     name: 'statusconfirm'
-                    // },
                     {
                         data: 'action',
                         name: 'action'

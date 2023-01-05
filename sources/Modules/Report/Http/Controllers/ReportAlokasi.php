@@ -28,12 +28,12 @@ class ReportAlokasi extends Controller
     public function index()
     {
         $data = array(
-            'title' => 'Report Allocation',
-            'menu'  => 'reportallocation',
+            'title' => 'Report Ready Allocation',
+            'menu'  => 'reportreadyallocation',
             'box'   => '',
         );
 
-        \LogActivity::addToLog('Web Forwarder :: Logistik : Access Menu Report Allocation', $this->micro);
+        \LogActivity::addToLog('Web Forwarder :: Logistik : Access Menu Ready Allocation', $this->micro);
         return view('report::reportalokasi', $data);
     }
 
@@ -44,19 +44,25 @@ class ReportAlokasi extends Controller
 
             if ($request->po == null) {
                 $data = modelformshipment::join('formpo', 'formpo.id_formpo', 'formshipment.idformpo')
+                    ->join('forwarder', 'forwarder.id_forwarder', 'formpo.idforwarder')
                     ->join('po', 'po.id', 'formpo.idpo')
                     ->join('masterforwarder', 'masterforwarder.id', 'formpo.idmasterfwd')
+                    ->join('mastersupplier', 'mastersupplier.id', 'po.vendor')
                     ->where('formpo.aktif', 'Y')->where('masterforwarder.aktif', 'Y')->where('formshipment.aktif', 'Y')
-                    ->selectRaw(' formshipment.*, formpo.kode_booking, po.id, po.pono, po.matcontents, po.qtypo, po.statusalokasi, po.statusconfirm, masterforwarder.name ')
+                    ->where('mastersupplier.aktif', 'Y')->where('forwarder.aktif', 'Y')
+                    ->selectRaw(' formshipment.*, formpo.kode_booking, formpo.shipmode, po.id, po.pono, po.matcontents, po.qtypo, po.statusalokasi, po.statusconfirm, po.podate, SUM(po.price * po.qtypo) as amount, po.curr, masterforwarder.name, mastersupplier.nama, forwarder.date_fwd')
                     ->groupby('po.pono')->groupby('formshipment.noinv')
                     ->get();
             } else {
                 $data = modelformshipment::join('formpo', 'formpo.id_formpo', 'formshipment.idformpo')
+                    ->join('forwarder', 'forwarder.id_forwarder', 'formpo.idforwarder')
                     ->join('po', 'po.id', 'formpo.idpo')
                     ->join('masterforwarder', 'masterforwarder.id', 'formpo.idmasterfwd')
+                    ->join('mastersupplier', 'mastersupplier.id', 'po.vendor')
                     ->where('formpo.aktif', 'Y')->where('masterforwarder.aktif', 'Y')->where('formshipment.aktif', 'Y')
+                    ->where('mastersupplier.aktif', 'Y')->where('forwarder.aktif', 'Y')
                     ->where('po.pono', $request->po)
-                    ->selectRaw(' formshipment.*, formpo.kode_booking, po.id, po.pono, po.matcontents, po.qtypo, po.statusalokasi, po.statusconfirm, masterforwarder.name ')
+                    ->selectRaw(' formshipment.*, formpo.kode_booking, formpo.shipmode, po.id, po.pono, po.matcontents, po.qtypo, po.statusalokasi, po.statusconfirm, po.podate, SUM(po.price * po.qtypo) as amount, po.curr, masterforwarder.name, mastersupplier.nama, forwarder.date_fwd')
                     ->groupby('po.pono')->groupby('formshipment.noinv')
                     ->get();
             }
@@ -67,40 +73,24 @@ class ReportAlokasi extends Controller
                 ->addColumn('po', function ($data) {
                     return $data->pono;
                 })
-                ->addColumn('invoice', function ($data) {
-                    return $data->noinv;
+                ->addColumn('date', function ($data) {
+                    return date("d/m/Y", strtotime($data->podate));
                 })
-                ->addColumn('kodebook', function ($data) {
-                    return $data->kode_booking;
+                ->addColumn('amount', function ($data) {
+                    return round($data->amount, 3) . ' ' . $data->curr;
                 })
-                ->addColumn('blnumber', function ($data) {
-                    return $data->nomor_bl;
+                ->addColumn('supplier', function ($data) {
+                    return $data->nama;
+                })
+                ->addColumn('shipmode', function ($data) {
+                    return $data->shipmode;
+                })
+                ->addColumn('dateallocation', function ($data) {
+                    return date("d/m/Y", strtotime($data->date_fwd));
                 })
                 ->addColumn('forwarder', function ($data) {
                     return $data->name;
                 })
-                // ->addColumn('statusallocation', function ($data) {
-                //     if ($data->statusalokasi == 'full_allocated') {
-                //         $statuspo = 'Full Allocated';
-                //     } elseif ($data->statusalokasi == 'partial_allocated') {
-                //         $statuspo = 'Partial Allocation';
-                //     } else {
-                //         $statuspo = 'Waiting';
-                //     }
-
-                //     return $statuspo;
-                // })
-                // ->addColumn('statusconfirm', function ($data) {
-                //     if ($data->statusconfirm == 'confirm') {
-                //         $status = 'Confirmed';
-                //     } elseif ($data->statusconfirm == 'reject') {
-                //         $status = 'Rejected';
-                //     } else {
-                //         $status = 'Unprocessed';
-                //     }
-
-                //     return $status;
-                // })
                 ->addColumn('action', function ($data) {
                     $process    = '';
 
