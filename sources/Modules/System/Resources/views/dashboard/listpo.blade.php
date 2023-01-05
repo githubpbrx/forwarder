@@ -48,6 +48,9 @@
                         <th>
                             <center>Supplier</center>
                         </th>
+                        <th>
+                            <center>Company</center>
+                        </th>
                     </tr>
                 </thead>
             </table>
@@ -148,6 +151,10 @@
                     {
                         data: 'supplier',
                         name: 'supplier'
+                    },
+                    {
+                        data: 'company',
+                        name: 'company'
                     },
                     // {
                     //     data: 'action',

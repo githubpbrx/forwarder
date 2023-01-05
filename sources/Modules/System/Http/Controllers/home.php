@@ -21,6 +21,7 @@ use Modules\System\Models\modelkyc as kyc;
 use Modules\System\Models\modelforwarder as forwarder;
 use Modules\System\Models\Privileges\modelgroup_access;
 use Modules\System\Models\masterhscode;
+use Modules\System\Models\mastercompany;
 
 class home extends Controller
 {
@@ -339,7 +340,7 @@ class home extends Controller
                     })
                     ->where('forwarder.statusallocation', null)
                     ->where('forwarder.aktif', 'Y')->where('privilege.privilege_aktif', 'Y')->where('mastersupplier.aktif', 'Y')
-                    ->selectRaw(' forwarder.statusforwarder, forwarder.statusapproval, po.id, po.pono, po.itemdesc, po.pino, po.pideldate, mastersupplier.nama ')
+                    ->selectRaw(' forwarder.statusforwarder, forwarder.statusapproval, po.id, po.pono, po.itemdesc, po.pino, po.pideldate, po.company, mastersupplier.nama ')
                     ->groupby('po.pino')
                     ->get();
             } else {
@@ -357,7 +358,7 @@ class home extends Controller
                     ->where('forwarder.statusallocation', null)
                     ->where('pideldate', $request->pidate)
                     ->where('forwarder.aktif', 'Y')->where('privilege.privilege_aktif', 'Y')->where('mastersupplier.aktif', 'Y')
-                    ->selectRaw(' forwarder.statusforwarder, forwarder.statusapproval, po.id, po.pono, po.itemdesc, po.pino, po.pideldate, mastersupplier.nama ')
+                    ->selectRaw(' forwarder.statusforwarder, forwarder.statusapproval, po.id, po.pono, po.itemdesc, po.pino, po.pideldate, po.company, mastersupplier.nama ')
                     ->groupby('po.pino')
                     ->get();
             }
@@ -423,6 +424,15 @@ class home extends Controller
                         ->pluck('nama');
 
                     return  str_replace("]", "", str_replace("[", "", str_replace('"', "", $mypo)));
+                })
+                ->addColumn('company', function ($query) {
+                    $getcompany = mastercompany::where('id', $query->company)->where('aktif', 'Y')->first();
+                    if ($getcompany) {
+                        $company = $getcompany->nama;
+                    } else {
+                        $company = $query->company;
+                    }
+                    return  $company;
                 })
                 // ->addColumn('statusalokasi', function ($query) {
                 //     if ($query->statusforwarder == 'full_allocated') {
