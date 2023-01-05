@@ -26,8 +26,8 @@ class ReportPo extends Controller
     public function index()
     {
         $data = array(
-            'title' => 'Outstanding PO',
-            'menu'  => 'outstandingpo',
+            'title' => 'Report Outstanding PO',
+            'menu'  => 'reportoutstandingpo',
             'box'   => '',
         );
 
