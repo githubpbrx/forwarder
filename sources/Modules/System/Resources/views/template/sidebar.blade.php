@@ -132,7 +132,7 @@
                                 <li class="nav-item">
                                     <a href="{{ route('reportpo') }}" class="nav-link">
                                         <i class="fa fa-file nav-icon"></i>
-                                        <p>Report PO</p>
+                                        <p>Outstanding PO</p>
                                     </a>
                                 </li>
                             @endif
@@ -142,7 +142,7 @@
                                 <li class="nav-item">
                                     <a href="{{ route('reportalokasi') }}" class="nav-link">
                                         <i class="fa fa-file nav-icon"></i>
-                                        <p>Report Allocation</p>
+                                        <p>Outstanding Allocation</p>
                                     </a>
                                 </li>
                             @endif

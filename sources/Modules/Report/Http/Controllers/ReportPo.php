@@ -26,23 +26,33 @@ class ReportPo extends Controller
     public function index()
     {
         $data = array(
-            'title' => 'Report PO',
-            'menu'  => 'reportpo',
+            'title' => 'Outstanding PO',
+            'menu'  => 'outstandingpo',
             'box'   => '',
         );
 
-        \LogActivity::addToLog('Web Forwarder :: Logistik : Access Menu Report PO', $this->micro);
+        \LogActivity::addToLog('Web Forwarder :: Logistik : Access Menu Outstanding PO', $this->micro);
         return view('report::reportpo', $data);
     }
 
     public function datatable(Request $request)
     {
-
         if ($request->ajax()) {
             if ($request->po == null) {
-                $data = modelpo::select('id', 'pono', 'matcontents', 'statusconfirm')->get();
+                $data = modelpo::join('mastersupplier', 'mastersupplier.id', 'po.vendor')
+                    ->where('mastersupplier.aktif', 'Y')
+                    ->select('po.id', 'po.pono', 'po.matcontents', 'po.podate', 'mastersupplier.nama')
+                    ->selectRaw(' count(po.id) as amount ')
+                    ->groupby('po.pono')
+                    ->get();
             } else {
-                $data = modelpo::where('pono', $request->po)->select('id', 'pono', 'matcontents', 'statusconfirm')->get();
+                $data = modelpo::join('mastersupplier', 'mastersupplier.id', 'po.vendor')
+                    ->where('pono', $request->po)
+                    ->where('mastersupplier.aktif', 'Y')
+                    ->select('po.id', 'po.pono', 'po.matcontents', 'po.podate', 'mastersupplier.nama')
+                    ->selectRaw(' count(po.id) as amount ')
+                    ->groupby('po.pono')
+                    ->get();
             }
 
             // dd($data);
@@ -51,8 +61,14 @@ class ReportPo extends Controller
                 ->addColumn('po', function ($data) {
                     return $data->pono;
                 })
-                ->addColumn('material', function ($data) {
-                    return $data->matcontents;
+                ->addColumn('date', function ($data) {
+                    return date("d/m/Y", strtotime($data->podate));
+                })
+                ->addColumn('amount', function ($data) {
+                    return $data->amount;
+                })
+                ->addColumn('supplier', function ($data) {
+                    return $data->nama;
                 })
                 // ->addColumn('allocation', function ($data) {
                 //     if ($data->statusalokasi == 'full_allocated') {
@@ -65,23 +81,23 @@ class ReportPo extends Controller
 
                 //     return $statuspo;
                 // })
-                ->addColumn('status', function ($data) {
-                    if ($data->statusconfirm == 'confirm') {
-                        $status = 'Confirmed';
-                    } elseif ($data->statusconfirm == 'reject') {
-                        $status = 'Rejected';
-                    } else {
-                        $status = 'Unprocessed';
-                    }
+                // ->addColumn('status', function ($data) {
+                //     if ($data->statusconfirm == 'confirm') {
+                //         $status = 'Confirmed';
+                //     } elseif ($data->statusconfirm == 'reject') {
+                //         $status = 'Rejected';
+                //     } else {
+                //         $status = 'Unprocessed';
+                //     }
 
-                    return $status;
-                })
+                //     return $status;
+                // })
                 ->addColumn('action', function ($data) {
                     $button = '';
 
-                    $button .= '<a href="#" data-id="' . $data->id . '" id="detailpo"><i class="fa fa-info-circle"></i></a>';
+                    $button .= '<a href="#" data-id="' . $data->pono . '" id="detailpo"><i class="fa fa-info-circle"></i></a>';
                     $button .= '&nbsp';
-                    $button .= '<a href="' . url('report/po/getexcelpo', ['id' => $data->id]) . '" data-id="#"><i class="fa fa-file-excel text-success"></i></a>';
+                    // $button .= '<a href="' . url('report/po/getexcelpo', ['id' => $data->id]) . '" data-id="#"><i class="fa fa-file-excel text-success"></i></a>';
 
                     return $button;
                 })
@@ -114,15 +130,14 @@ class ReportPo extends Controller
         // dd($request);
 
         $datapo = modelpo::join('mastersupplier', 'mastersupplier.id', 'po.vendor')
-            ->where('po.id', $request->id)
-            ->selectRaw(' po.*, mastersupplier.nama')
-            ->first();
+            ->where('po.pono', $request->id)
+            ->selectRaw(' po.pono, po.matcontents, po.itemdesc, po.colorcode, po.size, po.qtypo, po.statusconfirm, mastersupplier.nama')
+            ->get();
         // dd($datapo);
-        $data = array(
-            'dataku' => $datapo,
-        );
 
-        return response()->json(['status' => 200, 'data' => $data, 'message' => 'Berhasil']);
+        return response()->json(['status' => 200, 'data' => $datapo, 'message' => 'Berhasil']);
+        // $form = view('report::modalreportalokasi', ['data' => $datapo]);
+        // return $form->render();
     }
 
     function excelpo($id)

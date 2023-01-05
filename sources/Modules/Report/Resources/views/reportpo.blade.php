@@ -46,16 +46,19 @@
                                     <thead>
                                         <tr>
                                             <th>
+                                                <center>NO</center>
+                                            </th>
+                                            <th>
                                                 <center>PO</center>
                                             </th>
                                             <th>
-                                                <center>Material</center>
+                                                <center>Date</center>
                                             </th>
-                                            {{-- <th>
-                                                <center>Status Allocation</center>
-                                            </th> --}}
                                             <th>
-                                                <center>Status</center>
+                                                <center>Amount</center>
+                                            </th>
+                                            <th>
+                                                <center>Supplier</center>
                                             </th>
                                             <th>
                                                 <center>Action</center>
@@ -87,7 +90,7 @@
                     <form action="#" class="form-horizontal">
                         {{ csrf_field() }}
                         <div class="row">
-                            <div class="col-md-4">
+                            <div class="col-md-6">
                                 <div class="form-group">
                                     <label class="col-sm-12 control-label">PO</label>
                                     <div class="col-sm-12">
@@ -95,103 +98,24 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-md-4">
-                                <div class="form-group">
-                                    <label class="col-sm-12 control-label">Material</label>
-                                    <div class="col-sm-12">
-                                        <input type="text" class="form-control" id="material" name="material"
-                                            autocomplete="off" readonly>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="form-group">
-                                    <label class="col-sm-12 control-label">Material Desc</label>
-                                    <div class="col-sm-12">
-                                        <input type="text" class="form-control" id="matdesc" name="matdesc"
-                                            autocomplete="off" readonly>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-4">
-                                <div class="form-group">
-                                    <label class="col-sm-12 control-label">Color Code</label>
-                                    <div class="col-sm-12">
-                                        <input type="text" class="form-control" id="colorcode" name="colorcode"
-                                            autocomplete="off" readonly>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="form-group">
-                                    <label class="col-sm-12 control-label">Size</label>
-                                    <div class="col-sm-12">
-                                        <input type="text" class="form-control" id="size" name="size"
-                                            autocomplete="off" readonly>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="form-group">
-                                    <label class="col-sm-12 control-label">Quantity Item</label>
-                                    <div class="col-sm-12">
-                                        <input type="text" class="form-control" id="qtypo" name="qtypo"
-                                            autocomplete="off" readonly>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-4">
-                                <div class="form-group">
-                                    <label class="col-sm-12 control-label">Price</label>
-                                    <div class="col-sm-12">
-                                        <input type="text" class="form-control" id="price" name="price"
-                                            autocomplete="off" readonly>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
+                            <div class="col-md-6">
                                 <div class="form-group">
                                     <label class="col-sm-12 control-label">Supplier</label>
                                     <div class="col-sm-12">
-                                        <input type="text" class="form-control" id="supplier" name="supplier"
-                                            readonly>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="form-group">
-                                    <label class="col-sm-12 control-label">Plant</label>
-                                    <div class="col-sm-12">
-                                        <input type="text" class="form-control" id="plant" name="plant"
-                                            autocomplete="off" readonly>
+                                        <input type="text" class="form-control" id="supplier" name="supplier" readonly>
                                     </div>
                                 </div>
                             </div>
                         </div>
+                        <hr
+                            style="width: 100%; color: rgb(192, 192, 192); height: 0.5px; background-color:rgb(192, 192, 192);" />
                         <div class="row">
-                            <div class="col-md-4">
-                                <div class="form-group">
-                                    <label class="col-sm-12 control-label">Style</label>
-                                    <div class="col-sm-12">
-                                        <input type="text" class="form-control" id="style" name="style"
-                                            autocomplete="off" readonly>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="form-group">
-                                    <label class="col-sm-12 control-label">Buyer</label>
-                                    <div class="col-sm-12">
-                                        <input type="text" class="form-control" id="buyer" name="buyer"
-                                            autocomplete="off" readonly>
-                                    </div>
-                                </div>
+                            <div class="col-md-12">
+                                <div id="formdetailpo"></div>
                             </div>
                         </div>
+                        <hr
+                            style="width: 100%; color: rgb(192, 192, 192); height: 0.5px; background-color:rgb(192, 192, 192);" />
                     </form>
                 </div>
                 <div class="modal-footer">
@@ -227,20 +151,22 @@
                     }
                 },
                 columns: [{
+                        data: 'DT_RowIndex'
+                    }, {
                         data: 'po',
                         name: 'po'
                     },
                     {
-                        data: 'material',
-                        name: 'material'
+                        data: 'date',
+                        name: 'date'
                     },
-                    // {
-                    //     data: 'allocation',
-                    //     name: 'allocation'
-                    // },
                     {
-                        data: 'status',
-                        name: 'status'
+                        data: 'amount',
+                        name: 'amount'
+                    },
+                    {
+                        data: 'supplier',
+                        name: 'supplier'
                     },
                     {
                         data: 'action',
@@ -316,20 +242,45 @@
                         id: idku,
                     },
                 }).done(function(data) {
-                    console.log('data :>> ', data.data);
-                    let datapo = data.data.dataku;
+                    console.log('dataku :>> ', data.data);
+                    let datapo = data.data;
 
-                    $('#nomorpo').val(datapo.pono);
-                    $('#material').val(datapo.matcontents);
-                    $('#matdesc').val(datapo.itemdesc);
-                    $('#qtypo').val(datapo.qtypo);
-                    let curr = datapo.curr;
-                    let pr = datapo.price;
-                    $('#price').val(pr + ' ' + curr);
-                    $('#supplier').val(datapo.nama);
-                    $('#plant').val(datapo.plant);
-                    $('#style').val(datapo.style);
-                    $('#buyer').val(datapo.buyer);
+                    $('#formdetailpo').empty();
+
+                    html =
+                        '<table border="1" style="width:100%"><tr><th>Material</th><th>Material Desc</th><th>Color</th><th>Size</th><th>Qty PO</th><th>Status</th></tr>';
+                    for (let index = 0; index < datapo.length; index++) {
+                        let status;
+                        if (datapo[index].statusconfirm == 'confirm') {
+                            status = 'Confirmed';
+                        } else if (datapo[index].statusconfirm == 'reject') {
+                            status = 'Rejected';
+                        } else {
+                            status = 'Unprocessed';
+                        }
+
+                        html +=
+                            '<tr><td>' + datapo[index].matcontents + '</td><td>' + datapo[index]
+                            .itemdesc + '</td><td>' + datapo[index].colorcode +
+                            '</td><td>' + datapo[index].size + '</td><td>' + datapo[index].qtypo +
+                            '</td><td>' + status +
+                            '</td></tr>';
+                    }
+
+                    html += "</table>";
+                    $('#formdetailpo').html(html);
+
+                    $('#nomorpo').val(datapo[0].pono);
+                    // $('#material').val(datapo.matcontents);
+                    // $('#matdesc').val(datapo.itemdesc);
+                    // $('#qtypo').val(datapo.qtypo);
+                    // let curr = datapo.curr;
+                    // let pr = datapo.price;
+                    // $('#price').val(pr + ' ' + curr);
+                    $('#supplier').val(datapo[0].nama);
+                    // $('#plant').val(datapo.plant);
+                    // $('#style').val(datapo.style);
+                    // $('#buyer').val(datapo.buyer);
                 })
             });
         });
