@@ -43,27 +43,29 @@ class ReportAlokasi extends Controller
             // dd($request);
 
             if ($request->po == null) {
-                $data = modelformshipment::join('formpo', 'formpo.id_formpo', 'formshipment.idformpo')
-                    ->join('forwarder', 'forwarder.id_forwarder', 'formpo.idforwarder')
+                $getship = modelformshipment::where('aktif', 'Y')->groupby('idformpo')->pluck('idformpo');
+                $data = modelformpo::join('forwarder', 'forwarder.id_forwarder', 'formpo.idforwarder')
                     ->join('po', 'po.id', 'formpo.idpo')
                     ->join('masterforwarder', 'masterforwarder.id', 'formpo.idmasterfwd')
                     ->join('mastersupplier', 'mastersupplier.id', 'po.vendor')
-                    ->where('formpo.aktif', 'Y')->where('masterforwarder.aktif', 'Y')->where('formshipment.aktif', 'Y')
+                    ->whereNotIn('formpo.id_formpo', $getship)
+                    ->where('formpo.aktif', 'Y')->where('masterforwarder.aktif', 'Y')
                     ->where('mastersupplier.aktif', 'Y')->where('forwarder.aktif', 'Y')
-                    ->selectRaw(' formshipment.*, formpo.kode_booking, formpo.shipmode, po.id, po.pono, po.matcontents, po.qtypo, po.statusalokasi, po.statusconfirm, po.podate, SUM(po.price * po.qtypo) as amount, po.curr, masterforwarder.name, mastersupplier.nama, forwarder.date_fwd')
-                    ->groupby('po.pono')->groupby('formshipment.noinv')
+                    ->selectRaw(' formpo.*, po.id, po.pono, po.matcontents, po.qtypo, po.statusalokasi, po.statusconfirm, po.podate, SUM(po.price * po.qtypo) as amount, po.curr, masterforwarder.name, mastersupplier.nama, forwarder.date_fwd')
+                    ->groupby('po.pono')->groupby('formpo.kode_booking')
                     ->get();
             } else {
-                $data = modelformshipment::join('formpo', 'formpo.id_formpo', 'formshipment.idformpo')
-                    ->join('forwarder', 'forwarder.id_forwarder', 'formpo.idforwarder')
+                $getship = modelformshipment::where('aktif', 'Y')->groupby('idformpo')->pluck('idformpo');
+                $data = modelformpo::join('forwarder', 'forwarder.id_forwarder', 'formpo.idforwarder')
                     ->join('po', 'po.id', 'formpo.idpo')
                     ->join('masterforwarder', 'masterforwarder.id', 'formpo.idmasterfwd')
                     ->join('mastersupplier', 'mastersupplier.id', 'po.vendor')
-                    ->where('formpo.aktif', 'Y')->where('masterforwarder.aktif', 'Y')->where('formshipment.aktif', 'Y')
+                    ->whereNotIn('formpo.id_formpo', $getship)
+                    ->where('formpo.aktif', 'Y')->where('masterforwarder.aktif', 'Y')
                     ->where('mastersupplier.aktif', 'Y')->where('forwarder.aktif', 'Y')
                     ->where('po.pono', $request->po)
-                    ->selectRaw(' formshipment.*, formpo.kode_booking, formpo.shipmode, po.id, po.pono, po.matcontents, po.qtypo, po.statusalokasi, po.statusconfirm, po.podate, SUM(po.price * po.qtypo) as amount, po.curr, masterforwarder.name, mastersupplier.nama, forwarder.date_fwd')
-                    ->groupby('po.pono')->groupby('formshipment.noinv')
+                    ->selectRaw(' formpo.*, po.id, po.pono, po.matcontents, po.qtypo, po.statusalokasi, po.statusconfirm, po.podate, SUM(po.price * po.qtypo) as amount, po.curr, masterforwarder.name, mastersupplier.nama, forwarder.date_fwd')
+                    ->groupby('po.pono')->groupby('formpo.kode_booking')
                     ->get();
             }
 
@@ -94,9 +96,9 @@ class ReportAlokasi extends Controller
                 ->addColumn('action', function ($data) {
                     $process    = '';
 
-                    $process    .= '<a href="#" data-id="' . $data->noinv . '" id="detailalokasi"><i class="fa fa-info-circle"></i></a>';
+                    $process    .= '<a href="#" data-id="' . $data->kode_booking . '" id="detailalokasi"><i class="fa fa-info-circle"></i></a>';
                     $process    .= '&nbsp';
-                    $process    .= '<a href="' . url('report/alokasi/getexcelalokasi', ['id' => $data->noinv]) . '"><i class="fa fa-file-excel text-success"></i></a>';
+                    $process    .= '<a href="' . url('report/alokasi/getexcelalokasi', ['id' => $data->kode_booking]) . '"><i class="fa fa-file-excel text-success"></i></a>';
 
                     return $process;
                 })
@@ -112,10 +114,11 @@ class ReportAlokasi extends Controller
         header("Access-Control-Allow-Headers: *");
 
         if (!$request->ajax()) return;
-        $po = modelformshipment::join('formpo', 'formpo.id_formpo', 'formshipment.idformpo')
-            ->join('po', 'po.id', 'formpo.idpo')
+        $getship = modelformshipment::where('aktif', 'Y')->groupby('idformpo')->pluck('idformpo');
+        $po = modelformpo::join('po', 'po.id', 'formpo.idpo')
             ->join('masterforwarder', 'masterforwarder.id', 'formpo.idmasterfwd')
-            ->where('formpo.aktif', 'Y')->where('masterforwarder.aktif', 'Y')->where('formshipment.aktif', 'Y')
+            ->whereNotIn('formpo.id_formpo', $getship)
+            ->where('formpo.aktif', 'Y')->where('masterforwarder.aktif', 'Y')
             ->selectRaw(' po.pono ');
 
         if ($request->has('q')) {
@@ -132,26 +135,24 @@ class ReportAlokasi extends Controller
     {
         // dd($request);
 
-        $data = modelformshipment::join('formpo', 'formpo.id_formpo', 'formshipment.idformpo')
-            ->join('po', 'po.id', 'formpo.idpo')
+        $data = modelformpo::join('po', 'po.id', 'formpo.idpo')
             ->join('masterforwarder', 'masterforwarder.id', 'formpo.idmasterfwd')
             ->join('mastersupplier', 'mastersupplier.id', 'po.vendor')
             ->join('masterhscode', 'masterhscode.matcontent', 'po.matcontents')
-            ->where('formshipment.noinv', $request->id)
-            ->where('formshipment.aktif', 'Y')->where('formpo.aktif', 'Y')->where('masterforwarder.aktif', 'Y')->where('mastersupplier.aktif', 'Y')
+            ->where('formpo.kode_booking', $request->id)
+            ->where('formpo.aktif', 'Y')->where('masterforwarder.aktif', 'Y')->where('mastersupplier.aktif', 'Y')
             ->where('masterhscode.aktif', 'Y')
-            ->selectRaw(' formshipment.*, po.pono, po.matcontents, po.itemdesc, po.qtypo, po.colorcode, po.size, po.style, po.plant, formpo.*, masterforwarder.name, mastersupplier.nama, masterhscode.hscode ')
+            ->selectRaw(' formpo.*, po.pono, po.matcontents, po.itemdesc, po.qtypo, po.colorcode, po.size, po.style, po.plant, masterforwarder.name, mastersupplier.nama, masterhscode.hscode ')
             ->get();
 
-        $getdate = modelformshipment::join('formpo', 'formpo.id_formpo', 'formshipment.idformpo')
-            ->join('po', 'po.id', 'formpo.idpo')
+        $getdate = modelformpo::join('po', 'po.id', 'formpo.idpo')
             ->join('masterforwarder', 'masterforwarder.id', 'formpo.idmasterfwd')
             ->join('mastersupplier', 'mastersupplier.id', 'po.vendor')
-            ->where('formshipment.noinv', $request->id)
-            ->where('formshipment.aktif', 'Y')->where('formpo.aktif', 'Y')->where('masterforwarder.aktif', 'Y')->where('mastersupplier.aktif', 'Y')
-            ->selectRaw(' formshipment.id_shipment, formshipment.created_at, formshipment.updated_at ')
-            ->latest('id_shipment')->first();
-        // dd($getdate);
+            ->where('formpo.kode_booking', $request->id)
+            ->where('formpo.aktif', 'Y')->where('masterforwarder.aktif', 'Y')->where('mastersupplier.aktif', 'Y')
+            ->selectRaw(' formpo.id_formpo, formpo.created_at, formpo.updated_at ')
+            ->latest('id_formpo')->first();
+        // dd($data, $getdate);
         // return response()->json(['status' => 200, 'data' => $data, 'message' => 'Berhasil']);
         $form = view('report::modalreportalokasi', ['data' => $data, 'dateku' => $getdate]);
         return $form->render();
@@ -159,24 +160,22 @@ class ReportAlokasi extends Controller
 
     function excelalokasi($id)
     {
-        $getdata = modelformshipment::join('formpo', 'formpo.id_formpo', 'formshipment.idformpo')
-            ->join('po', 'po.id', 'formpo.idpo')
+        $getdata = modelformpo::join('po', 'po.id', 'formpo.idpo')
             ->join('masterforwarder', 'masterforwarder.id', 'formpo.idmasterfwd')
             ->join('mastersupplier', 'mastersupplier.id', 'po.vendor')
             ->join('masterhscode', 'masterhscode.matcontent', 'po.matcontents')
-            ->where('formshipment.noinv', $id)
-            ->where('formshipment.aktif', 'Y')->where('formpo.aktif', 'Y')->where('masterforwarder.aktif', 'Y')->where('mastersupplier.aktif', 'Y')
+            ->where('formpo.kode_booking', $id)
+            ->where('formpo.aktif', 'Y')->where('masterforwarder.aktif', 'Y')->where('mastersupplier.aktif', 'Y')
             ->where('masterhscode.aktif', 'Y')
-            ->selectRaw(' formshipment.*, po.pono, po.matcontents, po.itemdesc, po.qtypo, po.style, po.plant, po.colorcode, po.size, formpo.*, masterforwarder.name, mastersupplier.nama, masterhscode.hscode ')
+            ->selectRaw(' formpo.*, po.pono, po.matcontents, po.itemdesc, po.qtypo, po.style, po.plant, po.colorcode, po.size, masterforwarder.name, mastersupplier.nama, masterhscode.hscode ')
             ->get();
 
-        $getdate = modelformshipment::join('formpo', 'formpo.id_formpo', 'formshipment.idformpo')
-            ->join('po', 'po.id', 'formpo.idpo')
+        $getdate = modelformpo::join('po', 'po.id', 'formpo.idpo')
             ->join('mastersupplier', 'mastersupplier.id', 'po.vendor')
-            ->where('formshipment.noinv', $id)
-            ->where('formshipment.aktif', 'Y')->where('formpo.aktif', 'Y')->where('mastersupplier.aktif', 'Y')
-            ->selectRaw(' formshipment.id_shipment, formshipment.created_at, formshipment.updated_at')
-            ->latest('id_shipment')->first();
+            ->where('formpo.kode_booking', $id)
+            ->where('formpo.aktif', 'Y')->where('mastersupplier.aktif', 'Y')
+            ->selectRaw(' formpo.id_formpo, formpo.created_at, formpo.updated_at')
+            ->latest('id_formpo')->first();
         // dd($getdate);
 
         $spreadsheet = new Spreadsheet();
@@ -186,44 +185,38 @@ class ReportAlokasi extends Controller
         $sheet->getStyle('A2:G2')->getFont()->setBold(true);
 
         //single header
-        $sheet->setCellValue('A4', 'Invoice');
-        $sheet->setCellValue('A5', 'Invoice Date');
-        $sheet->setCellValue('A6', 'PO');
-        $sheet->setCellValue('A7', 'Supplier');
-        $sheet->getStyle('A4:A7')->getFont()->setBold(true);
+        $sheet->setCellValue('A4', 'PO');
+        $sheet->setCellValue('A5', 'Supplier');
+        $sheet->getStyle('A4:A5')->getFont()->setBold(true);
         $sheet->setCellValue('C4', 'Forwarder');
         $sheet->setCellValue('C5', 'Input Data');
         $sheet->setCellValue('C6', 'Update Data');
         $sheet->getStyle('C4:C6')->getFont()->setBold(true);
 
         //for header
-        $cellheader = 'A9:I9';
+        $cellheader = 'A9:G9';
         $sheet->setCellValue('A9', 'Code Booking');
-        $sheet->getColumnDimension('A')->setWidth(30);
-        $sheet->setCellValue('B9', 'BL Number');
-        $sheet->getColumnDimension('B')->setWidth(30);
-        $sheet->setCellValue('C9', 'ATD');
-        $sheet->getColumnDimension('C')->setWidth(30);
-        $sheet->setCellValue('D9', 'ATA');
-        $sheet->getColumnDimension('D')->setWidth(20);
-        $sheet->setCellValue('E9', 'Shipmode');
-        $sheet->getColumnDimension('E')->setWidth(20);
+        $sheet->getColumnDimension('A')->setAutoSize(true);
+        $sheet->setCellValue('B9', 'ETD');
+        $sheet->getColumnDimension('B')->setAutoSize(true);
+        $sheet->setCellValue('C9', 'ETA');
+        $sheet->getColumnDimension('C')->setAutoSize(true);
+        $sheet->setCellValue('D9', 'Shipmode');
+        $sheet->getColumnDimension('D')->setAutoSize(true);
+        $sheet->setCellValue('E9', '');
+        $sheet->getColumnDimension('E')->setAutoSize(true);
         if ($getdata[0]->shipmode == 'fcl') {
-            $sheet->setCellValue('F9', 'Container Size');
-            $sheet->getColumnDimension('F')->setWidth(20);
-            $sheet->setCellValue('G9', 'Volume');
-            $sheet->getColumnDimension('G')->setWidth(20);
-            $sheet->setCellValue('H9', 'Weight');
-            $sheet->getColumnDimension('H')->setWidth(20);
-            $sheet->setCellValue('I9', 'Vessel');
-            $sheet->getColumnDimension('I')->setWidth(20);
-        } else {
+            $sheet->setCellValue('E9', 'Container Size');
+            $sheet->getColumnDimension('E')->setAutoSize(true);
             $sheet->setCellValue('F9', 'Volume');
-            $sheet->getColumnDimension('F')->setWidth(20);
+            $sheet->getColumnDimension('F')->setAutoSize(true);
             $sheet->setCellValue('G9', 'Weight');
-            $sheet->getColumnDimension('G')->setWidth(20);
-            $sheet->setCellValue('H9', 'Vessel');
-            $sheet->getColumnDimension('H')->setWidth(20);
+            $sheet->getColumnDimension('G')->setAutoSize(true);
+        } else {
+            $sheet->setCellValue('E9', 'Volume');
+            $sheet->getColumnDimension('E')->setAutoSize(true);
+            $sheet->setCellValue('F9', 'Weight');
+            $sheet->getColumnDimension('F')->setAutoSize(true);
         }
         $sheet->getStyle($cellheader)->getAlignment()->setWrapText(true);
         $sheet->getStyle($cellheader)->getFont()->setBold(true);
@@ -233,21 +226,19 @@ class ReportAlokasi extends Controller
         $sheet->getStyle($cellheader)->getFill()->getStartColor()->setARGB('ff8400');
 
         //for data
-        $celldata = 'A12:G12';
+        $celldata = 'A12:F12';
         $sheet->setCellValue('A12', 'Material');
-        $sheet->getColumnDimension('A')->setWidth(50);
+        $sheet->getColumnDimension('A')->setAutoSize(true);
         $sheet->setCellValue('B12', 'Material Desc');
-        $sheet->getColumnDimension('B')->setWidth(30);
+        $sheet->getColumnDimension('B')->setAutoSize(true);
         $sheet->setCellValue('C12', 'HS Code ');
-        $sheet->getColumnDimension('C')->setWidth(20);
+        $sheet->getColumnDimension('C')->setAutoSize(true);
         $sheet->setCellValue('D12', 'Color');
-        $sheet->getColumnDimension('D')->setWidth(20);
+        $sheet->getColumnDimension('D')->setAutoSize(true);
         $sheet->setCellValue('E12', 'Size');
-        $sheet->getColumnDimension('E')->setWidth(20);
+        $sheet->getColumnDimension('E')->setAutoSize(true);
         $sheet->setCellValue('F12', 'Qty PO');
-        $sheet->getColumnDimension('F')->setWidth(20);
-        $sheet->setCellValue('G12', 'Qty Ship');
-        $sheet->getColumnDimension('G')->setWidth(20);
+        $sheet->getColumnDimension('F')->setAutoSize(true);
         $sheet->getStyle($celldata)->getAlignment()->setWrapText(true);
         $sheet->getStyle($celldata)->getFont()->setBold(true);
         $sheet->getStyle($celldata)->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID);
@@ -272,13 +263,11 @@ class ReportAlokasi extends Controller
             ],
         ];
         //title
-        $sheet->setCellValue('A' . '2', strtoupper('Detail Allocation'));
+        $sheet->setCellValue('A' . '2', strtoupper('Detail Ready Allocation'));
 
         //single header
-        $sheet->setCellValue('B' . '4', ':' . $getdata[0]->noinv);
-        $sheet->setCellValue('B' . '5', ':' . date('d F Y H:i:s', strtotime($getdata[0]->created_at)));
-        $sheet->setCellValue('B' . '6', ':' . $getdata[0]->pono);
-        $sheet->setCellValue('B' . '7', ':' . $getdata[0]->nama);
+        $sheet->setCellValue('B' . '4', ':' . $getdata[0]->pono);
+        $sheet->setCellValue('B' . '5', ':' . $getdata[0]->nama);
         $sheet->setCellValue('D' . '4', ':' . $getdata[0]->name);
         $sheet->setCellValue('D' . '5', ':' . date('d F Y H:i:s', strtotime($getdate->created_at)));
         if ($getdate->updated_at == null) {
@@ -290,20 +279,18 @@ class ReportAlokasi extends Controller
 
         //header
         $sheet->setCellValue('A' . $header, $getdata[0]->kode_booking);
-        $sheet->setCellValue('B' . $header, $getdata[0]->nomor_bl);
-        $sheet->setCellValue('C' . $header, date('d F Y', strtotime($getdata[0]->etdfix)));
-        $sheet->setCellValue('D' . $header, date('d F Y', strtotime($getdata[0]->etafix)));
-        $sheet->setCellValue('E' . $header, $getdata[0]->shipmode);
+        $sheet->setCellValue('B' . $header, date('d F Y', strtotime($getdata[0]->etd)));
+        $sheet->setCellValue('C' . $header, date('d F Y', strtotime($getdata[0]->eta)));
+        $sheet->setCellValue('D' . $header, $getdata[0]->shipmode);
         if ($getdata[0]->shipmode == 'fcl') {
             $exp = explode('-', $getdata[0]->subshipmode);
-            $sheet->setCellValue('F' . $header, ($exp[0] == '40hq') ? '40hq' : $exp[0] . '"');
-            $sheet->setCellValue('G' . $header, $exp[1] . 'M3');
-            $sheet->setCellValue('H' . $header, $exp[2]);
-            $sheet->setCellValue('I' . $header, $getdata[0]->vessel);
+            $sheet->setCellValue('E' . $header, ($exp[0] == '40hq') ? '40hq' : $exp[0] . '"');
+            $sheet->setCellValue('F' . $header, $exp[1] . 'M3');
+            $sheet->setCellValue('G' . $header, $exp[2]);
         } else {
             $exp2 = explode('-', $getdata[0]->subshipmode);
-            $sheet->setCellValue('F' . $header, $exp2[0] . 'M3');
-            $sheet->setCellValue('G' . $header, $exp2[1]);
+            $sheet->setCellValue('E' . $header, $exp2[0]);
+            $sheet->setCellValue('F' . $header, $exp2[1]);
         }
         $header++;
 
@@ -315,24 +302,23 @@ class ReportAlokasi extends Controller
             $sheet->setCellValue('D' . $bodydata, $value->colorcode);
             $sheet->setCellValue('E' . $bodydata, $value->size);
             $sheet->setCellValue('F' . $bodydata, $value->qtypo);
-            $sheet->setCellValue('G' . $bodydata, $value->qty_shipment);
             $bodydata++;
         }
 
         if ($getdata[0]->shipmode == 'fcl') {
-            $cellheader = 'A9:I' . ($header - 1);
+            $cellheader = 'A9:G' . ($header - 1);
         } else {
-            $cellheader = 'A9:H' . ($header - 1);
+            $cellheader = 'A9:F' . ($header - 1);
         }
 
-        $celldata = 'A12:G' . ($bodydata - 1);
+        $celldata = 'A12:F' . ($bodydata - 1);
         $sheet->getStyle('A2:G2')->applyFromArray($styleArraytitle);
         $sheet->getStyle($cellheader)->applyFromArray($styleArray);
         $sheet->getStyle($celldata)->applyFromArray($styleArray);
         $sheet->getStyle($cellheader)->getAlignment()->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER);
         $sheet->getStyle($celldata)->getAlignment()->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER);
 
-        $fileName = "Report_Allocation_" . $getdata[0]->noinv . ".xlsx";
+        $fileName = "Report_Ready_Allocation_" . $getdata[0]->kode_booking . ".xlsx";
 
         $writer = new Xlsx($spreadsheet);
         header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');

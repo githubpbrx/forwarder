@@ -37,35 +37,38 @@
     <div class="row">
         <div class="col-md-3">
             <div class="form-group">
-                <label class="col-sm-12 control-label">Invoice</label>
+                <label class="col-sm-12 control-label">ETD</label>
                 <div class="col-sm-12">
-                    <input type="text" class="form-control" value="{{ $data[0]->noinv }}" readonly>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="form-group">
-                <label class="col-sm-12 control-label">ATD</label>
-                <div class="col-sm-12">
-                    <input type="text" class="form-control" value="{{ date('d F Y', strtotime($data[0]->etdfix)) }}"
+                    <input type="text" class="form-control" value="{{ date('d F Y', strtotime($data[0]->etd)) }}"
                         readonly>
                 </div>
             </div>
         </div>
         <div class="col-md-3">
             <div class="form-group">
-                <label class="col-sm-12 control-label">ATA</label>
+                <label class="col-sm-12 control-label">ETA</label>
                 <div class="col-sm-12">
-                    <input type="text" class="form-control" value="{{ date('d F Y', strtotime($data[0]->etafix)) }}"
+                    <input type="text" class="form-control" value="{{ date('d F Y', strtotime($data[0]->eta)) }}"
                         readonly>
                 </div>
             </div>
         </div>
         <div class="col-md-3">
             <div class="form-group">
-                <label class="col-sm-12 control-label">BL Number</label>
+                <label class="col-sm-12 control-label">Input Data</label>
                 <div class="col-sm-12">
-                    <input type="text" class="form-control" value="{{ $data[0]->nomor_bl }}" readonly>
+                    <input type="text" class="form-control"
+                        value="{{ date('d F Y H:i:s', strtotime($dateku->created_at)) }}" readonly>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="form-group">
+                <label class="col-sm-12 control-label">Update Data</label>
+                <div class="col-sm-12">
+                    <input type="text" class="form-control"
+                        value="{{ $dateku->updated_at == null ? '' : date('d F Y H:i:s', strtotime($dateku->updated_at)) }}"
+                        readonly>
                 </div>
             </div>
         </div>
@@ -175,88 +178,6 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-3">
-            <div class="form-group">
-                <label class="col-sm-12 control-label">Vessel</label>
-                <div class="col-sm-12">
-                    <input type="text" class="form-control" value="{{ $data[0]->vessel }}" readonly>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="form-group">
-                <label class="col-sm-12 control-label">Input Data</label>
-                <div class="col-sm-12">
-                    <input type="text" class="form-control"
-                        value="{{ date('d F Y H:i:s', strtotime($dateku->created_at)) }}" readonly>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-md-3">
-            <div class="form-group">
-                <label class="col-sm-12 control-label">Update Data</label>
-                <div class="col-sm-12">
-                    <input type="text" class="form-control"
-                        value="{{ $dateku->updated_at == null ? '' : date('d F Y H:i:s', strtotime($dateku->updated_at)) }}"
-                        readonly>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="form-group">
-                <label class="col-sm-12 control-label">File BL</label>
-                <div class="col-sm-12">
-                    <div class="row">
-                        <div class="col-sm-10">
-                            <input type="text" class="form-control" value="{{ $data[0]->file_bl }}"
-                                id="filename" readonly>
-                        </div>
-                        <div class="col-sm-2">
-                            <a href="#" id="downloadfile" target="_BLANK" class="btn btn-info"><i
-                                    class="fa fa-download"></i></a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="form-group">
-                <label class="col-sm-12 control-label">File Invoice</label>
-                <div class="col-sm-12">
-                    <div class="row">
-                        <div class="col-sm-10">
-                            <input type="text" class="form-control" value="{{ $data[0]->file_invoice }}"
-                                id="filenameinv" readonly>
-                        </div>
-                        <div class="col-sm-2">
-                            <a href="#" id="downloadfileinv" target="_BLANK" class="btn btn-info"><i
-                                    class="fa fa-download"></i></a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-md-4">
-            <div class="form-group">
-                <label class="col-sm-12 control-label">File Packing List</label>
-                <div class="col-sm-12">
-                    <div class="row">
-                        <div class="col-sm-10">
-                            <input type="text" class="form-control" value="{{ $data[0]->file_packinglist }}"
-                                id="filenamepack" readonly>
-                        </div>
-                        <div class="col-sm-2">
-                            <a href="#" id="downloadfilepack" target="_BLANK" class="btn btn-info"><i
-                                    class="fa fa-download"></i></a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
     </div>
     <hr style="width: 100%; height: 0.5px; background-color:rgb(192, 192, 192);" />
     <table class="form-horizontal" border="1" style="width:100%">
@@ -268,7 +189,6 @@
                 <th>Color</th>
                 <th>Size</th>
                 <th>Qty PO</th>
-                <th>Qty Ship</th>
             </tr>
         </thead>
         @foreach ($data as $item)
@@ -280,43 +200,8 @@
                     <td>{{ $item->colorcode }}</td>
                     <td>{{ $item->size }}</td>
                     <td>{{ $item->qtypo }}</td>
-                    <td>{{ $item->qty_shipment }}</td>
                 </tr>
             </tbody>
         @endforeach
     </table>
-
-    <script type="text/javascript">
-        $(document).ready(function() {
-            $.ajaxSetup({
-                headers: {
-                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                }
-            });
-
-            $('#downloadfile').click(function(e) {
-                // e.preventDefault();
-                let filename = $('#filename').val();
-                // console.log('klik :>> ', filename);
-                var base = "{!! url('sources/storage/app') !!}" + "/" + filename;
-                $('#downloadfile').attr('href', base);
-            });
-
-            $('#downloadfileinv').click(function(e) {
-                // e.preventDefault();
-                let filenameinv = $('#filenameinv').val();
-                // console.log('klik :>> ', filename);
-                var baseinv = "{!! url('sources/storage/app') !!}" + "/" + filenameinv;
-                $('#downloadfileinv').attr('href', baseinv);
-            });
-
-            $('#downloadfilepack').click(function(e) {
-                // e.preventDefault();
-                let filenamepack = $('#filenamepack').val();
-                // console.log('klik :>> ', filename);
-                var basepack = "{!! url('sources/storage/app') !!}" + "/" + filenamepack;
-                $('#downloadfilepack').attr('href', basepack);
-            });
-        });
-    </script>
 </form>

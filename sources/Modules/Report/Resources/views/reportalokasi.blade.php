@@ -12,22 +12,20 @@
                 <div class="row">
                     <div class="col-md-12">
                         <div id="fullscreen-container" class="card-body" style="overflow-y: auto;">
-                            <div class="row">
-                                <div class="col-md-3">
-                                    <label class="control-label">Choose PO :</label>
-                                    <select class="select2" style="width: 100%;" name="datapo" id="datapo">
-                                        <option value=""></option>
-                                    </select>
+                            <div class="row justify-content-between col-md-12 ">
+                                <div class="row col-md-6">
+                                    <div class="col-md-6">
+                                        <label class="control-label">Choose PO :</label>
+                                        <select class="select2" style="width: 100%;" name="datapo" id="datapo">
+                                            <option value=""></option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="control-label"> &nbsp; </label>
+                                        <a href="#" type="button" id="search" class="btn btn-info form-control"
+                                            data-value="klik">Search</a>
+                                    </div>
                                 </div>
-                                <div class="col-md-1">
-                                    <label class="control-label"> &nbsp; </label>
-                                    <a href="#" type="button" id="search" class="btn btn-info form-control"
-                                        data-value="klik">Search</a>
-                                </div>
-                                {{-- <div class="ml-auto p-2">
-                                    <a href="{{ url('report/alokasi/getexcelalokasiall') }}" type="button"
-                                        class="btn btn-warning form-control">Download Data Excel</a>
-                                </div> --}}
                             </div>
                             <br>
                             <div class="table-responsive">
@@ -80,7 +78,7 @@
         <div class="modal-dialog" style="max-width: 80%;">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h4 class="modal-title"><span id="modaltitle">Detail Report Allocation</span></h4>
+                    <h4 class="modal-title"><span id="modaltitle">Detail Report Ready Allocation</span></h4>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -227,29 +225,6 @@
                     },
                 }).done(function(data) {
                     $('#formdetail').html(data);
-                    // console.log('data :>> ', data.data);
-                    // let dataku = data.data;
-
-                    // namefile = dataku.file_bl;
-
-                    // $('#nomorpo').val(dataku.pono);
-                    // $('#material').val(dataku.matcontents);
-                    // $('#matdesc').val(dataku.itemdesc);
-                    // $('#qtypo').val(dataku.qtypo);
-                    // $('#supplier').val(dataku.nama);
-                    // $('#style').val(dataku.style);
-                    // $('#plant').val(dataku.plant);
-                    // $('#forwarder').val(dataku.name);
-                    // $('#booking').val(dataku.kode_booking);
-                    // $('#qtyship').val(dataku.qty_shipment);
-                    // $('#invoice').val(dataku.noinv);
-                    // $('#etd').val(dataku.etdfix);
-                    // $('#eta').val(dataku.etafix);
-                    // $('#shipmode').val(dataku.shipmode);
-                    // $('#subshipmode').val(dataku.subshipmode);
-                    // $('#nobl').val(dataku.nomor_bl);
-                    // $('#vessel').val(dataku.vessel);
-                    // $('#filebl').val(dataku.file_bl);
                 })
             });
         });
