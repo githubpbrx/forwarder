@@ -27,6 +27,7 @@ Route::prefix('master')->group(function () {
     Route::group(['prefix' => 'hscode'], function () {
         Route::get('/', 'MasterHscode@index')->name('masterhscode');
         Route::get('/listhscode', 'MasterHscode@listhscode')->name('list_hscode');
+        Route::post('/hscodeadd', 'MasterHscode@add')->name('masterhscode_add');
         Route::post('/hscodeedit', 'MasterHscode@edit')->name('masterhscode_edit');
         Route::post('/updatehscode', 'MasterHscode@update')->name('masterhscode_update');
         Route::get('/deletehscode/{id}', 'MasterHscode@destroy')->name('masterhscode_delete');
