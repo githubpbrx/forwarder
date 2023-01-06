@@ -28,13 +28,13 @@ class DataAllocation extends Controller
     public function index()
     {
         $data = array(
-            'title' => 'Data Allocation',
-            'menu'  => 'data_allocation',
+            'title' => 'Data Cancel Allocation Forwarder',
+            'menu'  => 'datacancelallocationforwarder',
             'box'   => '',
             // 'sup'   => supplier::where('aktif', 'Y')->get(),
         );
 
-        \LogActivity::addToLog('Access Menu Data Allocation', $this->micro);
+        \LogActivity::addToLog('Access Menu Data Cancel Allocation Forwarder', $this->micro);
         return view('transaksi::data_allocation', $data);
     }
 
