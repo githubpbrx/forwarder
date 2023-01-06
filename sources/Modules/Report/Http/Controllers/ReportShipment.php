@@ -50,7 +50,7 @@ class ReportShipment extends Controller
                     ->join('mastersupplier', 'mastersupplier.id', 'po.vendor')
                     ->where('formpo.aktif', 'Y')->where('masterforwarder.aktif', 'Y')->where('formshipment.aktif', 'Y')
                     ->where('mastersupplier.aktif', 'Y')->where('forwarder.aktif', 'Y')
-                    ->selectRaw(' formshipment.*, formpo.kode_booking, formpo.shipmode, po.id, po.pono, po.matcontents, po.qtypo, po.statusalokasi, po.statusconfirm, po.podate, SUM(po.price * po.qtypo) as amount, po.curr, masterforwarder.name, mastersupplier.nama, forwarder.date_fwd')
+                    ->selectRaw(' formshipment.*, formpo.kode_booking, po.id, po.pono, po.matcontents, po.qtypo, po.statusalokasi, po.statusconfirm, po.podate, SUM(po.price * po.qtypo) as amount, po.curr, masterforwarder.name, mastersupplier.nama, forwarder.date_fwd')
                     ->groupby('po.pono')->groupby('formshipment.noinv')
                     ->get();
             } else {
@@ -62,7 +62,7 @@ class ReportShipment extends Controller
                     ->where('formpo.aktif', 'Y')->where('masterforwarder.aktif', 'Y')->where('formshipment.aktif', 'Y')
                     ->where('mastersupplier.aktif', 'Y')->where('forwarder.aktif', 'Y')
                     ->where('po.pono', $request->po)
-                    ->selectRaw(' formshipment.*, formpo.kode_booking, formpo.shipmode, po.id, po.pono, po.matcontents, po.qtypo, po.statusalokasi, po.statusconfirm, po.podate, SUM(po.price * po.qtypo) as amount, po.curr, masterforwarder.name, mastersupplier.nama, forwarder.date_fwd')
+                    ->selectRaw(' formshipment.*, formpo.kode_booking, po.id, po.pono, po.matcontents, po.qtypo, po.statusalokasi, po.statusconfirm, po.podate, SUM(po.price * po.qtypo) as amount, po.curr, masterforwarder.name, mastersupplier.nama, forwarder.date_fwd')
                     ->groupby('po.pono')->groupby('formshipment.noinv')
                     ->get();
             }
@@ -73,30 +73,33 @@ class ReportShipment extends Controller
                 ->addColumn('po', function ($data) {
                     return $data->pono;
                 })
-                ->addColumn('date', function ($data) {
-                    return date("d/m/Y", strtotime($data->podate));
-                })
-                ->addColumn('amount', function ($data) {
-                    return round($data->amount, 3) . ' ' . $data->curr;
-                })
                 ->addColumn('supplier', function ($data) {
                     return $data->nama;
                 })
-                ->addColumn('shipmode', function ($data) {
-                    return $data->shipmode;
-                })
-                ->addColumn('dateallocation', function ($data) {
-                    return date("d/m/Y", strtotime($data->date_fwd));
-                })
                 ->addColumn('forwarder', function ($data) {
                     return $data->name;
+                })
+                ->addColumn('codebook', function ($data) {
+                    return $data->kode_booking;
+                })
+                ->addColumn('invoice', function ($data) {
+                    return $data->noinv;
+                })
+                ->addColumn('atd', function ($data) {
+                    return $data->etdfix;
+                })
+                ->addColumn('ata', function ($data) {
+                    return $data->etafix;
+                })
+                ->addColumn('blnumber', function ($data) {
+                    return $data->nomor_bl;
                 })
                 ->addColumn('action', function ($data) {
                     $process    = '';
 
                     $process    .= '<a href="#" data-id="' . $data->noinv . '" id="detailshipment"><i class="fa fa-info-circle"></i></a>';
                     $process    .= '&nbsp';
-                    $process    .= '<a href="' . url('report/alokasi/getexcelshipment', ['id' => $data->noinv]) . '"><i class="fa fa-file-excel text-success"></i></a>';
+                    $process    .= '<a href="' . url('report/shipment/getexcelshipment', ['id' => $data->noinv]) . '"><i class="fa fa-file-excel text-success"></i></a>';
 
                     return $process;
                 })
@@ -272,7 +275,7 @@ class ReportShipment extends Controller
             ],
         ];
         //title
-        $sheet->setCellValue('A' . '2', strtoupper('Detail Allocation'));
+        $sheet->setCellValue('A' . '2', strtoupper('Detail Ready Shipment'));
 
         //single header
         $sheet->setCellValue('B' . '4', ':' . $getdata[0]->noinv);
@@ -332,7 +335,7 @@ class ReportShipment extends Controller
         $sheet->getStyle($cellheader)->getAlignment()->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER);
         $sheet->getStyle($celldata)->getAlignment()->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER);
 
-        $fileName = "Report_Allocation_" . $getdata[0]->noinv . ".xlsx";
+        $fileName = "Report_Ready_Shipment_" . $getdata[0]->noinv . ".xlsx";
 
         $writer = new Xlsx($spreadsheet);
         header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');

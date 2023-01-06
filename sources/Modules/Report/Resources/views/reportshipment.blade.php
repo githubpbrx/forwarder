@@ -5,7 +5,6 @@
 @endsection
 
 @section('content')
-
     <div class="row" style="font-size: 10pt;">
         <div class="col-lg-12">
             <div class="card card-primary">
@@ -40,22 +39,25 @@
                                                 <center>PO</center>
                                             </th>
                                             <th>
-                                                <center>Date</center>
-                                            </th>
-                                            <th>
-                                                <center>Amount</center>
-                                            </th>
-                                            <th>
                                                 <center>Supplier</center>
                                             </th>
                                             <th>
-                                                <center>Shipmode</center>
-                                            </th>
-                                            <th>
-                                                <center>Date Allocation</center>
-                                            </th>
-                                            <th>
                                                 <center>Forwarder</center>
+                                            </th>
+                                            <th>
+                                                <center>Code Booking</center>
+                                            </th>
+                                            <th>
+                                                <center>Invoice</center>
+                                            </th>
+                                            <th>
+                                                <center>ATD</center>
+                                            </th>
+                                            <th>
+                                                <center>ATA</center>
+                                            </th>
+                                            <th>
+                                                <center>BL Number</center>
                                             </th>
                                             <th>
                                                 <center>Action</center>
@@ -78,7 +80,7 @@
         <div class="modal-dialog" style="max-width: 80%;">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h4 class="modal-title"><span id="modaltitle">Detail Report Shipment</span></h4>
+                    <h4 class="modal-title"><span id="modaltitle">Detail Report Ready Shipment</span></h4>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -125,28 +127,32 @@
                         name: 'po'
                     },
                     {
-                        data: 'date',
-                        name: 'date'
-                    },
-                    {
-                        data: 'amount',
-                        name: 'amount'
-                    },
-                    {
                         data: 'supplier',
                         name: 'supplier'
                     },
                     {
-                        data: 'shipmode',
-                        name: 'shipmode'
-                    },
-                    {
-                        data: 'dateallocation',
-                        name: 'dateallocation'
-                    },
-                    {
                         data: 'forwarder',
                         name: 'forwarder'
+                    },
+                    {
+                        data: 'codebook',
+                        name: 'codebook'
+                    },
+                    {
+                        data: 'invoice',
+                        name: 'invoice'
+                    },
+                    {
+                        data: 'atd',
+                        name: 'atd'
+                    },
+                    {
+                        data: 'ata',
+                        name: 'ata'
+                    },
+                    {
+                        data: 'blnumber',
+                        name: 'blnumber'
                     },
                     {
                         data: 'action',
