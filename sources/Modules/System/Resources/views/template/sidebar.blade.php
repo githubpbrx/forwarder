@@ -100,12 +100,12 @@
                                 <li class="nav-item">
                                     <a href="{{ route('data_allocation') }}" class="nav-link">
                                         <i class="fas fa-share nav-icon"></i>
-                                        <p>Data Allocation</p>
+                                        <p>Cancel Allocation</p>
                                     </a>
                                 </li>
                             @endif
                         </ul>
-                        <ul class="nav nav-treeview">
+                        {{-- <ul class="nav nav-treeview">
                             @if (RoleAccess::whereMenu(7) > 0)
                                 <li class="nav-item">
                                     <a href="{{ route('approvalconfirmation') }}" class="nav-link">
@@ -114,7 +114,7 @@
                                     </a>
                                 </li>
                             @endif
-                        </ul>
+                        </ul> --}}
                     </li>
                 @endif
 
