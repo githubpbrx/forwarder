@@ -54,7 +54,7 @@
                     </a>
                 </li>
 
-                @if (RoleAccess::whereMenu(8) > 0)
+                @if (RoleAccess::whereMenu(8) + RoleAccess::whereMenu(14) > 0)
                     <li class="nav-item mt-2">
                         <a href="#" class="nav-link">
                             <i class="nav-icon fas fa-server"></i>
@@ -86,7 +86,7 @@
                     </li>
                 @endif
 
-                @if (RoleAccess::whereMenu(7) > 0)
+                @if (RoleAccess::whereMenu(6) > 0)
                     <li class="nav-item mt-2">
                         <a href="#" class="nav-link">
                             <i class="nav-icon fas fa-server"></i>
