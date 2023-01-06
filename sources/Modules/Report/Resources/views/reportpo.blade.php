@@ -11,33 +11,29 @@
                 <div class="row">
                     <div class="col-md-12">
                         <div id="fullscreen-container" class="card-body" style="overflow-y: auto;">
-                            <div class="row">
-                                {{-- <div class="d-flex"> --}}
-                                {{-- <div class="p-2"> --}}
-                                <div class="col-md-3">
-                                    <label class="control-label">Choose PO :</label>
-                                    <div class="col-sm-12">
-                                        <select class="select2" style="width: 100%;" name="datapo" id="datapo">
-                                            <option value=""></option>
-                                        </select>
+                            <div class="row justify-content-between col-md-12 ">
+                                <div class="row col-md-6">
+                                    <div class="col-md-4">
+                                        <label class="control-label">Choose PO :</label>
+                                        <div class="col-sm-12">
+                                            <select class="select2" style="width: 100%;" name="datapo" id="datapo">
+                                                <option value=""></option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="control-label"> &nbsp; </label>
+                                        <div class="col-sm-12">
+                                            <a href="#" type="button" id="search"
+                                                class="btn btn-info form-control" data-value="klik">Search</a>
+                                        </div>
                                     </div>
                                 </div>
-                                {{-- </div> --}}
-                                {{-- <div class="p-2"> --}}
-                                <div class="col-md-1">
-                                    <label class="control-label"> &nbsp; </label>
-                                    <div class="col-sm-12">
-                                        <a href="#" type="button" id="search" class="btn btn-info form-control"
-                                            data-value="klik">Search</a>
-                                    </div>
-                                </div>
-                                {{-- </div> --}}
-                                {{-- <div class="ml-auto p-2">
+                                {{-- <div class="col-md-2">
                                     <label class="control-label"> &nbsp; </label>
                                     <a href="{{ url('report/po/getexcelpoall') }}" type="button"
-                                        class="btn btn-warning form-control">Download Data Excel</a>
+                                        class="btn btn-warning form-control">Download Excel</a>
                                 </div> --}}
-                                {{-- </div> --}}
                             </div>
                             <br>
                             <div class="table-responsive">
@@ -59,6 +55,9 @@
                                             </th>
                                             <th>
                                                 <center>Supplier</center>
+                                            </th>
+                                            <th>
+                                                <center>Shipmode</center>
                                             </th>
                                             <th>
                                                 <center>Action</center>
@@ -167,6 +166,10 @@
                     {
                         data: 'supplier',
                         name: 'supplier'
+                    },
+                    {
+                        data: 'shipmode',
+                        name: 'shipmode'
                     },
                     {
                         data: 'action',

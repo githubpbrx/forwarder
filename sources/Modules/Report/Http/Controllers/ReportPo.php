@@ -41,16 +41,16 @@ class ReportPo extends Controller
             if ($request->po == null) {
                 $data = modelpo::join('mastersupplier', 'mastersupplier.id', 'po.vendor')
                     ->where('mastersupplier.aktif', 'Y')
-                    ->select('po.id', 'po.pono', 'po.matcontents', 'po.podate', 'mastersupplier.nama')
-                    ->selectRaw(' count(po.id) as amount ')
+                    ->where('po.statusconfirm', '!=', 'confirm')->orWhereNull('po.statusconfirm')
+                    ->selectRaw(' po.id, po.pono, po.matcontents, po.podate, sum(po.price * po.qtypo) as amount, po.curr, po.shipmode, mastersupplier.nama ')
                     ->groupby('po.pono')
                     ->get();
             } else {
                 $data = modelpo::join('mastersupplier', 'mastersupplier.id', 'po.vendor')
                     ->where('pono', $request->po)
+                    ->where('po.statusconfirm', '!=', 'confirm')->orWhereNull('po.statusconfirm')
                     ->where('mastersupplier.aktif', 'Y')
-                    ->select('po.id', 'po.pono', 'po.matcontents', 'po.podate', 'mastersupplier.nama')
-                    ->selectRaw(' count(po.id) as amount ')
+                    ->selectRaw(' po.id, po.pono, po.matcontents, po.podate, sum(po.price * po.qtypo) as amount, po.curr, po.shipmode, mastersupplier.nama ')
                     ->groupby('po.pono')
                     ->get();
             }
@@ -65,7 +65,7 @@ class ReportPo extends Controller
                     return date("d/m/Y", strtotime($data->podate));
                 })
                 ->addColumn('amount', function ($data) {
-                    return $data->amount;
+                    return round($data->amount, 3) . ' ' . $data->curr;
                 })
                 ->addColumn('supplier', function ($data) {
                     return $data->nama;
@@ -230,25 +230,39 @@ class ReportPo extends Controller
 
     function excelpoall()
     {
-        $getdata = modelpo::get();
-        // dd($getdata);
+        // $getdata = modelpo::get();
+        $getdatasum = modelpo::where('statusconfirm', '!=', 'confirm')->orWhereNull('statusconfirm')
+            ->selectRaw(' id, pono, sum(price * qtypo) as amount, curr')
+            ->groupby('pono')
+            ->get();
+
+        $getdata = modelpo::join('mastersupplier', 'mastersupplier.id', 'po.vendor')
+            ->where('mastersupplier.aktif', 'Y')
+            ->where('po.statusconfirm', '!=', 'confirm')->orWhereNull('po.statusconfirm')
+            ->selectRaw(' po.id, po.pono, po.matcontents, po.colorcode, po.size , po.podate, mastersupplier.nama ')
+            ->get();
+        // dd($getdatasum, $getdata);
 
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
 
-        $cell = 'A4:D4';
-        $sheet->mergeCells('A2:D2');
+        $cell = 'A4:F4';
+        $sheet->mergeCells('A2:F2');
         $sheet->setCellValue('A4', 'PO');
-        $sheet->getColumnDimension('A')->setWidth(20);
+        $sheet->getColumnDimension('A')->setAutoSize(true);
         $sheet->setCellValue('B4', 'Material');
-        $sheet->getColumnDimension('B')->setWidth(40);
-        $sheet->setCellValue('C4', 'Status Allocation');
-        $sheet->getColumnDimension('C')->setWidth(20);
-        $sheet->setCellValue('D4', 'Status Confirm');
-        $sheet->getColumnDimension('D')->setWidth(20);
+        $sheet->getColumnDimension('B')->setAutoSize(true);
+        $sheet->setCellValue('C4', 'Color');
+        $sheet->getColumnDimension('C')->setAutoSize(true);
+        $sheet->setCellValue('D4', 'Size');
+        $sheet->getColumnDimension('D')->setAutoSize(true);
+        $sheet->setCellValue('E4', 'Amount');
+        $sheet->getColumnDimension('E')->setAutoSize(true);
+        $sheet->setCellValue('F4', 'Supplier');
+        $sheet->getColumnDimension('F')->setAutoSize(true);
         $sheet->getStyle($cell)->getAlignment()->setWrapText(true);
         $sheet->getStyle($cell)->getFont()->setBold(true);
-        $sheet->getStyle('A2:D2')->getFont()->setBold(true);
+        $sheet->getStyle('A2:F2')->getFont()->setBold(true);
         $sheet->getStyle($cell)->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID);
         $sheet->getStyle($cell)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
         $sheet->getStyle($cell)->getAlignment()->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER);
@@ -274,16 +288,34 @@ class ReportPo extends Controller
         ];
 
         $sheet->setCellValue('A' . '2', strtoupper('Data PO'));
-        foreach ($getdata as $key => $value) {
+        // for ($i = 0; $i < count($getdata); $i++) {
+        //     for ($a = $i + 1; $a > $i; $a--) {
+        //         if ($getdata[$i]->pono ==  $getdata[$a]->pono) {
+        //             $sheet->mergeCells('A' . $rows . ':' . 'A' . $rows + [$a]);
+        //             $sheet->setCellValue('A' . $rows, $getdata[$i]->pono);
+        //         } else {
+        //             $sheet->setCellValue('A' . $rows, $getdata[$i]->pono);
+        //         }
+        //     }
+        // $sheet->setCellValue('B' . $rows, $value->matcontents);
+        // $sheet->setCellValue('C' . $rows, $value->colorcode);
+        // $sheet->setCellValue('D' . $rows, $value->size);
+        // $sheet->setCellValue('E' . $rows, $value->amount . ' ' . $value->curr);
+        // $sheet->setCellValue('F' . $rows, $value->nama);
+        //     $rows++;
+        // }
+        foreach ($getdatasum as $key => $value) {
             $sheet->setCellValue('A' . $rows, $value->pono);
             $sheet->setCellValue('B' . $rows, $value->matcontents);
-            $sheet->setCellValue('C' . $rows, $value->statusalokasi);
-            $sheet->setCellValue('D' . $rows, $value->statusconfirm);
+            $sheet->setCellValue('C' . $rows, $value->colorcode);
+            $sheet->setCellValue('D' . $rows, $value->size);
+            $sheet->setCellValue('E' . $rows, $value->amount . ' ' . $value->curr);
+            $sheet->setCellValue('F' . $rows, $value->nama);
             $rows++;
         }
 
-        $cell = 'A4:D' . ($rows - 1);
-        $sheet->getStyle('A2:D2')->applyFromArray($styleArraytitle);
+        $cell = 'A4:F' . ($rows - 1);
+        $sheet->getStyle('A2:F2')->applyFromArray($styleArraytitle);
         $sheet->getStyle($cell)->applyFromArray($styleArray);
         $sheet->getStyle($cell)->getAlignment()->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER);
 
