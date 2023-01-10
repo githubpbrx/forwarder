@@ -6,7 +6,7 @@
     <br>
     <p>Hi <b><i>,</i> {{ $nama }}</b></p>
 
-    <p>You Got New PO <br> Please Check In <b>Web Forwarder</b></p>
+    <p>You Got New PO : {{ $pono }} <br> Please Check In <b>Web Forwarder</b></p>
     <center>
         <a href="{{ $link }}"><button
                 style="background-color:  #6495ED; color: white; font-weight: bold; width:140px; height: 34px; border-radius: 11px">

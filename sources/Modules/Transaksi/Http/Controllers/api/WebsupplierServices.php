@@ -144,11 +144,11 @@ class WebsupplierServices extends Controller
         }
     }
 
-    public static function sendEmail($email, $nama, $link, $subject)
+    public static function sendEmail($pono, $email, $nama, $link, $subject)
     {
         // dd($email, $nama, $link, $subject);
         try {
-            Mail::send('transaksi::layouts/notifpoemail', ['nama' => $nama, 'link' => $link], function ($message) use ($subject, $email) {
+            Mail::send('transaksi::layouts/notifpoemail', ['nama' => $nama, 'link' => $link, 'pono' => $pono], function ($message) use ($subject, $email) {
                 // dd($subject, $email, $message);
                 $message->subject($subject);
                 $message->to($email);
@@ -233,11 +233,11 @@ class WebsupplierServices extends Controller
             $insertdatafwd = fwd::insert(['idpo' => $getqtypo->id, 'idmasterfwd' => $insert, 'po_nomor' => $getqtypo->pono, 'qty_allocation' => $getqtypo->qtypo, 'statusforwarder' => 'full_allocated', 'aktif' => 'Y', 'created_at' => date('Y-m-d H:i:s')]);
 
             //for notif email
-            // $getemail = privilege::where('idforwarder', $insert)->where('privilege_aktif', 'Y')->first();
-            // if ($getemail) {
-            //     $url = 'pbrx.web.id/forwarder';
-            //     WebsupplierServices::sendEmail($getemail->privilege_user_nik, $getemail->privilege_user_name, $url, "Notification Forwarder Get PO");
-            // }
+            $getemail = privilege::where('idforwarder', $insert)->where('leadforwarder', 1)->where('privilege_aktif', 'Y')->first();
+            if ($getemail) {
+                $url = 'pbrx.web.id/forwarder';
+                WebsupplierServices::sendEmail($pono, $getemail->privilege_user_nik, $getemail->privilege_user_name, $url, "Notification Forwarder Get PO");
+            }
 
             modellogproses::insert(['typelog' => 'prosesupdatepi', 'activity' => '=== SUCCESS UPDATE PI NUMBER ===', 'status' => true, 'datetime' => date('Y-m-d H:i:s'), 'from' => 'api_updatepi', 'created_at' => date('Y-m-d H:i:s')]);
             $failed['message'] = "Done";
