@@ -40,15 +40,19 @@ class ReportPo extends Controller
         if ($request->ajax()) {
             if ($request->po == null) {
                 $data = modelpo::join('mastersupplier', 'mastersupplier.id', 'po.vendor')
+                    ->where(function ($var) {
+                        $var->where('po.statusconfirm', '!=', 'confirm')->orWhere('po.statusconfirm', null);
+                    })
                     ->where('mastersupplier.aktif', 'Y')
-                    ->where('po.statusconfirm', '!=', 'confirm')->orWhereNull('po.statusconfirm')
                     ->selectRaw(' po.id, po.pono, po.matcontents, po.podate, sum(po.price * po.qtypo) as amount, po.curr, po.shipmode, mastersupplier.nama ')
                     ->groupby('po.pono')
                     ->get();
             } else {
                 $data = modelpo::join('mastersupplier', 'mastersupplier.id', 'po.vendor')
-                    ->where('pono', $request->po)
-                    ->where('po.statusconfirm', '!=', 'confirm')->orWhereNull('po.statusconfirm')
+                    ->where('po.pono', $request->po)
+                    ->where(function ($var) {
+                        $var->where('po.statusconfirm', '!=', 'confirm')->orWhere('po.statusconfirm', null);
+                    })
                     ->where('mastersupplier.aktif', 'Y')
                     ->selectRaw(' po.id, po.pono, po.matcontents, po.podate, sum(po.price * po.qtypo) as amount, po.curr, po.shipmode, mastersupplier.nama ')
                     ->groupby('po.pono')
@@ -113,7 +117,7 @@ class ReportPo extends Controller
         header("Access-Control-Allow-Headers: *");
 
         if (!$request->ajax()) return;
-        $po = modelpo::select('pono');
+        $po = modelpo::select('pono')->where('statusconfirm', '!=', 'confirm')->orWhere('statusconfirm', null);
 
         if ($request->has('q')) {
             $search = $request->q;
