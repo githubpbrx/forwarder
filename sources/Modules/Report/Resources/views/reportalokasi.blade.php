@@ -14,9 +14,15 @@
                         <div id="fullscreen-container" class="card-body" style="overflow-y: auto;">
                             <div class="row justify-content-between col-md-12 ">
                                 <div class="row col-md-6">
-                                    <div class="col-md-6">
+                                    <div class="col-md-4">
                                         <label class="control-label">Choose PO :</label>
                                         <select class="select2" style="width: 100%;" name="datapo" id="datapo">
+                                            <option value=""></option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="control-label">Choose Forwarder:</label>
+                                        <select class="select2" style="width: 100%;" name="datafwd" id="datafwd">
                                             <option value=""></option>
                                         </select>
                                     </div>
@@ -25,6 +31,11 @@
                                         <a href="#" type="button" id="search" class="btn btn-info form-control"
                                             data-value="klik">Search</a>
                                     </div>
+                                </div>
+                                <div class="col-md-2">
+                                    <label class="control-label"> &nbsp; </label>
+                                    <a href="{{ url('report/alokasi/getexcelalokasiall') }}" type="button"
+                                        class="btn btn-warning form-control">Download Excel</a>
                                 </div>
                             </div>
                             <br>
@@ -52,10 +63,19 @@
                                                 <center>Shipmode</center>
                                             </th>
                                             <th>
+                                                <center>Forwarder</center>
+                                            </th>
+                                            <th>
                                                 <center>Date Allocation</center>
                                             </th>
                                             <th>
-                                                <center>Forwarder</center>
+                                                <center>Date Booking</center>
+                                            </th>
+                                            <th>
+                                                <center>Date Confirm</center>
+                                            </th>
+                                            <th>
+                                                <center>Status</center>
                                             </th>
                                             <th>
                                                 <center>Action</center>
@@ -114,7 +134,8 @@
                 ajax: {
                     url: "{{ url('report/alokasi/search') }}",
                     data: function(d) {
-                        d.po = $('#datapo').val()
+                        d.pono = $('#datapo').val(),
+                            d.idmasterfwd = $('#datafwd').val()
                     }
                 },
                 columns: [{
@@ -141,12 +162,24 @@
                         name: 'shipmode'
                     },
                     {
+                        data: 'forwarder',
+                        name: 'forwarder'
+                    },
+                    {
                         data: 'dateallocation',
                         name: 'dateallocation'
                     },
                     {
-                        data: 'forwarder',
-                        name: 'forwarder'
+                        data: 'datebook',
+                        name: 'datebook'
+                    },
+                    {
+                        data: 'dateconfirm',
+                        name: 'dateconfirm'
+                    },
+                    {
+                        data: 'status',
+                        name: 'status'
                     },
                     {
                         data: 'action',
@@ -194,8 +227,8 @@
 
                             results: $.map(data.data, function(item) {
                                 return {
-                                    text: item.pono,
-                                    id: item.pono,
+                                    text: item.po_nomor,
+                                    id: item.po_nomor,
                                     selected: true,
                                 }
                             }),
@@ -208,13 +241,47 @@
                 }
             });
 
-            var namefile;
+            $('#datafwd').select2({
+                placeholder: '-- Choose Forwarder --',
+                ajax: {
+                    url: "{!! route('report_getfwdalokasi') !!}",
+                    dataType: 'json',
+                    delay: 500,
+                    type: 'post',
+                    data: function(params) {
+                        var query = {
+                            q: params.term,
+                            page: params.page || 1,
+                            _token: $('meta[name=csrf-token]').attr('content')
+                        }
+                        return query;
+                    },
+                    processResults: function(data, params) {
+                        return {
+
+                            results: $.map(data.data, function(item) {
+                                return {
+                                    text: item.name,
+                                    id: item.id,
+                                    selected: true,
+                                }
+                            }),
+                            pagination: {
+                                more: data.to < data.total
+                            }
+                        };
+                    },
+                    cache: true
+                }
+            });
+
             $('body').on('click', '#detailalokasi', function() {
                 $('#detailall').modal({
                     show: true,
                     backdrop: 'static'
                 });
                 let idku = $(this).attr('data-id');
+                let idmasterfwd = $(this).attr('data-idfwd');
                 $.ajax({
                     url: "{!! route('report_detailalokasi') !!}",
                     type: 'POST',
@@ -222,6 +289,7 @@
                     data: {
                         _token: $('meta[name=csrf-token]').attr('content'),
                         id: idku,
+                        idmasterfwd: idmasterfwd
                     },
                 }).done(function(data) {
                     $('#formdetail').html(data);

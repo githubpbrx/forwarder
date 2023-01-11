@@ -26,6 +26,7 @@ Route::prefix('report')->group(function () {
     Route::group(['prefix' => 'alokasi'], function () {
         Route::get('/', 'ReportAlokasi@index')->name('reportalokasi');
         Route::post('/getpo/', 'ReportAlokasi@getpo')->name('report_getpoalokasi');
+        Route::post('/getfwd/', 'ReportAlokasi@getfwd')->name('report_getfwdalokasi');
         Route::get('search', 'ReportAlokasi@datatable');
         Route::post('/getdetailalokasi/', 'ReportAlokasi@detailalokasi')->name('report_detailalokasi');
         Route::get('/getexcelalokasi/{id}', 'ReportAlokasi@excelalokasi')->name('report_excelalokasi');
