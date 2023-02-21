@@ -177,6 +177,9 @@ class WebsupplierServices extends Controller
         $pirecdate = $req->pirecdate;
         $pideldate = $req->pideldate;
         $forwarder = $req->forwarder;
+        $country = $req->country;
+        $address = $req->address;
+        $telephone = $req->telephone;
         modellogproses::insert(['typelog' => 'prosesupdatepi', 'activity' => '==== START CHECKING Update PI po => ' . $pono . '; lineid => ' . $lineid . '; pino =>' . $pino . '; pirecdate=>' . $pirecdate . '; pideldate=>' . $pideldate, 'status' => true, 'datetime' => date('Y-m-d H:i:s'), 'from' => 'api_updatepi', 'created_at' => date('Y-m-d H:i:s')]);
         if ($pono == "") {
             modellogproses::insert(['typelog' => 'prosesupdatepi', 'activity' => 'FAILED alert => The PO your send cannot be empty', 'status' => false, 'datetime' => date('Y-m-d H:i:s'), 'from' => 'api_updatepi', 'created_at' => date('Y-m-d H:i:s')]);
@@ -218,7 +221,17 @@ class WebsupplierServices extends Controller
             return response()->json($failed, Response::HTTP_UNPROCESSABLE_ENTITY);
         }
 
-        $update = po::where('pono', $pono)->where('line_id', $lineid)->update(['pino' => $pino, 'pirecdate' => $pirecdate, 'pideldate' => $pideldate, 'updated_at' => date('Y-m-d H:i:s')]);
+        if ($country == ""  || $address == "" || $telephone == "") {
+            modellogproses::insert(['typelog' => 'prosesupdatepi', 'activity' => 'FAILED alert => Country/Addres/Telephone your send cannot be empty', 'status' => false, 'datetime' => date('Y-m-d H:i:s'), 'from' => 'api_updatepi', 'created_at' => date('Y-m-d H:i:s')]);
+            modellogproses::insert(['typelog' => 'prosesupdatepi', 'activity' => '=== END PROSES => ROLLBACK ===', 'status' => false, 'datetime' => date('Y-m-d H:i:s'), 'from' => 'api_updatepi', 'created_at' => date('Y-m-d H:i:s')]);
+            $failed['message'] = "Country/Addres/Telephone your send cannot be empty";
+            $failed['success'] = false;
+            $failed['title'] = "Warning!";
+            $failed['type'] = "warning";
+            return response()->json($failed, Response::HTTP_UNPROCESSABLE_ENTITY);
+        }
+
+        $update = po::where('pono', $pono)->where('line_id', $lineid)->update(['pino' => $pino, 'pirecdate' => $pirecdate, 'pideldate' => $pideldate, 'country' => $country, 'address' => $address, 'telephone' => $telephone, 'updated_at' => date('Y-m-d H:i:s')]);
         if ($update) {
             $cekforwarder = forward::where('name', $forwarder)->where('aktif', 'Y')->first();
             if ($cekforwarder == null) {
