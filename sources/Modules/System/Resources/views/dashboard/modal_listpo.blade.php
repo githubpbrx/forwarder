@@ -79,7 +79,7 @@
                                                     } else {
                                                         $hscode = $dat['poku']['hscode']->hscode;
                                                     }
-
+                                                    
                                                     ?>
                                                     <tr>
                                                         <td>{{ $dat->po_nomor }}</td>
@@ -260,6 +260,37 @@
                     </div>
                 </div>
             </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label class="col-sm-12 control-label">Port Of Loading<code>*</code></label>
+                    <div class="col-sm-12">
+                        <select class="form-control select2" name="portloading" id="portloading">
+                            <option value=""></option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label class="col-sm-12 control-label">Port Of Destination<code>*</code></label>
+                    <div class="col-sm-12">
+                        <select class="form-control select2" name="portdestination" id="portdestination">
+                            <option value=""></option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label class="col-sm-12 control-label">Package<code>*</code></label>
+                    <div class="col-sm-12">
+                        <input type="text" class="form-control" name="package" id="package"
+                            autocomplete="off">
+                    </div>
+                </div>
+            </div>
         </div>
     </form>
 </div>
@@ -370,6 +401,74 @@
             }
         });
 
+        $('#portloading').select2({
+            placeholder: '-- Choose Port Of Loading --',
+            ajax: {
+                url: "{!! route('get_portloading') !!}",
+                dataType: 'json',
+                delay: 500,
+                type: 'post',
+                data: function(params) {
+                    var query = {
+                        q: params.term,
+                        page: params.page || 1,
+                        _token: $('meta[name=csrf-token]').attr('content')
+                    }
+                    return query;
+                },
+                processResults: function(data, params) {
+                    console.log('data :>> ', data);
+                    return {
+                        results: $.map(data.data, function(item) {
+                            return {
+                                text: item.code_port + '-' + item.name_port,
+                                id: item.id_portloading,
+                                selected: true,
+                            }
+                        }),
+                        pagination: {
+                            more: data.to < data.total
+                        }
+                    };
+                },
+                cache: true
+            }
+        });
+
+        $('#portdestination').select2({
+            placeholder: '-- Choose Port Of Destination --',
+            ajax: {
+                url: "{!! route('get_portdestination') !!}",
+                dataType: 'json',
+                delay: 500,
+                type: 'post',
+                data: function(params) {
+                    var query = {
+                        q: params.term,
+                        page: params.page || 1,
+                        _token: $('meta[name=csrf-token]').attr('content')
+                    }
+                    return query;
+                },
+                processResults: function(data, params) {
+                    console.log('data :>> ', data);
+                    return {
+                        results: $.map(data.data, function(item) {
+                            return {
+                                text: item.code_port + '-' + item.name_port,
+                                id: item.id_portdestination,
+                                selected: true,
+                            }
+                        }),
+                        pagination: {
+                            more: data.to < data.total
+                        }
+                    };
+                },
+                cache: true
+            }
+        });
+
         $('#btnsubmit').click(function(e) {
             $('#btnsubmit').html('<i class="fas fa-hourglass"></i> Please Wait')
             $('#btnsubmit').prop('disabled', true)
@@ -392,6 +491,9 @@
             let myair = $('#airku').val();
             let airweight = $('#airweight').val();
             let myroute = $('#route').val();
+            let portloading = $('#portloading').val();
+            let portdestination = $('#portdestination').val();
+            let package = $('#package').val();
 
             var arraysave = [];
             for (let index = 0; index < dataku.length; index++) {
@@ -459,6 +561,18 @@
                 notifalert('Route');
                 $('#btnsubmit').html('Submit')
                 $('#btnsubmit').prop('disabled', false)
+            } else if (portloading == null || portloading == '') {
+                notifalert('Port Of Loading');
+                $('#btnsubmit').html('Submit')
+                $('#btnsubmit').prop('disabled', false)
+            } else if (portdestination == null || portdestination == '') {
+                notifalert('Port Of Destination');
+                $('#btnsubmit').html('Submit')
+                $('#btnsubmit').prop('disabled', false)
+            } else if (package == null || package == '') {
+                notifalert('Package');
+                $('#btnsubmit').html('Submit')
+                $('#btnsubmit').prop('disabled', false)
             } else {
                 $.ajax({
                     type: "post",
@@ -480,7 +594,10 @@
                         'lclweight': lclweight,
                         'air': myair,
                         'airweight': airweight,
-                        'route': myroute
+                        'route': myroute,
+                        'portloading': portloading,
+                        'portdestination': portdestination,
+                        'package': package
                     },
                     dataType: "json",
                     success: function(response) {

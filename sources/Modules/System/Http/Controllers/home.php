@@ -22,6 +22,8 @@ use Modules\System\Models\modelforwarder as forwarder;
 use Modules\System\Models\Privileges\modelgroup_access;
 use Modules\System\Models\masterhscode;
 use Modules\System\Models\mastercompany;
+use Modules\System\Models\masterportofloading;
+use Modules\System\Models\masterportofdestination;
 
 class home extends Controller
 {
@@ -848,6 +850,42 @@ class home extends Controller
         return response()->json($po);
     }
 
+    public function getportloading(Request $request)
+    {
+        header("Access-Control-Allow-Origin: *");
+        header("Access-Control-Allow-Headers: *");
+
+        if (!$request->ajax()) return;
+        $po = masterportofloading::selectRaw(' id_portloading, code_port, name_port');
+
+        if ($request->has('q')) {
+            $search = $request->q;
+            $po = $po->whereRaw(' (name_port like "%' . $search . '%") ');
+        }
+
+        $po = $po->where('aktif', 'Y')->paginate(10, $request->page);
+        // dd($po);
+        return response()->json($po);
+    }
+
+    public function getportdestination(Request $request)
+    {
+        header("Access-Control-Allow-Origin: *");
+        header("Access-Control-Allow-Headers: *");
+
+        if (!$request->ajax()) return;
+        $po = masterportofdestination::selectRaw(' id_portdestination, code_port, name_port');
+
+        if ($request->has('q')) {
+            $search = $request->q;
+            $po = $po->whereRaw(' (name_port like "%' . $search . '%") ');
+        }
+
+        $po = $po->where('aktif', 'Y')->paginate(10, $request->page);
+        // dd($po);
+        return response()->json($po);
+    }
+
     public function formupdate(Request $request)
     {
         // dd($request);
@@ -989,6 +1027,26 @@ class home extends Controller
                 $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'AIR is required, please input AIR'];
                 return response()->json($status, 200);
             }
+            if ($request->route == '' && $request->route == null) {
+                DB::rollback();
+                $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'Route is required, please input Route'];
+                return response()->json($status, 200);
+            }
+            if ($request->portloading == '' && $request->portloading == null) {
+                DB::rollback();
+                $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'Port Of Loading is required, please input Port Of Loading'];
+                return response()->json($status, 200);
+            }
+            if ($request->portdestination == '' && $request->portdestination == null) {
+                DB::rollback();
+                $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'Port Of Destination is required, please input Port Of Destination'];
+                return response()->json($status, 200);
+            }
+            if ($request->package == '' && $request->package == null) {
+                DB::rollback();
+                $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'Package is required, please input Package'];
+                return response()->json($status, 200);
+            }
 
             $cekpino = po::where('id', $val['idpo'])
                 ->where(function ($var) {
@@ -1009,28 +1067,33 @@ class home extends Controller
             }
 
             $save1 = formpo::insert([
-                'idpo'          => $val['idpo'],
-                'idmasterfwd'   => $val['idmasterfwd'],
-                'idforwarder'   => $val['idforwarder'],
-                'idroute'       => $request->route,
-                'kode_booking'  => strtoupper($request->nobooking),
-                'date_booking'  => $request->datebooking,
-                'etd'           => $request->etd,
-                'eta'           => $request->eta,
-                'shipmode'      => $request->shipmode,
-                'subshipmode'   => $submode,
-                'statusformpo'  => 'waiting',
-                'aktif'         => 'Y',
-                'created_at'    => date('Y-m-d H:i:s'),
-                'created_by'    => Session::get('session')['user_nik']
+                'idpo'              => $val['idpo'],
+                'idmasterfwd'       => $val['idmasterfwd'],
+                'idforwarder'       => $val['idforwarder'],
+                'idroute'           => $request->route,
+                'idportloading'     => $request->portloading,
+                'idportdestination' => $request->portdestination,
+                'kode_booking'      => strtoupper($request->nobooking),
+                'date_booking'      => $request->datebooking,
+                'etd'               => $request->etd,
+                'eta'               => $request->eta,
+                'shipmode'          => $request->shipmode,
+                'subshipmode'       => $submode,
+                'package'           => $request->package,
+                'statusformpo'      => 'waiting',
+                'aktif'             => 'Y',
+                'created_at'        => date('Y-m-d H:i:s'),
+                'created_by'        => Session::get('session')['user_nik']
             ]);
 
             $save2 = po::where('id', $val['idpo'])->update([
-                'statusconfirm' => 'waiting'
+                'statusconfirm' => 'waiting',
+                'updated_at'    => date('Y-m-d H:i:s')
             ]);
 
             $save3 = forwarder::where('id_forwarder', $val['idforwarder'])->update([
-                'statusapproval' => 'waiting'
+                'statusapproval' => 'waiting',
+                'updated_at'    => date('Y-m-d H:i:s')
             ]);
 
             if ($save1 && $save2 && $save3) {

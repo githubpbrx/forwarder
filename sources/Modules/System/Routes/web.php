@@ -28,6 +28,8 @@ Route::prefix('')->group(function () {
     Route::get('/listpotimeout', 'home@listpotimeout')->name('list_potimeout');
     Route::get('/listcancel', 'home@listcancel')->name('list_cancel');
     Route::post('/getroute', 'home@getroute')->name('get_route');
+    Route::post('/getportloading', 'home@getportloading')->name('get_portloading');
+    Route::post('/getportdestination', 'home@getportdestination')->name('get_portdestination');
     Route::post('/getpidate', 'home@getpi')->name('get_pi');
     Route::get('/listupdate', 'home@listupdate')->name('list_update');
     Route::get('/listkyc', 'home@listkyc')->name('list_kyc');
@@ -49,7 +51,6 @@ Route::prefix('')->group(function () {
     Route::get('/validasikyc', 'login@validasikyc')->name('validasikyc');
     Route::get('/validasikycreject', 'login@validasikycreject')->name('validasikycreject');
     Route::post('/validasikycaction', 'login@validasikycaction')->name('validasikycaction');
-
 
     Route::get('/aktifasiuser', 'login@aktifasiuser')->name('aktifasiuser');
     Route::get('/resendemail', 'login@resendemail')->name('resendemail');
