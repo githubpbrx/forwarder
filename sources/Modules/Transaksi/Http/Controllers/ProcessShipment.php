@@ -14,7 +14,8 @@ use Modules\Transaksi\Models\modelpo;
 use Modules\Transaksi\Models\modelcontainer;
 use Modules\Transaksi\Models\modelformpo;
 use Modules\Transaksi\Models\modelformshipment;
-
+use Modules\Transaksi\Models\masterportofloading;
+use Modules\Transaksi\Models\masterportofdestination;
 
 class ProcessShipment extends Controller
 {
@@ -201,7 +202,7 @@ class ProcessShipment extends Controller
             $priv->with(['privilege' => function ($lege) {
                 $lege->where('privilege_user_nik', Session::get('session')['user_nik']);
             }]);
-        }, 'withroute'])
+        }, 'withroute', 'withportloading', 'withportdestination'])
             // ->join('po', 'po.id', 'formpo.idpo')
             // ->join('forwarder', 'forwarder.id_forwarder', 'formpo.idforwarder')
             // ->join('privilege', 'privilege.idforwarder', 'forwarder.idmasterfwd')
@@ -236,6 +237,42 @@ class ProcessShipment extends Controller
         // return response()->json(['status' => 200, 'data' => $data, 'message' => 'Berhasil']);
         $form = view('transaksi::modalshipment', ['data' => $data]);
         return $form->render();
+    }
+
+    public function getportloading(Request $request)
+    {
+        header("Access-Control-Allow-Origin: *");
+        header("Access-Control-Allow-Headers: *");
+
+        if (!$request->ajax()) return;
+        $po = masterportofloading::selectRaw(' id_portloading, code_port, name_port');
+
+        if ($request->has('q')) {
+            $search = $request->q;
+            $po = $po->whereRaw(' (name_port like "%' . $search . '%") ');
+        }
+
+        $po = $po->where('aktif', 'Y')->paginate(10, $request->page);
+        // dd($po);
+        return response()->json($po);
+    }
+
+    public function getportdestination(Request $request)
+    {
+        header("Access-Control-Allow-Origin: *");
+        header("Access-Control-Allow-Headers: *");
+
+        if (!$request->ajax()) return;
+        $po = masterportofdestination::selectRaw(' id_portdestination, code_port, name_port');
+
+        if ($request->has('q')) {
+            $search = $request->q;
+            $po = $po->whereRaw(' (name_port like "%' . $search . '%") ');
+        }
+
+        $po = $po->where('aktif', 'Y')->paginate(10, $request->page);
+        // dd($po);
+        return response()->json($po);
     }
 
     /**
@@ -337,6 +374,8 @@ class ProcessShipment extends Controller
             $subshipmode = $request->volume . 'M3' . '-' . $request->updateweight . 'KG';
             $save1 = modelformshipment::insert([
                 'idformpo'         => $val->idformpo,
+                'idportloading'    => $request->portloading,
+                'idportdestination' => $request->portdestination,
                 'qty_shipment'     => $val->value,
                 'noinv'            => strtoupper($request->noinv),
                 'etdfix'           => $request->etdfix,
@@ -349,6 +388,7 @@ class ProcessShipment extends Controller
                 'statusshipment'   => $status,
                 'shipmode'         => $request->shipmode,
                 'subshipmode'      => $subshipmode,
+                'package'          => $request->package,
                 'aktif'            => 'Y',
                 'created_at'       => date('Y-m-d H:i:s'),
                 'created_by'       => Session::get('session')['user_nik']

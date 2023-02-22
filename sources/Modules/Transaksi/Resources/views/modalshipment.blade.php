@@ -75,13 +75,13 @@
                             $block = '';
                             $ceked = 'checked';
                         }
-
+                        
                         if ($item['withpo']['hscode'] == null) {
                             $hscode = '';
                         } else {
                             $hscode = $item['withpo']['hscode']->hscode;
                         }
-
+                        
                         ?>
                         <tr>
                             <td><input type="checkbox" id="check-{{ $key }}" style="height:18px;width:18px"
@@ -275,6 +275,37 @@
                                 </div>
                             </div>
                         </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                <div class="form-group">
+                    <label class="col-sm-12 control-label">Port Of Loading</label>
+                    <div class="col-sm-12">
+                        <select class="form-control select2" name="portloading" id="portloading">
+                            <option value=""></option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="form-group">
+                    <label class="col-sm-12 control-label">Port Of Destination</label>
+                    <div class="col-sm-12">
+                        <select class="form-control select2" name="portdestination" id="portdestination">
+                            <option value=""></option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="form-group">
+                    <label class="col-sm-12 control-label">Package</label>
+                    <div class="col-sm-12">
+                        <input type="text" class="form-control" id="package" name="package"
+                            value="{{ $data['dataku'][0]->package }}" autocomplete="off">
                     </div>
                 </div>
             </div>
@@ -489,6 +520,86 @@
         removefield();
     });
 
+    $('#portloading').select2({
+        placeholder: '-- Choose Port Of Loading --',
+        ajax: {
+            url: "{!! route('getportloading') !!}",
+            dataType: 'json',
+            delay: 500,
+            type: 'post',
+            data: function(params) {
+                var query = {
+                    q: params.term,
+                    page: params.page || 1,
+                    _token: $('meta[name=csrf-token]').attr('content')
+                }
+                return query;
+            },
+            processResults: function(data, params) {
+                console.log('data :>> ', data);
+                return {
+                    results: $.map(data.data, function(item) {
+                        return {
+                            text: item.code_port + '-' + item.name_port,
+                            id: item.id_portloading,
+                            selected: true,
+                        }
+                    }),
+                    pagination: {
+                        more: data.to < data.total
+                    }
+                };
+            },
+            cache: true
+        }
+    });
+
+    $('#portloading').empty().html('<option value="' + dataku[0]['withportloading'].id_portloading + '">' + dataku[0][
+        'withportloading'
+    ].code_port + '-' + dataku[0]['withportloading'].name_port + '</option>').val(dataku[0]['withportloading']
+        .id_portloading).trigger('change');
+
+    $('#portdestination').select2({
+        placeholder: '-- Choose Port Of Destination --',
+        ajax: {
+            url: "{!! route('getportdestination') !!}",
+            dataType: 'json',
+            delay: 500,
+            type: 'post',
+            data: function(params) {
+                var query = {
+                    q: params.term,
+                    page: params.page || 1,
+                    _token: $('meta[name=csrf-token]').attr('content')
+                }
+                return query;
+            },
+            processResults: function(data, params) {
+                console.log('data :>> ', data);
+                return {
+                    results: $.map(data.data, function(item) {
+                        return {
+                            text: item.code_port + '-' + item.name_port,
+                            id: item.id_portdestination,
+                            selected: true,
+                        }
+                    }),
+                    pagination: {
+                        more: data.to < data.total
+                    }
+                };
+            },
+            cache: true
+        }
+    });
+
+    $('#portdestination').empty().html('<option value="' + dataku[0]['withportdestination'].id_portdestination + '">' +
+        dataku[0][
+            'withportdestination'
+        ].code_port + '-' + dataku[0]['withportdestination'].name_port + '</option>').val(dataku[0][
+        'withportdestination'
+    ].id_portdestination).trigger('change');
+
     $('#btnsubmit').click(function(e) {
         let matcontent = $("td[data-name='mat[]']")
             .map(function() {
@@ -528,6 +639,9 @@
         let lclweight = $('#lclweight').val();
         let airvol = $('#airvol').val();
         let airweight = $('#airweight').val();
+        let pol = $('#portloading').val();
+        let pod = $('#portdestination').val();
+        let package = $('#package').val();
         let nomorbl = $('#nobl').val();
         let noinv = $('#invoice').val();
         let vessel = $('#vessel').val();
@@ -571,6 +685,9 @@
         form_data.append('volume', vol);
         form_data.append('updateweight', updateweight);
         form_data.append('fclfeet', fclfeet);
+        form_data.append('portloading', pol);
+        form_data.append('portdestination', pod);
+        form_data.append('package', package);
         form_data.append('nomorbl', nomorbl);
         form_data.append('noinv', noinv);
         form_data.append('vessel', vessel);

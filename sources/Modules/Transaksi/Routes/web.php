@@ -52,5 +52,7 @@ Route::prefix('transaksi')->group(function () {
         Route::get('/listshipmentprocess', 'ProcessShipment@listshipmentprocess')->name('list_shipmentprocess');
         Route::post('/formshipmentprocess', 'ProcessShipment@formshipment')->name('form_shipmentprocess');
         Route::post('/saveshipmentprocess', 'ProcessShipment@saveshipment')->name('saveshipmentprocess');
+        Route::post('/getportloading', 'ProcessShipment@getportloading')->name('getportloading');
+        Route::post('/getportdestination', 'ProcessShipment@getportdestination')->name('getportdestination');
     });
 });

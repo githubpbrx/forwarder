@@ -29,4 +29,14 @@ class modelformpo extends Model
     {
         return $this->hasOne('Modules\Transaksi\Models\masterroute', 'id_route', 'idroute')->where('aktif', 'Y');
     }
+
+    public function withportloading()
+    {
+        return $this->hasOne('Modules\Transaksi\Models\masterportofloading', 'id_portloading', 'idportloading')->where('aktif', 'Y');
+    }
+
+    public function withportdestination()
+    {
+        return $this->hasOne('Modules\Transaksi\Models\masterportofdestination', 'id_portdestination', 'idportdestination')->where('aktif', 'Y');
+    }
 }
