@@ -4,6 +4,12 @@
 @endsection
 
 @section('content')
+    <style>
+        input:read-only {
+            background-color: transparent !important;
+        }
+    </style>
+
     <div class="row" style="font-size: 10pt;">
         <div class="col-lg-12">
             <div class="card card-primary">
@@ -47,7 +53,8 @@
                             <div class="col-md-4">
                                 <label class="col-sm-12 control-label">PO Number</label>
                                 <div class="col-sm-12">
-                                    <input type="text" class="form-control" id="nomorpo" name="nomorpo" readonly>
+                                    <input type="text" class="form-control" id="nomorpo" name="nomorpo"
+                                        style="background-color: transparent" readonly>
                                 </div>
                             </div>
                             <div class="col-md-4">
@@ -120,7 +127,8 @@
                                 <div class="form-group">
                                     <label class="col-sm-12 control-label">Forwarder</label>
                                     <div class="col-sm-12">
-                                        <input type="text" class="form-control" id="forwarder" name="forwarder" readonly>
+                                        <input type="text" class="form-control" id="forwarder" name="forwarder"
+                                            readonly>
                                     </div>
                                 </div>
                             </div>
@@ -141,6 +149,53 @@
                                                     name="routedesc" readonly>
                                             </div>
                                         </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <div class="col-sm-12">
+                                        <div class="row">
+                                            <div class="col-sm-6">
+                                                <label class="control-label">Port Of Loading Code</label>
+                                                <input type="text" class="form-control" id="polcode" name="polcode"
+                                                    readonly>
+                                            </div>
+                                            <div class="col-sm-6">
+                                                <label class="control-label">Port Of Loading Name</label>
+                                                <input type="text" class="form-control" id="polname" name="polname"
+                                                    readonly>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <div class="col-sm-12">
+                                        <div class="row">
+                                            <div class="col-sm-6">
+                                                <label class="control-label">Port Of Destination Code</label>
+                                                <input type="text" class="form-control" id="podcode" name="podcode"
+                                                    readonly>
+                                            </div>
+                                            <div class="col-sm-6">
+                                                <label class="control-label">Port Of Destination Name</label>
+                                                <input type="text" class="form-control" id="podname" name="podname"
+                                                    readonly>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <div class="col-sm-12">
+                                        <label class="control-label">Package</label>
+                                        <input type="text" class="form-control" id="package" name="package"
+                                            readonly>
                                     </div>
                                 </div>
                             </div>
@@ -326,6 +381,11 @@
                     var arraycreatedby = [];
                     var arrayroutecode = [];
                     var arrayroutedesc = [];
+                    var arrayloadingcode = [];
+                    var arrayloadingname = [];
+                    var arraydestinationcode = [];
+                    var arraydestinationname = [];
+                    var arraypackage = [];
                     for (let indexpo = 0; indexpo < mypo.length; indexpo++) {
                         arraypo.push(mypo[indexpo]['pono']);
                         arraypi.push(mypo[indexpo]['pino']);
@@ -337,6 +397,11 @@
                         arraycreatedby.push(mypo[indexpo]['created_by']);
                         arrayroutecode.push(mypo[indexpo]['route_code']);
                         arrayroutedesc.push(mypo[indexpo]['route_desc']);
+                        arrayloadingcode.push(mypo[indexpo]['loadingcode']);
+                        arrayloadingname.push(mypo[indexpo]['loadingname']);
+                        arraydestinationcode.push(mypo[indexpo]['destinationcode']);
+                        arraydestinationname.push(mypo[indexpo]['destinationname']);
+                        arraypackage.push(mypo[indexpo]['package']);
 
                         if ((mypo[indexpo].shipmode == 'fcl')) {
                             let expfcl = mypo[indexpo].subshipmode.split("-");
@@ -391,6 +456,11 @@
                     let implodecreatedby = arraycreatedby.join(', ');
                     let imploderoutecode = arrayroutecode.join(', ');
                     let imploderoutedesc = arrayroutedesc.join(', ');
+                    let implodeloadingcode = arrayloadingcode.join(', ');
+                    let implodeloadingname = arrayloadingname.join(', ');
+                    let implodedestinationcode = arraydestinationcode.join(', ');
+                    let implodedestinationname = arraydestinationname.join(', ');
+                    let implodepackage = arraypackage.join(', ');
 
                     $('#nomorpo').val(implodepo);
                     $('#nomorpi').val(implodepi);
@@ -405,6 +475,11 @@
                     $('#pengajunik').val(implodecreatedby);
                     $('#routecode').val(imploderoutecode);
                     $('#routedesc').val(imploderoutedesc);
+                    $('#polcode').val(implodeloadingcode);
+                    $('#polname').val(implodeloadingname);
+                    $('#podcode').val(implodedestinationcode);
+                    $('#podname').val(implodedestinationname);
+                    $('#package').val(implodepackage);
                 })
             });
 

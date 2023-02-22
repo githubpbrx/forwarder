@@ -216,13 +216,15 @@ class ApprovalConfirmation extends Controller
         $podata = po::join('forwarder', 'forwarder.idpo', 'po.id')->where('forwarder.aktif', 'Y')
             ->join('formpo', 'formpo.idforwarder', 'forwarder.id_forwarder')->where('formpo.aktif', 'Y')
             ->join('masterroute', 'masterroute.id_route', 'formpo.idroute')->where('masterroute.aktif', 'Y')
+            ->join('masterportofloading', 'masterportofloading.id_portloading', 'formpo.idportloading')->where('masterportofloading.aktif', 'Y')
+            ->join('masterportofdestination', 'masterportofdestination.id_portdestination', 'formpo.idportdestination')->where('masterportofdestination.aktif', 'Y')
             ->join('privilege', 'privilege.idforwarder', 'formpo.idmasterfwd')->where('privilege_aktif', 'Y')
             ->join('mastersupplier', 'mastersupplier.id', 'po.vendor')->where('mastersupplier.aktif', 'Y')
             ->where('po.pideldate', $request->id)
             ->where('formpo.statusformpo', 'waiting')
             ->groupby('po.pono')
             // ->where('privilege.nikfinance', Session::get('session')['user_nik'])
-            ->selectRaw(' po.id, po.pono, po.pino, mastersupplier.nama, formpo.kode_booking, formpo.date_booking, formpo.etd, formpo.eta, formpo.shipmode, formpo.subshipmode, formpo.created_by, masterroute.route_code, masterroute.route_desc')
+            ->selectRaw(' po.id, po.pono, po.pino, mastersupplier.nama, formpo.kode_booking, formpo.date_booking, formpo.etd, formpo.eta, formpo.shipmode, formpo.subshipmode, formpo.package, formpo.created_by, masterroute.route_code, masterroute.route_desc, masterportofloading.code_port as loadingcode, masterportofloading.name_port as loadingname, masterportofdestination.code_port as destinationcode, masterportofdestination.name_port as destinationname')
             ->get();
         // dd($podata);
 
