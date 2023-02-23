@@ -29,7 +29,7 @@
         </div>
     </div>
     <div class="row">
-        <div class="col-md-2">
+        <div class="col-md-3">
             <div class="form-group">
                 <label class="col-sm-12 control-label">Code Booking</label>
                 <div class="col-sm-12">
@@ -38,21 +38,12 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-2">
+        <div class="col-md-3">
             <div class="form-group">
                 <label class="col-sm-12 control-label">Invoice</label>
                 <div class="col-sm-12">
                     <input type="text" class="form-control" id="kodebook" name="kodebook"
                         value="{{ $mydata ? $mydata[0]->noinv : '' }}" readonly>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-2">
-            <div class="form-group">
-                <label class="col-sm-12 control-label">Vessel</label>
-                <div class="col-sm-12">
-                    <input type="text" class="form-control" id="kodebook" name="kodebook"
-                        value="{{ $mydata ? $mydata[0]->vessel : '' }}" readonly>
                 </div>
             </div>
         </div>
@@ -162,7 +153,54 @@
         </div>
     </div>
     <div class="row">
-        <div class="col-md-2">
+        <div class="col-md-3">
+            <div class="form-group">
+                <label class="col-sm-12 control-label">Vessel</label>
+                <div class="col-sm-12">
+                    <input type="text" class="form-control" id="kodebook" name="kodebook"
+                        value="{{ $mydata ? $mydata[0]->vessel : '' }}" readonly>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="form-group">
+                <label class="col-sm-12 control-label">Route</label>
+                <div class="col-sm-12">
+                    <input type="text" class="form-control" id="route" name="route"
+                        value="{{ $data[0]->route_code . ' ~ ' . $data[0]->route_desc }}" readonly>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="form-group">
+                <label class="col-sm-12 control-label">Port Of Loading</label>
+                <div class="col-sm-12">
+                    <input type="text" class="form-control" id="route" name="route"
+                        value="{{ $data[0]->loadingcode . ' ~ ' . $data[0]->loadingname }}" readonly>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="form-group">
+                <label class="col-sm-12 control-label">Port Of Destination</label>
+                <div class="col-sm-12">
+                    <input type="text" class="form-control" id="route" name="route"
+                        value="{{ $data[0]->destinationcode . ' ~ ' . $data[0]->destinationname }}" readonly>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-3">
+            <div class="form-group">
+                <label class="col-sm-12 control-label">Package</label>
+                <div class="col-sm-12">
+                    <input type="text" class="form-control" id="route" name="route"
+                        value="{{ $data[0]->package }}" readonly>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
             <div class="form-group">
                 <label class="col-sm-12 control-label">ATD</label>
                 <div class="col-sm-12">
@@ -172,7 +210,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-2">
+        <div class="col-md-3">
             <div class="form-group">
                 <label class="col-sm-12 control-label">ATA</label>
                 <div class="col-sm-12">
@@ -182,12 +220,23 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-2">
+        <div class="col-md-3">
             <div class="form-group">
                 <label class="col-sm-12 control-label">BL Number</label>
                 <div class="col-sm-12">
                     <input type="text" class="form-control" id="kodebook" name="kodebook"
                         value="{{ !$mydata ? '' : $mydata[0]->nomor_bl }}" readonly>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-3">
+            <div class="form-group">
+                <label class="col-sm-12 control-label">Date Booking</label>
+                <div class="col-sm-12">
+                    <input type="text" class="form-control" id="kodebook" name="kodebook"
+                        value="{{ date('d F Y', strtotime($data[0]->date_booking)) }}" readonly>
                 </div>
             </div>
         </div>
