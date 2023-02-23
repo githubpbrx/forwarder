@@ -237,6 +237,8 @@
                                         </div>
                                     </div>
                                 </div>
+                            </div>
+                            <div class="row">
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <div class="col-sm-12">
@@ -336,6 +338,73 @@
                                         </div>
                                     </div>
                                 </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <div class="col-sm-12">
+                                            <div class="row">
+                                                <div class="col-sm-6">
+                                                    <label class="control-label">Route Code</label>
+                                                    <input type="text" class="form-control" id="routecode"
+                                                        name="routecode" readonly>
+                                                </div>
+                                                <div class="col-sm-6">
+                                                    <label class="control-label">Route Description</label>
+                                                    <input type="text" class="form-control" id="routedesc"
+                                                        name="routedesc" readonly>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <div class="col-sm-12">
+                                            <div class="row">
+                                                <div class="col-sm-6">
+                                                    <label class="control-label">Port Of Loading Code</label>
+                                                    <input type="text" class="form-control" id="polcode"
+                                                        name="polcode" readonly>
+                                                </div>
+                                                <div class="col-sm-6">
+                                                    <label class="control-label">Port Of Loading Name</label>
+                                                    <input type="text" class="form-control" id="polname"
+                                                        name="polname" readonly>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <div class="col-sm-12">
+                                            <div class="row">
+                                                <div class="col-sm-6">
+                                                    <label class="control-label">Port Of Destination Code</label>
+                                                    <input type="text" class="form-control" id="podcode"
+                                                        name="podcode" readonly>
+                                                </div>
+                                                <div class="col-sm-6">
+                                                    <label class="control-label">Port Of Destination Name</label>
+                                                    <input type="text" class="form-control" id="podname"
+                                                        name="podname" readonly>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <div class="col-sm-12">
+                                            <label class="control-label">Package</label>
+                                            <input type="text" class="form-control" id="package" name="package"
+                                                readonly>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                             <div class="row">
                                 <div class="col-md-12">
@@ -409,6 +478,13 @@
                 $('#datebook').val(poreject[0].date_booking);
                 $('#etd').val(poreject[0].etd);
                 $('#eta').val(poreject[0].eta);
+                $('#routecode').val(poreject[0].route_code);
+                $('#routedesc').val(poreject[0].route_desc);
+                $('#polcode').val(poreject[0].loadingcode);
+                $('#polname').val(poreject[0].loadingname);
+                $('#podcode').val(poreject[0].destinationcode);
+                $('#podname').val(poreject[0].destinationname);
+                $('#package').val(poreject[0].package);
                 $('#shipmode').val(poreject[0].shipmode);
                 $('#subshipmode').val(poreject[0].subshipmode);
                 $('#deskripsi').val(poreject[0].ket_tolak);

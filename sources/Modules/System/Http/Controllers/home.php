@@ -97,6 +97,9 @@ class home extends Controller
         $datareject = formpo::join('po', 'po.id', 'formpo.idpo')
             ->join('mastersupplier', 'mastersupplier.id', 'po.vendor')
             ->join('masterhscode', 'masterhscode.matcontent', 'po.matcontents')
+            ->join('masterroute', 'masterroute.id_route', 'formpo.idroute')->where('masterroute.aktif', 'Y')
+            ->join('masterportofloading', 'masterportofloading.id_portloading', 'formpo.idportloading')->where('masterportofloading.aktif', 'Y')
+            ->join('masterportofdestination', 'masterportofdestination.id_portdestination', 'formpo.idportdestination')->where('masterportofdestination.aktif', 'Y')
             ->join('privilege', 'privilege.idforwarder', 'formpo.idmasterfwd')
             ->where('privilege.privilege_user_nik', Session::get('session')['user_nik'])
             ->where('privilege.privilege_aktif', 'Y')
@@ -105,7 +108,7 @@ class home extends Controller
             ->where('mastersupplier.aktif', 'Y')
             ->where('masterhscode.aktif', 'Y')
             ->groupby('po.pono')
-            ->selectRaw(' po.pono, po.matcontents, po.itemdesc, po.qtypo, po.pino, formpo.kode_booking, formpo.date_booking, formpo.etd, formpo.eta, formpo.shipmode, formpo.subshipmode, formpo.ket_tolak, mastersupplier.nama, masterhscode.hscode ')
+            ->selectRaw(' po.pono, po.matcontents, po.itemdesc, po.qtypo, po.pino, formpo.kode_booking, formpo.date_booking, formpo.etd, formpo.eta, formpo.shipmode, formpo.subshipmode, formpo.ket_tolak, formpo.package, mastersupplier.nama, masterhscode.hscode, masterroute.route_code, masterroute.route_desc, masterportofloading.code_port as loadingcode, masterportofloading.name_port as loadingname, masterportofdestination.code_port as destinationcode, masterportofdestination.name_port as destinationname ')
             ->get();
 
         $datarejecttabel = formpo::join('po', 'po.id', 'formpo.idpo')
