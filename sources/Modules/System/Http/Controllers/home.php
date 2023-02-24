@@ -961,8 +961,10 @@ class home extends Controller
             $submode = $request->fcl . '-' . $request->fclvol . '-' . $request->fclweight . 'KG';
         } else if ($request->shipmode == 'lcl') {
             $submode = $request->lcl . 'M3' . '-' . $request->lclweight . 'KG';
-        } else {
+        } else if ($request->shipmode == 'air') {
             $submode = $request->air . 'M3' . '-' . $request->airweight . 'KG';
+        } else {
+            $submode = $request->cfscyvol . 'M3' . '-' . $request->cfscyweight . 'KG';
         }
 
         $val_matcontent = $request->matcontent;

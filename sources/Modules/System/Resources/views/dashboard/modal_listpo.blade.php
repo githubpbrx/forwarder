@@ -152,6 +152,7 @@
                             <option value="fcl">FCL</option>
                             <option value="lcl">LCL</option>
                             <option value="air">Air</option>
+                            <option value="cfscy">CFS/CY</option>
                         </select>
                     </div>
                 </div>
@@ -239,6 +240,32 @@
                                 <div class="input-group">
                                     <input type="number" min="0" class="form-control" name="airweight"
                                         id="airweight" autocomplete="off">
+                                    <div class="input-group-append">
+                                        <span class="input-group-text">KG</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group" id="datacfscy" style="display: none">
+                    <div class="col-sm-12">
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <label class="control-label">Volume<code>*</code></label>
+                                <div class="input-group">
+                                    <input type="number" min="0" class="form-control" name="cfscyvol"
+                                        id="cfscyvol" autocomplete="off">
+                                    <div class="input-group-append">
+                                        <span class="input-group-text">M3</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <label class="control-label">Weight<code>*</code></label>
+                                <div class="input-group">
+                                    <input type="number" min="0" class="form-control" name="cfscyweight"
+                                        id="cfscyweight" autocomplete="off">
                                     <div class="input-group-append">
                                         <span class="input-group-text">KG</span>
                                     </div>
@@ -355,13 +382,20 @@
                 $('#datafcl').show()
                 $('#datalcl').hide()
                 $('#dataair').hide()
-
+                $('#datacfscy').hide()
             } else if (mode == 'lcl') {
                 $('#datalcl').show()
                 $('#datafcl').hide()
                 $('#dataair').hide()
-            } else {
+                $('#datacfscy').hide()
+            } else if (mode == 'air') {
                 $('#dataair').show()
+                $('#datafcl').hide()
+                $('#datalcl').hide()
+                $('#datacfscy').hide()
+            } else {
+                $('#datacfscy').show()
+                $('#dataair').hide()
                 $('#datafcl').hide()
                 $('#datalcl').hide()
             }
@@ -490,6 +524,8 @@
             let lclweight = $('#lclweight').val();
             let myair = $('#airku').val();
             let airweight = $('#airweight').val();
+            let cfscyvol = $('#cfscyvol').val();
+            let cfscyweight = $('#cfscyweight').val();
             let myroute = $('#route').val();
             let portloading = $('#portloading').val();
             let portdestination = $('#portdestination').val();
@@ -557,6 +593,14 @@
                 notifalert('AIR Weight');
                 $('#btnsubmit').html('Submit')
                 $('#btnsubmit').prop('disabled', false)
+            } else if (mode == 'cfscy' && cfscyvol == '') {
+                notifalert('CSF/CY Volume');
+                $('#btnsubmit').html('Submit')
+                $('#btnsubmit').prop('disabled', false)
+            } else if (mode == 'cfscy' && cfscyweight == '') {
+                notifalert('CSF/CY Weight');
+                $('#btnsubmit').html('Submit')
+                $('#btnsubmit').prop('disabled', false)
             } else if (myroute == null || myroute == '') {
                 notifalert('Route');
                 $('#btnsubmit').html('Submit')
@@ -594,6 +638,8 @@
                         'lclweight': lclweight,
                         'air': myair,
                         'airweight': airweight,
+                        'cfscyvol': cfscyvol,
+                        'cfscyweight': cfscyweight,
                         'route': myroute,
                         'portloading': portloading,
                         'portdestination': portdestination,
