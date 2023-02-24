@@ -37,6 +37,52 @@
     <div class="row">
         <div class="col-md-3">
             <div class="form-group">
+                <label class="col-sm-12 control-label">Date Booking</label>
+                <div class="col-sm-12">
+                    <input type="text" class="form-control"
+                        value="{{ date('d F Y', strtotime($data[0]->date_booking)) }}" readonly>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="form-group">
+                <label class="col-sm-12 control-label">Route</label>
+                <div class="col-sm-12">
+                    <input type="text" class="form-control"
+                        value="{{ $data[0]->route_code . ' ~ ' . $data[0]->route_desc }}" readonly>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="form-group">
+                <label class="col-sm-12 control-label">Port Of Loading</label>
+                <div class="col-sm-12">
+                    <input type="text" class="form-control"
+                        value="{{ $data[0]->loadingcode . ' ~ ' . $data[0]->loadingname }}" readonly>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="form-group">
+                <label class="col-sm-12 control-label">Port Of Destination</label>
+                <div class="col-sm-12">
+                    <input type="text" class="form-control"
+                        value="{{ $data[0]->destinationcode . ' ~ ' . $data[0]->destinationname }}" readonly>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-3">
+            <div class="form-group">
+                <label class="col-sm-12 control-label">Package</label>
+                <div class="col-sm-12">
+                    <input type="text" class="form-control" value="{{ $data[0]->package }}" readonly>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="form-group">
                 <label class="col-sm-12 control-label">Invoice</label>
                 <div class="col-sm-12">
                     <input type="text" class="form-control" value="{{ $data[0]->noinv }}" readonly>
@@ -61,6 +107,8 @@
                 </div>
             </div>
         </div>
+    </div>
+    <div class="row">
         <div class="col-md-3">
             <div class="form-group">
                 <label class="col-sm-12 control-label">BL Number</label>
@@ -69,43 +117,50 @@
                 </div>
             </div>
         </div>
-    </div>
-    <div class="row">
-        <div class="col-md-6">
+        <div class="col-md-9">
             <div class="form-group">
                 <div class="col-sm-12">
                     <div class="row">
-                        <div class="col-sm-3">
+                        <div class="col-sm-2">
                             <label class="col-sm-12">Shipmode</label>
                             <input type="text" class="form-control" value="{{ $data[0]->shipmode }}" readonly>
                         </div>
                         @if ($data[0]->shipmode == 'fcl')
                             <?php
-                            $exp = explode('-', $data[0]->subshipmode);
-                            $fclsize = $exp[0];
-                            $fclvol = $exp[1];
-                            $expkg = explode('KG', $exp[2]);
+                            $datacont = $data[0]['container'];
+                            // dd($datacont);
+                            // $exp = explode('-', $data[0]->subshipmode);
+                            // $fclsize = $exp[0];
+                            // $fclvol = $exp[1];
+                            $expkg = explode('KG', $data[0]['container']->weight);
                             $fclkg = $expkg[0];
-                            if ($fclsize == '40hq') {
-                                $fclcont = $fclsize;
-                            } else {
-                                $fclcont = $fclsize . '"';
-                            }
+                            // if ($fclsize == '40hq') {
+                            //     $fclcont = $fclsize;
+                            // } else {
+                            //     $fclcont = $fclsize . '"';
+                            // }
                             ?>
-                            <div class="col-sm-3">
+                            <div class="col-sm-2">
                                 <label class="col-sm-12 control-label">Container Size</label>
-                                <input type="text" class="form-control" value="{{ $fclcont }}" readonly>
+                                <input type="text" class="form-control"
+                                    value="{{ $data[0]['container']->containernumber }}" readonly>
                             </div>
-                            <div class="col-sm-3">
+                            <div class="col-sm-2">
                                 <label class="col-sm-12 control-label">Volume</label>
                                 <div class="input-group">
-                                    <input type="number" class="form-control" value="{{ $fclvol }}" readonly>
+                                    <input type="number" class="form-control"
+                                        value="{{ $data[0]['container']->volume }}" readonly>
                                     <div class="input-group-append">
                                         <span class="input-group-text">M3</span>
                                     </div>
                                 </div>
                             </div>
                             <div class="col-sm-3">
+                                <label class="col-sm-12 control-label">Number Of Container</label>
+                                <input type="text" class="form-control"
+                                    value="{{ $data[0]['container']->numberofcontainer }}" readonly>
+                            </div>
+                            <div class="col-sm-2">
                                 <label class="col-sm-12 control-label">Weight</label>
                                 <div class="input-group">
                                     <input type="number" class="form-control" value="{{ $fclkg }}" readonly>
@@ -175,6 +230,8 @@
                 </div>
             </div>
         </div>
+    </div>
+    <div class="row">
         <div class="col-md-3">
             <div class="form-group">
                 <label class="col-sm-12 control-label">Vessel</label>
@@ -192,8 +249,6 @@
                 </div>
             </div>
         </div>
-    </div>
-    <div class="row">
         <div class="col-md-3">
             <div class="form-group">
                 <label class="col-sm-12 control-label">Update Data</label>
@@ -204,6 +259,8 @@
                 </div>
             </div>
         </div>
+    </div>
+    <div class="row">
         <div class="col-md-4">
             <div class="form-group">
                 <label class="col-sm-12 control-label">File BL</label>
@@ -238,8 +295,6 @@
                 </div>
             </div>
         </div>
-    </div>
-    <div class="row">
         <div class="col-md-4">
             <div class="form-group">
                 <label class="col-sm-12 control-label">File Packing List</label>

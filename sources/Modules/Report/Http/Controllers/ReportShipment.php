@@ -135,17 +135,22 @@ class ReportShipment extends Controller
     {
         // dd($request);
 
-        $data = modelformshipment::join('formpo', 'formpo.id_formpo', 'formshipment.idformpo')
+        $data = modelformshipment::with(['container'])
+            ->join('formpo', 'formpo.id_formpo', 'formshipment.idformpo')
+            ->join('masterroute', 'masterroute.id_route', 'formpo.idroute')
+            ->join('masterportofloading', 'masterportofloading.id_portloading', 'formpo.idportloading')
+            ->join('masterportofdestination', 'masterportofdestination.id_portdestination', 'formpo.idportdestination')
             ->join('po', 'po.id', 'formpo.idpo')
             ->join('masterforwarder', 'masterforwarder.id', 'formpo.idmasterfwd')
             ->join('mastersupplier', 'mastersupplier.id', 'po.vendor')
             ->join('masterhscode', 'masterhscode.matcontent', 'po.matcontents')
+            // ->leftjoin('containershipment', 'containershipment.noinv', 'formshipment.noinv')
             ->where('formshipment.noinv', $request->id)
             ->where('formshipment.aktif', 'Y')->where('formpo.aktif', 'Y')->where('masterforwarder.aktif', 'Y')->where('mastersupplier.aktif', 'Y')
-            ->where('masterhscode.aktif', 'Y')
-            ->selectRaw(' formshipment.*, po.pono, po.matcontents, po.itemdesc, po.qtypo, po.colorcode, po.size, po.style, po.plant, formpo.*, masterforwarder.name, mastersupplier.nama, masterhscode.hscode ')
+            ->where('masterhscode.aktif', 'Y')->where('masterportofloading.aktif', 'Y')->where('masterportofdestination.aktif', 'Y')->where('masterroute.aktif', 'Y')
+            ->selectRaw(' formshipment.*, po.pono, po.matcontents, po.itemdesc, po.qtypo, po.colorcode, po.size, po.style, po.plant, formpo.kode_booking, formpo.date_booking, formpo.package , masterforwarder.name, mastersupplier.nama, masterhscode.hscode, masterroute.route_code, masterroute.route_desc, masterportofloading.code_port as loadingcode, masterportofloading.name_port as loadingname, masterportofdestination.code_port as destinationcode, masterportofdestination.name_port as destinationname')
             ->get();
-
+        // dd($data);
         $getdate = modelformshipment::join('formpo', 'formpo.id_formpo', 'formshipment.idformpo')
             ->join('po', 'po.id', 'formpo.idpo')
             ->join('masterforwarder', 'masterforwarder.id', 'formpo.idmasterfwd')
@@ -162,15 +167,19 @@ class ReportShipment extends Controller
 
     function excelshipment($id)
     {
-        $getdata = modelformshipment::join('formpo', 'formpo.id_formpo', 'formshipment.idformpo')
+        $getdata = modelformshipment::with(['container'])
+            ->join('formpo', 'formpo.id_formpo', 'formshipment.idformpo')
+            ->join('masterroute', 'masterroute.id_route', 'formpo.idroute')
+            ->join('masterportofloading', 'masterportofloading.id_portloading', 'formpo.idportloading')
+            ->join('masterportofdestination', 'masterportofdestination.id_portdestination', 'formpo.idportdestination')
             ->join('po', 'po.id', 'formpo.idpo')
             ->join('masterforwarder', 'masterforwarder.id', 'formpo.idmasterfwd')
             ->join('mastersupplier', 'mastersupplier.id', 'po.vendor')
             ->join('masterhscode', 'masterhscode.matcontent', 'po.matcontents')
             ->where('formshipment.noinv', $id)
             ->where('formshipment.aktif', 'Y')->where('formpo.aktif', 'Y')->where('masterforwarder.aktif', 'Y')->where('mastersupplier.aktif', 'Y')
-            ->where('masterhscode.aktif', 'Y')
-            ->selectRaw(' formshipment.*, po.pono, po.matcontents, po.itemdesc, po.qtypo, po.style, po.plant, po.colorcode, po.size, formpo.*, masterforwarder.name, mastersupplier.nama, masterhscode.hscode ')
+            ->where('masterhscode.aktif', 'Y')->where('masterportofloading.aktif', 'Y')->where('masterportofdestination.aktif', 'Y')->where('masterroute.aktif', 'Y')
+            ->selectRaw(' formshipment.*, po.pono, po.matcontents, po.itemdesc, po.qtypo, po.style, po.plant, po.colorcode, po.size, formpo.kode_booking, formpo.date_booking, formpo.package, masterforwarder.name, mastersupplier.nama, masterhscode.hscode, masterroute.route_code, masterroute.route_desc, masterportofloading.code_port as loadingcode, masterportofloading.name_port as loadingname, masterportofdestination.code_port as destinationcode, masterportofdestination.name_port as destinationname')
             ->get();
 
         $getdate = modelformshipment::join('formpo', 'formpo.id_formpo', 'formshipment.idformpo')
@@ -185,8 +194,8 @@ class ReportShipment extends Controller
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
 
-        $sheet->mergeCells('A2:G2');
-        $sheet->getStyle('A2:G2')->getFont()->setBold(true);
+        $sheet->mergeCells('A2:M2');
+        $sheet->getStyle('A2:M2')->getFont()->setBold(true);
 
         //single header
         $sheet->setCellValue('A4', 'Invoice');
@@ -200,33 +209,43 @@ class ReportShipment extends Controller
         $sheet->getStyle('C4:C6')->getFont()->setBold(true);
 
         //for header
-        $cellheader = 'A9:I9';
+        $cellheader = 'A9:O9';
         $sheet->setCellValue('A9', 'Code Booking');
-        $sheet->getColumnDimension('A')->setWidth(30);
-        $sheet->setCellValue('B9', 'BL Number');
-        $sheet->getColumnDimension('B')->setWidth(30);
-        $sheet->setCellValue('C9', 'ATD');
-        $sheet->getColumnDimension('C')->setWidth(30);
-        $sheet->setCellValue('D9', 'ATA');
-        $sheet->getColumnDimension('D')->setWidth(20);
-        $sheet->setCellValue('E9', 'Shipmode');
-        $sheet->getColumnDimension('E')->setWidth(20);
+        $sheet->getColumnDimension('A')->setAutoSize(true);
+        $sheet->setCellValue('B9', 'Date Booking');
+        $sheet->getColumnDimension('B')->setAutoSize(true);
+        $sheet->setCellValue('C9', 'Route');
+        $sheet->getColumnDimension('C')->setAutoSize(true);
+        $sheet->setCellValue('D9', 'Port Of Loading');
+        $sheet->getColumnDimension('D')->setAutoSize(true);
+        $sheet->setCellValue('E9', 'Port Of Destination');
+        $sheet->getColumnDimension('E')->setAutoSize(true);
+        $sheet->setCellValue('F9', 'Package');
+        $sheet->getColumnDimension('F')->setAutoSize(true);
+        $sheet->setCellValue('G9', 'BL Number');
+        $sheet->getColumnDimension('G')->setAutoSize(true);
+        $sheet->setCellValue('H9', 'ATD');
+        $sheet->getColumnDimension('H')->setAutoSize(true);
+        $sheet->setCellValue('I9', 'ATA');
+        $sheet->getColumnDimension('I')->setAutoSize(true);
+        $sheet->setCellValue('J9', 'Vessel');
+        $sheet->getColumnDimension('J')->setAutoSize(true);
+        $sheet->setCellValue('K9', 'Shipmode');
+        $sheet->getColumnDimension('K')->setAutoSize(true);
         if ($getdata[0]->shipmode == 'fcl') {
-            $sheet->setCellValue('F9', 'Container Size');
-            $sheet->getColumnDimension('F')->setWidth(20);
-            $sheet->setCellValue('G9', 'Volume');
-            $sheet->getColumnDimension('G')->setWidth(20);
-            $sheet->setCellValue('H9', 'Weight');
-            $sheet->getColumnDimension('H')->setWidth(20);
-            $sheet->setCellValue('I9', 'Vessel');
-            $sheet->getColumnDimension('I')->setWidth(20);
+            $sheet->setCellValue('L9', 'Container Size');
+            $sheet->getColumnDimension('L')->setAutoSize(true);
+            $sheet->setCellValue('M9', 'Volume');
+            $sheet->getColumnDimension('M')->setAutoSize(true);
+            $sheet->setCellValue('N9', 'Number Of Container');
+            $sheet->getColumnDimension('N')->setAutoSize(true);
+            $sheet->setCellValue('O9', 'Weight');
+            $sheet->getColumnDimension('O')->setAutoSize(true);
         } else {
-            $sheet->setCellValue('F9', 'Volume');
-            $sheet->getColumnDimension('F')->setWidth(20);
-            $sheet->setCellValue('G9', 'Weight');
-            $sheet->getColumnDimension('G')->setWidth(20);
-            $sheet->setCellValue('H9', 'Vessel');
-            $sheet->getColumnDimension('H')->setWidth(20);
+            $sheet->setCellValue('L9', 'Volume');
+            $sheet->getColumnDimension('L')->setAutoSize(true);
+            $sheet->setCellValue('M9', 'Weight');
+            $sheet->getColumnDimension('M')->setAutoSize(true);
         }
         $sheet->getStyle($cellheader)->getAlignment()->setWrapText(true);
         $sheet->getStyle($cellheader)->getFont()->setBold(true);
@@ -293,20 +312,26 @@ class ReportShipment extends Controller
 
         //header
         $sheet->setCellValue('A' . $header, $getdata[0]->kode_booking);
-        $sheet->setCellValue('B' . $header, $getdata[0]->nomor_bl);
-        $sheet->setCellValue('C' . $header, date('d F Y', strtotime($getdata[0]->etdfix)));
-        $sheet->setCellValue('D' . $header, date('d F Y', strtotime($getdata[0]->etafix)));
-        $sheet->setCellValue('E' . $header, $getdata[0]->shipmode);
+        $sheet->setCellValue('B' . $header, date('d F Y', strtotime($getdata[0]->date_booking)));
+        $sheet->setCellValue('C' . $header, $getdata[0]->route_code . ' - ' .  $getdata[0]->route_desc);
+        $sheet->setCellValue('D' . $header, $getdata[0]->loadingcode . ' - ' .  $getdata[0]->loadingname);
+        $sheet->setCellValue('E' . $header, $getdata[0]->destinationcode . ' - ' .  $getdata[0]->destinationname);
+        $sheet->setCellValue('F' . $header, $getdata[0]->package);
+        $sheet->setCellValue('G' . $header, $getdata[0]->nomor_bl);
+        $sheet->setCellValue('H' . $header, date('d F Y', strtotime($getdata[0]->etdfix)));
+        $sheet->setCellValue('I' . $header, date('d F Y', strtotime($getdata[0]->etafix)));
+        $sheet->setCellValue('J' . $header, $getdata[0]->vessel);
+        $sheet->setCellValue('K' . $header, $getdata[0]->shipmode);
         if ($getdata[0]->shipmode == 'fcl') {
-            $exp = explode('-', $getdata[0]->subshipmode);
-            $sheet->setCellValue('F' . $header, ($exp[0] == '40hq') ? '40hq' : $exp[0] . '"');
-            $sheet->setCellValue('G' . $header, $exp[1] . 'M3');
-            $sheet->setCellValue('H' . $header, $exp[2]);
-            $sheet->setCellValue('I' . $header, $getdata[0]->vessel);
+            // $exp = explode('-', $getdata[0]->subshipmode);
+            $sheet->setCellValue('L' . $header, $getdata[0]['container']->containernumber);
+            $sheet->setCellValue('M' . $header, $getdata[0]['container']->volume . 'M3');
+            $sheet->setCellValue('N' . $header, $getdata[0]['container']->numberofcontainer);
+            $sheet->setCellValue('O' . $header, $getdata[0]['container']->weight);
         } else {
             $exp2 = explode('-', $getdata[0]->subshipmode);
-            $sheet->setCellValue('F' . $header, $exp2[0] . 'M3');
-            $sheet->setCellValue('G' . $header, $exp2[1]);
+            $sheet->setCellValue('L' . $header, $exp2[0] . 'M3');
+            $sheet->setCellValue('M' . $header, $exp2[1]);
         }
         $header++;
 
@@ -323,13 +348,13 @@ class ReportShipment extends Controller
         }
 
         if ($getdata[0]->shipmode == 'fcl') {
-            $cellheader = 'A9:I' . ($header - 1);
+            $cellheader = 'A9:O' . ($header - 1);
         } else {
-            $cellheader = 'A9:H' . ($header - 1);
+            $cellheader = 'A9:M' . ($header - 1);
         }
 
         $celldata = 'A12:G' . ($bodydata - 1);
-        $sheet->getStyle('A2:G2')->applyFromArray($styleArraytitle);
+        $sheet->getStyle('A2:M2')->applyFromArray($styleArraytitle);
         $sheet->getStyle($cellheader)->applyFromArray($styleArray);
         $sheet->getStyle($celldata)->applyFromArray($styleArray);
         $sheet->getStyle($cellheader)->getAlignment()->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER);
