@@ -11,7 +11,7 @@ use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
-use Modules\Report\Models\modelprivilege;
+use Modules\Report\Models\modelcontainership;
 use Modules\Report\Models\modelpo;
 use Modules\Report\Models\modelforwarder;
 use Modules\Report\Models\modelformshipment;
@@ -219,13 +219,15 @@ class ReportForwarder extends Controller
             ->groupby('po.pono')
             ->get();
 
-        // dd($getdata, $getdate, $getposup);
+        $getfcl = modelcontainership::where('noinv', $getdata[0]->noinv)->groupby('volume')->groupby('weight')->where('aktif', 'Y')->get();
+        // dd($getfcl);
+        // dd($arr, $getdata, $getdate, $getposup);
         $data = array(
             'alldata' => $getdata
         );
 
         // return response()->json(['status' => 200, 'data' => $data, 'message' => 'Berhasil']);
-        $form = view('report::modalreportfwd', ['data' => $getdata, 'mydata' => $arr, 'dateku' => $getdate, 'posup' => $getposup]);
+        $form = view('report::modalreportfwd', ['data' => $getdata, 'mydata' => $arr, 'dateku' => $getdate, 'posup' => $getposup, 'getfcl' => $getfcl]);
         return $form->render();
     }
 
@@ -293,6 +295,8 @@ class ReportForwarder extends Controller
             ->groupby('po.pono')
             ->get();
 
+        $getfcl = modelcontainership::where('noinv', $getdata[0]->noinv)->groupby('volume')->groupby('weight')->where('aktif', 'Y')->get();
+
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
 
@@ -310,7 +314,7 @@ class ReportForwarder extends Controller
         $sheet->getStyle('C4:C5')->getFont()->setBold(true);
 
         //for header
-        $cellheader = 'A9:J9';
+        $cellheader = 'A9:O9';
         $sheet->setCellValue('A9', 'Code Booking');
         $sheet->getColumnDimension('A')->setAutoSize(true);
         $sheet->setCellValue('B9', 'BL Number');
@@ -329,24 +333,25 @@ class ReportForwarder extends Controller
         $sheet->getColumnDimension('H')->setAutoSize(true);
         $sheet->setCellValue('I9', 'Date Booking');
         $sheet->getColumnDimension('I')->setAutoSize(true);
-        $sheet->setCellValue('J9', 'Shipmode');
+        $sheet->setCellValue('J9', 'Vessel');
         $sheet->getColumnDimension('J')->setAutoSize(true);
+        $sheet->setCellValue('K9', 'Shipmode');
+        $sheet->getColumnDimension('K')->setAutoSize(true);
         if ($getdata[0]->shipmode == 'fcl') {
-            $sheet->setCellValue('K9', 'Container Size');
-            $sheet->getColumnDimension('F')->setAutoSize(true);
-            $sheet->setCellValue('L9', 'Volume');
-            $sheet->getColumnDimension('G')->setAutoSize(true);
-            $sheet->setCellValue('M9', 'Weight');
-            $sheet->getColumnDimension('H')->setAutoSize(true);
-            $sheet->setCellValue('N9', 'Vessel');
-            $sheet->getColumnDimension('I')->setAutoSize(true);
-            $sheet->getStyle('A9:N9')->getFont()->setBold(true);
+            $sheet->setCellValue('L9', 'Container Size');
+            $sheet->getColumnDimension('L')->setAutoSize(true);
+            $sheet->setCellValue('M9', 'Volume');
+            $sheet->getColumnDimension('M')->setAutoSize(true);
+            $sheet->setCellValue('N9', 'Number Of Container');
+            $sheet->getColumnDimension('N')->setAutoSize(true);
+            $sheet->setCellValue('O9', 'Weight');
+            $sheet->getColumnDimension('O')->setAutoSize(true);
+            // $sheet->getStyle('A9:N9')->getFont()->setBold(true);
         } else {
-            $sheet->setCellValue('K9', 'Volume');
-            $sheet->getColumnDimension('F')->setAutoSize(true);
-            $sheet->setCellValue('L9', 'Weight');
-            $sheet->getColumnDimension('G')->setAutoSize(true);
-            $sheet->setCellValue('M9', 'Vessel');
+            $sheet->setCellValue('L9', 'Volume');
+            $sheet->getColumnDimension('L')->setAutoSize(true);
+            $sheet->setCellValue('M9', 'Weight');
+            $sheet->getColumnDimension('M')->setAutoSize(true);
         }
         $sheet->getStyle($cellheader)->getAlignment()->setWrapText(true);
         $sheet->getStyle($cellheader)->getFont()->setBold(true);
@@ -356,20 +361,28 @@ class ReportForwarder extends Controller
         $sheet->getStyle($cellheader)->getFill()->getStartColor()->setARGB('ff8400');
 
         //for data
-        $celldata = 'A12:G12';
-        $sheet->setCellValue('A12', 'Material');
+        $count = count($getfcl);
+        if ($count > 1) {
+            $mycell = (12 + $count) - 1;
+        } else {
+            $mycell = 12;
+        }
+        // dd($mycell);
+        // for ($i = 0; $i < 0; $i++) {
+        $celldata = 'A' . $mycell . ':G' . $mycell;
+        $sheet->setCellValue('A' . $mycell, 'Material');
         $sheet->getColumnDimension('A')->setAutoSize(true);
-        $sheet->setCellValue('B12', 'Material Desc');
+        $sheet->setCellValue('B' . $mycell, 'Material Desc');
         $sheet->getColumnDimension('B')->setAutoSize(true);
-        $sheet->setCellValue('C12', 'HS Code ');
+        $sheet->setCellValue('C' . $mycell, 'HS Code ');
         $sheet->getColumnDimension('C')->setAutoSize(true);
-        $sheet->setCellValue('D12', 'Color');
+        $sheet->setCellValue('D' . $mycell, 'Color');
         $sheet->getColumnDimension('D')->setAutoSize(true);
-        $sheet->setCellValue('E12', 'Size');
+        $sheet->setCellValue('E' . $mycell, 'Size');
         $sheet->getColumnDimension('E')->setAutoSize(true);
-        $sheet->setCellValue('F12', 'Qty PO');
+        $sheet->setCellValue('F' . $mycell, 'Qty PO');
         $sheet->getColumnDimension('F')->setAutoSize(true);
-        $sheet->setCellValue('G12', 'Qty Ship');
+        $sheet->setCellValue('G' . $mycell, 'Qty Ship');
         $sheet->getColumnDimension('G')->setAutoSize(true);
         $sheet->getStyle($celldata)->getAlignment()->setWrapText(true);
         $sheet->getStyle($celldata)->getFont()->setBold(true);
@@ -377,9 +390,11 @@ class ReportForwarder extends Controller
         $sheet->getStyle($celldata)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
         $sheet->getStyle($celldata)->getAlignment()->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER);
         $sheet->getStyle($celldata)->getFill()->getStartColor()->setARGB('ff8400');
+        // }
 
         $header = 10;
-        $bodydata = 13;
+        $datafcl = 10;
+        $bodydata = $mycell + 1;
         // BORDER STYLE
         $styleArray = [
             'borders' => [
@@ -427,18 +442,21 @@ class ReportForwarder extends Controller
         $sheet->setCellValue('G' . $header, $getdata[0]->destinationcode . ' - ' . $getdata[0]->destinationname);
         $sheet->setCellValue('H' . $header, $getdata[0]->package);
         $sheet->setCellValue('I' . $header, date('d F Y', strtotime($getdata[0]->date_booking)));
-        $sheet->setCellValue('J' . $header, $getdata[0]->shipmode);
+        $sheet->setCellValue('J' . $header, !$arr ? '' : $arr[0]->vessel);
+        $sheet->setCellValue('K' . $header, $getdata[0]->shipmode);
         if ($getdata[0]->shipmode == 'fcl') {
-            $expfcl = explode('-', $getdata[0]->subshipmode);
-            $sheet->setCellValue('K' . $header, $expfcl[0]);
-            $sheet->setCellValue('L' . $header, $expfcl[1] . 'M3');
-            $sheet->setCellValue('M' . $header, $expfcl[2]);
-            $sheet->setCellValue('N' . $header, !$arr ? '' : $arr[0]->vessel);
+            foreach ($getfcl as $key => $value) {
+                // $expfcl = explode('-', $getdata[0]->subshipmode);
+                $sheet->setCellValue('L' . $datafcl, $value->containernumber);
+                $sheet->setCellValue('M' . $datafcl, $value->volume);
+                $sheet->setCellValue('N' . $datafcl, $value->numberofcontainer);
+                $sheet->setCellValue('O' . $datafcl, $value->weight);
+                $datafcl++;
+            }
         } else {
             $exp = explode('-', $getdata[0]->subshipmode);
-            $sheet->setCellValue('K' . $header, $exp[0]);
-            $sheet->setCellValue('L' . $header, $exp[1]);
-            $sheet->setCellValue('M' . $header, !$arr ? '' : $arr[0]->vessel);
+            $sheet->setCellValue('L' . $header, $exp[0]);
+            $sheet->setCellValue('M' . $header, $exp[1]);
         }
         $header++;
 
@@ -455,19 +473,22 @@ class ReportForwarder extends Controller
         }
 
         if ($getdata[0]->shipmode == 'fcl') {
-            $cellheader = 'A9:N' . ($header - 1);
+            $cellheader = 'A9:O' . ($header - 1);
         } else {
             $cellheader = 'A9:M' . ($header - 1);
         }
 
-        $celldata = 'A12:G' . ($bodydata - 1);
+        $celldata = 'A' . $mycell . ':G' . ($bodydata - 1);
+        $cellfcl = 'L10:O' . ($datafcl - 1);
         $sheet->getStyle('A2:N2')->applyFromArray($styleArraytitle);
         $sheet->getStyle($cellheader)->applyFromArray($styleArray);
         $sheet->getStyle($celldata)->applyFromArray($styleArray);
+        $sheet->getStyle($cellfcl)->applyFromArray($styleArray);
         $sheet->getStyle($cellheader)->getAlignment()->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER);
         $sheet->getStyle($celldata)->getAlignment()->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER);
+        $sheet->getStyle($cellfcl)->getAlignment()->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER);
 
-        $fileName = "Detail_Forwarder_" . $getdata[0]->kode_booking . ".xlsx";
+        $fileName = "Report_Forwarder_" . $getdata[0]->kode_booking . ".xlsx";
 
         $writer = new Xlsx($spreadsheet);
         header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
