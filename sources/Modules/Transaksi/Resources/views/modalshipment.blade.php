@@ -175,7 +175,7 @@
                                 <?php
                                 $dat = $data['dataku'][0]->subshipmode;
                                 $exp = explode('-', $dat);
-                                $exp2 = explode('KG', $exp[1]);
+                                $exp2 = explode('KG', $exp[2]);
                                 ?>
                                 <br>
                                 <div class="form-check form-check-inline">
@@ -194,16 +194,16 @@
                                     <label class="form-check-label" for="inlineRadio2">40 HQ</label>
                                 </div>
                             </div>
-                            {{-- <div class="col-sm-2">
-                                <label class="control-label">Volume</label>
+                            <div class="col-sm-2">
+                                <label class="control-label">Volume<code>*</code></label>
                                 <div class="input-group">
-                                    <input type="number" min="0" class="form-control" name="fclvol"
+                                    <input type="number" min="0" class="form-control" name="fclvol[]"
                                         id="fclvol" value="{{ $exp[1] }}" autocomplete="off">
                                     <div class="input-group-append">
                                         <span class="input-group-text">M3</span>
                                     </div>
                                 </div>
-                            </div> --}}
+                            </div>
                             <div class="col-sm-3">
                                 <label class="control-label">Container Number<code>*</code></label>
                                 <input type="number" min="0" class="form-control" name="noc[]"
@@ -458,11 +458,11 @@
             $('#datalcl').hide()
             $('#dataair').hide()
         } else if (mode == 'lcl') {
-            console.log('object :>> ', 'kliklcl');
             let explcl = dataku[0].subshipmode.split("-");
-            let lclcbm = explcl[0].split("M3");
-            let lclkg = explcl[1].split("KG");
-            $('#lclvol').val(lclcbm[0]);
+            console.log('objectlcl :>> ', explcl);
+            // let lclcbm = explcl[0].split("M3");
+            let lclkg = explcl[2].split("KG");
+            $('#lclvol').val(explcl[1]);
             $('#lclweight').val(lclkg[0]);
             $('#fclinput').empty();
             $('#datalcl').show()
@@ -471,9 +471,9 @@
         } else {
             console.log('object :>> ', 'kliksir');
             let expair = dataku[0].subshipmode.split("-");
-            let aircbm = expair[0].split("M3");
-            let airkg = expair[1].split("KG");
-            $('#airvol').val(aircbm[0]);
+            // let aircbm = expair[0].split("M3");
+            let airkg = expair[2].split("KG");
+            $('#airvol').val(expair[1]);
             $('#airweight').val(airkg[0]);
             $('#fclinput').empty();
             $('#dataair').show()
@@ -498,6 +498,15 @@
                 <div class="col-md-12">
                     <div class="form-group row">
                         <div class="col-sm-2"></div>
+                        <div class="col-sm-2">
+                            <div class="input-group">
+                                <input type="number" min="0" class="form-control" name="fclvol[]"
+                                    id="fclvol" autocomplete="off">
+                                <div class="input-group-append">
+                                    <span class="input-group-text">M3</span>
+                                </div>
+                            </div>
+                        </div>
                         <div class="col-sm-3">
                             <input type="number" class="form-control" name="noc[]" value="">
                         </div>
@@ -617,6 +626,14 @@
                     return $(this).val();
                 }
             }).get();
+        let volume = $("input[name='fclvol[]']")
+            .map(function() {
+                if ($(this).val() == '') {
+                    return;
+                } else {
+                    return $(this).val();
+                }
+            }).get();
         let numbofcont = $("input[name='noc[]']")
             .map(function() {
                 if ($(this).val() == '') {
@@ -677,6 +694,7 @@
 
         let form_data = new FormData();
         form_data.append('dataid', JSON.stringify(arrayku));
+        form_data.append('datavolume', JSON.stringify(volume));
         form_data.append('datacontainer', JSON.stringify(numbofcont));
         form_data.append('dataweight', JSON.stringify(weight));
         form_data.append('datamatcontent', JSON.stringify(matcontent));
@@ -699,6 +717,8 @@
 
         if (arrayku == null || arrayku == '') {
             notifalert('Quantity Allocation');
+        } else if (mode == 'fcl' && (volume == null || volume == '')) {
+            notifalert('Volume');
         } else if (mode == 'fcl' && (numbofcont == null || numbofcont == '')) {
             notifalert('Number Of Container');
         } else if (mode == 'fcl' && (weight == null || weight == '')) {

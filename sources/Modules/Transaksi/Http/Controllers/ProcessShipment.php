@@ -284,6 +284,7 @@ class ProcessShipment extends Controller
     public function saveshipment(Request $request)
     {
         $decode = json_decode($request->dataid);
+        $decodevolume = json_decode($request->datacontainer);
         $decodecont = json_decode($request->datacontainer);
         $decodeweight = json_decode($request->dataweight);
         $decodematcontent = json_decode($request->datamatcontent);
@@ -409,6 +410,7 @@ class ProcessShipment extends Controller
                     'noinv'             => $getinv->noinv,
                     'containernumber'   => ($request->fclfeet == '40hq') ? $request->fclfeet : $request->fclfeet . '"',
                     'numberofcontainer' => $lue,
+                    'volume'            => $decodevolume[$key] . 'M3',
                     'weight'            => $decodeweight[$key] . 'KG',
                     'aktif'             => 'Y',
                     'created_at'        => date('Y-m-d H:i:s'),
