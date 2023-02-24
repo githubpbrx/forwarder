@@ -226,13 +226,15 @@ class ReportAlokasi extends Controller
         //     ->selectRaw(' formpo.id_formpo, formpo.created_at, formpo.updated_at ')
         //     ->latest('id_formpo')->first();
 
-        $data = modelforwarder::with(['formpo'])
+        $data = modelforwarder::with(['formpo' => function ($var) {
+            $var->with(['route', 'loading', 'destination']);
+        }])
             ->join('po', 'po.id', 'forwarder.idpo')
             ->join('mastersupplier', 'mastersupplier.id', 'po.vendor')
             ->join('masterhscode', 'masterhscode.matcontent', 'po.matcontents')
             ->join('masterforwarder', 'masterforwarder.id', 'forwarder.idmasterfwd')
-            ->where('po_nomor', $request->id)
-            ->where('idmasterfwd', $request->idmasterfwd)
+            ->where('forwarder.po_nomor', $request->id)
+            ->where('forwarder.idmasterfwd', $request->idmasterfwd)
             ->selectRaw(' forwarder.*, po.pono, po.matcontents, po.itemdesc, po.qtypo, po.colorcode, po.size, po.style, po.plant, masterforwarder.name, mastersupplier.nama, masterhscode.hscode ')
             ->where('forwarder.aktif', 'Y')->where('masterforwarder.aktif', 'Y')->where('mastersupplier.aktif', 'Y')->where('masterhscode.aktif', 'Y')
             ->get();

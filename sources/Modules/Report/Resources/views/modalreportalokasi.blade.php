@@ -39,6 +39,57 @@
     <div class="row">
         <div class="col-md-3">
             <div class="form-group">
+                <label class="col-sm-12 control-label">Date Booking</label>
+                <div class="col-sm-12">
+                    <input type="text" class="form-control"
+                        value="{{ $data[0]['formpo'] == null ? '' : date('d F Y', strtotime($data[0]['formpo']->date_booking)) }}"
+                        readonly>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="form-group">
+                <label class="col-sm-12 control-label">Route</label>
+                <div class="col-sm-12">
+                    <input type="text" class="form-control"
+                        value="{{ $data[0]['formpo'] == null ? '' : $data[0]['formpo']['route']->route_code . ' ~ ' . $data[0]['formpo']['route']->route_desc }}"
+                        readonly>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="form-group">
+                <label class="col-sm-12 control-label">Port Of Loading</label>
+                <div class="col-sm-12">
+                    <input type="text" class="form-control"
+                        value="{{ $data[0]['formpo'] == null ? '' : $data[0]['formpo']['loading']->code_port . ' ~ ' . $data[0]['formpo']['loading']->name_port }}"
+                        readonly>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="form-group">
+                <label class="col-sm-12 control-label">Port Of Destination</label>
+                <div class="col-sm-12">
+                    <input type="text" class="form-control"
+                        value="{{ $data[0]['formpo'] == null ? '' : $data[0]['formpo']['destination']->code_port . ' ~ ' . $data[0]['formpo']['destination']->name_port }}"
+                        readonly>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-3">
+            <div class="form-group">
+                <label class="col-sm-12 control-label">Package</label>
+                <div class="col-sm-12">
+                    <input type="text" class="form-control"
+                        value="{{ $data[0]['formpo'] == null ? '' : $data[0]['formpo']->package }}" readonly>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="form-group">
                 <label class="col-sm-12 control-label">ETD</label>
                 <div class="col-sm-12">
                     <input type="text" class="form-control"
@@ -67,6 +118,8 @@
                 </div>
             </div>
         </div>
+    </div>
+    <div class="row">
         <div class="col-md-3">
             <div class="form-group">
                 <label class="col-sm-12 control-label">Update Data</label>
@@ -77,8 +130,6 @@
                 </div>
             </div>
         </div>
-    </div>
-    <div class="row">
         <div class="col-md-6">
             <div class="form-group">
                 <div class="col-sm-12">
