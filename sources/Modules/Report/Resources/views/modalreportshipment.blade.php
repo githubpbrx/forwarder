@@ -121,54 +121,48 @@
             <div class="form-group">
                 <div class="col-sm-12">
                     <div class="row">
-                        <div class="col-sm-2">
-                            <label class="col-sm-12">Shipmode</label>
-                            <input type="text" class="form-control" value="{{ $data[0]->shipmode }}" readonly>
-                        </div>
                         @if ($data[0]->shipmode == 'fcl')
-                            <?php
-                            $datacont = $data[0]['container'];
-                            // dd($datacont);
-                            // $exp = explode('-', $data[0]->subshipmode);
-                            // $fclsize = $exp[0];
-                            // $fclvol = $exp[1];
-                            $expkg = explode('KG', $data[0]['container']->weight);
-                            $fclkg = $expkg[0];
-                            // if ($fclsize == '40hq') {
-                            //     $fclcont = $fclsize;
-                            // } else {
-                            //     $fclcont = $fclsize . '"';
-                            // }
-                            ?>
-                            <div class="col-sm-2">
-                                <label class="col-sm-12 control-label">Container Size</label>
-                                <input type="text" class="form-control"
-                                    value="{{ $data[0]['container']->containernumber }}" readonly>
-                            </div>
-                            <div class="col-sm-2">
-                                <label class="col-sm-12 control-label">Volume</label>
-                                <div class="input-group">
-                                    <input type="number" class="form-control"
-                                        value="{{ $data[0]['container']->volume }}" readonly>
-                                    <div class="input-group-append">
-                                        <span class="input-group-text">M3</span>
+                            @foreach ($datafcl as $item)
+                                <?php
+                                $expvol = explode('M3', $item->volume);
+                                $expweight = explode('KG', $item->weight);
+                                ?>
+                                <div class="col-sm-2">
+                                    <label class="col-sm-12">Shipmode</label>
+                                    <input type="text" class="form-control" value="{{ $data[0]->shipmode }}"
+                                        readonly>
+                                </div>
+                                <div class="col-sm-2">
+                                    <label class="col-sm-12 control-label">Container Size</label>
+                                    <input type="text" class="form-control" value="{{ $item->containernumber }}"
+                                        readonly>
+                                </div>
+                                <div class="col-sm-2">
+                                    <label class="col-sm-12 control-label">Volume</label>
+                                    <div class="input-group">
+                                        <input type="number" class="form-control" value="{{ $expvol[0] }}"
+                                            readonly>
+                                        <div class="input-group-append">
+                                            <span class="input-group-text">M3</span>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                            <div class="col-sm-3">
-                                <label class="col-sm-12 control-label">Number Of Container</label>
-                                <input type="text" class="form-control"
-                                    value="{{ $data[0]['container']->numberofcontainer }}" readonly>
-                            </div>
-                            <div class="col-sm-2">
-                                <label class="col-sm-12 control-label">Weight</label>
-                                <div class="input-group">
-                                    <input type="number" class="form-control" value="{{ $fclkg }}" readonly>
-                                    <div class="input-group-append">
-                                        <span class="input-group-text">Kg</span>
+                                <div class="col-sm-3">
+                                    <label class="col-sm-12 control-label">Number Of Container</label>
+                                    <input type="text" class="form-control"
+                                        value="{{ $item->numberofcontainer }}" readonly>
+                                </div>
+                                <div class="col-sm-2">
+                                    <label class="col-sm-12 control-label">Weight</label>
+                                    <div class="input-group">
+                                        <input type="number" class="form-control" value="{{ $expweight[0] }}"
+                                            readonly>
+                                        <div class="input-group-append">
+                                            <span class="input-group-text">Kg</span>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
+                            @endforeach
                         @elseif($data[0]->shipmode == 'lcl')
                             <?php
                             $explcl = explode('-', $data[0]->subshipmode);
@@ -177,6 +171,11 @@
                             $explclkg = explode('KG', $explcl[1]);
                             $lclkg = $explclkg[0];
                             ?>
+                            <div class="col-sm-2">
+                                <label class="col-sm-12">Shipmode</label>
+                                <input type="text" class="form-control" value="{{ $data[0]->shipmode }}"
+                                    readonly>
+                            </div>
                             <div class="col-sm-4">
                                 <label class="col-sm-12 control-label">Volume</label>
                                 <div class="input-group">
@@ -205,6 +204,11 @@
                             $expairkg = explode('KG', $expair[1]);
                             $airkg = $expairkg[0];
                             ?>
+                            <div class="col-sm-2">
+                                <label class="col-sm-12">Shipmode</label>
+                                <input type="text" class="form-control" value="{{ $data[0]->shipmode }}"
+                                    readonly>
+                            </div>
                             <div class="col-sm-4">
                                 <label class="col-sm-12 control-label">Volume</label>
                                 <div class="input-group">

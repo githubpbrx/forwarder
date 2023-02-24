@@ -11,7 +11,7 @@ use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
-use Modules\Report\Models\modelprivilege;
+use Modules\Report\Models\modelcontainership;
 use Modules\Report\Models\modelpo;
 use Modules\Report\Models\modelformpo;
 use Modules\Report\Models\modelformshipment;
@@ -135,8 +135,7 @@ class ReportShipment extends Controller
     {
         // dd($request);
 
-        $data = modelformshipment::with(['container'])
-            ->join('formpo', 'formpo.id_formpo', 'formshipment.idformpo')
+        $data = modelformshipment::join('formpo', 'formpo.id_formpo', 'formshipment.idformpo')
             ->join('masterroute', 'masterroute.id_route', 'formpo.idroute')
             ->join('masterportofloading', 'masterportofloading.id_portloading', 'formpo.idportloading')
             ->join('masterportofdestination', 'masterportofdestination.id_portdestination', 'formpo.idportdestination')
@@ -151,6 +150,7 @@ class ReportShipment extends Controller
             ->selectRaw(' formshipment.*, po.pono, po.matcontents, po.itemdesc, po.qtypo, po.colorcode, po.size, po.style, po.plant, formpo.kode_booking, formpo.date_booking, formpo.package , masterforwarder.name, mastersupplier.nama, masterhscode.hscode, masterroute.route_code, masterroute.route_desc, masterportofloading.code_port as loadingcode, masterportofloading.name_port as loadingname, masterportofdestination.code_port as destinationcode, masterportofdestination.name_port as destinationname')
             ->get();
         // dd($data);
+
         $getdate = modelformshipment::join('formpo', 'formpo.id_formpo', 'formshipment.idformpo')
             ->join('po', 'po.id', 'formpo.idpo')
             ->join('masterforwarder', 'masterforwarder.id', 'formpo.idmasterfwd')
@@ -160,8 +160,11 @@ class ReportShipment extends Controller
             ->selectRaw(' formshipment.id_shipment, formshipment.created_at, formshipment.updated_at ')
             ->latest('id_shipment')->first();
         // dd($getdate);
+
+        $getfcl = modelcontainership::where('noinv', $data[0]->noinv)->groupby('volume')->groupby('weight')->where('aktif', 'Y')->get();
+        // dd($getfcl);
         // return response()->json(['status' => 200, 'data' => $data, 'message' => 'Berhasil']);
-        $form = view('report::modalreportshipment', ['data' => $data, 'dateku' => $getdate]);
+        $form = view('report::modalreportshipment', ['data' => $data, 'dateku' => $getdate, 'datafcl' => $getfcl]);
         return $form->render();
     }
 
@@ -190,6 +193,8 @@ class ReportShipment extends Controller
             ->selectRaw(' formshipment.id_shipment, formshipment.created_at, formshipment.updated_at')
             ->latest('id_shipment')->first();
         // dd($getdate);
+
+        $getfcl = modelcontainership::where('noinv', $getdata[0]->noinv)->groupby('volume')->groupby('weight')->where('aktif', 'Y')->get();
 
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
@@ -255,20 +260,26 @@ class ReportShipment extends Controller
         $sheet->getStyle($cellheader)->getFill()->getStartColor()->setARGB('ff8400');
 
         //for data
-        $celldata = 'A12:G12';
-        $sheet->setCellValue('A12', 'Material');
+        $count = count($getfcl);
+        if ($count > 1) {
+            $mycell = (12 + $count) - 1;
+        } else {
+            $mycell = 12;
+        }
+        $celldata = 'A' . $mycell . ':G' . $mycell;
+        $sheet->setCellValue('A' . $mycell, 'Material');
         $sheet->getColumnDimension('A')->setWidth(50);
-        $sheet->setCellValue('B12', 'Material Desc');
+        $sheet->setCellValue('B' . $mycell, 'Material Desc');
         $sheet->getColumnDimension('B')->setWidth(30);
-        $sheet->setCellValue('C12', 'HS Code ');
+        $sheet->setCellValue('C' . $mycell, 'HS Code ');
         $sheet->getColumnDimension('C')->setWidth(20);
-        $sheet->setCellValue('D12', 'Color');
+        $sheet->setCellValue('D' . $mycell, 'Color');
         $sheet->getColumnDimension('D')->setWidth(20);
-        $sheet->setCellValue('E12', 'Size');
+        $sheet->setCellValue('E' . $mycell, 'Size');
         $sheet->getColumnDimension('E')->setWidth(20);
-        $sheet->setCellValue('F12', 'Qty PO');
+        $sheet->setCellValue('F' . $mycell, 'Qty PO');
         $sheet->getColumnDimension('F')->setWidth(20);
-        $sheet->setCellValue('G12', 'Qty Ship');
+        $sheet->setCellValue('G' . $mycell, 'Qty Ship');
         $sheet->getColumnDimension('G')->setWidth(20);
         $sheet->getStyle($celldata)->getAlignment()->setWrapText(true);
         $sheet->getStyle($celldata)->getFont()->setBold(true);
@@ -278,7 +289,8 @@ class ReportShipment extends Controller
         $sheet->getStyle($celldata)->getFill()->getStartColor()->setARGB('ff8400');
 
         $header = 10;
-        $bodydata = 13;
+        $datafcl = 10;
+        $bodydata = $mycell + 1;
         // BORDER STYLE
         $styleArray = [
             'borders' => [
@@ -323,11 +335,14 @@ class ReportShipment extends Controller
         $sheet->setCellValue('J' . $header, $getdata[0]->vessel);
         $sheet->setCellValue('K' . $header, $getdata[0]->shipmode);
         if ($getdata[0]->shipmode == 'fcl') {
-            // $exp = explode('-', $getdata[0]->subshipmode);
-            $sheet->setCellValue('L' . $header, $getdata[0]['container']->containernumber);
-            $sheet->setCellValue('M' . $header, $getdata[0]['container']->volume . 'M3');
-            $sheet->setCellValue('N' . $header, $getdata[0]['container']->numberofcontainer);
-            $sheet->setCellValue('O' . $header, $getdata[0]['container']->weight);
+            foreach ($getfcl as $key => $value) {
+                // $exp = explode('-', $getdata[0]->subshipmode);
+                $sheet->setCellValue('L' . $datafcl, $value->containernumber);
+                $sheet->setCellValue('M' . $datafcl, $value->volume);
+                $sheet->setCellValue('N' . $datafcl, $value->numberofcontainer);
+                $sheet->setCellValue('O' . $datafcl, $value->weight);
+                $datafcl++;
+            }
         } else {
             $exp2 = explode('-', $getdata[0]->subshipmode);
             $sheet->setCellValue('L' . $header, $exp2[0] . 'M3');
@@ -353,12 +368,15 @@ class ReportShipment extends Controller
             $cellheader = 'A9:M' . ($header - 1);
         }
 
-        $celldata = 'A12:G' . ($bodydata - 1);
+        $celldata = 'A' . $mycell . ':G' . ($bodydata - 1);
+        $cellfcl = 'L10:O' . ($datafcl - 1);
         $sheet->getStyle('A2:M2')->applyFromArray($styleArraytitle);
         $sheet->getStyle($cellheader)->applyFromArray($styleArray);
         $sheet->getStyle($celldata)->applyFromArray($styleArray);
+        $sheet->getStyle($cellfcl)->applyFromArray($styleArray);
         $sheet->getStyle($cellheader)->getAlignment()->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER);
         $sheet->getStyle($celldata)->getAlignment()->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER);
+        $sheet->getStyle($cellfcl)->getAlignment()->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER);
 
         $fileName = "Report_Ready_Shipment_" . $getdata[0]->noinv . ".xlsx";
 
