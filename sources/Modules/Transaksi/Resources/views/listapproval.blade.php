@@ -417,30 +417,17 @@
                                 expfcl1[0] +
                                 '" readonly><div class="input-group-append"><span class="input-group-text">KG</span></div></div></div></div>'
                             );
-                        } else if ((mypo[indexpo].shipmode == 'lcl')) {
-                            let explcl = mypo[indexpo].subshipmode.split("-");
-                            let explcl1 = explcl[0].split("M3");
-                            let explcl2 = explcl[1].split("KG");
-                            $('#datashipmode').append(
-                                '<div class="row"><div class="col-sm-3"><label class="control-label">Ship Mode</label><input type="text" class="form-control" value="' +
-                                mypo[indexpo].shipmode +
-                                '" readonly></div><div class="col-sm-3"><label class="control-label">Volume</label><div class="input-group"><input type="number" min="0" class="form-control" autocomplete="off" value="' +
-                                explcl1[0] +
-                                '" readonly><div class="input-group-append"><span class="input-group-text">M3</span></div></div></div><div class="col-sm-3"><label class="control-label">Weight</label><div class="input-group"><input type="number" min="0" class="form-control" autocomplete="off" value="' +
-                                explcl2[0] +
-                                '" readonly><div class="input-group-append"><span class="input-group-text">KG</span></div></div></div></div>'
-                            );
                         } else {
-                            let expair = mypo[indexpo].subshipmode.split("-");
-                            let expair1 = expair[0].split("M3");
-                            let expair2 = expair[1].split("KG");
+                            let expsubship = mypo[indexpo].subshipmode.split("-");
+                            let expsubship1 = expsubship[0].split("M3");
+                            let expsubship2 = expsubship[1].split("KG");
                             $('#datashipmode').append(
                                 '<div class="row"><div class="col-sm-3"><label class="control-label">Ship Mode</label><input type="text" class="form-control" value="' +
                                 mypo[indexpo].shipmode +
-                                '" readonly></div><div class="col-sm-3"><label class="control-label">Volume</label><div class="input-group"><input type="number" min="0" class="form-control" autocomplete="off" value="' +
-                                expair1[0] +
-                                '" readonly><div class="input-group-append"><span class="input-group-text">M3</span></div></div></div><div class="col-sm-3"><label class="control-label">Weight</label><div class="input-group"><input type="number" min="0" class="form-control" autocomplete="off" value="' +
-                                expair2[0] +
+                                '" readonly></div><div class="col-sm-4"><label class="control-label">Volume</label><div class="input-group"><input type="number" min="0" class="form-control" autocomplete="off" value="' +
+                                expsubship1[0] +
+                                '" readonly><div class="input-group-append"><span class="input-group-text">M3</span></div></div></div><div class="col-sm-4"><label class="control-label">Weight</label><div class="input-group"><input type="number" min="0" class="form-control" autocomplete="off" value="' +
+                                expsubship2[0] +
                                 '" readonly><div class="input-group-append"><span class="input-group-text">KG</span></div></div></div></div>'
                             );
                         }
