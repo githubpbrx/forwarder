@@ -284,7 +284,7 @@ class ProcessShipment extends Controller
     public function saveshipment(Request $request)
     {
         $decode = json_decode($request->dataid);
-        $decodevolume = json_decode($request->datacontainer);
+        $decodevolume = json_decode($request->datavolume);
         $decodecont = json_decode($request->datacontainer);
         $decodeweight = json_decode($request->dataweight);
         $decodematcontent = json_decode($request->datamatcontent);

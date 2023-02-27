@@ -160,6 +160,7 @@
                             <option value="fcl">FCL</option>
                             <option value="lcl">LCL</option>
                             <option value="air">Air</option>
+                            <option value="cfscy">CFS/CY</option>
                         </select>
                     </div>
                 </div>
@@ -173,24 +174,31 @@
                             <div class="col-sm-2" class="radiocontainer">
                                 <label class="control-label">Container Size<code>*</code></label>
                                 <?php
-                                $dat = $data['dataku'][0]->subshipmode;
-                                $exp = explode('-', $dat);
-                                $exp2 = explode('KG', $exp[2]);
+                                // $dat = $data['dataku'][0]->subshipmode;
+                                // $exp = explode('-', $dat);
+                                // if (count($exp) > 2) {
+                                //     $exp2 = explode('KG', $exp[2]);
+                                //     $expvol = $exp[1];
+                                // } else {
+                                //     $exp2 = explode('KG', $exp[1]);
+                                //     $explode = explode('M3', $exp[0]);
+                                //     $expvol = $explode[0];
+                                // }
                                 ?>
                                 <br>
                                 <div class="form-check form-check-inline">
                                     <input class="form-check-input" type="radio" name="inlineRadioOptions"
-                                        id="inlineRadio1" value="20" {{ $exp[0] == '20' ? 'checked' : '' }}>
+                                        id="inlineRadio1" value="20">
                                     <label class="form-check-label" for="inlineRadio1">20"</label>
                                 </div>
                                 <div class="form-check form-check-inline">
                                     <input class="form-check-input" type="radio" name="inlineRadioOptions"
-                                        id="inlineRadio2" value="40" {{ $exp[0] == '40' ? 'checked' : '' }}>
+                                        id="inlineRadio2" value="40">
                                     <label class="form-check-label" for="inlineRadio2">40"</label>
                                 </div>
                                 <div class="form-check form-check-inline">
                                     <input class="form-check-input" type="radio" name="inlineRadioOptions"
-                                        id="inlineRadio2" value="40hq" {{ $exp[0] == '40hq' ? 'checked' : '' }}>
+                                        id="inlineRadio2" value="40hq">
                                     <label class="form-check-label" for="inlineRadio2">40 HQ</label>
                                 </div>
                             </div>
@@ -198,7 +206,7 @@
                                 <label class="control-label">Volume<code>*</code></label>
                                 <div class="input-group">
                                     <input type="number" min="0" class="form-control" name="fclvol[]"
-                                        id="fclvol" value="{{ $exp[1] }}" autocomplete="off">
+                                        id="fclvol" autocomplete="off">
                                     <div class="input-group-append">
                                         <span class="input-group-text">M3</span>
                                     </div>
@@ -213,7 +221,7 @@
                                 <label class="control-label">Weight<code>*</code></label>
                                 <div class="input-group">
                                     <input type="number" min="0" class="form-control" name="weight[]"
-                                        id="weight" value="{{ $exp2[0] }}" autocomplete="off">
+                                        id="weight" autocomplete="off">
                                     <div class="input-group-append">
                                         <span class="input-group-text">KG</span>
                                     </div>
@@ -230,7 +238,7 @@
                         <div id="datalcl" style="display: none">
                             <div class="row">
                                 <div class="col-sm-4">
-                                    <label class="col-sm-12 control-label">Volume<code>*</code></label>
+                                    <label class="control-label">Volume<code>*</code></label>
                                     <div class="input-group">
                                         <input type="number" min="0" class="form-control" name="lclvol"
                                             id="lclvol" autocomplete="off">
@@ -240,7 +248,7 @@
                                     </div>
                                 </div>
                                 <div class="col-sm-4">
-                                    <label class="col-sm-12 control-label">Weight<code>*</code></label>
+                                    <label class="control-label">Weight<code>*</code></label>
                                     <div class="input-group">
                                         <input type="number" min="0" class="form-control" name="lclweight"
                                             id="lclweight" autocomplete="off">
@@ -254,7 +262,7 @@
                         <div id="dataair" style="display: none">
                             <div class="row">
                                 <div class="col-sm-4">
-                                    <label class="col-sm-12 control-label">Volume<code>*</code></label>
+                                    <label class="control-label">Volume<code>*</code></label>
                                     <div class="input-group">
                                         <input type="number" min="0" class="form-control" name="airvol"
                                             id="airvol" autocomplete="off">
@@ -264,12 +272,36 @@
                                     </div>
                                 </div>
                                 <div class="col-sm-4">
-                                    <label class="col-sm-12 control-label">Weight<code>*</code></label>
+                                    <label class="control-label">Weight<code>*</code></label>
                                     <div class="input-group">
                                         <input type="number" min="0" class="form-control" name="airweight"
                                             id="airweight" autocomplete="off">
                                         <div class="input-group-append">
                                             <span class="input-group-text">Kg</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="datacfscy" style="display: none">
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    <label class="control-label">Volume<code>*</code></label>
+                                    <div class="input-group">
+                                        <input type="number" min="0" class="form-control" name="cfscyvol"
+                                            id="cfscyvol" autocomplete="off">
+                                        <div class="input-group-append">
+                                            <span class="input-group-text">M3</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-4">
+                                    <label class="control-label">Weight<code>*</code></label>
+                                    <div class="input-group">
+                                        <input type="number" min="0" class="form-control" name="cfscyweight"
+                                            id="cfscyweight" autocomplete="off">
+                                        <div class="input-group-append">
+                                            <span class="input-group-text">KG</span>
                                         </div>
                                     </div>
                                 </div>
@@ -399,10 +431,14 @@
     var dataku = @JSON($data['dataku']);
     console.log('dataku :>> ', dataku);
 
-    var radiovalue = $("input[name='inlineRadioOptions']:checked").val();
-    var cekrad;
+    // var radiovalue = $(".form-check-input:checked").val();
+    // console.log('radiovalue :>> ', radiovalue);
+
+    var radsplit = dataku[0].subshipmode.split("-")
+    var cekrad = radsplit[0];
     $('.form-check-input').click(function(e) {
         cekrad = $(this).val();
+        console.log('cekrad :>> ', cekrad);
     });
 
     //Initialize Select2 Elements
@@ -453,30 +489,94 @@
         mode = $(this).val();
         console.log('training :>> ', mode);
         if (mode == 'fcl') {
-            console.log('object :>> ', 'klikfcl');
+            let expfcl = dataku[0].subshipmode.split("-");
+            console.log('expfcl :>> ', expfcl);
+
+            let fclvol;
+            let fclkg;
+            let fclradio;
+            if (expfcl.length > 2) {
+                fclradio = expfcl[0];
+                fclvol = expfcl[1];
+                fclkg = expfcl[2].split("KG");
+            } else {
+                let splitfcl = expfcl[0].split("M3");
+                console.log('splitfcl :>> ', splitfcl);
+                fclvol = splitfcl[0];
+                fclkg = expfcl[1].split("KG");
+            }
+
+            $("input[name=inlineRadioOptions][value=" + fclradio + "]").prop('checked', true);
+            // $("input[name=inlineRadioOptions][value=" + value + "]").prop('checked', true);
+            // $("input[name=inlineRadioOptions][value=" + value + "]").prop('checked', true);
+            $('#weight').val(fclkg[0]);
+            $('#fclvol').val(fclvol);
             $('#datafcl').show()
             $('#datalcl').hide()
             $('#dataair').hide()
+            $('#datacfscy').hide()
         } else if (mode == 'lcl') {
             let explcl = dataku[0].subshipmode.split("-");
             console.log('objectlcl :>> ', explcl);
-            // let lclcbm = explcl[0].split("M3");
-            let lclkg = explcl[2].split("KG");
-            $('#lclvol').val(explcl[1]);
+
+            let lclvol;
+            let lclkg;
+            if (explcl.length > 2) {
+                lclvol = explcl[1];
+                lclkg = explcl[2].split("KG");
+            } else {
+                let splitlcl = explcl[0].split("M3");
+                lclvol = splitlcl[0];
+                lclkg = explcl[1].split("KG");
+            }
+            $('#lclvol').val(lclvol);
             $('#lclweight').val(lclkg[0]);
             $('#fclinput').empty();
             $('#datalcl').show()
             $('#datafcl').hide()
             $('#dataair').hide()
-        } else {
-            console.log('object :>> ', 'kliksir');
+            $('#datacfscy').hide()
+        } else if (mode == 'air') {
             let expair = dataku[0].subshipmode.split("-");
-            // let aircbm = expair[0].split("M3");
-            let airkg = expair[2].split("KG");
-            $('#airvol').val(expair[1]);
+
+            let airvol;
+            let airkg;
+            if (expair.length > 2) {
+                airvol = expair[1];
+                airkg = expair[2].split("KG");
+            } else {
+                let splitair = expair[0].split("M3");
+                airvol = splitair[0];
+                airkg = expair[1].split("KG");
+            }
+
+            $('#airvol').val(airvol);
             $('#airweight').val(airkg[0]);
             $('#fclinput').empty();
             $('#dataair').show()
+            $('#datafcl').hide()
+            $('#datalcl').hide()
+            $('#datacfscy').hide()
+        } else {
+            let expcfscy = dataku[0].subshipmode.split("-");
+            console.log('expcfscy :>> ', expcfscy);
+
+            let cfscyvol;
+            let cfscykg;
+            if (expcfscy.length > 2) {
+                cfscyvol = expcfscy[1];
+                cfscykg = expcfscy[2].split("KG");
+            } else {
+                let splitcfscy = expcfscy[0].split("M3");
+                cfscyvol = splitcfscy[0];
+                cfscykg = expcfscy[1].split("KG");
+            }
+
+            $('#cfscyvol').val(cfscyvol);
+            $('#cfscyweight').val(cfscykg[0]);
+            $('#fclinput').empty();
+            $('#datacfscy').show()
+            $('#dataair').hide()
             $('#datafcl').hide()
             $('#datalcl').hide()
         }
@@ -610,6 +710,7 @@
     ].id_portdestination).trigger('change');
 
     $('#btnsubmit').click(function(e) {
+        console.log('submit :>> ', 'submit');
         let matcontent = $("td[data-name='mat[]']")
             .map(function() {
                 if ($(this).html() == '') {
@@ -650,12 +751,15 @@
                     return $(this).val();
                 }
             }).get();
-        let fclfeet = (cekrad == null) ? radiovalue : cekrad;
+        // let fclfeet = (cekrad == null) ? radiovalue : cekrad;
+        let fclfeet = cekrad;
         let shipmode = $('#shipmode').val();
         let lclvol = $('#lclvol').val();
         let lclweight = $('#lclweight').val();
         let airvol = $('#airvol').val();
         let airweight = $('#airweight').val();
+        let volcfscy = $('#cfscyvol').val();
+        let weightcfscy = $('#cfscyweight').val();
         let pol = $('#portloading').val();
         let pod = $('#portdestination').val();
         let package = $('#package').val();
@@ -690,6 +794,9 @@
         } else if (shipmode == 'air') {
             vol = airvol;
             updateweight = airweight;
+        } else if (shipmode == 'cfscy') {
+            vol = volcfscy;
+            updateweight = weightcfscy;
         }
 
         let form_data = new FormData();
