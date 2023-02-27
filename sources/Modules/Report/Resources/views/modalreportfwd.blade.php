@@ -87,46 +87,13 @@
                                     </div>
                                 </div>
                             @endforeach
-                        @elseif($data[0]->shipmode == 'lcl')
-                            <?php
-                            $explcl = explode('-', $data[0]->subshipmode);
-                            $lclvolexp = explode('M3', $explcl[0]);
-                            $lclvol = $lclvolexp[0];
-                            $explclkg = explode('KG', $explcl[1]);
-                            $lclkg = $explclkg[0];
-                            ?>
-                            <div class="col-sm-2">
-                                <label class="col-sm-12 control-label">Ship Mode</label>
-                                <input type="text" class="form-control" id="shipmode" name="shipmode"
-                                    value="{{ $data[0]->shipmode }}" readonly>
-                            </div>
-                            <div class="col-sm-4">
-                                <label class="col-sm-12 control-label">Volume</label>
-                                <div class="input-group">
-                                    <input type="number" min="0" class="form-control"
-                                        value="{{ $lclvol }}" readonly>
-                                    <div class="input-group-append">
-                                        <span class="input-group-text">M3</span>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-sm-4">
-                                <label class="col-sm-12 control-label">Weight</label>
-                                <div class="input-group">
-                                    <input type="number" min="0" class="form-control"
-                                        value="{{ $lclkg }}" readonly>
-                                    <div class="input-group-append">
-                                        <span class="input-group-text">Kg</span>
-                                    </div>
-                                </div>
-                            </div>
                         @else
                             <?php
-                            $expair = explode('-', $data[0]->subshipmode);
-                            $airvolexp = explode('M3', $expair[0]);
-                            $airvol = $airvolexp[0];
-                            $expairkg = explode('KG', $expair[1]);
-                            $airkg = $expairkg[0];
+                            $explode = explode('-', $data[0]->subshipmode);
+                            $volexp = explode('M3', $explode[0]);
+                            $vol = $volexp[0];
+                            $expkg = explode('KG', $explode[1]);
+                            $kg = $expkg[0];
                             ?>
                             <div class="col-sm-2">
                                 <label class="col-sm-12 control-label">Ship Mode</label>
@@ -137,7 +104,7 @@
                                 <label class="col-sm-12 control-label">Volume</label>
                                 <div class="input-group">
                                     <input type="number" min="0" class="form-control"
-                                        value="{{ $airvol }}" readonly>
+                                        value="{{ $vol }}" readonly>
                                     <div class="input-group-append">
                                         <span class="input-group-text">M3</span>
                                     </div>
@@ -147,7 +114,7 @@
                                 <label class="col-sm-12 control-label">Weight</label>
                                 <div class="input-group">
                                     <input type="number" min="0" class="form-control"
-                                        value="{{ $airkg }}" readonly>
+                                        value="{{ $kg }}" readonly>
                                     <div class="input-group-append">
                                         <span class="input-group-text">Kg</span>
                                     </div>

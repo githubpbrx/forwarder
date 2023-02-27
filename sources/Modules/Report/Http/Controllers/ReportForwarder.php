@@ -178,7 +178,7 @@ class ReportForwarder extends Controller
             ->where(function ($kk) {
                 $kk->where('formshipment.id_shipment', null)->orWhere('formshipment.aktif', 'Y');
             })
-            ->selectRaw('formshipment.qty_shipment, formshipment.noinv, formshipment.etdfix, formshipment.etafix, formshipment.nomor_bl, formshipment.vessel, po.pono, po.qtypo, po.matcontents, po.itemdesc, po.style, po.colorcode, po.size, formpo.kode_booking, formpo.date_booking, formpo.shipmode, formpo.subshipmode, formpo.package, mastersupplier.nama, masterhscode.hscode, masterroute.route_code, masterroute.route_desc, masterportofloading.code_port as loadingcode, masterportofloading.name_port as loadingname, masterportofdestination.code_port as destinationcode, masterportofdestination.name_port as destinationname')
+            ->selectRaw('formshipment.qty_shipment, formshipment.noinv, formshipment.etdfix, formshipment.etafix, formshipment.nomor_bl, formshipment.vessel, formshipment.shipmode, formshipment.subshipmode, po.pono, po.qtypo, po.matcontents, po.itemdesc, po.style, po.colorcode, po.size, formpo.kode_booking, formpo.date_booking, formpo.package, mastersupplier.nama, masterhscode.hscode, masterroute.route_code, masterroute.route_desc, masterportofloading.code_port as loadingcode, masterportofloading.name_port as loadingname, masterportofdestination.code_port as destinationcode, masterportofdestination.name_port as destinationname')
             ->get();
         $arr = [];
         foreach ($getdata as $key => $val) {
@@ -251,7 +251,7 @@ class ReportForwarder extends Controller
             ->where(function ($kk) {
                 $kk->where('formshipment.id_shipment', null)->orWhere('formshipment.aktif', 'Y');
             })
-            ->selectRaw('formshipment.*, po.pono, po.style, po.qtypo, po.colorcode, po.size, po.qtypo, po.matcontents, po.itemdesc, formpo.kode_booking, formpo.shipmode, formpo.subshipmode,formpo.date_booking, formpo.package, mastersupplier.nama, masterhscode.hscode, masterroute.route_code, masterroute.route_desc, masterportofloading.code_port as loadingcode, masterportofloading.name_port as loadingname, masterportofdestination.code_port as destinationcode, masterportofdestination.name_port as destinationname')
+            ->selectRaw('formshipment.*, po.pono, po.style, po.qtypo, po.colorcode, po.size, po.qtypo, po.matcontents, po.itemdesc, formpo.kode_booking,formpo.date_booking, formpo.package, mastersupplier.nama, masterhscode.hscode, masterroute.route_code, masterroute.route_desc, masterportofloading.code_port as loadingcode, masterportofloading.name_port as loadingname, masterportofdestination.code_port as destinationcode, masterportofdestination.name_port as destinationname')
             ->get();
 
         $arr = [];
@@ -479,7 +479,7 @@ class ReportForwarder extends Controller
         }
 
         $celldata = 'A' . $mycell . ':G' . ($bodydata - 1);
-        $cellfcl = 'L10:O' . ($datafcl - 1);
+        $cellfcl = 'A10:O' . ($datafcl - 1);
         $sheet->getStyle('A2:N2')->applyFromArray($styleArraytitle);
         $sheet->getStyle($cellheader)->applyFromArray($styleArray);
         $sheet->getStyle($celldata)->applyFromArray($styleArray);
