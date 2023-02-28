@@ -178,7 +178,7 @@ class ReportForwarder extends Controller
             ->where(function ($kk) {
                 $kk->where('formshipment.id_shipment', null)->orWhere('formshipment.aktif', 'Y');
             })
-            ->selectRaw('formshipment.qty_shipment, formshipment.noinv, formshipment.etdfix, formshipment.etafix, formshipment.nomor_bl, formshipment.vessel, formshipment.shipmode, formshipment.subshipmode, po.pono, po.qtypo, po.matcontents, po.itemdesc, po.style, po.colorcode, po.size, formpo.kode_booking, formpo.date_booking, formpo.package, mastersupplier.nama, masterhscode.hscode, masterroute.route_code, masterroute.route_desc, masterportofloading.code_port as loadingcode, masterportofloading.name_port as loadingname, masterportofdestination.code_port as destinationcode, masterportofdestination.name_port as destinationname')
+            ->selectRaw('formshipment.qty_shipment, formshipment.noinv, formshipment.etdfix, formshipment.etafix, formshipment.nomor_bl, formshipment.vessel, formshipment.shipmode, formshipment.subshipmode, formshipment.package, po.pono, po.qtypo, po.matcontents, po.itemdesc, po.style, po.colorcode, po.size, formpo.kode_booking, formpo.date_booking, mastersupplier.nama, masterhscode.hscode, masterroute.route_code, masterroute.route_desc, masterportofloading.code_port as loadingcode, masterportofloading.name_port as loadingname, masterportofdestination.code_port as destinationcode, masterportofdestination.name_port as destinationname')
             ->get();
         $arr = [];
         foreach ($getdata as $key => $val) {
@@ -239,8 +239,8 @@ class ReportForwarder extends Controller
             ->join('masterroute', 'masterroute.id_route', 'formpo.idroute')
             ->join('masterhscode', 'masterhscode.matcontent', 'po.matcontents')
             ->leftjoin('formshipment', 'formshipment.idformpo', 'formpo.id_formpo')
-            ->join('masterportofloading', 'masterportofloading.id_portloading', 'formpo.idportloading')
-            ->join('masterportofdestination', 'masterportofdestination.id_portdestination', 'formpo.idportdestination')
+            ->join('masterportofloading', 'masterportofloading.id_portloading', 'formshipment.idportloading')
+            ->join('masterportofdestination', 'masterportofdestination.id_portdestination', 'formshipment.idportdestination')
             ->where('privilege.privilege_user_nik', Session::get('session')['user_nik'])
             // ->where('formpo.kode_booking', $id)
             ->where('formshipment.noinv', $id)
@@ -251,7 +251,7 @@ class ReportForwarder extends Controller
             ->where(function ($kk) {
                 $kk->where('formshipment.id_shipment', null)->orWhere('formshipment.aktif', 'Y');
             })
-            ->selectRaw('formshipment.*, po.pono, po.style, po.qtypo, po.colorcode, po.size, po.qtypo, po.matcontents, po.itemdesc, formpo.kode_booking,formpo.date_booking, formpo.package, mastersupplier.nama, masterhscode.hscode, masterroute.route_code, masterroute.route_desc, masterportofloading.code_port as loadingcode, masterportofloading.name_port as loadingname, masterportofdestination.code_port as destinationcode, masterportofdestination.name_port as destinationname')
+            ->selectRaw('formshipment.*, po.pono, po.style, po.qtypo, po.colorcode, po.size, po.qtypo, po.matcontents, po.itemdesc, formpo.kode_booking,formpo.date_booking, mastersupplier.nama, masterhscode.hscode, masterroute.route_code, masterroute.route_desc, masterportofloading.code_port as loadingcode, masterportofloading.name_port as loadingname, masterportofdestination.code_port as destinationcode, masterportofdestination.name_port as destinationname')
             ->get();
 
         $arr = [];
