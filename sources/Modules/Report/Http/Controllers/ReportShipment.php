@@ -298,6 +298,9 @@ class ReportShipment extends Controller
                     'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
                 ],
             ],
+            'alignment' => [
+                'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER,
+            ],
         ];
 
         $styleArraytitle = [
@@ -345,7 +348,7 @@ class ReportShipment extends Controller
             }
         } else {
             $exp2 = explode('-', $getdata[0]->subshipmode);
-            $sheet->setCellValue('L' . $header, $exp2[0] . 'M3');
+            $sheet->setCellValue('L' . $header, $exp2[0]);
             $sheet->setCellValue('M' . $header, $exp2[1]);
         }
         $header++;
@@ -364,12 +367,23 @@ class ReportShipment extends Controller
 
         if ($getdata[0]->shipmode == 'fcl') {
             $cellheader = 'A9:O' . ($header - 1);
+            $sheet->mergeCells('A10:A' . ($datafcl - 1));
+            $sheet->mergeCells('B10:B' . ($datafcl - 1));
+            $sheet->mergeCells('C10:C' . ($datafcl - 1));
+            $sheet->mergeCells('D10:D' . ($datafcl - 1));
+            $sheet->mergeCells('E10:E' . ($datafcl - 1));
+            $sheet->mergeCells('F10:F' . ($datafcl - 1));
+            $sheet->mergeCells('G10:G' . ($datafcl - 1));
+            $sheet->mergeCells('H10:H' . ($datafcl - 1));
+            $sheet->mergeCells('I10:I' . ($datafcl - 1));
+            $sheet->mergeCells('J10:J' . ($datafcl - 1));
+            $sheet->mergeCells('K10:K' . ($datafcl - 1));
         } else {
             $cellheader = 'A9:M' . ($header - 1);
         }
 
         $celldata = 'A' . $mycell . ':G' . ($bodydata - 1);
-        $cellfcl = 'L10:O' . ($datafcl - 1);
+        $cellfcl = 'A10:O' . ($datafcl - 1);
         $sheet->getStyle('A2:M2')->applyFromArray($styleArraytitle);
         $sheet->getStyle($cellheader)->applyFromArray($styleArray);
         $sheet->getStyle($celldata)->applyFromArray($styleArray);
