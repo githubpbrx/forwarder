@@ -137,8 +137,8 @@ class ReportShipment extends Controller
 
         $data = modelformshipment::join('formpo', 'formpo.id_formpo', 'formshipment.idformpo')
             ->join('masterroute', 'masterroute.id_route', 'formpo.idroute')
-            ->join('masterportofloading', 'masterportofloading.id_portloading', 'formpo.idportloading')
-            ->join('masterportofdestination', 'masterportofdestination.id_portdestination', 'formpo.idportdestination')
+            ->join('masterportofloading', 'masterportofloading.id_portloading', 'formshipment.idportloading')
+            ->join('masterportofdestination', 'masterportofdestination.id_portdestination', 'formshipment.idportdestination')
             ->join('po', 'po.id', 'formpo.idpo')
             ->join('masterforwarder', 'masterforwarder.id', 'formpo.idmasterfwd')
             ->join('mastersupplier', 'mastersupplier.id', 'po.vendor')
@@ -147,7 +147,7 @@ class ReportShipment extends Controller
             ->where('formshipment.noinv', $request->id)
             ->where('formshipment.aktif', 'Y')->where('formpo.aktif', 'Y')->where('masterforwarder.aktif', 'Y')->where('mastersupplier.aktif', 'Y')
             ->where('masterhscode.aktif', 'Y')->where('masterportofloading.aktif', 'Y')->where('masterportofdestination.aktif', 'Y')->where('masterroute.aktif', 'Y')
-            ->selectRaw(' formshipment.*, po.pono, po.matcontents, po.itemdesc, po.qtypo, po.colorcode, po.size, po.style, po.plant, formpo.kode_booking, formpo.date_booking, formpo.package , masterforwarder.name, mastersupplier.nama, masterhscode.hscode, masterroute.route_code, masterroute.route_desc, masterportofloading.code_port as loadingcode, masterportofloading.name_port as loadingname, masterportofdestination.code_port as destinationcode, masterportofdestination.name_port as destinationname')
+            ->selectRaw(' formshipment.*, po.pono, po.matcontents, po.itemdesc, po.qtypo, po.colorcode, po.size, po.style, po.plant, formpo.kode_booking, formpo.date_booking , masterforwarder.name, mastersupplier.nama, masterhscode.hscode, masterroute.route_code, masterroute.route_desc, masterportofloading.code_port as loadingcode, masterportofloading.name_port as loadingname, masterportofdestination.code_port as destinationcode, masterportofdestination.name_port as destinationname')
             ->get();
         // dd($data);
 
@@ -173,8 +173,8 @@ class ReportShipment extends Controller
         $getdata = modelformshipment::with(['container'])
             ->join('formpo', 'formpo.id_formpo', 'formshipment.idformpo')
             ->join('masterroute', 'masterroute.id_route', 'formpo.idroute')
-            ->join('masterportofloading', 'masterportofloading.id_portloading', 'formpo.idportloading')
-            ->join('masterportofdestination', 'masterportofdestination.id_portdestination', 'formpo.idportdestination')
+            ->join('masterportofloading', 'masterportofloading.id_portloading', 'formshipment.idportloading')
+            ->join('masterportofdestination', 'masterportofdestination.id_portdestination', 'formshipment.idportdestination')
             ->join('po', 'po.id', 'formpo.idpo')
             ->join('masterforwarder', 'masterforwarder.id', 'formpo.idmasterfwd')
             ->join('mastersupplier', 'mastersupplier.id', 'po.vendor')
@@ -182,7 +182,7 @@ class ReportShipment extends Controller
             ->where('formshipment.noinv', $id)
             ->where('formshipment.aktif', 'Y')->where('formpo.aktif', 'Y')->where('masterforwarder.aktif', 'Y')->where('mastersupplier.aktif', 'Y')
             ->where('masterhscode.aktif', 'Y')->where('masterportofloading.aktif', 'Y')->where('masterportofdestination.aktif', 'Y')->where('masterroute.aktif', 'Y')
-            ->selectRaw(' formshipment.*, po.pono, po.matcontents, po.itemdesc, po.qtypo, po.style, po.plant, po.colorcode, po.size, formpo.kode_booking, formpo.date_booking, formpo.package, masterforwarder.name, mastersupplier.nama, masterhscode.hscode, masterroute.route_code, masterroute.route_desc, masterportofloading.code_port as loadingcode, masterportofloading.name_port as loadingname, masterportofdestination.code_port as destinationcode, masterportofdestination.name_port as destinationname')
+            ->selectRaw(' formshipment.*, po.pono, po.matcontents, po.itemdesc, po.qtypo, po.style, po.plant, po.colorcode, po.size, formpo.kode_booking, formpo.date_booking, masterforwarder.name, mastersupplier.nama, masterhscode.hscode, masterroute.route_code, masterroute.route_desc, masterportofloading.code_port as loadingcode, masterportofloading.name_port as loadingname, masterportofdestination.code_port as destinationcode, masterportofdestination.name_port as destinationname')
             ->get();
 
         $getdate = modelformshipment::join('formpo', 'formpo.id_formpo', 'formshipment.idformpo')
