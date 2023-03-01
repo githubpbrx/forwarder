@@ -125,25 +125,24 @@ class home extends Controller
             ->get();
         // dd($totalreject, $datareject, $datarejecttabel);
 
-        $dataconfirm = formpo::join('privilege', 'privilege.idforwarder', 'formpo.idmasterfwd')
-            ->join('po', 'po.id', 'formpo.idpo')
-            ->where('privilege.privilege_user_nik', Session::get('session')['user_nik'])
-            ->where('formpo.statusformpo', 'confirm')
-            ->where('formpo.aktif', 'Y')->where('privilege.privilege_aktif', 'Y')
-            ->groupby('po.pono')
-            ->select('formpo.id_formpo', 'formpo.idforwarder', 'po.pono')
-            ->get();
-
+        //cek untuk notif shipment
         $cekshipment = formpo::join('formshipment', 'formshipment.idformpo', 'formpo.id_formpo')
             ->join('privilege', 'privilege.idforwarder', 'formpo.idmasterfwd')
             ->join('po', 'po.id', 'formpo.idpo')
             ->where('privilege.privilege_user_nik', Session::get('session')['user_nik'])
             ->where('formpo.statusformpo', 'confirm')
             ->where('formpo.aktif', 'Y')->where('privilege.privilege_aktif', 'Y')->where('formshipment.aktif', 'Y')
-            ->groupby('po.pono')
+            // ->groupby('po.pono')
             ->select('formpo.id_formpo', 'formpo.idforwarder', 'po.pono', 'formshipment.id_shipment', 'formshipment.noinv')
-            ->get();
-        // dd($dataconfirm, $cekshipment);
+            ->get()->pluck('id_formpo');
+
+        $cekformpo = formpo::join('privilege', 'privilege.idforwarder', 'formpo.idmasterfwd')
+            ->where('privilege.privilege_user_nik', Session::get('session')['user_nik'])
+            ->where('formpo.statusformpo', 'confirm')
+            ->whereNotIn('formpo.id_formpo', $cekshipment)
+            ->where('formpo.aktif', 'Y')->where('privilege.privilege_aktif', 'Y')
+            ->count();
+        // dd($cekshipment, $cekformpo);
         // End For Forwarder
 
         $userkyc = privilege::join('kyc', 'kyc.idmasterfwd', 'privilege.idforwarder')
@@ -198,8 +197,7 @@ class home extends Controller
             'menu'            => 'dashboard',
             'box'             => '',
             'totalpo'         => count($datapo),
-            'totalconfirm'    => count($dataconfirm),
-            'totalshipment'   => count($cekshipment),
+            'totalshipment'   => $cekformpo,
             'totalreject'     => count($totalreject),
             'datareject'      => $datareject,
             'datarejecttabel' => $datarejecttabel,

@@ -68,7 +68,7 @@
                                 </p>
                             </div>
                         @endif
-                        @if ($totalconfirm >= 1 && $totalshipment == 0)
+                        @if ($totalshipment > 0)
                             <div class="alert alert-danger" style="background-color: rgb(253, 181, 181)">
                                 {{-- <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button> --}}
                                 <h5><i class="icon fas fa-info"></i> Notification</h5>

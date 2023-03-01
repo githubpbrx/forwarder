@@ -338,7 +338,7 @@
         $('#datebook').datepicker({
             changeYear: true,
             changeMonth: true,
-            minDate: 0,
+            minDate: -14,
             dateFormat: "yy-m-dd",
             yearRange: "-100:+20",
         });
