@@ -50,4 +50,13 @@ Route::prefix('master')->group(function () {
         Route::post('/updatepol', 'MasterPOL@update')->name('masterpol_update');
         Route::get('/deletepol/{id}', 'MasterPOL@destroy')->name('masterpol_delete');
     });
+
+    Route::group(['prefix' => 'pod'], function () {
+        Route::get('/', 'MasterPOD@index')->name('masterpod');
+        Route::get('/listpod', 'MasterPOD@listpod')->name('list_pod');
+        Route::post('/podadd', 'MasterPOD@add')->name('masterpod_add');
+        Route::post('/podedit', 'MasterPOD@edit')->name('masterpod_edit');
+        Route::post('/updatepod', 'MasterPOD@update')->name('masterpod_update');
+        Route::get('/deletepod/{id}', 'MasterPOD@destroy')->name('masterpod_delete');
+    });
 });

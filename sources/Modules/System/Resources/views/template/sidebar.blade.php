@@ -111,7 +111,7 @@
                         <ul class="nav nav-treeview">
                             @if (RoleAccess::whereMenu(20) > 0)
                                 <li class="nav-item">
-                                    <a href="{{ route('masterhscode') }}" class="nav-link">
+                                    <a href="{{ route('masterpod') }}" class="nav-link">
                                         <i class="fas fa-location-arrow nav-icon"></i>
                                         <p>Master Port Of Destination</p>
                                     </a>
