@@ -96,15 +96,18 @@
                     url: "{{ route('list_route') }}"
                 },
                 columns: [{
-                        data: 'DT_RowIndex'
+                        data: 'DT_RowIndex',
+                        name: 'DT_RowIndex',
+                        orderable: false,
+                        searchable: false
                     },
                     {
                         data: 'routecode',
-                        name: 'routecode'
+                        name: 'route_code'
                     },
                     {
                         data: 'routedesc',
-                        name: 'routedesc'
+                        name: 'route_desc'
                     },
                     {
                         data: 'action',
@@ -161,38 +164,44 @@
                 let routecode = $('#routecode').val();
                 let routedesc = $('#routedesc').val();
 
-                $.ajax({
-                    url: (id == null || id == '') ? "{!! route('masterroute_add') !!}" :
-                        "{!! route('masterroute_update') !!}",
-                    type: 'POST',
-                    dataType: 'json',
-                    data: {
-                        _token: $('meta[name=csrf-token]').attr('content'),
-                        id: id,
-                        routecode: routecode,
-                        routedesc: routedesc,
-                    },
-                    success: function(response) {
-                        console.log('response :>> ', response);
-                        Swal.fire({
-                            title: response.title,
-                            text: response.message,
-                            type: (response.status != 'error') ? 'success' : 'error'
-                        }).then((result) => {
-                            $('#modalroute').modal('hide');
-                            oTable.ajax.reload();
-                        });
-                        return;
-                    },
-                    error: function(xhr, status, error) {
-                        Swal.fire({
-                            title: 'Unsuccessfully Saved Data',
-                            text: 'Check Your Data',
-                            type: 'error'
-                        });
-                        return;
-                    }
-                });
+                if (routecode == '' || routecode == null) {
+                    notifalert('Route Code')
+                } else if (routedesc == '' || routedesc == null) {
+                    notifalert('Route Description')
+                } else {
+                    $.ajax({
+                        url: (id == null || id == '') ? "{!! route('masterroute_add') !!}" :
+                            "{!! route('masterroute_update') !!}",
+                        type: 'POST',
+                        dataType: 'json',
+                        data: {
+                            _token: $('meta[name=csrf-token]').attr('content'),
+                            id: id,
+                            routecode: routecode,
+                            routedesc: routedesc,
+                        },
+                        success: function(response) {
+                            console.log('response :>> ', response);
+                            Swal.fire({
+                                title: response.title,
+                                text: response.message,
+                                type: (response.status != 'error') ? 'success' : 'error'
+                            }).then((result) => {
+                                $('#modalroute').modal('hide');
+                                oTable.ajax.reload();
+                            });
+                            return;
+                        },
+                        error: function(xhr, status, error) {
+                            Swal.fire({
+                                title: 'Unsuccessfully Saved Data',
+                                text: 'Check Your Data',
+                                type: 'error'
+                            });
+                            return;
+                        }
+                    });
+                }
             });
 
             $('body').on('click', '#delbtn', function() {
@@ -237,5 +246,14 @@
             });
 
         });
+
+        function notifalert(params) {
+            Swal.fire({
+                title: 'Information',
+                text: params + ' is required, please input data',
+                type: 'warning'
+            });
+            return;
+        }
     </script>
 @endsection
