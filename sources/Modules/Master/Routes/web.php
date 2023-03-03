@@ -32,4 +32,13 @@ Route::prefix('master')->group(function () {
         Route::post('/updatehscode', 'MasterHscode@update')->name('masterhscode_update');
         Route::get('/deletehscode/{id}', 'MasterHscode@destroy')->name('masterhscode_delete');
     });
+
+    Route::group(['prefix' => 'route'], function () {
+        Route::get('/', 'MasterRoute@index')->name('masterroute');
+        Route::get('/listroute', 'MasterRoute@listroute')->name('list_route');
+        Route::post('/routeadd', 'MasterRoute@add')->name('masterroute_add');
+        Route::post('/routeedit', 'MasterRoute@edit')->name('masterroute_edit');
+        Route::post('/updateroute', 'MasterRoute@update')->name('masterroute_update');
+        Route::get('/deleteroute/{id}', 'MasterRoute@destroy')->name('masterroute_delete');
+    });
 });

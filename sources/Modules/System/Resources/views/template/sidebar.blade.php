@@ -34,7 +34,7 @@
         @php
             $active_menu = 'active';
             $dashboard = '';
-
+            
             // you can append the menus
             if ($menu == 'dashboard') {
                 $dashboard = $active_menu;
@@ -54,7 +54,12 @@
                     </a>
                 </li>
 
-                @if (RoleAccess::whereMenu(8) + RoleAccess::whereMenu(14) > 0)
+                @if (RoleAccess::whereMenu(8) +
+                        RoleAccess::whereMenu(14) +
+                        RoleAccess::whereMenu(18) +
+                        RoleAccess::whereMenu(19) +
+                        RoleAccess::whereMenu(20) >
+                        0)
                     <li class="nav-item mt-2">
                         <a href="#" class="nav-link">
                             <i class="nav-icon fas fa-server"></i>
@@ -79,6 +84,36 @@
                                     <a href="{{ route('masterhscode') }}" class="nav-link">
                                         <i class="fas fa-dot-circle nav-icon"></i>
                                         <p>Master HSCode</p>
+                                    </a>
+                                </li>
+                            @endif
+                        </ul>
+                        <ul class="nav nav-treeview">
+                            @if (RoleAccess::whereMenu(18) > 0)
+                                <li class="nav-item">
+                                    <a href="{{ route('masterroute') }}" class="nav-link">
+                                        <i class="fas fa-route nav-icon"></i>
+                                        <p>Master Route</p>
+                                    </a>
+                                </li>
+                            @endif
+                        </ul>
+                        <ul class="nav nav-treeview">
+                            @if (RoleAccess::whereMenu(19) > 0)
+                                <li class="nav-item">
+                                    <a href="{{ route('masterhscode') }}" class="nav-link">
+                                        <i class="fas fa-spinner nav-icon"></i>
+                                        <p>Master Port Of Loading</p>
+                                    </a>
+                                </li>
+                            @endif
+                        </ul>
+                        <ul class="nav nav-treeview">
+                            @if (RoleAccess::whereMenu(20) > 0)
+                                <li class="nav-item">
+                                    <a href="{{ route('masterhscode') }}" class="nav-link">
+                                        <i class="fas fa-location-arrow nav-icon"></i>
+                                        <p>Master Port Of Destination</p>
                                     </a>
                                 </li>
                             @endif
