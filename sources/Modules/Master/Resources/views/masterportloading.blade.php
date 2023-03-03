@@ -160,42 +160,48 @@
 
             $('#submit').click(function() {
                 let id = $('#idku').val();
-                console.log('id :>> ', id);
                 let polcode = $('#polcode').val();
                 let polname = $('#polname').val();
 
-                $.ajax({
-                    url: (id == null || id == '') ? "{!! route('masterpol_add') !!}" :
-                        "{!! route('masterpol_update') !!}",
-                    type: 'POST',
-                    dataType: 'json',
-                    data: {
-                        _token: $('meta[name=csrf-token]').attr('content'),
-                        id: id,
-                        codeport: polcode,
-                        nameport: polname,
-                    },
-                    success: function(response) {
-                        console.log('response :>> ', response);
-                        Swal.fire({
-                            title: response.title,
-                            text: response.message,
-                            type: (response.status != 'error') ? 'success' : 'error'
-                        }).then((result) => {
-                            $('#modalpol').modal('hide');
-                            oTable.ajax.reload();
-                        });
-                        return;
-                    },
-                    error: function(xhr, status, error) {
-                        Swal.fire({
-                            title: 'Unsuccessfully Saved Data',
-                            text: 'Check Your Data',
-                            type: 'error'
-                        });
-                        return;
-                    }
-                });
+                if (polcode == '' || polcode == null) {
+                    notifalert('Port Code');
+                } else if (polname == '' || polname == null) {
+                    notifalert('Port Name');
+                } else {
+                    $.ajax({
+                        url: (id == null || id == '') ? "{!! route('masterpol_add') !!}" :
+                            "{!! route('masterpol_update') !!}",
+                        type: 'POST',
+                        dataType: 'json',
+                        data: {
+                            _token: $('meta[name=csrf-token]').attr('content'),
+                            id: id,
+                            codeport: polcode,
+                            nameport: polname,
+                        },
+                        success: function(response) {
+                            console.log('response :>> ', response);
+                            Swal.fire({
+                                title: response.title,
+                                text: response.message,
+                                type: (response.status != 'error') ? 'success' : 'error'
+                            }).then((result) => {
+                                $('#modalpol').modal('hide');
+                                oTable.ajax.reload();
+                            });
+                            return;
+                        },
+                        error: function(xhr, status, error) {
+                            Swal.fire({
+                                title: 'Unsuccessfully Saved Data',
+                                text: 'Check Your Data',
+                                type: 'error'
+                            });
+                            return;
+                        }
+                    });
+                }
+
             });
 
             $('body').on('click', '#delbtn', function() {
@@ -240,5 +246,14 @@
             });
 
         });
+
+        function notifalert(params) {
+            Swal.fire({
+                title: 'Information',
+                text: params + ' is required, please input data',
+                type: 'warning'
+            });
+            return;
+        }
     </script>
 @endsection
