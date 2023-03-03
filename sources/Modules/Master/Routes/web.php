@@ -41,4 +41,13 @@ Route::prefix('master')->group(function () {
         Route::post('/updateroute', 'MasterRoute@update')->name('masterroute_update');
         Route::get('/deleteroute/{id}', 'MasterRoute@destroy')->name('masterroute_delete');
     });
+
+    Route::group(['prefix' => 'pol'], function () {
+        Route::get('/', 'MasterPOL@index')->name('masterpol');
+        Route::get('/listpol', 'MasterPOL@listpol')->name('list_pol');
+        Route::post('/poladd', 'MasterPOL@add')->name('masterpol_add');
+        Route::post('/poledit', 'MasterPOL@edit')->name('masterpol_edit');
+        Route::post('/updatepol', 'MasterPOL@update')->name('masterpol_update');
+        Route::get('/deletepol/{id}', 'MasterPOL@destroy')->name('masterpol_delete');
+    });
 });
