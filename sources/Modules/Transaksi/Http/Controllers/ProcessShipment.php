@@ -2,11 +2,14 @@
 
 namespace Modules\Transaksi\Http\Controllers;
 
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
 use Yajra\DataTables\DataTables;
-use Session, Crypt, DB, Mail;
+// use Session, Crypt, DB, Mail;
+use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Modules\Transaksi\Models\mastersupplier;
 use Modules\Transaksi\Models\masterhscode;
@@ -291,175 +294,190 @@ class ProcessShipment extends Controller
         $decodehscode = json_decode($request->datahscode);
         // dd($request);
         // DB::beginTransaction();
-        DB::beginTransaction();
+        try {
+            //code...
 
-        $filebl = $request->file('filebl');
-        $originalNamebl = str_replace(' ', '_', $filebl->getClientOriginalName());
-        $fileNamebl = time() . '_' . $originalNamebl;
-        Storage::disk('local')->put($fileNamebl, file_get_contents($request->filebl));
+            DB::beginTransaction();
 
-        if ($request->file('fileinv')) {
-            $fileinv = $request->file('fileinv');
-            $originalNameinv = str_replace(' ', '_', $fileinv->getClientOriginalName());
-            $fileNameinv = time() . '_' . $originalNameinv;
-            Storage::disk('local')->put($fileNameinv, file_get_contents($request->fileinv));
-        }
+            $filebl = $request->file('filebl');
+            $originalNamebl = str_replace(' ', '_', $filebl->getClientOriginalName());
+            $fileNamebl = time() . '_' . $originalNamebl;
+            Storage::disk('local')->put($fileNamebl, file_get_contents($request->filebl));
 
-        if ($request->file('filepack')) {
-            $filepack = $request->file('filepack');
-            $originalNamepack = str_replace(' ', '_', $filepack->getClientOriginalName());
-            $fileNamepack = time() . '_' . $originalNamepack;
-            Storage::disk('local')->put($fileNamepack, file_get_contents($request->filepack));
-        }
+            if ($request->file('fileinv')) {
+                $fileinv = $request->file('fileinv');
+                $originalNameinv = str_replace(' ', '_', $fileinv->getClientOriginalName());
+                $fileNameinv = time() . '_' . $originalNameinv;
+                Storage::disk('local')->put($fileNameinv, file_get_contents($request->fileinv));
+            }
 
-        $cekdata = modelformshipment::where('noinv', $request->noinv)->where('aktif', 'Y')->first();
-        if ($cekdata != null) {
-            DB::rollback();
-            $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'Invoice Already Exist'];
-            return response()->json($status, 200);
-        }
+            if ($request->file('filepack')) {
+                $filepack = $request->file('filepack');
+                $originalNamepack = str_replace(' ', '_', $filepack->getClientOriginalName());
+                $fileNamepack = time() . '_' . $originalNamepack;
+                Storage::disk('local')->put($fileNamepack, file_get_contents($request->filepack));
+            }
 
-        foreach ($decode as $key => $val) {
-            if ($filebl == '' || $filebl == null) {
+            $cekdata = modelformshipment::where('noinv', $request->noinv)->where('aktif', 'Y')->first();
+            if ($cekdata != null) {
                 DB::rollback();
-                $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'File BL is required, please input File BL'];
+                $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'Invoice Already Exist'];
                 return response()->json($status, 200);
             }
 
-            if ($request->nomorbl == '' || $request->nomorbl == null) {
-                DB::rollback();
-                $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'Nomor BL is required, please input Nomor BL'];
-                return response()->json($status, 200);
-            }
+            foreach ($decode as $key => $val) {
+                if ($filebl == '' || $filebl == null) {
+                    DB::rollback();
+                    $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'File BL is required, please input File BL'];
+                    return response()->json($status, 200);
+                }
 
-            if ($request->vessel == '' || $request->vessel == null) {
-                DB::rollback();
-                $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'Vessel is required, please input Vessel'];
-                return response()->json($status, 200);
-            }
+                if ($request->nomorbl == '' || $request->nomorbl == null) {
+                    DB::rollback();
+                    $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'Nomor BL is required, please input Nomor BL'];
+                    return response()->json($status, 200);
+                }
 
-            if ($request->etdfix == '' || $request->etdfix == null) {
-                DB::rollback();
-                $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'ETD Fix is required, please input ETD Fix'];
-                return response()->json($status, 200);
-            }
+                if ($request->vessel == '' || $request->vessel == null) {
+                    DB::rollback();
+                    $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'Vessel is required, please input Vessel'];
+                    return response()->json($status, 200);
+                }
 
-            if ($request->etafix == '' || $request->etafix == null) {
-                DB::rollback();
-                $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'ETA Fix is required, please input ETA Fix'];
-                return response()->json($status, 200);
-            }
+                if ($request->etdfix == '' || $request->etdfix == null) {
+                    DB::rollback();
+                    $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'ETD Fix is required, please input ETD Fix'];
+                    return response()->json($status, 200);
+                }
 
-            $cekpo = modelpo::where('id', $val->idpo)->first();
-            $rep = str_replace('.', '', $cekpo->qtypo);
-            $qtypo = (float)$rep;
+                if ($request->etafix == '' || $request->etafix == null) {
+                    DB::rollback();
+                    $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'ETA Fix is required, please input ETA Fix'];
+                    return response()->json($status, 200);
+                }
 
-            $cekqtyshipment = modelformshipment::where('idformpo', $val->idformpo)->where('aktif', 'Y')->selectRaw(' sum(qty_shipment) as jml ')->first();
-            $jumlahexist = ($cekqtyshipment->jml == null) ? 0 : $cekqtyshipment->jml;
+                $cekpo = modelpo::where('id', $val->idpo)->first();
+                $rep = str_replace('.', '', $cekpo->qtypo);
+                $qtypo = (float)$rep;
 
-            $jumlahall = $val->value + $jumlahexist;
-            // dd($jumlahall, $qtypo);
+                $cekqtyshipment = modelformshipment::where('idformpo', $val->idformpo)->where('aktif', 'Y')->selectRaw(' sum(qty_shipment) as jml ')->first();
+                $jumlahexist = ($cekqtyshipment->jml == null) ? 0 : $cekqtyshipment->jml;
 
-            if ($jumlahall > $qtypo) {
-                DB::rollback();
-                $status = ['title' => 'Error!', 'status' => 'error', 'message' => 'Qty Ship Over Than Balance Qty'];
-                return response()->json($status, 200);
-            }
+                $jumlahall = $val->value + $jumlahexist;
+                // dd($jumlahall, $qtypo);
 
-            if ($jumlahall == $qtypo) {
-                $status = 'full_allocated';
-            } else {
-                $status = 'partial_allocated';
-            }
+                if ($jumlahall > $qtypo) {
+                    DB::rollback();
+                    $status = ['title' => 'Error!', 'status' => 'error', 'message' => 'Qty Ship Over Than Balance Qty'];
+                    return response()->json($status, 200);
+                }
 
-            $subshipmode = $request->volume . 'M3' . '-' . $request->updateweight . 'KG';
-            $save1 = modelformshipment::insert([
-                'idformpo'         => $val->idformpo,
-                'idportloading'    => $request->portloading,
-                'idportdestination' => $request->portdestination,
-                'qty_shipment'     => $val->value,
-                'noinv'            => strtoupper($request->noinv),
-                'etdfix'           => $request->etdfix,
-                'etafix'           => $request->etafix,
-                'file_bl'          => $fileNamebl,
-                'file_invoice'     => ($request->file('fileinv') == null) ? null : $fileNameinv,
-                'file_packinglist' => ($request->file('filepack') == null) ? null : $fileNamepack,
-                'nomor_bl'         => strtoupper($request->nomorbl),
-                'vessel'           => strtoupper($request->vessel),
-                'statusshipment'   => $status,
-                'shipmode'         => $request->shipmode,
-                'subshipmode'      => $subshipmode,
-                'package'          => $request->package,
-                'aktif'            => 'Y',
-                'created_at'       => date('Y-m-d H:i:s'),
-                'created_by'       => Session::get('session')['user_nik']
-            ]);
+                if ($jumlahall == $qtypo) {
+                    $status = 'full_allocated';
+                } else {
+                    $status = 'partial_allocated';
+                }
 
-            if ($save1) {
-                $sukses[] = "OK";
-            } else {
-                $gagal[] = "OK";
-            }
-        }
-
-        $getinv = modelformshipment::latest('id_shipment')->first();
-        foreach ($decodecont as $key => $lue) {
-            foreach ($decode as $key2 => $value) {
-                $savecont = modelcontainer::insert([
-                    'idformpo'          => $value->idformpo,
-                    'noinv'             => $getinv->noinv,
-                    'containernumber'   => ($request->fclfeet == '40hq') ? $request->fclfeet : $request->fclfeet . '"',
-                    'numberofcontainer' => $lue,
-                    'volume'            => $decodevolume[$key] . 'M3',
-                    'weight'            => $decodeweight[$key] . 'KG',
-                    'aktif'             => 'Y',
-                    'created_at'        => date('Y-m-d H:i:s'),
-                    'created_by'        => Session::get('session')['user_nik']
+                $subshipmode = $request->volume . 'M3' . '-' . $request->updateweight . 'KG';
+                $save1 = modelformshipment::insert([
+                    'idformpo'         => $val->idformpo,
+                    'idportloading'    => $request->portloading,
+                    'idportdestination' => $request->portdestination,
+                    'qty_shipment'     => $val->value,
+                    'noinv'            => strtoupper($request->noinv),
+                    'etdfix'           => $request->etdfix,
+                    'etafix'           => $request->etafix,
+                    'file_bl'          => $fileNamebl,
+                    'file_invoice'     => ($request->file('fileinv') == null) ? null : $fileNameinv,
+                    'file_packinglist' => ($request->file('filepack') == null) ? null : $fileNamepack,
+                    'nomor_bl'         => strtoupper($request->nomorbl),
+                    'vessel'           => strtoupper($request->vessel),
+                    'statusshipment'   => $status,
+                    'shipmode'         => $request->shipmode,
+                    'subshipmode'      => $subshipmode,
+                    'package'          => $request->package,
+                    'aktif'            => 'Y',
+                    'created_at'       => date('Y-m-d H:i:s'),
+                    'created_by'       => Session::get('session')['user_nik']
                 ]);
 
-                if ($savecont) {
-                    $sukses[] = "OK";
-                } else {
-                    $gagal[] = "OK";
+                // if ($save1) {
+                //     $sukses[] = "OK";
+                // } else {
+                //     $gagal[] = "OK";
+                // }
+            }
+
+            if ($request->shipmode == 'fcl') {
+                $getinv = modelformshipment::latest('id_shipment')->first();
+                foreach ($decodecont as $key => $lue) {
+                    foreach ($decode as $key2 => $value) {
+                        $savecont = modelcontainer::insert([
+                            'idformpo'          => $value->idformpo,
+                            'noinv'             => $getinv->noinv,
+                            'containernumber'   => ($request->fclfeet == '40hq') ? $request->fclfeet : $request->fclfeet . '"',
+                            'numberofcontainer' => $lue,
+                            'volume'            => $decodevolume[$key] . 'M3',
+                            'weight'            => $decodeweight[$key] . 'KG',
+                            'aktif'             => 'Y',
+                            'created_at'        => date('Y-m-d H:i:s'),
+                            'created_by'        => Session::get('session')['user_nik']
+                        ]);
+
+                        // if ($savecont) {
+                        //     $sukses[] = "OK";
+                        // } else {
+                        //     $gagal[] = "OK";
+                        // }
+                    }
                 }
             }
-        }
 
-        foreach ($decodematcontent as $keymat => $valmat) {
-            $cekhs = masterhscode::where('matcontent', $valmat)->where('aktif', 'Y')->first();
-            if ($cekhs) {
-                $simpan = masterhscode::where('matcontent', $valmat)->update([
-                    'hscode'      => $decodehscode[$keymat],
-                    'matcontent'  => $valmat,
-                    'updated_at'  => date('Y-m-d H:i:s'),
-                    'updated_by'  => Session::get('session')['user_nik']
-                ]);
-            } else {
-                $simpan = masterhscode::insert([
-                    'hscode'      => $decodehscode[$keymat],
-                    'matcontent'  => $valmat,
-                    'aktif'       => 'Y',
-                    'created_at'  => date('Y-m-d H:i:s'),
-                    'created_by'  => Session::get('session')['user_nik']
-                ]);
+            foreach ($decodematcontent as $keymat => $valmat) {
+                $cekhs = masterhscode::where('matcontent', $valmat)->where('aktif', 'Y')->first();
+                if ($cekhs) {
+                    $simpan = masterhscode::where('matcontent', $valmat)->update([
+                        'hscode'      => $decodehscode[$keymat],
+                        'matcontent'  => $valmat,
+                        'updated_at'  => date('Y-m-d H:i:s'),
+                        'updated_by'  => Session::get('session')['user_nik']
+                    ]);
+                } else {
+                    $simpan = masterhscode::insert([
+                        'hscode'      => $decodehscode[$keymat],
+                        'matcontent'  => $valmat,
+                        'aktif'       => 'Y',
+                        'created_at'  => date('Y-m-d H:i:s'),
+                        'created_by'  => Session::get('session')['user_nik']
+                    ]);
+                }
+
+                // if ($simpan) {
+                //     $sukses[] = "OK";
+                // } else {
+                //     $gagal[] = "OK";
+                // }
             }
 
-            if ($simpan) {
-                $sukses[] = "OK";
-            } else {
-                $gagal[] = "OK";
-            }
-        }
-
-        if (empty($gagal)) {
             DB::commit();
             \LogActivity::addToLog('Web Forwarder :: Forwarder : Insert Shipment Process by Forwarder', $this->micro);
             $status = ['title' => 'Success', 'status' => 'success', 'message' => 'Data Successfully Saved'];
             return response()->json($status, 200);
-        } else {
+        } catch (\Exception $e) {
             DB::rollback();
             $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'Data Failed Saved'];
             return response()->json($status, 200);
         }
+
+        // if (empty($gagal)) {
+        //     DB::commit();
+        //     \LogActivity::addToLog('Web Forwarder :: Forwarder : Insert Shipment Process by Forwarder', $this->micro);
+        //     $status = ['title' => 'Success', 'status' => 'success', 'message' => 'Data Successfully Saved'];
+        //     return response()->json($status, 200);
+        // } else {
+        //     DB::rollback();
+        //     $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'Data Failed Saved'];
+        //     return response()->json($status, 200);
+        // }
     }
 }
