@@ -594,8 +594,8 @@
             //for add
             $('#nikfinance').keyup(function(e) {
                 var nik = $("#nikfinance").val();
-                let url = '{!! route('getkaryawan', ['id']) !!}'
-                url = url.replace('id', nik)
+                let url = '{!! route('getkaryawan', ['params']) !!}'
+                url = url.replace('params', nik)
                 $.ajax({
                     url: url,
                     type: 'GET',
@@ -608,8 +608,8 @@
             //for edit
             $('#nikfinanceedit').keyup(function(e) {
                 var nik = $("#nikfinanceedit").val();
-                let url = '{!! route('getkaryawan', ['id']) !!}'
-                url = url.replace('id', nik)
+                let url = '{!! route('getkaryawan', ['params']) !!}'
+                url = url.replace('params', nik)
                 $.ajax({
                     url: url,
                     type: 'GET',
