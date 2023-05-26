@@ -46,6 +46,7 @@ class ReportPo extends Controller
                     ->where('mastersupplier.aktif', 'Y')
                     ->selectRaw(' po.id, po.pono, po.matcontents, po.podate, sum(po.price * po.qtypo) as amount, po.curr, po.shipmode, mastersupplier.nama ')
                     ->groupby('po.pono')
+                    ->orderby('po.podate', 'DESC')
                     ->get();
             } else {
                 $data = modelpo::join('mastersupplier', 'mastersupplier.id', 'po.vendor')
@@ -56,6 +57,7 @@ class ReportPo extends Controller
                     ->where('mastersupplier.aktif', 'Y')
                     ->selectRaw(' po.id, po.pono, po.matcontents, po.podate, sum(po.price * po.qtypo) as amount, po.curr, po.shipmode, mastersupplier.nama ')
                     ->groupby('po.pono')
+                    ->orderby('po.podate', 'DESC')
                     ->get();
             }
 
@@ -66,7 +68,7 @@ class ReportPo extends Controller
                     return $data->pono;
                 })
                 ->addColumn('date', function ($data) {
-                    return date("d/m/Y", strtotime($data->podate));
+                    return date("Y/m/d", strtotime($data->podate));
                 })
                 ->addColumn('amount', function ($data) {
                     return round($data->amount, 3) . ' ' . $data->curr;
