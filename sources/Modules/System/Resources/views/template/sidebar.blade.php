@@ -34,7 +34,7 @@
         @php
             $active_menu = 'active';
             $dashboard = '';
-            
+
             // you can append the menus
             if ($menu == 'dashboard') {
                 $dashboard = $active_menu;
@@ -237,6 +237,15 @@
                         <a href="{{ route('historyallocation') }}" class="nav-link">
                             <i class="fa fa-history nav-icon"></i>
                             <p>History List PO</p>
+                        </a>
+                    </li>
+                @endif
+
+                @if (RoleAccess::whereMenu(21) > 0)
+                    <li class="nav-item">
+                        <a href="{{ route('dataupdatebooking') }}" class="nav-link">
+                            <i class="fa fa-history nav-icon"></i>
+                            <p>Update Booking</p>
                         </a>
                     </li>
                 @endif
