@@ -55,4 +55,11 @@ Route::prefix('transaksi')->group(function () {
         Route::post('/getportloading', 'ProcessShipment@getportloading')->name('getportloading');
         Route::post('/getportdestination', 'ProcessShipment@getportdestination')->name('getportdestination');
     });
+
+    Route::group(['prefix' => 'updatebooking'], function () {
+        Route::get('/', 'DataUpdateBooking@index')->name('dataupdatebooking');
+        Route::get('/listbooking', 'DataUpdateBooking@listbooking')->name('list_booking');
+        Route::post('/getbooking', 'DataUpdateBooking@getdatabooking')->name('getdatabooking');
+        Route::post('/updatebooking/', 'DataUpdateBooking@updatebooking')->name('updatebooking');
+    });
 });

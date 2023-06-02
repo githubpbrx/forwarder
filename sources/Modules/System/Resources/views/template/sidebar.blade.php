@@ -205,6 +205,15 @@
                     </li>
                 @endif
 
+                @if (RoleAccess::whereMenu(21) > 0)
+                    <li class="nav-item">
+                        <a href="{{ route('dataupdatebooking') }}" class="nav-link">
+                            <i class="fa fa-book nav-icon"></i>
+                            <p>Update Booking</p>
+                        </a>
+                    </li>
+                @endif
+
                 @if (RoleAccess::whereMenu(12) > 0)
                     <li class="nav-item">
                         <a href="{{ route('datashipment') }}" class="nav-link">
@@ -237,15 +246,6 @@
                         <a href="{{ route('historyallocation') }}" class="nav-link">
                             <i class="fa fa-history nav-icon"></i>
                             <p>History List PO</p>
-                        </a>
-                    </li>
-                @endif
-
-                @if (RoleAccess::whereMenu(21) > 0)
-                    <li class="nav-item">
-                        <a href="{{ route('dataupdatebooking') }}" class="nav-link">
-                            <i class="fa fa-history nav-icon"></i>
-                            <p>Update Booking</p>
                         </a>
                     </li>
                 @endif
