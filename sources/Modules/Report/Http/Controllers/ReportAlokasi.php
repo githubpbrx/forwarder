@@ -89,7 +89,7 @@ class ReportAlokasi extends Controller
                     return $data->pono;
                 })
                 ->addColumn('date', function ($data) {
-                    return date("d/m/Y", strtotime($data->podate));
+                    return date("Y/m/d", strtotime($data->podate));
                 })
                 ->addColumn('amount', function ($data) {
                     return round($data->amount, 3) . ' ' . $data->curr;
@@ -111,7 +111,7 @@ class ReportAlokasi extends Controller
                 })
                 ->addColumn('dateallocation', function ($data) {
                     if ($data->created_at) {
-                        $dateall = date("d/m/Y", strtotime($data->created_at));
+                        $dateall = date("Y/m/d", strtotime($data->created_at));
                     } else {
                         $dateall = '';
                     }
@@ -120,7 +120,7 @@ class ReportAlokasi extends Controller
                 })
                 ->addColumn('datebook', function ($data) {
                     if ($data['formpo']) {
-                        $bookdate = date("d/m/Y", strtotime($data['formpo']['date_booking']));
+                        $bookdate = date("Y/m/d", strtotime($data['formpo']['date_booking']));
                     } else {
                         $bookdate = '';
                     }
@@ -129,7 +129,7 @@ class ReportAlokasi extends Controller
                 })
                 ->addColumn('dateconfirm', function ($data) {
                     if ($data->date_fwd) {
-                        $confirmdate = date("d/m/Y", strtotime($data->date_fwd));
+                        $confirmdate = date("Y/m/d", strtotime($data->date_fwd));
                     } else {
                         $confirmdate = '';
                     }
