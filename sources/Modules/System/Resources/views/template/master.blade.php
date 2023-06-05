@@ -70,7 +70,8 @@
         <!-- /.content-wrapper -->
 
         <footer class="main-footer">
-            <strong>Copyright &copy; 2019 <a href="{{ url('') }}">{!! $system['copyright'] !!}</a></strong>
+            <strong>Copyright &copy; <?php echo date('Y'); ?> <a
+                    href="{{ url('') }}">{!! $system['copyright'] !!}</a></strong>
             All rights reserved.
         </footer>
     </div>
