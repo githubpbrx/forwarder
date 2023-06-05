@@ -161,7 +161,7 @@ class MasterPOL extends Controller
             'name_port' => strtoupper($request->nameport),
             'aktif'      => 'Y',
             'updated_at' => date('Y-m-d H:i:s'),
-            'update_by' => Session::get('session')['user_nik']
+            'updated_by' => Session::get('session')['user_nik']
         ]);
 
         if ($updateloading) {
@@ -186,7 +186,7 @@ class MasterPOL extends Controller
         $delete = loading::where('id_portloading', $id)->update([
             'aktif'       => 'N',
             'updated_at'  => date('Y-m-d H:i:s'),
-            'update_by'  => Session::get('session')['user_nik']
+            'updated_by'  => Session::get('session')['user_nik']
         ]);
 
         if ($delete) {
