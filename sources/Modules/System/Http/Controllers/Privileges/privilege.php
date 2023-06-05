@@ -132,7 +132,16 @@ class privilege extends Controller
 
     public function resetpassword($nik)
     {
-        app('Modules\System\Http\Controllers\login')->apiForgotPassword($nik, 'password123');
+        $cek =  modelprivilege::where('privilege_user_nik', $nik)->first();
+        if ($cek->privilege_hrips == 'Y') {
+            app('Modules\System\Http\Controllers\login')->apiForgotPassword($nik, 'password123');
+        } else {
+            $pass = Hash::make('password123');
+            modelprivilege::where('privilege_user_nik', $nik)->where('privilege_aktif', 'Y')->update([
+                'privilege_password' => $pass,
+                'updated_at'         => date('Y-m-d H:i:s')
+            ]);
+        }
 
         \LogActivity::update('user [Reset Password]', $nik, $this->micro);
         Session::flash('toast', 'toast("success", "Berhasil disimpan.")');
