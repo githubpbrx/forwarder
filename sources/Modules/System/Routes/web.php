@@ -95,6 +95,7 @@ Route::prefix('')->group(function () {
     // setting routes
     Route::get('changepassword', 'settings@changepassword');
     Route::post('changepasswordaction', 'settings@changepasswordaction');
+    Route::post('changepasswordactionfwd', 'settings@changepasswordactionfwd');
     Route::get('/settings/application', 'settings@application');
     Route::get('/settings/applicationdata/{system_id}', 'settings@applicationdata');
     Route::post('/settings/applicationupdateaction', 'settings@applicationupdateaction');
