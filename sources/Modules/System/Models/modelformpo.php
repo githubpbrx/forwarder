@@ -8,6 +8,8 @@ class modelformpo extends Model
 {
     protected $table = 'formpo';
     protected $primaryKey = 'id_formpo';
+    const CREATED_AT = 'created_at';
+    const UPDATED_AT = 'updated_at';
     protected $guarded = [];
 
     public function po()

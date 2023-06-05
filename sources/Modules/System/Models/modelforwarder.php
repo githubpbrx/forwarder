@@ -8,6 +8,8 @@ class modelforwarder extends Model
 {
     protected $table = 'forwarder';
     protected $primaryKey = 'id_forwarder';
+    const CREATED_AT = 'created_at';
+    const UPDATED_AT = 'updated_at';
     protected $guarded = [];
 
     public function poku()

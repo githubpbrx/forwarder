@@ -970,13 +970,18 @@ class home extends Controller
 
         foreach ($val_matcontent as $key => $hs) {
             $cekhs = masterhscode::where('matcontent', $hs)->where('aktif', 'Y')->first();
+
             if ($cekhs) {
-                $simpan = masterhscode::where('matcontent', $hs)->update([
-                    'hscode'      => $val_hscode[$key],
-                    'matcontent'  => $hs,
-                    'updated_at'  => date('Y-m-d H:i:s'),
-                    'updated_by'  => Session::get('session')['user_nik']
-                ]);
+                if ($cekhs->hscode != $val_hscode[$key]) {
+                    $simpan = masterhscode::where('matcontent', $hs)->update([
+                        'hscode'      => $val_hscode[$key],
+                        'matcontent'  => $hs,
+                        'updated_at'  => date('Y-m-d H:i:s'),
+                        'updated_by'  => Session::get('session')['user_nik']
+                    ]);
+                } else {
+                    $simpan = true;
+                }
             } else {
                 $simpan = masterhscode::insert([
                     'hscode'      => $val_hscode[$key],
@@ -988,9 +993,9 @@ class home extends Controller
             }
 
             if ($simpan) {
-                $sukses[] = "OK";
+                $sukses[] = "OK hscode";
             } else {
-                $gagal[] = "OK";
+                $gagal[] = "gagal hscode";
             }
         }
 
@@ -1089,20 +1094,41 @@ class home extends Controller
                 'created_by'        => Session::get('session')['user_nik']
             ]);
 
-            $save2 = po::where('id', $val['idpo'])->update([
-                'statusconfirm' => 'waiting',
-                'updated_at'    => date('Y-m-d H:i:s')
-            ]);
+            $cekpo = po::where('id', $val['idpo'])->first();
+            $save2 = false;
+            if ($cekpo != null) {
+                if ($cekpo->statusconfirm != 'waiting') {
+                    $save2 = po::where('id', $val['idpo'])->update([
+                        'statusconfirm' => 'waiting',
+                        'updated_at'    => date('Y-m-d H:i:s')
+                    ]);
+                } else {
+                    $save2 = true;
+                }
+            }
 
             $save3 = forwarder::where('id_forwarder', $val['idforwarder'])->update([
                 'statusapproval' => 'waiting',
                 'updated_at'    => date('Y-m-d H:i:s')
             ]);
 
-            if ($save1 && $save2 && $save3) {
-                $sukses[] = "OK";
+            $save3 = ($save3 == 1) ? true : $save3;
+            if ($save1) {
+                $sukses[] = "OK frompo 1";
             } else {
-                $gagal[] = "OK";
+                $gagal[] = "gagal formpo 1";
+            }
+
+            if ($save2) {
+                $sukses[] = "OK frompo 2";
+            } else {
+                $gagal[] = "gagal formpo 2";
+            }
+
+            if ($save3) {
+                $sukses[] = "OK frompo 3";
+            } else {
+                $gagal[] = "gagal formpo 3";
             }
         }
 
