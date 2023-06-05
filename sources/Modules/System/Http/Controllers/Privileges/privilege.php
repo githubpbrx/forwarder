@@ -52,6 +52,7 @@ class privilege extends Controller
     public function privilegedata()
     {
         $query = modelprivilege::with(['group_access'])
+            ->where('privilege_aktif', 'Y')
             ->orderBy('privilege_user_nik', 'ASC')
             ->get();
 
