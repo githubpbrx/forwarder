@@ -653,7 +653,6 @@ class login extends Controller
         $kode = $request->password;
         $ses = Session::get('session');
         $user = $ses['user_nik'];
-
         $cek = modelprivilege::where('privilege_user_nik', $user)->where('privilege_aktif', 'Y')->first();
         if ($cek == null) {
             Session::flash('alert', 'sweetAlert("error", "Tokens don`t match")');
@@ -664,9 +663,11 @@ class login extends Controller
                 $kode = rand(11111, 99999);
                 $update = modelprivilege::where('privilege_user_nik', $user)->where('privilege_aktif', 'Y')->update(['kode' => $kode, 'token' => $token, 'kode_validate' => 'Y']);
                 \LogActivity::addToLog('Web Forwarder :: Forwarder : Account Activation', $this->micro);
+
                 if ($update) {
-                    Session::flash('alert', 'sweetAlert("success", "Your user is already active")');
-                    return redirect()->route('dashcam');
+                    // Session::flash('alert', 'sweetAlert("success", "Your user is already active")');
+                    // return redirect('login');
+                    return $this->logout();
                 } else {
                     Session::flash('alert', 'sweetAlert("error", "Tokens don`t match")');
                     return redirect()->back();
