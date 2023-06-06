@@ -462,7 +462,7 @@ class ProcessShipment extends Controller
                 //     $gagal[] = "OK";
                 // }
             }
-            // DB::commit();
+            DB::commit();
             \LogActivity::addToLog('Web Forwarder :: Forwarder : Insert Shipment Process by Forwarder', $this->micro);
             $status = ['title' => 'Success', 'status' => 'success', 'message' => 'Data Successfully Saved'];
             return response()->json($status, 200);
