@@ -406,6 +406,7 @@ class ProcessShipment extends Controller
                 // } else {
                 //     $gagal[] = "OK";
                 // }
+
             }
 
             if ($request->shipmode == 'fcl') {
@@ -436,12 +437,16 @@ class ProcessShipment extends Controller
             foreach ($decodematcontent as $keymat => $valmat) {
                 $cekhs = masterhscode::where('matcontent', $valmat)->where('aktif', 'Y')->first();
                 if ($cekhs) {
-                    $simpan = masterhscode::where('matcontent', $valmat)->update([
-                        'hscode'      => $decodehscode[$keymat],
-                        'matcontent'  => $valmat,
-                        'updated_at'  => date('Y-m-d H:i:s'),
-                        'updated_by'  => Session::get('session')['user_nik']
-                    ]);
+                    if ($decodehscode != []) {
+                        // dd('masuk2');
+
+                        $simpan = masterhscode::where('matcontent', $valmat)->update([
+                            'hscode'      => $decodehscode[$keymat],
+                            'matcontent'  => $valmat,
+                            'updated_at'  => date('Y-m-d H:i:s'),
+                            'updated_by'  => Session::get('session')['user_nik']
+                        ]);
+                    }
                 } else {
                     $simpan = masterhscode::insert([
                         'hscode'      => $decodehscode[$keymat],
@@ -451,15 +456,13 @@ class ProcessShipment extends Controller
                         'created_by'  => Session::get('session')['user_nik']
                     ]);
                 }
-
                 // if ($simpan) {
                 //     $sukses[] = "OK";
                 // } else {
                 //     $gagal[] = "OK";
                 // }
             }
-
-            DB::commit();
+            // DB::commit();
             \LogActivity::addToLog('Web Forwarder :: Forwarder : Insert Shipment Process by Forwarder', $this->micro);
             $status = ['title' => 'Success', 'status' => 'success', 'message' => 'Data Successfully Saved'];
             return response()->json($status, 200);
