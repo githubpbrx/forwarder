@@ -22,6 +22,7 @@ use Modules\Transaksi\Models\modelforwarder as fwd;
 use Modules\Transaksi\Models\modelformpo as formpo;
 use Modules\Transaksi\Models\modelformshipment as shipment;
 use Modules\Transaksi\Models\modelprivilege as privilege;
+use Modules\Transaksi\Models\modelcontainer as container;
 
 class WebsupplierServices extends Controller
 {
@@ -71,7 +72,7 @@ class WebsupplierServices extends Controller
         $sup = $post->supplier;
         // dd($noinv);
         modellogproses::insert(['typelog' => 'api', 'activity' => '==== START CHECKING get data Shipping, inv no => ' . $noinv . ' supplier => ' . $sup, 'status' => true, 'datetime' => date('Y-m-d H:i:s'), 'from' => 'api_shipping', 'created_at' => date('Y-m-d H:i:s')]);
-        $data = formpo::where('noinv', $noinv)->where('statusformpo', 'confirm')->where('aktif', 'Y')->get();
+        $data = shipment::where('noinv', $noinv)->where('aktif', 'Y')->get();
         $datasup = supplier::where('nama', $sup)->where('aktif', 'Y')->first();
         $datapo = array();
 
@@ -85,7 +86,8 @@ class WebsupplierServices extends Controller
         }
 
         foreach ($data as $key => $r) {
-            $po = po::where('id', $r->idpo)->where('vendor', $datasup->id)->first();
+            $idformpo = formpo::where('id_formpo', $r->idformpo)->first();
+            $po = po::where('id', $idformpo->idpo)->where('vendor', $datasup->id)->first();
             if ($po == null) {
                 $lp = [];
             } else {
@@ -97,27 +99,41 @@ class WebsupplierServices extends Controller
                 // $sup = supplier::where('id', $po->vendor)->where('aktif', 'Y')->first();
                 // $lp['supplier'] = $r->noinv . '_' . $sup->nama;
 
-                $fw = forward::where('id', $r->idmasterfwd)->first();
+                $fw = forward::where('id', $idformpo->idmasterfwd)->first();
                 $lp['forwardername'] = $fw->name;
 
-                $all = fwd::where('id_forwarder', $r->idforwarder)->first();
+                // $all = fwd::where('id_forwarder', $r->idforwarder)->first();
 
-                $lp['qtyallocation'] = $all->qty_allocation;
-                $lp['statusallocation'] = $all->statusforwarder;
+                $lp['qtyallocation'] = $r->qty_shipment;
+                $lp['statusallocation'] = $r->statusshipment;
 
-                $lp['kodebooking'] = $r->kode_booking;
-                $lp['datebooking'] = $r->date_booking;
-                $lp['estimasietd'] = $r->etd;
-                $lp['estimasieta'] = $r->eta;
+                $lp['kodebooking'] = $idformpo->kode_booking;
+                $lp['datebooking'] = $idformpo->date_booking;
+                $lp['estimasietd'] = $idformpo->etd;
+                $lp['estimasieta'] = $idformpo->eta;
                 $lp['shipmode'] = $r->shipmode;
-                $lp['subshipmode'] = $r->subshipmode;
-                $lp['etd'] = $r->etdfix;
-                $lp['eta'] = $r->etafix;
+
+                if ($r->shipmode == 'fcl') {
+                    $container = container::where('idformpo', $r->idformpo)->where('noinv', $r->noinv)->first();
+                    $lp['containernumber'] = $container->containernumber;
+                    $lp['numberofcontainer'] = $container->numberofcontainer;
+                    $lp['volume'] = $container->volume;
+                    $lp['weight'] = $container->weight;
+                } else {
+                    $lp['subshipmode'] = $r->subshipmode;
+                }
+
+                $lp['atd'] = $r->etdfix;
+                $lp['ata'] = $r->etafix;
                 $lp['nomor_bl'] = $r->nomor_bl;
                 $lp['vessel'] = $r->vessel;
                 $sys = modelsystem::first();
                 $url = $sys->url . 'sources/storage/app/' . $r->file_bl;
+                $urlinv = $sys->url . 'sources/storage/app/' . $r->file_invoice;
+                $urlpack = $sys->url . 'sources/storage/app/' . $r->file_packinglist;
                 $lp['file_bl'] = $url;
+                $lp['file_invoice'] = $urlinv;
+                $lp['file_packinglist'] = $urlpack;
 
                 modellogproses::insert(['typelog' => 'api', 'activity' => json_encode($lp), 'status' => true, 'datetime' => date('Y-m-d H:i:s'), 'from' => 'api_shipping', 'created_at' => date('Y-m-d H:i:s')]);
                 array_push($datapo, $lp);
