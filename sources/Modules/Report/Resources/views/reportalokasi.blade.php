@@ -69,6 +69,9 @@
                                                 <center>Date Allocation</center>
                                             </th>
                                             <th>
+                                                <center>PI Delivery</center>
+                                            </th>
+                                            <th>
                                                 <center>Date Booking</center>
                                             </th>
                                             <th>
@@ -168,6 +171,10 @@
                     {
                         data: 'dateallocation',
                         name: 'dateallocation'
+                    },
+                    {
+                        data: 'pidelivery',
+                        name: 'pidelivery'
                     },
                     {
                         data: 'datebook',

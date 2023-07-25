@@ -47,7 +47,7 @@ class ReportAlokasi extends Controller
                     ->join('masterforwarder', 'masterforwarder.id', 'forwarder.idmasterfwd')
                     ->where('po_nomor', $request->pono)
                     ->where('idmasterfwd', $request->idmasterfwd)
-                    ->selectRaw(' forwarder.*,  po.pono, po.podate, po.shipmode, po.curr, po.vendor, po.price, po.qtypo, SUM(po.price * po.qtypo) as amount, mastersupplier.nama, masterforwarder.name')
+                    ->selectRaw(' forwarder.*,  po.pono, po.podate, po.shipmode, po.curr, po.vendor, po.price, po.qtypo, SUM(po.price * po.qtypo) as amount, po.pideldate, mastersupplier.nama, masterforwarder.name')
                     ->where('forwarder.aktif', 'Y')->where('mastersupplier.aktif', 'Y')->where('masterforwarder.aktif', 'Y')
                     ->groupby('forwarder.po_nomor')->groupby('forwarder.idmasterfwd')
                     ->get();
@@ -57,7 +57,7 @@ class ReportAlokasi extends Controller
                     ->join('mastersupplier', 'mastersupplier.id', 'po.vendor')
                     ->join('masterforwarder', 'masterforwarder.id', 'forwarder.idmasterfwd')
                     ->where('po_nomor', $request->pono)
-                    ->selectRaw(' forwarder.*,  po.pono, po.podate, po.shipmode, po.curr, po.vendor, po.price, po.qtypo, SUM(po.price * po.qtypo) as amount, mastersupplier.nama, masterforwarder.name')
+                    ->selectRaw(' forwarder.*,  po.pono, po.podate, po.shipmode, po.curr, po.vendor, po.price, po.qtypo, SUM(po.price * po.qtypo) as amount, po.pideldate, mastersupplier.nama, masterforwarder.name')
                     ->where('forwarder.aktif', 'Y')->where('mastersupplier.aktif', 'Y')->where('masterforwarder.aktif', 'Y')
                     ->groupby('forwarder.po_nomor')->groupby('forwarder.idmasterfwd')
                     ->get();
@@ -67,7 +67,7 @@ class ReportAlokasi extends Controller
                     ->join('mastersupplier', 'mastersupplier.id', 'po.vendor')
                     ->join('masterforwarder', 'masterforwarder.id', 'forwarder.idmasterfwd')
                     ->where('idmasterfwd', $request->idmasterfwd)
-                    ->selectRaw(' forwarder.*,  po.pono, po.podate, po.shipmode, po.curr, po.vendor, po.price, po.qtypo, SUM(po.price * po.qtypo) as amount, mastersupplier.nama, masterforwarder.name')
+                    ->selectRaw(' forwarder.*,  po.pono, po.podate, po.shipmode, po.curr, po.vendor, po.price, po.qtypo, SUM(po.price * po.qtypo) as amount, po.pideldate, mastersupplier.nama, masterforwarder.name')
                     ->where('forwarder.aktif', 'Y')->where('mastersupplier.aktif', 'Y')->where('masterforwarder.aktif', 'Y')
                     ->groupby('forwarder.po_nomor')->groupby('forwarder.idmasterfwd')
                     ->get();
@@ -76,7 +76,7 @@ class ReportAlokasi extends Controller
                     ->join('po', 'po.id', 'forwarder.idpo')
                     ->join('mastersupplier', 'mastersupplier.id', 'po.vendor')
                     ->join('masterforwarder', 'masterforwarder.id', 'forwarder.idmasterfwd')
-                    ->selectRaw(' forwarder.*,  po.pono, po.podate, po.shipmode, po.curr, po.vendor, po.price, po.qtypo, SUM(po.price * po.qtypo) as amount, mastersupplier.nama, masterforwarder.name')
+                    ->selectRaw(' forwarder.*,  po.pono, po.podate, po.shipmode, po.curr, po.vendor, po.price, po.qtypo, SUM(po.price * po.qtypo) as amount, po.pideldate, mastersupplier.nama, masterforwarder.name')
                     ->where('forwarder.aktif', 'Y')->where('mastersupplier.aktif', 'Y')->where('masterforwarder.aktif', 'Y')
                     ->groupby('forwarder.po_nomor')->groupby('forwarder.idmasterfwd')
                     ->get();
@@ -112,6 +112,15 @@ class ReportAlokasi extends Controller
                 ->addColumn('dateallocation', function ($data) {
                     if ($data->created_at) {
                         $dateall = date("Y/m/d", strtotime($data->created_at));
+                    } else {
+                        $dateall = '';
+                    }
+
+                    return $dateall;
+                })
+                ->addColumn('pidelivery', function ($data) {
+                    if ($data->pideldate) {
+                        $dateall = date("Y/m/d", strtotime($data->pideldate));
                     } else {
                         $dateall = '';
                     }
