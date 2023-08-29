@@ -338,7 +338,6 @@
         $('#datebook').datepicker({
             changeYear: true,
             changeMonth: true,
-            // minDate: -14,
             dateFormat: "yy-m-dd",
             yearRange: "-100:+20",
         });
@@ -350,7 +349,6 @@
             $('#etd').datepicker({
                 changeYear: true,
                 changeMonth: true,
-                // minDate: date1,
                 dateFormat: "yy-m-dd",
                 yearRange: "-100:+20",
             });
@@ -362,7 +360,6 @@
                 $('#eta').datepicker({
                     changeYear: true,
                     changeMonth: true,
-                    // minDate: date2,
                     dateFormat: "yy-m-dd",
                     yearRange: "-100:+20",
                 });
