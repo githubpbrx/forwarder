@@ -429,16 +429,11 @@
 <script type="text/javascript">
     var current = 1;
     var dataku = @JSON($data['dataku']);
-    console.log('dataku :>> ', dataku);
-
-    // var radiovalue = $(".form-check-input:checked").val();
-    // console.log('radiovalue :>> ', radiovalue);
 
     var radsplit = dataku[0].subshipmode.split("-")
     var cekrad = radsplit[0];
     $('.form-check-input').click(function(e) {
         cekrad = $(this).val();
-        console.log('cekrad :>> ', cekrad);
     });
 
     //Initialize Select2 Elements
@@ -447,7 +442,7 @@
     $('#etdfix').datepicker({
         changeYear: true,
         changeMonth: true,
-        minDate: -14,
+        // minDate: -14,
         dateFormat: "yy-m-dd",
         yearRange: "-100:+20",
     });
@@ -455,13 +450,12 @@
     $('#etafix').datepicker({
         changeYear: true,
         changeMonth: true,
-        minDate: -14,
+        // minDate: -14,
         dateFormat: "yy-m-dd",
         yearRange: "-100:+20",
     });
 
     $('.checkall').change(function(e) {
-        console.log('klik :>> ', 'klik');
         if (this.checked) {
             $('.trigerinput').prop('disabled', false);
             $('input[type="checkbox"]').prop('checked', true);
@@ -475,11 +469,8 @@
     for (let index = 0; index < dataku.length; index++) {
         $('#check-' + index).change(function(e) {
             if (this.checked) {
-                console.log('objectsijine :>> ', 'isChecked');
                 $('.cekinput-' + index).prop('disabled', false);
-                // }
             } else {
-                console.log('objectsijine :>> ', 'notChecked');
                 $('.cekinput-' + index).val('');
                 $('.cekinput-' + index).prop('disabled', true);
             }
@@ -489,10 +480,8 @@
     var mode;
     $('#shipmode').on('change', function() {
         mode = $(this).val();
-        console.log('training :>> ', mode);
         if (mode == 'fcl') {
             let expfcl = dataku[0].subshipmode.split("-");
-            console.log('expfcl :>> ', expfcl);
 
             let fclvol;
             let fclkg;
@@ -503,14 +492,11 @@
                 fclkg = expfcl[2].split("KG");
             } else {
                 let splitfcl = expfcl[0].split("M3");
-                console.log('splitfcl :>> ', splitfcl);
                 fclvol = splitfcl[0];
                 fclkg = expfcl[1].split("KG");
             }
 
             $("input[name=inlineRadioOptions][value=" + fclradio + "]").prop('checked', true);
-            // $("input[name=inlineRadioOptions][value=" + value + "]").prop('checked', true);
-            // $("input[name=inlineRadioOptions][value=" + value + "]").prop('checked', true);
             $('#weight').val(fclkg[0]);
             $('#fclvol').val(fclvol);
             $('#datafcl').show()
@@ -519,7 +505,6 @@
             $('#datacfscy').hide()
         } else if (mode == 'lcl') {
             let explcl = dataku[0].subshipmode.split("-");
-            console.log('objectlcl :>> ', explcl);
 
             let lclvol;
             let lclkg;
@@ -561,7 +546,6 @@
             $('#datacfscy').hide()
         } else {
             let expcfscy = dataku[0].subshipmode.split("-");
-            console.log('expcfscy :>> ', expcfscy);
 
             let cfscyvol;
             let cfscykg;
@@ -647,7 +631,6 @@
                 return query;
             },
             processResults: function(data, params) {
-                console.log('data :>> ', data);
                 return {
                     results: $.map(data.data, function(item) {
                         return {
@@ -686,7 +669,6 @@
                 return query;
             },
             processResults: function(data, params) {
-                console.log('data :>> ', data);
                 return {
                     results: $.map(data.data, function(item) {
                         return {
@@ -712,7 +694,6 @@
     ].id_portdestination).trigger('change');
 
     $('#btnsubmit').click(function(e) {
-        console.log('submit :>> ', 'submit');
         let matcontent = $("td[data-name='mat[]']")
             .map(function() {
                 if ($(this).html() == '') {
@@ -851,17 +832,8 @@
                 processData: false,
                 contentType: false,
                 data: form_data,
-                // data: {
-                //     _token: $('meta[name=csrf-token]').attr('content'),
-                //     'idpo': idku,
-                //     'idformpo': formpo,
-                //     'file': form_data,
-                //     'nomorbl': nomorbl,
-                //     'vessel': vessel,
-                // },
                 dataType: "json",
                 success: function(response) {
-                    console.log('response :>> ', response);
                     Swal.fire({
                         title: response.title,
                         text: response.message,
