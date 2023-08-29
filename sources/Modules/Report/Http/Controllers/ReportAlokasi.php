@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
 use Yajra\DataTables\DataTables;
+use Modules\System\Helpers\LogActivity;
 use Session, Crypt, DB, Mail;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
@@ -18,6 +19,7 @@ use Modules\Report\Models\modelformshipment;
 
 class ReportAlokasi extends Controller
 {
+    protected $micro;
     public function __construct()
     {
         header("Access-Control-Allow-Origin: *");
@@ -33,7 +35,7 @@ class ReportAlokasi extends Controller
             'box'   => '',
         );
 
-        \LogActivity::addToLog('Web Forwarder :: Logistik : Access Menu Ready Allocation', $this->micro);
+        LogActivity::addToLog('Web Forwarder :: Logistik : Access Menu Ready Allocation', $this->micro);
         return view('report::reportalokasi', $data);
     }
 
@@ -426,18 +428,11 @@ class ReportAlokasi extends Controller
 
     function excelalokasiall()
     {
-        // $getdata = modelpo::join('forwarder', 'forwarder.idpo', 'po.id')
-        //     ->join('formpo', 'formpo.idforwarder', 'forwarder.id_forwarder')
-        //     ->join('masterforwarder', 'masterforwarder.id', 'formpo.idmasterfwd')
-        //     ->where('forwarder.aktif', 'Y')->where('formpo.aktif', 'Y')->where('masterforwarder.aktif', 'Y')
-        //     ->selectRaw(' po.id, po.pono, po.qtypo, po.statusalokasi, po.statusconfirm, forwarder.qty_allocation, formpo.noinv, masterforwarder.name ')
-        //     ->get();
-
         $getdata = modelforwarder::with(['formpo'])
             ->join('po', 'po.id', 'forwarder.idpo')
             ->join('mastersupplier', 'mastersupplier.id', 'po.vendor')
             ->join('masterforwarder', 'masterforwarder.id', 'forwarder.idmasterfwd')
-            ->selectRaw(' forwarder.*,  po.pono, po.podate, po.shipmode, po.curr, po.vendor, po.price, po.qtypo, SUM(po.price * po.qtypo) as amount, mastersupplier.nama, masterforwarder.name')
+            ->selectRaw(' forwarder.*,  po.pono, po.podate, po.pideldate, po.shipmode, po.curr, po.vendor, po.price, po.qtypo, SUM(po.price * po.qtypo) as amount, mastersupplier.nama, masterforwarder.name')
             ->where('forwarder.aktif', 'Y')->where('mastersupplier.aktif', 'Y')->where('masterforwarder.aktif', 'Y')
             ->groupby('forwarder.po_nomor')->groupby('forwarder.idmasterfwd')
             ->get();
@@ -445,8 +440,8 @@ class ReportAlokasi extends Controller
 
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
-        $cell = 'A4:J4';
-        $sheet->mergeCells('A2:J2');
+        $cell = 'A4:K4';
+        $sheet->mergeCells('A2:K2');
         $sheet->setCellValue('A4', 'PO');
         $sheet->getColumnDimension('A')->setAutoSize(true);
         $sheet->setCellValue('B4', 'Date');
@@ -461,16 +456,18 @@ class ReportAlokasi extends Controller
         $sheet->getColumnDimension('F')->setAutoSize(true);
         $sheet->setCellValue('G4', 'Date Allocation');
         $sheet->getColumnDimension('G')->setAutoSize(true);
-        $sheet->setCellValue('H4', 'Date Booking');
+        $sheet->setCellValue('H4', 'PI Delivery');
         $sheet->getColumnDimension('H')->setAutoSize(true);
-        $sheet->setCellValue('I4', 'Date Confirm');
+        $sheet->setCellValue('I4', 'Date Booking');
         $sheet->getColumnDimension('I')->setAutoSize(true);
-        $sheet->setCellValue('J4', 'Status');
+        $sheet->setCellValue('J4', 'Date Confirm');
         $sheet->getColumnDimension('J')->setAutoSize(true);
+        $sheet->setCellValue('K4', 'Status');
+        $sheet->getColumnDimension('K')->setAutoSize(true);
 
         $sheet->getStyle($cell)->getAlignment()->setWrapText(true);
         $sheet->getStyle($cell)->getFont()->setBold(true);
-        $sheet->getStyle('A2:J2')->getFont()->setBold(true);
+        $sheet->getStyle('A2:K2')->getFont()->setBold(true);
         $sheet->getStyle($cell)->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID);
         $sheet->getStyle($cell)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
         $sheet->getStyle($cell)->getAlignment()->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER);
@@ -507,8 +504,9 @@ class ReportAlokasi extends Controller
             $sheet->setCellValue('E' . $rows, $ship);
             $sheet->setCellValue('F' . $rows, $val->name);
             $sheet->setCellValue('G' . $rows, date("d/m/Y", strtotime($val->created_at)));
-            $sheet->setCellValue('H' . $rows, ($val['formpo'] == null) ? '' : $val['formpo']->date_booking);
-            $sheet->setCellValue('I' . $rows, ($val->date_fwd == null) ? '' : date("d/m/Y", strtotime($val->date_fwd)));
+            $sheet->setCellValue('H' . $rows, date("d/m/Y", strtotime($val->pideldate)));
+            $sheet->setCellValue('I' . $rows, ($val['formpo'] == null) ? '' : $val['formpo']->date_booking);
+            $sheet->setCellValue('J' . $rows, ($val->date_fwd == null) ? '' : date("d/m/Y", strtotime($val->date_fwd)));
             if ($val->statusapproval == 'confirm') {
                 $stat = 'Confirmed';
             } else if ($val->statusapproval == 'reject') {
@@ -518,12 +516,12 @@ class ReportAlokasi extends Controller
             } else {
                 $stat = 'Waiting';
             }
-            $sheet->setCellValue('J' . $rows, $stat);
+            $sheet->setCellValue('K' . $rows, $stat);
             $rows++;
         }
 
-        $cell = 'A4:J' . ($rows - 1);
-        $sheet->getStyle('A2:J2')->applyFromArray($styleArraytitle);
+        $cell = 'A4:K' . ($rows - 1);
+        $sheet->getStyle('A2:K2')->applyFromArray($styleArraytitle);
         $sheet->getStyle($cell)->applyFromArray($styleArray);
         $sheet->getStyle($cell)->getAlignment()->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER);
 
