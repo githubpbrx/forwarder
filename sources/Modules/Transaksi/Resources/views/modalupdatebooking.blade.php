@@ -321,7 +321,6 @@
 
 <script type="text/javascript">
     var dataku = @JSON($data['booking']);
-    console.log('dataku :>> ', dataku);
 
     //Initialize Select2 Elements
     $('.select2').select2();
@@ -331,7 +330,7 @@
     $('#datebook').datepicker({
         changeYear: true,
         changeMonth: true,
-        minDate: -14,
+        // minDate: -14,
         dateFormat: "yy-m-dd",
         yearRange: "-100:+20",
     });
@@ -339,7 +338,7 @@
     $('#etd').datepicker({
         changeYear: true,
         changeMonth: true,
-        minDate: -14,
+        // minDate: -14,
         dateFormat: "yy-m-dd",
         yearRange: "-100:+20",
     });
@@ -347,7 +346,7 @@
     $('#eta').datepicker({
         changeYear: true,
         changeMonth: true,
-        minDate: -14,
+        // minDate: -14,
         dateFormat: "yy-m-dd",
         yearRange: "-100:+20",
     });
@@ -357,7 +356,6 @@
         mode = $(this).val();
         if (mode == 'fcl') {
             let expfcl = dataku[0].subshipmode.split("-");
-            console.log('expfcl :>> ', expfcl);
 
             let fclvol;
             let fclkg;
@@ -380,7 +378,6 @@
             $('#datacfscy').hide()
         } else if (mode == 'lcl') {
             let explcl = dataku[0].subshipmode.split("-");
-            console.log('objectlcl :>> ', explcl);
 
             let lclvol;
             let lclkg;
@@ -493,7 +490,6 @@
                 return query;
             },
             processResults: function(data, params) {
-                console.log('data :>> ', data);
                 return {
                     results: $.map(data.data, function(item) {
                         return {
@@ -527,7 +523,6 @@
                 return query;
             },
             processResults: function(data, params) {
-                console.log('data :>> ', data);
                 return {
                     results: $.map(data.data, function(item) {
                         return {
@@ -699,7 +694,6 @@
                     },
                     dataType: "json",
                     success: function(response) {
-                        console.log('response :>> ', response);
                         Swal.fire({
                             title: response.title,
                             text: response.message,
