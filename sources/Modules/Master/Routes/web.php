@@ -70,4 +70,14 @@ Route::prefix('master')->group(function () {
         Route::post('/updatecountry', 'MasterCountry@update')->name('mastercountry_update');
         Route::get('/deletecountry/{id}', 'MasterCountry@destroy')->name('mastercountry_delete');
     });
+
+    Route::group(['prefix' => 'polcity'], function () {
+        Route::get('/', 'MasterPOL_City@index')->name('masterpolcity');
+        Route::get('/listpolcity', 'MasterPOL_City@listpolcity')->name('list_polcity');
+        Route::post('/polcityadd', 'MasterPOL_City@add')->name('masterpolcity_add');
+        Route::post('/getcountry', 'MasterPOL_City@getcountry')->name('getcountry');
+        Route::post('/polcityedit', 'MasterPOL_City@edit')->name('masterpolcity_edit');
+        Route::post('/updatepolcity', 'MasterPOL_City@update')->name('masterpolcity_update');
+        Route::get('/deletepolcity/{id}', 'MasterPOL_City@destroy')->name('masterpolcity_delete');
+    });
 });
