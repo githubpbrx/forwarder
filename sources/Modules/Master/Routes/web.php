@@ -1,5 +1,7 @@
 <?php
 
+use Illuminate\Support\Facades\Route;
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -58,5 +60,14 @@ Route::prefix('master')->group(function () {
         Route::post('/podedit', 'MasterPOD@edit')->name('masterpod_edit');
         Route::post('/updatepod', 'MasterPOD@update')->name('masterpod_update');
         Route::get('/deletepod/{id}', 'MasterPOD@destroy')->name('masterpod_delete');
+    });
+
+    Route::group(['prefix' => 'country'], function () {
+        Route::get('/', 'MasterCountry@index')->name('mastercountry');
+        Route::get('/listcountry', 'MasterCountry@listcountry')->name('list_country');
+        Route::post('/countryadd', 'MasterCountry@add')->name('mastercountry_add');
+        Route::post('/countryedit', 'MasterCountry@edit')->name('mastercountry_edit');
+        Route::post('/updatecountry', 'MasterCountry@update')->name('mastercountry_update');
+        Route::get('/deletecountry/{id}', 'MasterCountry@destroy')->name('mastercountry_delete');
     });
 });

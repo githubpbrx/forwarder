@@ -34,7 +34,7 @@
         @php
             $active_menu = 'active';
             $dashboard = '';
-
+            
             // you can append the menus
             if ($menu == 'dashboard') {
                 $dashboard = $active_menu;
@@ -58,7 +58,8 @@
                         RoleAccess::whereMenu(14) +
                         RoleAccess::whereMenu(18) +
                         RoleAccess::whereMenu(19) +
-                        RoleAccess::whereMenu(20) >
+                        RoleAccess::whereMenu(20) +
+                        RoleAccess::whereMenu(22) >
                         0)
                     <li class="nav-item mt-2">
                         <a href="#" class="nav-link">
@@ -114,6 +115,16 @@
                                     <a href="{{ route('masterpod') }}" class="nav-link">
                                         <i class="fas fa-location-arrow nav-icon"></i>
                                         <p>Master Port Of Destination</p>
+                                    </a>
+                                </li>
+                            @endif
+                        </ul>
+                        <ul class="nav nav-treeview">
+                            @if (RoleAccess::whereMenu(22) > 0)
+                                <li class="nav-item">
+                                    <a href="{{ route('mastercountry') }}" class="nav-link">
+                                        <i class="fas fa-flag nav-icon"></i>
+                                        <p>Master Country</p>
                                     </a>
                                 </li>
                             @endif
