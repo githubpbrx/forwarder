@@ -9,8 +9,8 @@ use Illuminate\Support\Facades\Session;
 use Modules\System\Helpers\LogActivity;
 use Yajra\Datatables\Datatables;
 
-use Modules\Master\Models\masterportofdestination as destination;
 use Modules\Master\Models\mastercountry as country;
+use Modules\Master\Models\masterpol_city as pol_city;
 
 class MasterCountry extends Controller
 {
@@ -160,6 +160,12 @@ class MasterCountry extends Controller
     public function destroy($id)
     {
         $id = decrypt($id);
+
+        $cek = pol_city::where('id_country', $id)->where('aktif', 'Y')->first();
+        if ($cek) {
+            $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'Country Already Used, Can`t Delete It'];
+            return response()->json($status, 200);
+        }
 
         $delete = country::where('id', $id)->update([
             'aktif'       => 'N',
