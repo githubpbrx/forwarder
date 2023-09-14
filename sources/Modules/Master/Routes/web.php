@@ -91,4 +91,16 @@ Route::prefix('master')->group(function () {
         Route::post('/updatepodcity', 'MasterPOD_City@update')->name('masterpodcity_update');
         Route::get('/deletepodcity/{id}', 'MasterPOD_City@destroy')->name('masterpodcity_delete');
     });
+
+    Route::group(['prefix' => 'shipping'], function () {
+        Route::get('/', 'MasterShippingLine@index')->name('mastershipping');
+        Route::get('/listshipping', 'MasterShippingLine@listshipping')->name('list_shipping');
+        Route::post('/shippingadd', 'MasterShippingLine@add')->name('mastershipping_add');
+        Route::post('/getcountry', 'MasterShippingLine@getcountry')->name('getcountry');
+        Route::post('/getpolcity', 'MasterShippingLine@getpolcity')->name('getpolcity');
+        Route::post('/getpodcity', 'MasterShippingLine@getpodcity')->name('getpodcity');
+        Route::post('/shippingedit', 'MasterShippingLine@edit')->name('mastershipping_edit');
+        Route::post('/updateshipping', 'MasterShippingLine@update')->name('mastershipping_update');
+        Route::get('/deleteshipping/{id}', 'MasterShippingLine@destroy')->name('mastershipping_delete');
+    });
 });

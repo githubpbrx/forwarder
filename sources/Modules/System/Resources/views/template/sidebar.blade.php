@@ -61,7 +61,8 @@
                         RoleAccess::whereMenu(20) +
                         RoleAccess::whereMenu(22) +
                         RoleAccess::whereMenu(23) +
-                        RoleAccess::whereMenu(24) >
+                        RoleAccess::whereMenu(24) +
+                        RoleAccess::whereMenu(25) >
                         0)
                     <li class="nav-item mt-2">
                         <a href="#" class="nav-link">
@@ -147,6 +148,16 @@
                                     <a href="{{ route('masterpodcity') }}" class="nav-link">
                                         <i class="fas fa-location-arrow nav-icon"></i>
                                         <p>Master POD (City)</p>
+                                    </a>
+                                </li>
+                            @endif
+                        </ul>
+                        <ul class="nav nav-treeview">
+                            @if (RoleAccess::whereMenu(24) > 0)
+                                <li class="nav-item">
+                                    <a href="{{ route('mastershipping') }}" class="nav-link">
+                                        <i class="fas fa-shipping-fast nav-icon"></i>
+                                        <p>Master Shipping Line</p>
                                     </a>
                                 </li>
                             @endif
