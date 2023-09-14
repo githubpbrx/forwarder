@@ -11,6 +11,7 @@ use Yajra\Datatables\Datatables;
 
 use Modules\Master\Models\mastercountry as country;
 use Modules\Master\Models\masterpol_city as pol_city;
+use Modules\Master\Models\masterpod_city as pod_city;
 
 class MasterPOL_City extends Controller
 {
@@ -189,6 +190,12 @@ class MasterPOL_City extends Controller
     public function destroy($id)
     {
         $id = decrypt($id);
+
+        $cek = pod_city::where('id_polcity', $id)->where('aktif', 'Y')->first();
+        if ($cek) {
+            $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'POL City Already Used, Can`t Delete It'];
+            return response()->json($status, 200);
+        }
 
         $delete = pol_city::where('id', $id)->update([
             'aktif'       => 'N',
