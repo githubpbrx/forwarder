@@ -80,4 +80,15 @@ Route::prefix('master')->group(function () {
         Route::post('/updatepolcity', 'MasterPOL_City@update')->name('masterpolcity_update');
         Route::get('/deletepolcity/{id}', 'MasterPOL_City@destroy')->name('masterpolcity_delete');
     });
+
+    Route::group(['prefix' => 'podcity'], function () {
+        Route::get('/', 'MasterPOD_City@index')->name('masterpodcity');
+        Route::get('/listpodcity', 'MasterPOD_City@listpodcity')->name('list_podcity');
+        Route::post('/podcityadd', 'MasterPOD_City@add')->name('masterpodcity_add');
+        Route::post('/getcountry', 'MasterPOD_City@getcountry')->name('getcountry');
+        Route::post('/getpolcity', 'MasterPOD_City@getpolcity')->name('getpolcity');
+        Route::post('/podcityedit', 'MasterPOD_City@edit')->name('masterpodcity_edit');
+        Route::post('/updatepodcity', 'MasterPOD_City@update')->name('masterpodcity_update');
+        Route::get('/deletepodcity/{id}', 'MasterPOD_City@destroy')->name('masterpodcity_delete');
+    });
 });
