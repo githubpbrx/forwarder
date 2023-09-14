@@ -12,6 +12,7 @@ use Yajra\Datatables\Datatables;
 use Modules\Master\Models\mastercountry as country;
 use Modules\Master\Models\masterpol_city as pol_city;
 use Modules\Master\Models\masterpod_city as pod_city;
+use Modules\Master\Models\mastershippingline as shipping;
 
 class MasterPOD_City extends Controller
 {
@@ -204,6 +205,12 @@ class MasterPOD_City extends Controller
     public function destroy($id)
     {
         $id = decrypt($id);
+
+        $cek = shipping::where('id_podcity', $id)->where('aktif', 'Y')->first();
+        if ($cek) {
+            $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'POD City Already Used, Can`t Delete It'];
+            return response()->json($status, 200);
+        }
 
         $delete = pod_city::where('id', $id)->update([
             'aktif'       => 'N',
