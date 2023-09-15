@@ -1,5 +1,7 @@
 <?php
 
+use Illuminate\Support\Facades\Route;
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -61,5 +63,18 @@ Route::prefix('transaksi')->group(function () {
         Route::get('/listbooking', 'DataUpdateBooking@listbooking')->name('list_booking');
         Route::post('/getbooking', 'DataUpdateBooking@getdatabooking')->name('getdatabooking');
         Route::post('/updatebooking/', 'DataUpdateBooking@updatebooking')->name('updatebooking');
+    });
+
+    Route::group(['prefix' => 'mappingratefcl'], function () {
+        Route::get('/', 'MappingRate@index')->name('mappingratefcl');
+        Route::get('/listmapping', 'MappingRate@listmapping')->name('list_mappingratefcl');
+        Route::post('/mappingrateadd', 'MappingRate@add')->name('mappingratefcl_add');
+        Route::post('/getcountry', 'MappingRate@getcountry')->name('getcountry');
+        Route::post('/getpolcity', 'MappingRate@getpolcity')->name('getpolcity');
+        Route::post('/getpodcity', 'MappingRate@getpodcity')->name('getpodcity');
+        Route::post('/getshipping', 'MappingRate@getshipping')->name('getshipping');
+        Route::post('/mappingrateedit', 'MappingRate@edit')->name('mappingratefcl_edit');
+        Route::post('/updatemappingrate', 'MappingRate@update')->name('mappingratefcl_update');
+        Route::get('/deletemappingratefcl/{id}', 'MappingRate@destroy')->name('mappingratefcl_delete');
     });
 });

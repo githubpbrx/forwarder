@@ -197,6 +197,38 @@
                     </li>
                 @endif
 
+                @if (RoleAccess::whereMenu(26) > 0)
+                    <li class="nav-item mt-2">
+                        <a href="#" class="nav-link">
+                            <i class="nav-icon fas fa-server"></i>
+                            <p>
+                                Rate FCL
+                                <i class="fas fa-angle-left right"></i>
+                            </p>
+                        </a>
+                        <ul class="nav nav-treeview">
+                            @if (RoleAccess::whereMenu(26) > 0)
+                                <li class="nav-item">
+                                    <a href="{{ route('mappingratefcl') }}" class="nav-link">
+                                        <i class="fas fa-map-marked nav-icon"></i>
+                                        <p>Mapping Rate FCL</p>
+                                    </a>
+                                </li>
+                            @endif
+                        </ul>
+                        {{-- <ul class="nav nav-treeview">
+                            @if (RoleAccess::whereMenu(7) > 0)
+                                <li class="nav-item">
+                                    <a href="{{ route('approvalconfirmation') }}" class="nav-link">
+                                        <i class="fas fa-check-double nav-icon"></i>
+                                        <p>Approval Cofirmation</p>
+                                    </a>
+                                </li>
+                            @endif
+                        </ul> --}}
+                    </li>
+                @endif
+
                 @if (RoleAccess::whereMenu(9) + RoleAccess::whereMenu(10) + RoleAccess::whereMenu(17) > 0)
                     <li class="nav-item mt-2">
                         <a href="#" class="nav-link">
