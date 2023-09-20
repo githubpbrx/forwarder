@@ -308,6 +308,15 @@
                     </li>
                 @endif
 
+                @if (RoleAccess::whereMenu(28) > 0)
+                    <li class="nav-item">
+                        <a href="{{ route('resultratefcl') }}" class="nav-link">
+                            <i class="fas fa-poll-h nav-icon"></i>
+                            <p>Result FCL Rate</p>
+                        </a>
+                    </li>
+                @endif
+
                 @if (RoleAccess::whereMenu(11) > 0)
                     <li class="nav-item">
                         <a href="{{ route('reportforwarder') }}" class="nav-link">

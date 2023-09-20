@@ -1,5 +1,7 @@
 <?php
 
+use Illuminate\Support\Facades\Route;
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -58,5 +60,11 @@ Route::prefix('report')->group(function () {
         Route::post('/getdetailshipment/', 'ReportShipment@detailshipment')->name('report_detailshipment');
         Route::get('/getexcelshipment/{id}', 'ReportShipment@excelshipment')->name('report_excelshipment');
         Route::get('/getexcelshipmentall/', 'ReportShipment@excelshipmentall')->name('report_excelshipmentall');
+    });
+
+    Route::group(['prefix' => 'resultratefcl'], function () {
+        Route::get('/', 'ResultRate@index')->name('resultratefcl');
+        Route::get('/listresult', 'ResultRate@listresult')->name('list_resultratefcl');
+        Route::get('/getexcelresult', 'ResultRate@getexcel')->name('getexcelresult');
     });
 });
