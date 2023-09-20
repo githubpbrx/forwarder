@@ -34,7 +34,7 @@
         @php
             $active_menu = 'active';
             $dashboard = '';
-            
+
             // you can append the menus
             if ($menu == 'dashboard') {
                 $dashboard = $active_menu;
@@ -295,6 +295,15 @@
                         <a href="{{ route('datashipment') }}" class="nav-link">
                             <i class="fa fa-archive nav-icon"></i>
                             <p>Update Shipment</p>
+                        </a>
+                    </li>
+                @endif
+
+                @if (RoleAccess::whereMenu(27) > 0)
+                    <li class="nav-item">
+                        <a href="{{ route('inputratefcl') }}" class="nav-link">
+                            <i class="fas fa-percentage nav-icon"></i>
+                            <p>Input FCL Rate</p>
                         </a>
                     </li>
                 @endif
