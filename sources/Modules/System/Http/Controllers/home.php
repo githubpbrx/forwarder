@@ -392,41 +392,45 @@ class home extends Controller
                     return  str_replace("]", "", str_replace("[", "", str_replace('"', "", $mypo)));
                 })
                 ->addColumn('pinomor', function ($query) {
-                    $mypo = forwarder::join('po', 'po.id', 'forwarder.idpo')
-                        ->join('privilege', 'privilege.idforwarder', 'forwarder.idmasterfwd')
-                        ->join('mastersupplier', 'mastersupplier.id', 'po.vendor')
-                        ->where('po.pino', $query->pino)
-                        ->where('privilege.privilege_user_nik', Session::get('session')['user_nik'])
-                        ->where(function ($kus) {
-                            $kus->where('forwarder.statusapproval', null)->orWhere('forwarder.statusapproval', 'reject');
-                        })
-                        ->where('forwarder.statusallocation', null)
-                        ->where('forwarder.aktif', 'Y')->where('privilege.privilege_aktif', 'Y')->where('mastersupplier.aktif', 'Y')
-                        ->selectRaw('po.pino')
-                        ->groupby('po.pono')
-                        ->pluck('pino');
+                    // $mypo = forwarder::join('po', 'po.id', 'forwarder.idpo')
+                    //     ->join('privilege', 'privilege.idforwarder', 'forwarder.idmasterfwd')
+                    //     ->join('mastersupplier', 'mastersupplier.id', 'po.vendor')
+                    //     ->where('po.pino', $query->pino)
+                    //     ->where('privilege.privilege_user_nik', Session::get('session')['user_nik'])
+                    //     ->where(function ($kus) {
+                    //         $kus->where('forwarder.statusapproval', null)->orWhere('forwarder.statusapproval', 'reject');
+                    //     })
+                    //     ->where('forwarder.statusallocation', null)
+                    //     ->where('forwarder.aktif', 'Y')->where('privilege.privilege_aktif', 'Y')->where('mastersupplier.aktif', 'Y')
+                    //     ->selectRaw('po.pino')
+                    //     ->groupby('po.pono')
+                    //     ->pluck('pino');
 
-                    return  str_replace("]", "", str_replace("[", "", str_replace('"', "", $mypo)));
+                    // return  str_replace("]", "", str_replace("[", "", str_replace('"', "", $mypo)));
+
+                    return $query->pino;
                 })
                 ->addColumn('pidel', function ($query) {
                     return  $query->pideldate;
                 })
                 ->addColumn('supplier', function ($query) {
-                    $mypo = forwarder::join('po', 'po.id', 'forwarder.idpo')
-                        ->join('privilege', 'privilege.idforwarder', 'forwarder.idmasterfwd')
-                        ->join('mastersupplier', 'mastersupplier.id', 'po.vendor')
-                        ->where('po.pino', $query->pino)
-                        ->where('privilege.privilege_user_nik', Session::get('session')['user_nik'])
-                        ->where(function ($kus) {
-                            $kus->where('forwarder.statusapproval', null)->orWhere('forwarder.statusapproval', 'reject');
-                        })
-                        ->where('forwarder.statusallocation', null)
-                        ->where('forwarder.aktif', 'Y')->where('privilege.privilege_aktif', 'Y')->where('mastersupplier.aktif', 'Y')
-                        ->selectRaw('mastersupplier.nama')
-                        ->groupby('po.pono')
-                        ->pluck('nama');
+                    // $mypo = forwarder::join('po', 'po.id', 'forwarder.idpo')
+                    //     ->join('privilege', 'privilege.idforwarder', 'forwarder.idmasterfwd')
+                    //     ->join('mastersupplier', 'mastersupplier.id', 'po.vendor')
+                    //     ->where('po.pino', $query->pino)
+                    //     ->where('privilege.privilege_user_nik', Session::get('session')['user_nik'])
+                    //     ->where(function ($kus) {
+                    //         $kus->where('forwarder.statusapproval', null)->orWhere('forwarder.statusapproval', 'reject');
+                    //     })
+                    //     ->where('forwarder.statusallocation', null)
+                    //     ->where('forwarder.aktif', 'Y')->where('privilege.privilege_aktif', 'Y')->where('mastersupplier.aktif', 'Y')
+                    //     ->selectRaw('mastersupplier.nama')
+                    //     ->groupby('po.pono')
+                    //     ->pluck('nama');
 
-                    return  str_replace("]", "", str_replace("[", "", str_replace('"', "", $mypo)));
+                    // return  str_replace("]", "", str_replace("[", "", str_replace('"', "", $mypo)));
+
+                    return  $query->nama;
                 })
                 ->addColumn('company', function ($query) {
                     $getcompany = mastercompany::where('id', $query->company)->where('aktif', 'Y')->first();
