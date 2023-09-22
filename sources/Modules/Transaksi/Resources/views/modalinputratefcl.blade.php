@@ -55,26 +55,28 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <tr>
-                                                <td>{{ $data->country->country }}</td>
-                                                <td>{{ $data->polcity->city }}</td>
-                                                <td>{{ $data->podcity->city }}</td>
-                                                <td>{{ $data->shipping->name }}</td>
-                                                <td>{{ $awal }}</td>
-                                                <td>{{ $akhir }}</td>
-                                                <td><input id="20of" type="number" min="0"
-                                                        class="form-control"></td>
-                                                <td><input id="40of" type="number" min="0"
-                                                        class="form-control"></td>
-                                                <td><input id="40hcof" type="number" min="0"
-                                                        class="form-control"></td>
-                                                <td><input id="20lb" type="number" min="0"
-                                                        class="form-control"></td>
-                                                <td><input id="40lb" type="number" min="0"
-                                                        class="form-control"></td>
-                                                <td><input id="40hclb" type="number" min="0"
-                                                        class="form-control"></td>
-                                            </tr>
+                                            @foreach ($data as $key => $dat)
+                                                <tr>
+                                                    <td>{{ $dat->country->country }}</td>
+                                                    <td>{{ $dat->polcity->city }}</td>
+                                                    <td>{{ $dat->podcity->city }}</td>
+                                                    <td>{{ $dat->shipping->name }}</td>
+                                                    <td>{{ $awal }}</td>
+                                                    <td>{{ $akhir }}</td>
+                                                    <td><input type="number" min="0"
+                                                            class="form-control 20of-{{ $key }}"></td>
+                                                    <td><input type="number" min="0"
+                                                            class="form-control 40of-{{ $key }}"></td>
+                                                    <td><input type="number" min="0"
+                                                            class="form-control 40hcof-{{ $key }}"></td>
+                                                    <td><input type="number" min="0"
+                                                            class="form-control 20lb-{{ $key }}"></td>
+                                                    <td><input type="number" min="0"
+                                                            class="form-control 40lb-{{ $key }}"></td>
+                                                    <td><input type="number" min="0"
+                                                            class="form-control 40hclb-{{ $key }}"></td>
+                                                </tr>
+                                            @endforeach
                                         </tbody>
                                     </table>
                                     <hr>
@@ -98,23 +100,54 @@
     $('#datatables').DataTable();
 
     var dataku = @JSON($data);
+    console.log('dataku :>> ', dataku);
 
     $('#savedata').click(function(e) {
-        console.log('kloik :>> ', 'kloik');
+        var arrayku = [];
+        for (let index = 0; index < dataku.length; index++) {
+            let of20 = $('.20of-' + index).val();
+            let of40 = $('.40of-' + index).val();
+            let of40hc = $('.40hcof-' + index).val();
+            let lb20 = $('.20lb-' + index).val();
+            let lb40 = $('.40lb-' + index).val();
+            let lb40hc = $('.40hclb-' + index).val();
+
+            // if (val) {
+            let data = {
+                'idmappingrate': dataku[index].id,
+                'of20': of20,
+                'of40': of40,
+                'of40hc': of40hc,
+                'lb20': lb20,
+                'lb40': lb40,
+                'lb40hc': lb40hc,
+            };
+            arrayku.push(data);
+            // }
+        }
+
         $.ajax({
             type: "post",
             url: "{{ route('inputratefcl_add') }}",
             data: {
                 _token: $('meta[name=csrf-token]').attr('content'),
-                idmappingrate: dataku.id,
-                of20: $('#20of').val(),
-                of40: $('#40of').val(),
-                of40hc: $('#40hcof').val(),
-                lb20: $('#20lb').val(),
-                lb40: $('#40lb').val(),
-                lb40hc: $('#40hclb').val(),
+                mydata: JSON.stringify(arrayku)
             },
             dataType: "json",
+            beforeSend: function() {
+                Swal.fire({
+                    title: 'Inserting ...',
+                    html: 'Please wait data was inserting!',
+                    allowEscapeKey: false,
+                    allowOutsideClick: false,
+                    showCancelButton: false,
+                    showConfirmButton: false,
+                    backdrop: true,
+                    onOpen: () => {
+                        Swal.showLoading()
+                    }
+                })
+            },
             success: function(response) {
                 console.log('response :>> ', response);
                 Swal.fire({
@@ -124,7 +157,8 @@
                 }).then((result) => {
                     (response.status == 'success') ? window.location
                         .replace("{{ route('inputratefcl') }}"):
-                        ''
+                        '';
+                    Swal.close();
                 });
                 return;
             },
