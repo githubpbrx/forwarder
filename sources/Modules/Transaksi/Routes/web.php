@@ -83,12 +83,5 @@ Route::prefix('transaksi')->group(function () {
         Route::get('/listinput', 'InputRate@listinput')->name('list_inputratefcl');
         Route::post('/getinputrate', 'InputRate@getdatainputrate')->name('getdatainputrate');
         Route::post('/inputrateadd', 'InputRate@add')->name('inputratefcl_add');
-        Route::post('/getcountry', 'InputRate@getcountry')->name('getcountry');
-        Route::post('/getpolcity', 'InputRate@getpolcity')->name('getpolcity');
-        Route::post('/getpodcity', 'InputRate@getpodcity')->name('getpodcity');
-        Route::post('/getshipping', 'InputRate@getshipping')->name('getshipping');
-        Route::post('/inputrateedit', 'InputRate@edit')->name('inputratefcl_edit');
-        Route::post('/updateinputrate', 'InputRate@update')->name('inputratefcl_update');
-        Route::get('/deleteinputratefcl/{id}', 'InputRate@destroy')->name('inputratefcl_delete');
     });
 });
