@@ -27,7 +27,7 @@
                     <label class="col-sm-12 control-label">PI Number</label>
                     <div class="col-sm-12">
                         <input type="text" class="form-control" id="nomorpo" name="nomorpo"
-                            value=" {{ implode(', ', $listpi) }}" readonly>
+                            value=" {{ $listpi[0] }}" readonly>
                     </div>
                 </div>
             </div>
@@ -36,7 +36,7 @@
                     <label class="col-sm-12 control-label">Supplier</label>
                     <div class="col-sm-12">
                         <input type="text" class="form-control" id="supplier" name="supplier"
-                            value="{{ implode(', ', $namasup) }}" readonly>
+                            value="{{ $namasup[0] }}" readonly>
                     </div>
                 </div>
             </div>
@@ -79,7 +79,7 @@
                                                     } else {
                                                         $hscode = $dat['poku']['hscode']->hscode;
                                                     }
-                                                    
+
                                                     ?>
                                                     <tr>
                                                         <td>{{ $dat->po_nomor }}</td>
