@@ -71,6 +71,6 @@ Route::prefix('report')->group(function () {
     Route::group(['prefix' => 'resultratefcladmin'], function () {
         Route::get('/', 'ResultRateAdmin@index')->name('resultratefcladmin');
         Route::get('/listresult', 'ResultRateAdmin@listresult')->name('list_resultratefcladmin');
-        Route::get('/getexcelresult', 'ResultRateAdmin@getexcel')->name('getexcelresult');
+        Route::post('/getreport', 'ResultRateAdmin@getreport')->name('getreport');
     });
 });

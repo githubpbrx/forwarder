@@ -3,11 +3,11 @@
 namespace Modules\Transaksi\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasOne;
 use Modules\Master\Models\mastercountry;
-use Modules\Master\Models\masterpol_city;
 use Modules\Master\Models\masterpod_city;
+use Modules\Master\Models\masterpol_city;
 use Modules\Master\Models\mastershippingline;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class modelmappingratefcl extends Model
 {
