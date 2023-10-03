@@ -19,7 +19,7 @@ use Modules\Transaksi\Models\modelformshipment;
 use Modules\Transaksi\Models\modelmappingratefcl;
 use Modules\Transaksi\Models\modelinputratefcl;
 
-class ResultRate extends Controller
+class BestRateFcl extends Controller
 {
     protected $micro;
     public function __construct()
@@ -35,14 +35,57 @@ class ResultRate extends Controller
      */
     public function index()
     {
+        $getperiode = modelmappingratefcl::groupby('periodeawal')->groupby('periodeakhir')->where('aktif', 'Y')->get(['periodeawal', 'periodeakhir']);
+        // dd($getperiode);
         $data = array(
-            'title' => 'List Result Rate FCL',
-            'menu'  => 'resultratefcl',
+            'title' => 'List Best Rate FCL',
+            'menu'  => 'bestratefcl',
             'box'   => '',
+            'periode' => $getperiode,
         );
 
-        LogActivity::addToLog('Web Forwarder :: Forwarder : Access Menu Result Rate FCL', $this->micro);
-        return view('report::resultratefcl', $data);
+        LogActivity::addToLog('Web Forwarder :: Forwarder : Access Menu Best Rate FCL', $this->micro);
+        return view('report::bestratefcl.index', $data);
+    }
+
+    function getbestrate(Request $request)
+    {
+        // dd($request);
+        $exp = explode("/", $request->periode);
+        $awal = $exp[0];
+        $akhir = $exp[1];
+
+        $mapping = modelmappingratefcl::with(['country', 'polcity', 'podcity', 'shipping'])->where('periodeawal', $awal)->where('periodeakhir', $akhir)->where('aktif', 'Y')->orderby('id_country', 'asc')->get();
+
+        $databest = array();
+        foreach ($mapping as $keys => $map) {
+            $datainput = modelinputratefcl::with(['masterfwd'])->where('id_mappingrate', $map->id)->where('aktif', 'Y');
+            if ($datainput == null) {
+                $db['bestof_20']   = '-';
+                $db['bestof_40']   = '-';
+                $db['bestof_40hc'] = '-';
+                $db['bestlb_20']   = '-';
+                $db['bestlb_40']   = '-';
+                $db['bestlb_40hc'] = '-';
+            } else {
+                $db['bestof_20']   = $datainput->where('of_20', '!=', '')->selectRaw(' id_forwarder,MIN(of_20) as bestof20 ')->first();
+                $db['bestof_40']   = $datainput->where('of_40', '!=', '')->selectRaw(' id_forwarder,MIN(of_40) as bestof40 ')->first();
+                $db['bestof_40hc'] = $datainput->where('of_40hc', '!=', '')->selectRaw(' id_forwarder,MIN(of_40hc) as bestof40hc ')->first();
+                $db['bestlb_20']   = $datainput->where('lb_20', '!=', '')->selectRaw(' id_forwarder,MIN(lb_20) as bestlb20 ')->first();
+                $db['bestlb_40']   = $datainput->where('lb_40', '!=', '')->selectRaw(' id_forwarder,MIN(lb_40) as bestlb40 ')->first();
+                $db['bestlb_40hc'] = $datainput->where('lb_40hc', '!=', '')->selectRaw(' id_forwarder,MIN(lb_40hc) as bestlb40hc ')->first();
+            }
+            array_push($databest, $db);
+            unset($db);
+        }
+        // dd($databest);
+        $data = array(
+            'mapping' => $mapping,
+            'data'   => $databest,
+        );
+
+        $form = view('report::bestratefcl.getresult', $data);
+        return $form->render();
     }
 
     /**
