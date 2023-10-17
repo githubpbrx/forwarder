@@ -1,19 +1,9 @@
 <div class="modal-body" style="font-size: 10pt;">
     <form action="#" class="form-horizontal">
         {{ csrf_field() }}
-        {{-- {{ dd($data) }} --}}
-        {{-- <hr style="width: 100%; color: rgb(192, 192, 192); height: 0.5px; background-color:rgb(192, 192, 192);" /> --}}
         <div class="row">
             <div class="col-12">
                 <div class="card card-default">
-                    {{-- <div class="card-header">
-                        <h3 class="card-title"> kk </h3>
-                        <div class="card-tools">
-                            <button type="button" class="btn btn-tool" data-card-widget="collapse">
-                                <i class="fas fa-minus"></i>
-                            </button>
-                        </div>
-                    </div> --}}
                     <div class="card-body">
                         <div class="row">
                             <div class="col-12">
@@ -64,17 +54,29 @@
                                                     <td>{{ $awal }}</td>
                                                     <td>{{ $akhir }}</td>
                                                     <td><input type="number" min="0"
-                                                            class="form-control 20of-{{ $key }}"></td>
+                                                            class="form-control 20of-{{ $key }}"
+                                                            value="{{ count($datainput) != 0 ? $datainput[$key]->of_20 : '' }}">
+                                                    </td>
                                                     <td><input type="number" min="0"
-                                                            class="form-control 40of-{{ $key }}"></td>
+                                                            class="form-control 40of-{{ $key }}"
+                                                            value="{{ count($datainput) != 0 ? $datainput[$key]->of_40 : '' }}">
+                                                    </td>
                                                     <td><input type="number" min="0"
-                                                            class="form-control 40hcof-{{ $key }}"></td>
+                                                            class="form-control 40hcof-{{ $key }}"
+                                                            value="{{ count($datainput) != 0 ? $datainput[$key]->of_40hc : '' }}">
+                                                    </td>
                                                     <td><input type="number" min="0"
-                                                            class="form-control 20lb-{{ $key }}"></td>
+                                                            class="form-control 20lb-{{ $key }}"
+                                                            value="{{ count($datainput) != 0 ? $datainput[$key]->lb_20 : '' }}">
+                                                    </td>
                                                     <td><input type="number" min="0"
-                                                            class="form-control 40lb-{{ $key }}"></td>
+                                                            class="form-control 40lb-{{ $key }}"
+                                                            value="{{ count($datainput) != 0 ? $datainput[$key]->lb_40 : '' }}">
+                                                    </td>
                                                     <td><input type="number" min="0"
-                                                            class="form-control 40hclb-{{ $key }}"></td>
+                                                            class="form-control 40hclb-{{ $key }}"
+                                                            value="{{ count($datainput) != 0 ? $datainput[$key]->lb_40hc : '' }}">
+                                                    </td>
                                                 </tr>
                                             @endforeach
                                         </tbody>
@@ -87,7 +89,6 @@
                 </div>
             </div>
         </div>
-        {{-- <hr style="width: 100%; color: rgb(192, 192, 192); height: 0.5px; background-color:rgb(192, 192, 192);" /> --}}
     </form>
 </div>
 
@@ -97,10 +98,15 @@
 </div>
 
 <script type="text/javascript">
-    $('#datatables').DataTable();
+    $('#datatables').DataTable({
+        "ordering": false,
+        "paging": false,
+        "info": false,
+        "searching": false,
+    });
 
     var dataku = @JSON($data);
-    console.log('dataku :>> ', dataku);
+    var datainput = @JSON($datainput);
 
     $('#savedata').click(function(e) {
         var arrayku = [];
@@ -131,7 +137,8 @@
             url: "{{ route('inputratefcl_add') }}",
             data: {
                 _token: $('meta[name=csrf-token]').attr('content'),
-                mydata: JSON.stringify(arrayku)
+                mydata: JSON.stringify(arrayku),
+                datainput: datainput ? 'exist' : 'not',
             },
             dataType: "json",
             beforeSend: function() {

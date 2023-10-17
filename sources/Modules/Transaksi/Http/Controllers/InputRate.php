@@ -97,14 +97,24 @@ class InputRate extends Controller
         $awal = $exp[0];
         $akhir = $exp[1];
 
+        $cekfwd = masterforwarder::where('name', Session::get('session')['user_nama'])->where('aktif', 'Y')->first('id');
+
         $getmapping = modelmappingratefcl::with(['country', 'polcity', 'podcity', 'shipping'])->where('periodeawal', $awal)->where('periodeakhir', $akhir)->where('aktif', 'Y')->select('id', 'id_country', 'id_polcity', 'id_podcity', 'id_shippingline', 'periodeawal', 'periodeakhir')->get();
         // dd($getmapping);
+
+        $arr = [];
+        foreach ($getmapping as $key => $val) {
+            $cekinput = modelinputratefcl::where('id_mappingrate', $val->id)->where('id_forwarder', $cekfwd->id)->where('aktif', 'Y')->first();
+            if ($cekinput) {
+                array_push($arr, $cekinput);
+            }
+        }
+
         $nama = Session::get('session')['user_nama'];
         $awal = Carbon::parse($awal)->format('d M');
         $akhir = Carbon::parse($akhir)->format('d M');
 
-
-        $form = view('transaksi::modalinputratefcl', ['data' => $getmapping, 'nama' => $nama, 'awal' => $awal, 'akhir' => $akhir]);
+        $form = view('transaksi::modalinputratefcl', ['data' => $getmapping, 'datainput' => $arr, 'nama' => $nama, 'awal' => $awal, 'akhir' => $akhir]);
         return $form->render();
     }
 
@@ -117,8 +127,8 @@ class InputRate extends Controller
     public function add(Request $request)
     {
         $decode = json_decode($request->mydata);
-
-        // dd($decode);
+        $statusinput = $request->datainput;
+        // dd($statusinput);
         // if ($request->of20 == null || $request->of40 == null || $request->of40hc == null || $request->lb20 == null || $request->lb40 == null || $request->lb40hc == null) {
         //     $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'Some Data is Empty, Please Check Your Data'];
         //     return response()->json($status, 200);
@@ -127,20 +137,46 @@ class InputRate extends Controller
         try {
             $cekfwd = masterforwarder::where('name', Session::get('session')['user_nama'])->where('aktif', 'Y')->first('id');
 
+            $arr = [];
+            foreach ($decode as $key1 => $val1) {
+                if ($val1->of20 || $val1->of40 || $val1->of40hc || $val1->lb20 || $val1->lb40 || $val1->lb40hc) {
+                    $arr[] = 1;
+                } else {
+                    $arr[] = 0;
+                }
+            }
+
+            if (array_sum($arr) < 1) {
+                throw new \Exception("Please Fill Data", 1);
+            }
+
             foreach ($decode as $key => $val) {
-                $insert = modelinputratefcl::insert([
-                    'id_mappingrate' => $val->idmappingrate,
-                    'id_forwarder'   => $cekfwd->id,
-                    'of_20'          => $val->of20,
-                    'of_40'          => $val->of40,
-                    'of_40hc'        => $val->of40hc,
-                    'lb_20'          => $val->lb20,
-                    'lb_40'          => $val->lb40,
-                    'lb_40hc'        => $val->lb40hc,
-                    'aktif'          => 'Y',
-                    'created_at'     => date('Y-m-d H:i:s'),
-                    'created_by'     => Session::get('session')['user_nik']
-                ]);
+                if ($statusinput == 'not') {
+                    $insert = modelinputratefcl::insert([
+                        'id_mappingrate' => $val->idmappingrate,
+                        'id_forwarder'   => $cekfwd->id,
+                        'of_20'          => $val->of20,
+                        'of_40'          => $val->of40,
+                        'of_40hc'        => $val->of40hc,
+                        'lb_20'          => $val->lb20,
+                        'lb_40'          => $val->lb40,
+                        'lb_40hc'        => $val->lb40hc,
+                        'aktif'          => 'Y',
+                        'created_at'     => date('Y-m-d H:i:s'),
+                        'created_by'     => Session::get('session')['user_nik']
+                    ]);
+                } else {
+                    $update = modelinputratefcl::where('id_mappingrate', $val->idmappingrate)->where('id_forwarder', $cekfwd->id)->where('aktif', 'Y')->update([
+                        'of_20'          => $val->of20,
+                        'of_40'          => $val->of40,
+                        'of_40hc'        => $val->of40hc,
+                        'lb_20'          => $val->lb20,
+                        'lb_40'          => $val->lb40,
+                        'lb_40hc'        => $val->lb40hc,
+                        'updated_at'     => date('Y-m-d H:i:s'),
+                        'updated_by'     => Session::get('session')['user_nik']
+                    ]);
+                }
             }
 
             LogActivity::addToLog('Web Forwarder :: Forwarder : Save Input Rate FCL', $this->micro);
