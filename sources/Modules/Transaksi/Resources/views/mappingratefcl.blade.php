@@ -20,6 +20,7 @@
                                 <th>POD City</th>
                                 <th>Shipping Line</th>
                                 <th>Periode</th>
+                                <th>Expired Date</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
@@ -73,6 +74,12 @@
                                 <select class="form-control select2" name="shipping" id="shipping" disabled>
                                     <option value=""></option>
                                 </select>
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <div class="form-group">
+                                <label class="control-label">Set Date</label>
+                                <input type="date" name="setdate" id="setdate" class="form-control" autocomplete="off">
                             </div>
                         </div>
                     </form>
@@ -130,6 +137,10 @@
                         name: 'periode'
                     },
                     {
+                        data: 'expireddate',
+                        name: 'expireddate'
+                    },
+                    {
                         data: 'action',
                         name: 'action',
                         orderable: false,
@@ -153,6 +164,7 @@
                 $("#polcity").empty().prop('disabled', true);
                 $("#podcity").empty().prop('disabled', true);
                 $('#shipping').empty().prop('disabled', true);
+                $('#setdate').val('');
                 $('#modaltitle').html('Add Data Mapping Rate FCL');
             });
 
@@ -247,7 +259,6 @@
 
             $('#podcity').change(function(e) {
                 let idpod = $(this).val();
-                console.log('idpod :>> ', idpod);
                 $.ajax({
                     type: "POST",
                     url: "{!! route('getshipping') !!}",
@@ -257,7 +268,6 @@
                     },
                     dataType: "JSON",
                     success: function(data) {
-                        console.log('data :>> ', data);
                         let local = localStorage.getItem("action");
                         $("#shipping").empty().prop('disabled', true);
                         let html =
@@ -295,7 +305,6 @@
                         id: idku,
                     },
                 }).done(function(data) {
-                    console.log('dataeduit :>> ', data);
                     localStorage.setItem("action", "edit");
                     let dataku = data.data;
                     $('#idku').val(dataku.id);
@@ -304,6 +313,7 @@
                     eidpodcity = dataku.id_podcity;
                     eidshipping = dataku.id_shippingline;
                     eidpolcity = dataku.id_polcity;
+                    $('#setdate').val(dataku.expired_date);
                     $('#modaltitle').html('Edit Data Shipping Line');
                 })
             });
@@ -342,6 +352,7 @@
                 let polcity = $('#polcity').val();
                 let podcity = $('#podcity').val();
                 let shipping = $('#shipping').val();
+                let setdate = $('#setdate').val();
 
                 $.ajax({
                     url: (id == null || id == '') ? "{!! route('mappingratefcl_add') !!}" :
@@ -355,6 +366,7 @@
                         idpol: polcity,
                         idpod: podcity,
                         idship: shipping,
+                        setdate: setdate,
                     },
                     success: function(response) {
                         Swal.fire({

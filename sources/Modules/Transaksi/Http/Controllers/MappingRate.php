@@ -48,7 +48,7 @@ class MappingRate extends Controller
      */
     public function listmapping()
     {
-        $data = modelmappingratefcl::with(['country', 'polcity', 'podcity', 'shipping'])->where('aktif', 'Y')->select('id', 'id_country', 'id_polcity', 'id_podcity', 'id_shippingline', 'periodeawal', 'periodeakhir')->get();
+        $data = modelmappingratefcl::with(['country', 'polcity', 'podcity', 'shipping'])->where('aktif', 'Y')->select('id', 'id_country', 'id_polcity', 'id_podcity', 'id_shippingline', 'periodeawal', 'periodeakhir', 'expired_date')->get();
         // dd($data);
         return DataTables::of($data)
             ->addIndexColumn()
@@ -65,9 +65,13 @@ class MappingRate extends Controller
                 return $data->shipping->name;
             })
             ->addColumn('periode', function ($data) {
-                $awal = Carbon::parse($data->periodeawal)->format('d M');
-                $akhir = Carbon::parse($data->periodeakhir)->format('d M');
+                $awal = $data->periodeawal ? Carbon::parse($data->periodeawal)->format('d M') : '';
+                $akhir = $data->periodeakhir ? Carbon::parse($data->periodeakhir)->format('d M') : '';
                 return $awal . ' - ' . $akhir;
+            })
+            ->addColumn('expireddate', function ($data) {
+                $expired = $data->expired_date ? Carbon::parse($data->expired_date)->format('d M Y') : '';
+                return $expired;
             })
             ->addColumn('action', function ($data) {
                 $button = '';
@@ -141,8 +145,9 @@ class MappingRate extends Controller
         $idshipping   = $request->idship;
         $periodeawal = Carbon::now()->startOfMonth()->toDateString();
         $periodeakhir = Carbon::now()->endOfMonth()->toDateString();
+        $expireddate = $request->setdate;
 
-        if ($idcountry == '' || $idcountry == null || $idpolcity == '' || $idpolcity == null || $idpodcity == '' || $idpodcity == null || $idshipping == '' || $idshipping == null) {
+        if ($idcountry == '' || $idcountry == null || $idpolcity == '' || $idpolcity == null || $idpodcity == '' || $idpodcity == null || $idshipping == '' || $idshipping == null || $expireddate == '' || $expireddate == null) {
             $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'Some Column is Empty, please input data'];
             return response()->json($status, 200);
         }
@@ -160,6 +165,7 @@ class MappingRate extends Controller
             'id_shippingline' => $idshipping,
             'periodeawal'     => $periodeawal,
             'periodeakhir'    => $periodeakhir,
+            'expired_date'    => $expireddate,
             'aktif'           => 'Y',
             'created_at'      => date('Y-m-d H:i:s'),
             'created_by'      => Session::get('session')['user_nik']
@@ -203,8 +209,9 @@ class MappingRate extends Controller
         $idpolcity = $request->idpol;
         $idpodcity = $request->idpod;
         $idshipping = $request->idship;
+        $expireddate = $request->setdate;
 
-        if ($idcountry == '' || $idcountry == null || $idpolcity == '' || $idpolcity == null || $idpodcity == '' || $idpodcity == null || $idshipping == '' || $idshipping == null) {
+        if ($idcountry == '' || $idcountry == null || $idpolcity == '' || $idpolcity == null || $idpodcity == '' || $idpodcity == null || $idshipping == '' || $idshipping == null || $expireddate == '' || $expireddate == null) {
             $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'Some Column is Empty, please input data'];
             return response()->json($status, 200);
         }
@@ -220,6 +227,7 @@ class MappingRate extends Controller
             'id_polcity'      => $idpolcity,
             'id_podcity'      => $idpodcity,
             'id_shippingline' => $idshipping,
+            'expired_date'    => $expireddate,
             'aktif'           => 'Y',
             'updated_at'      => date('Y-m-d H:i:s'),
             'updated_by'      => Session::get('session')['user_nik']
