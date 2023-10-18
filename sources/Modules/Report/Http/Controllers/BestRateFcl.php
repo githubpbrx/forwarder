@@ -59,7 +59,7 @@ class BestRateFcl extends Controller
 
         $databest = array();
         foreach ($mapping as $keys => $map) {
-            $datainput = modelinputratefcl::with(['masterfwd'])->where('id_mappingrate', $map->id)->where('aktif', 'Y');
+            $datainput = modelinputratefcl::with(['masterfwd'])->where('id_mappingrate', $map->id)->where('aktif', 'Y')->get(['id_forwarder', 'of_20 as bestof20', 'of_40 as bestof40', 'of_40hc as bestof40hc', 'lb_20 as bestlb20', 'lb_40 as bestlb40', 'lb_40hc as bestlb40hc']);
             if ($datainput == null) {
                 $db['bestof_20']   = '-';
                 $db['bestof_40']   = '-';
@@ -68,16 +68,18 @@ class BestRateFcl extends Controller
                 $db['bestlb_40']   = '-';
                 $db['bestlb_40hc'] = '-';
             } else {
-                $db['bestof_20']   = $datainput->where('of_20', '!=', '')->selectRaw(' id_forwarder,MIN(of_20) as bestof20 ')->first();
-                $db['bestof_40']   = $datainput->where('of_40', '!=', '')->selectRaw(' id_forwarder,MIN(of_40) as bestof40 ')->first();
-                $db['bestof_40hc'] = $datainput->where('of_40hc', '!=', '')->selectRaw(' id_forwarder,MIN(of_40hc) as bestof40hc ')->first();
-                $db['bestlb_20']   = $datainput->where('lb_20', '!=', '')->selectRaw(' id_forwarder,MIN(lb_20) as bestlb20 ')->first();
-                $db['bestlb_40']   = $datainput->where('lb_40', '!=', '')->selectRaw(' id_forwarder,MIN(lb_40) as bestlb40 ')->first();
-                $db['bestlb_40hc'] = $datainput->where('lb_40hc', '!=', '')->selectRaw(' id_forwarder,MIN(lb_40hc) as bestlb40hc ')->first();
+                $db['bestof_20']   = $this->whereData($datainput, 'bestof20');
+                $db['bestof_40']   = $this->whereData($datainput, 'bestof40');
+                $db['bestof_40hc'] = $this->whereData($datainput, 'bestof40hc');
+                $db['bestlb_20']   = $this->whereData($datainput, 'bestlb20');
+                $db['bestlb_40']   = $this->whereData($datainput, 'bestlb40');
+                $db['bestlb_40hc'] = $this->whereData($datainput, 'bestlb40hc');
             }
+            // dump($db);
             array_push($databest, $db);
             unset($db);
         }
+
         // dd($databest);
         $data = array(
             'mapping' => $mapping,
@@ -86,6 +88,25 @@ class BestRateFcl extends Controller
 
         $form = view('report::bestratefcl.getresult', $data);
         return $form->render();
+    }
+
+    public function whereData($datainput, $label)
+    {
+        $datas = $datainput->where("$label", '!=', '')->sortBy("$label")->first();
+
+        return $datas ? $datas->toArray() : $this->dataisNull();
+    }
+
+    public function dataisNull()
+    {
+        $db['masterfwd']  = null;
+        $db['bestof20']   = null;
+        $db['bestof40']   = null;
+        $db['bestof40hc'] = null;
+        $db['bestlb20']   = null;
+        $db['bestlb40']   = null;
+        $db['bestlb40hc'] = null;
+        return $db;
     }
 
     /**

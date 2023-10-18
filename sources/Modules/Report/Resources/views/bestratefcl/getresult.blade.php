@@ -35,18 +35,24 @@
                 <td>{{ $item->polcity->city }}</td>
                 <td>{{ $item->podcity->city }}</td>
                 <td>{{ $item->shipping->name }}</td>
-                <td>{{ $data[$key]['bestof_20']->bestof20 }} -
-                    {{ $data[$key]['bestof_20']->masterfwd ? $data[$key]['bestof_20']->masterfwd->name : '' }}</td>
-                <td>{{ $data[$key]['bestof_40']->bestof40 }} -
-                    {{ $data[$key]['bestof_40']->masterfwd ? $data[$key]['bestof_40']->masterfwd->name : '' }}</td>
-                <td>{{ $data[$key]['bestof_40hc']->bestof40hc }} -
-                    {{ $data[$key]['bestof_40hc']->masterfwd ? $data[$key]['bestof_40hc']->masterfwd->name : '' }}</td>
-                <td>{{ $data[$key]['bestlb_20']->bestlb20 }} -
-                    {{ $data[$key]['bestlb_20']->masterfwd ? $data[$key]['bestlb_20']->masterfwd->name : '' }}</td>
-                <td>{{ $data[$key]['bestlb_40']->bestlb40 }} -
-                    {{ $data[$key]['bestlb_40']->masterfwd ? $data[$key]['bestlb_40']->masterfwd->name : '' }}</td>
-                <td>{{ $data[$key]['bestlb_40hc']->bestlb40hc }} -
-                    {{ $data[$key]['bestlb_40hc']->masterfwd ? $data[$key]['bestlb_40hc']->masterfwd->name : '' }}</td>
+                <td>{{ $data[$key]['bestof_20']['bestof20'] }} -
+                    {{ $data[$key]['bestof_20']['masterfwd'] ? $data[$key]['bestof_20']['masterfwd']['name'] : '' }}
+                </td>
+                <td>{{ $data[$key]['bestof_40']['bestof40'] }} -
+                    {{ $data[$key]['bestof_40']['masterfwd'] ? $data[$key]['bestof_40']['masterfwd']['name'] : '' }}
+                </td>
+                <td>{{ $data[$key]['bestof_40hc']['bestof40hc'] }} -
+                    {{ $data[$key]['bestof_40hc']['masterfwd'] ? $data[$key]['bestof_40hc']['masterfwd']['name'] : '' }}
+                </td>
+                <td>{{ $data[$key]['bestlb_20']['bestlb20'] }} -
+                    {{ $data[$key]['bestlb_20']['masterfwd'] ? $data[$key]['bestlb_20']['masterfwd']['name'] : '' }}
+                </td>
+                <td>{{ $data[$key]['bestlb_40']['bestlb40'] }} -
+                    {{ $data[$key]['bestlb_40']['masterfwd'] ? $data[$key]['bestlb_40']['masterfwd']['name'] : '' }}
+                </td>
+                <td>{{ $data[$key]['bestlb_40hc']['bestlb40hc'] }} -
+                    {{ $data[$key]['bestlb_40hc']['masterfwd'] ? $data[$key]['bestlb_40hc']['masterfwd']['name'] : '' }}
+                </td>
             </tr>
         @endforeach
     </tbody>
