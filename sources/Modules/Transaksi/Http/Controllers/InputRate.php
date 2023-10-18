@@ -53,7 +53,18 @@ class InputRate extends Controller
     {
         if ($request->ajax()) {
             // dd($data);
-            $data = modelmappingratefcl::with(['country', 'polcity', 'podcity', 'shipping'])->where('aktif', 'Y')->select('id', 'id_country', 'id_polcity', 'id_podcity', 'id_shippingline', 'periodeawal', 'periodeakhir')->groupby('periodeawal', 'periodeakhir')->get();
+            $cekdata = modelmappingratefcl::with(['country', 'polcity', 'podcity', 'shipping'])->where('aktif', 'Y')->select('id', 'id_country', 'id_polcity', 'id_podcity', 'id_shippingline', 'periodeawal', 'periodeakhir', 'expired_date')->groupby('periodeawal', 'periodeakhir')->get();
+
+            $data = [];
+            foreach ($cekdata as $key => $val) {
+                $datenow = Carbon::parse(Carbon::now()->format('Y-m-d'));
+                $expired = Carbon::parse(Carbon::parse($val->expired_date)->format('Y-m-d'));
+                $cekdate = $datenow->lte($expired);
+                if ($cekdate) {
+                    array_push($data, $val);
+                }
+            }
+
             return DataTables::of($data)
                 ->addIndexColumn()
                 ->addColumn('namecountry', function ($data) {
@@ -109,7 +120,7 @@ class InputRate extends Controller
                 array_push($arr, $cekinput);
             }
         }
-
+        // dd($getmapping, $arr);
         $nama = Session::get('session')['user_nama'];
         $awal = Carbon::parse($awal)->format('d M');
         $akhir = Carbon::parse($akhir)->format('d M');

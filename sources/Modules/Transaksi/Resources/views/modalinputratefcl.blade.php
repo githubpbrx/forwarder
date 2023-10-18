@@ -81,7 +81,6 @@
                                             @endforeach
                                         </tbody>
                                     </table>
-                                    <hr>
                                 </div>
                             </div>
                         </div>
@@ -138,7 +137,7 @@
             data: {
                 _token: $('meta[name=csrf-token]').attr('content'),
                 mydata: JSON.stringify(arrayku),
-                datainput: datainput ? 'exist' : 'not',
+                datainput: datainput.length != 0 ? 'exist' : 'not',
             },
             dataType: "json",
             beforeSend: function() {
