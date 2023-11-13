@@ -2,25 +2,26 @@
 
 namespace Modules\Transaksi\Http\Controllers;
 
-use Carbon\Carbon;
+use GuzzleHttp\Client;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Illuminate\Routing\Controller;
 use Yajra\DataTables\DataTables;
-use Session, Crypt, DB, Mail;
-use GuzzleHttp\Client;
-use Modules\Transaksi\Models\mastersupplier as supplier;
-use Modules\Transaksi\Models\masterforwarder as forwarder;
-use Modules\Transaksi\Models\modelformpo as formpo;
+use Illuminate\Routing\Controller;
+// use Illuminate\Support\Facades\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Session;
+
+use Modules\System\Helpers\LogActivity;
 use Modules\Transaksi\Models\modelpo as po;
-use Modules\Transaksi\Models\modelforwarder as fwd;
 use Modules\Transaksi\Models\masterbuyer as buyer;
-use Modules\Transaksi\Models\modelapproval as approval;
-use Modules\System\Models\modelprivilege as privilege;
+use Modules\Transaksi\Models\modelformpo as formpo;
+use Modules\Transaksi\Models\modelforwarder as fwd;
+use Modules\Transaksi\Models\mastersupplier as supplier;
 
 class ApprovalConfirmation extends Controller
 {
     protected $ip_server;
+    protected $micro;
     public function __construct()
     {
         header("Access-Control-Allow-Origin: *");
@@ -41,7 +42,7 @@ class ApprovalConfirmation extends Controller
             'box'   => '',
         );
 
-        \LogActivity::addToLog('Web Forwarder :: Logistik : Access Menu Approval Confirmation', $this->micro);
+        LogActivity::addToLog('Web Forwarder :: Logistik : Access Menu Approval Confirmation', $this->micro);
         return view('transaksi::approvalconfirmation', $data);
     }
 
@@ -233,7 +234,7 @@ class ApprovalConfirmation extends Controller
             'datapo' => $podata
         ];
         // dd($data);
-        \LogActivity::addToLog('Web Forwarder :: Logistik : Process Approval Data PO by Logistik', $this->micro);
+        LogActivity::addToLog('Web Forwarder :: Logistik : Process Approval Data PO by Logistik', $this->micro);
         return response()->json(['status' => 200, 'data' => $data, 'message' => 'Berhasil']);
     }
 
@@ -297,7 +298,7 @@ class ApprovalConfirmation extends Controller
 
             if (empty($gagal)) {
                 DB::commit();
-                \LogActivity::addToLog('Web Forwarder :: Logistik : Approval Confirmed', $this->micro);
+                LogActivity::addToLog('Web Forwarder :: Logistik : Approval Confirmed', $this->micro);
                 $status = ['title' => 'Success', 'status' => 'success', 'message' => 'Data Successfully Saved'];
                 return response()->json($status, 200);
             } else {
@@ -342,7 +343,7 @@ class ApprovalConfirmation extends Controller
 
             if (empty($gagal)) {
                 DB::commit();
-                \LogActivity::addToLog('Web Forwarder :: Logistik : Approval Rejected', $this->micro);
+                LogActivity::addToLog('Web Forwarder :: Logistik : Approval Rejected', $this->micro);
                 $status = ['title' => 'Success', 'status' => 'success', 'message' => 'Data Successfully Saved'];
                 return response()->json($status, 200);
             } else {

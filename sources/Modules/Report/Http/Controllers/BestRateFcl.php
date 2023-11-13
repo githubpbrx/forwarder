@@ -50,7 +50,9 @@ class BestRateFcl extends Controller
 
     function getbestrate(Request $request)
     {
-        // dd($request);
+        // dd($request->periode);
+        Session::put(['sesper' => $request->periode]);
+
         $exp = explode("/", $request->periode);
         $awal = $exp[0];
         $akhir = $exp[1];
@@ -93,8 +95,25 @@ class BestRateFcl extends Controller
     public function whereData($datainput, $label)
     {
         $datas = $datainput->where("$label", '!=', '')->sortBy("$label")->first();
+        $arr = $datas ? $datas->toArray() : [];
 
-        return $datas ? $datas->toArray() : $this->dataisNull();
+        // if (count($arr) > 0) {
+        //     $res = array_values(array_filter($datainput->toArray(), function ($val) use ($label, $arr) {
+        //         return $val[$label] == $arr[$label];
+        //     }));
+
+        //     $name = [];
+        //     foreach ($res as $keyR => $ress) {
+        //         $name[] = $ress['masterfwd']['name'];
+        //     }
+
+        //     $implode = implode(' - ', $name);
+        //     $arr['masterfwd']['name'] = $implode;
+        // }
+
+        return count($arr) > 0 ? $arr : $this->dataisNull();
+
+        // return $datas ? $datas->toArray() : $this->dataisNull();
     }
 
     public function dataisNull()
@@ -113,41 +132,45 @@ class BestRateFcl extends Controller
      * Show the form for creating a new resource.
      * @return Response
      */
-    public function getexcel(Request $request)
+    public function getexcel()
     {
-        dd($request);
-        if ($request->ajax()) {
-            $data = modelmappingratefcl::with(['country', 'polcity', 'podcity', 'shipping'])->where('aktif', 'Y')->select('id', 'id_country', 'id_polcity', 'id_podcity', 'id_shippingline', 'periodeawal', 'periodeakhir')->get();
-            // dd($data);
-            return DataTables::of($data)
-                ->addIndexColumn()
-                ->addColumn('namecountry', function ($data) {
-                    return $data->country->country;
-                })
-                ->addColumn('namepolcity', function ($data) {
-                    return $data->polcity->city;
-                })
-                ->addColumn('namepodcity', function ($data) {
-                    return $data->podcity->city;
-                })
-                ->addColumn('nameshipping', function ($data) {
-                    return $data->shipping->name;
-                })
-                ->addColumn('periode', function ($data) {
-                    $awal = Carbon::parse($data->periodeawal)->format('d M');
-                    $akhir = Carbon::parse($data->periodeakhir)->format('d M');
-                    return $awal . ' - ' . $akhir;
-                })
-                ->addColumn('action', function ($data) {
-                    $button = '';
+        $periode = Session::get('sesper');
+        // dd($periode);
+        $exp = explode("/", $periode);
+        $awal = $exp[0];
+        $akhir = $exp[1];
 
-                    $button = '<a href="#" data-id="' . $data->id . '" id="detailbtn"><i class="fa fa-angle-double-right text-green"></i></a>';
+        $mapping = modelmappingratefcl::with(['country', 'polcity', 'podcity', 'shipping'])->where('periodeawal', $awal)->where('periodeakhir', $akhir)->where('aktif', 'Y')->orderby('id_country', 'asc')->get();
 
-                    // $button = '<a href="' . route('detail_allocation', ['id' => $idku]) . '" id="detailbtn"><i data-tooltip="tooltip" title="Detail Allocation" class="fa fa-info-circle fa-lg"></i></a>';
-                    return $button;
-                })
-                // ->rawColumns(['status'])
-                ->make(true);
+        $databest = array();
+        foreach ($mapping as $keys => $map) {
+            $datainput = modelinputratefcl::with(['masterfwd'])->where('id_mappingrate', $map->id)->where('aktif', 'Y')->get(['id_forwarder', 'of_20 as bestof20', 'of_40 as bestof40', 'of_40hc as bestof40hc', 'lb_20 as bestlb20', 'lb_40 as bestlb40', 'lb_40hc as bestlb40hc']);
+            if ($datainput == null) {
+                $db['bestof_20']   = '-';
+                $db['bestof_40']   = '-';
+                $db['bestof_40hc'] = '-';
+                $db['bestlb_20']   = '-';
+                $db['bestlb_40']   = '-';
+                $db['bestlb_40hc'] = '-';
+            } else {
+                $db['bestof_20']   = $this->whereData($datainput, 'bestof20');
+                $db['bestof_40']   = $this->whereData($datainput, 'bestof40');
+                $db['bestof_40hc'] = $this->whereData($datainput, 'bestof40hc');
+                $db['bestlb_20']   = $this->whereData($datainput, 'bestlb20');
+                $db['bestlb_40']   = $this->whereData($datainput, 'bestlb40');
+                $db['bestlb_40hc'] = $this->whereData($datainput, 'bestlb40hc');
+            }
+            // dump($db);
+            array_push($databest, $db);
+            unset($db);
         }
+
+        // dd($databest);
+        $data = array(
+            'mapping' => $mapping,
+            'data'   => $databest,
+        );
+
+        return view('report::bestratefcl.excel', $data);
     }
 }

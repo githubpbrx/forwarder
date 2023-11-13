@@ -320,7 +320,6 @@
             var idformpo;
             // var length;
             $('body').on('click', '#prosesapproval', function() {
-                console.log('objectproses :>> ', 'klik');
                 $('#nik').val('');
                 $('#detailpengesah').html('');
                 // $('#modal-detail').modal('show');
@@ -337,13 +336,20 @@
                         _token: $('meta[name=csrf-token]').attr('content'),
                         id: idku,
                     },
+                    beforeSend: function(xhr) {
+                        Swal.fire({
+                            html: "Please Wait",
+                            showCancelButton: false,
+                            showConfirmButton: false,
+                            onOpen: () => {
+                                Swal.showLoading();
+                            }
+                        })
+                    }
                 }).done(function(data) {
-                    console.log('data :>> ', data.data);
-
+                    Swal.close();
                     let mydata = data.data.dataku;
-                    console.log('mydata :>> ', mydata);
                     let mypo = data.data.datapo;
-                    console.log('mypo :>> ', mypo);
 
                     length = mydata.length;
                     $('#detailitem').empty();
@@ -471,10 +477,8 @@
             });
 
             $('.btnapproval').click(function() {
-                console.log('objectkuu :>> ', 'klik');
                 let idku = $(this).attr('data-id');
                 let val = $(this).attr('data-value');
-                console.log('val :>> ', val);
 
                 if (val == 'confirm') {
                     confirm();
@@ -520,7 +524,6 @@
                             tolak: tolak
                         },
                         success: function(response) {
-                            console.log('response :>> ', response);
                             Swal.fire({
                                 title: response.title,
                                 text: response.message,
@@ -557,12 +560,9 @@
                         allowEscapeKey: false
                     })
                     .then((result) => {
-                        console.log('willDelete :>> ', result);
                         if (result.dismiss == 'cancel') {
-                            console.log('object :>> ', 'cancel');
                             return;
                         } else {
-                            console.log('object :>> ', 'ok');
                             // let idpo = $('#dataid').attr('data-idpo');
                             // let idfwd = $('#dataid').attr('data-idfwd');
                             // let idformpo = $('#dataid').attr('data-idformpo');
@@ -588,6 +588,15 @@
                                     // idformpo: idformpo,
                                     dataid: arrayku,
                                 },
+                                beforeSend: function(xhr) {
+                                    Swal.fire({
+                                        title: "Loading...",
+                                        html: "Please Wait",
+                                        showCancelButton: false,
+                                        showConfirmButton: false
+                                    })
+                                    Swal.showLoading()
+                                },
                                 success: function(response) {
                                     console.log('response :>> ', response);
                                     Swal.fire({
@@ -598,6 +607,7 @@
                                     }).then((result) => {
                                         // $('#approvalfwd').modal('hide');
                                         // table.ajax.reload();
+                                        Swal.close();
                                         (response.status == 'success') ? window.location
                                             .replace("{{ route('page_approval') }}"):
                                             ''
@@ -616,7 +626,6 @@
                         }
                     });
             }
-
         });
     </script>
 @endsection

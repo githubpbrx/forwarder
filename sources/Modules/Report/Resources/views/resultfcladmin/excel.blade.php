@@ -1,26 +1,31 @@
-{{-- @php
-    $arc = [];
-@endphp
-@foreach ($row as $k => $rs)
-    @php
-    $dtr[$rs->id_country] = [];
-    $arc[] = $rs->id_country;
-    $djml[$rs->id_country] = $rs->jml;
-    @endphp
-@endforeach --}}
+<?php
+header('Content-type: application/octet-stream');
+header('Content-Disposition: attachment; filename=Report Result Rate FCL_ ' . date('d-m-Y') . '.xlsx');
+header('Pragma: no-cache');
+header('Expires: 0');
 
-{{-- @php
-    $dtpol = [];
-@endphp   --}}
-{{-- @foreach ($rowpol as $rp)
-    @php
-    $dtp[$rp->id_polcity] = [];
-    $dtpol[] = $rp->id_polcity;
-    $jmlpol[$rp->id_polcity] = $rp->jml;
-    @endphp
-@endforeach --}}
+?>
+<style type="text/css">
+    table {
+        margin: 20px auto;
+        border-collapse: collapse;
+    }
 
-<table width="100%" id="datatables" class="table table-bordered table-hover table-striped">
+    table,
+    th,
+    td {
+        border: 1px solid #3c3c3c;
+        padding: 3px 8px;
+
+    }
+</style>
+{{-- <table border="0" cellspacing="0" cellpadding="0">
+    <tr>
+        <td align="left" colspan="5"><strong>Data Result Rate FCL </strong></td>
+    </tr>
+</table> --}}
+<p> </p>
+<table border="1">
     <thead>
         <tr>
             <th rowspan="3" style="vertical-align: middle; text-align: center">
@@ -72,24 +77,6 @@
     </thead>
     <tbody>
         @foreach ($master as $key => $item)
-            {{-- @php
-                $rows = '';
-                $rowspol = '';
-                if (in_array($item->id_country, $arc)) {
-                    if (count($dtr[$item->id_country]) == 0) {
-                        $dtr[$item->id_country] = ['a' => 'ok', 'b' => 'ok'];
-                        $rows = $djml[$item->id_country];
-                    }
-                }
-
-                if (in_array($item->id_polcity, $dtpol)) {
-                    if (count($dtp[$item->id_polcity]) == 0) {
-                        $dtp[$item->id_polcity] = ['a' => 'ok', 'b' => 'ok'];
-                        $rowspol = $jmlpol[$item->id_polcity];
-                    }
-                }
-            @endphp --}}
-
             <tr>
                 <td>{{ $item->country->country }}</td>
                 <td>{{ $item->polcity->city }}</td>
@@ -127,23 +114,3 @@
         @endforeach
     </tbody>
 </table>
-<script>
-    $('#datatables').DataTable({
-        // order: [],
-        serverSide: false,
-        processing: true,
-        ordering: false,
-        paging: false,
-        scrollX: true,
-        scrollCollapse: true,
-        lengthChange: true,
-        searching: false,
-        autoWidth: true,
-        // info: false
-        scrollY: screen.height * 0.55,
-
-        fixedColumns: {
-            leftColumns: 6
-        },
-    });
-</script>

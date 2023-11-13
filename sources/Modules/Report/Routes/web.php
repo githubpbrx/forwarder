@@ -66,13 +66,14 @@ Route::prefix('report')->group(function () {
     Route::group(['prefix' => 'bestratefcl'], function () {
         Route::get('/', 'BestRateFcl@index')->name('bestratefcl');
         Route::get('/listresult', 'BestRateFcl@listresult')->name('list_bestratefcl');
-        Route::get('/getexcelresult', 'BestRateFcl@getexcel')->name('getexcelresult');
+        Route::get('/getexcel', 'BestRateFcl@getexcel')->name('getexcel');
     });
 
     Route::group(['prefix' => 'resultratefcladmin'], function () {
         Route::get('/', 'ResultRateAdmin@index')->name('resultratefcladmin');
         Route::get('/listresult', 'ResultRateAdmin@listresult')->name('list_resultratefcladmin');
         Route::post('/getreport', 'ResultRateAdmin@getreport')->name('getreport');
+        Route::get('/getexcel/', 'ResultRateAdmin@getexcel')->name('getexcel');
     });
 
     Route::group(['prefix' => 'bestratefcladmin'], function () {

@@ -36,6 +36,9 @@
     {{-- fixedcolumn --}}
     <link rel="stylesheet"
         href="{{ asset('public/adminlte/plugins/datatables-fixedcolumns/css/fixedColumns.bootstrap4.min.css') }}">
+    {{-- buttons --}}
+    <link rel="stylesheet"
+        href="{{ asset('public/adminlte/plugins/datatables-buttons/css/buttons.bootstrap4.min.css') }}">
 </head>
 
 <body class="hold-transition sidebar-mini layout-fixed layout-navbar-fixed">
@@ -113,6 +116,12 @@
     {{-- fixedcolumn --}}
     <script src="{{ asset('public/adminlte/plugins/datatables-fixedcolumns/js/dataTables.fixedColumns.min.js') }}">
     </script>
+    {{-- buttons --}}
+    <script src="{{ asset('public/adminlte/plugins/datatables-buttons/js/dataTables.buttons.min.js') }}"></script>
+    <script src="{{ asset('public/adminlte/plugins/datatables-buttons/js/buttons.html5.min.js') }}"></script>
+    <script src="{{ asset('public/adminlte/plugins/datatables-buttons/js/buttons.bootstrap4.min.js') }}"></script>
+    <script src="{{ asset('public/adminlte/plugins/jszip/jszip.min.js') }}"></script>
+
     <script src="{{ asset('public/adminlte/plugins/datatables-fixedcolumns/js/fixedColumns.bootstrap4.min.js') }}">
         < script >
             function spin(id) {

@@ -1,4 +1,26 @@
-<table width="100%" id="datatables" class="table table-bordered table-hover table-striped">
+<?php
+header('Content-type: application/octet-stream');
+header('Content-Disposition: attachment; filename=Report Best Rate FCL_ ' . date('d-m-Y') . '.xlsx');
+header('Pragma: no-cache');
+header('Expires: 0');
+
+?>
+<style type="text/css">
+    table {
+        margin: 20px auto;
+        border-collapse: collapse;
+    }
+
+    table,
+    th,
+    td {
+        border: 1px solid #3c3c3c;
+        padding: 3px 8px;
+
+    }
+</style>
+
+<table>
     <thead>
         <tr>
             <th rowspan="3" style="vertical-align: middle; text-align: center">
@@ -51,19 +73,3 @@
         @endforeach
     </tbody>
 </table>
-<script>
-    $('#datatables').DataTable({
-        // order: [],
-        serverSide: false,
-        processing: true,
-        ordering: false,
-        paging: false,
-        scrollX: true,
-        scrollCollapse: true,
-        lengthChange: true,
-        searching: false,
-        autoWidth: true,
-        // info: false
-        scrollY: screen.height * 0.55,
-    });
-</script>

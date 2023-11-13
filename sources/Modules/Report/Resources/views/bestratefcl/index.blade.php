@@ -11,7 +11,7 @@
                     <h4 class="text-center">REKAPITULASI FORM FCL RATE PB</h4>
                 </div>
                 <div class="card-body">
-                    <div class="row mb-4">
+                    <div class="d-flex">
                         <div class="col-auto">
                             <label>Periode:</label>
                             <select class="form-control select2" style="width: 100%;" name="periode" id="periode">
@@ -28,6 +28,10 @@
                         </div>
                         <div class="col-auto mt-4">
                             <button class="btn btn-success form-control mt-1" type="button" id="btnview">View</button>
+                        </div>
+                        <div id="download" class="col-auto ml-auto mt-4 d-none">
+                            <a href="{{ url('report/bestratefcl/getexcel') }}" type="button"
+                                class="btn btn-warning form-control">Download Excel</a>
                         </div>
                     </div>
                     {{-- <div class="d-flex justify-content-between mb-3">
@@ -69,6 +73,7 @@
                     // dataType: "json",
                     success: function(response) {
                         $('#kontent').html(response);
+                        $('#download').removeClass('d-none');
                     }
                 });
             });
