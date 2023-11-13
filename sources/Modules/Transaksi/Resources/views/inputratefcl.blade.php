@@ -15,11 +15,12 @@
                         <thead>
                             <tr>
                                 <th>#</th>
-                                <th>Country</th>
+                                {{-- <th>Country</th>
                                 <th>POL City</th>
                                 <th>POD City</th>
-                                <th>Shipping Line</th>
+                                <th>Shipping Line</th> --}}
                                 <th>Periode</th>
+                                <th>Expired Date</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
@@ -70,25 +71,29 @@
                         orderable: false,
                         searchable: false
                     },
-                    {
-                        data: 'namecountry',
-                        name: 'namecountry'
-                    },
-                    {
-                        data: 'namepolcity',
-                        name: 'namepolcity'
-                    },
-                    {
-                        data: 'namepodcity',
-                        name: 'namepodcity'
-                    },
-                    {
-                        data: 'nameshipping',
-                        name: 'nameshipping'
-                    },
+                    // {
+                    //     data: 'namecountry',
+                    //     name: 'namecountry'
+                    // },
+                    // {
+                    //     data: 'namepolcity',
+                    //     name: 'namepolcity'
+                    // },
+                    // {
+                    //     data: 'namepodcity',
+                    //     name: 'namepodcity'
+                    // },
+                    // {
+                    //     data: 'nameshipping',
+                    //     name: 'nameshipping'
+                    // },
                     {
                         data: 'periode',
                         name: 'periode'
+                    },
+                    {
+                        data: 'expireddate',
+                        name: 'expireddate'
                     },
                     {
                         data: 'action',

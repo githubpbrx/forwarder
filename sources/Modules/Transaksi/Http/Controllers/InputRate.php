@@ -67,22 +67,26 @@ class InputRate extends Controller
 
             return DataTables::of($data)
                 ->addIndexColumn()
-                ->addColumn('namecountry', function ($data) {
-                    return $data->country->country;
-                })
-                ->addColumn('namepolcity', function ($data) {
-                    return $data->polcity->city;
-                })
-                ->addColumn('namepodcity', function ($data) {
-                    return $data->podcity->city;
-                })
-                ->addColumn('nameshipping', function ($data) {
-                    return $data->shipping->name;
-                })
+                // ->addColumn('namecountry', function ($data) {
+                //     return $data->country->country;
+                // })
+                // ->addColumn('namepolcity', function ($data) {
+                //     return $data->polcity->city;
+                // })
+                // ->addColumn('namepodcity', function ($data) {
+                //     return $data->podcity->city;
+                // })
+                // ->addColumn('nameshipping', function ($data) {
+                //     return $data->shipping->name;
+                // })
                 ->addColumn('periode', function ($data) {
                     $awal = Carbon::parse($data->periodeawal)->format('d M');
                     $akhir = Carbon::parse($data->periodeakhir)->format('d M');
                     return $awal . ' - ' . $akhir;
+                })
+                ->addColumn('expireddate', function ($data) {
+                    $dateku = Carbon::parse($data->expired_date)->format('d M Y');
+                    return $dateku;
                 })
                 ->addColumn('action', function ($data) {
                     $button = '';
