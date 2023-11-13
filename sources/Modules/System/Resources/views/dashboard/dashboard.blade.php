@@ -104,6 +104,17 @@
                                 </p>
                             </div>
                         @endif
+                        @if ($totalinput == 0)
+                            <div class="alert alert-danger" style="background-color: rgb(253, 181, 181)">
+                                <h5><i class="icon fas fa-info"></i> Notification</h5>
+                                <p style="color:black">You got a FCL Rate
+                                    {{-- <span class="badge badge-info">{{ $totalcancel }}</span> --}}
+                                    <br>
+                                    <a href="{{ route('inputratefcl') }}"><button type="button"
+                                            class="btn btn-primary btn-xs">Show</button></a>
+                                </p>
+                            </div>
+                        @endif
                     @endif
                 @else
                     @if ($totalapproval >= 1)
