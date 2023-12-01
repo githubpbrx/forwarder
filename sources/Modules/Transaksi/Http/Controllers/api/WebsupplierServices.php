@@ -260,7 +260,7 @@ class WebsupplierServices extends Controller
 
             $getqtypo = po::where('pono', $pono)->where('line_id', $lineid)->first();
             $cekdifwd = fwd::where('idpo', $getqtypo->id)->where('idmasterfwd', $insert)->where('po_nomor', $pono)->first();
-            if ($cekdifwd) {
+            if ($cekdifwd != null) {
                 $updatefwd = fwd::where('idpo', $getqtypo->id)->where('idmasterfwd', $insert)->where('po_nomor', $pono)->update(['idpo' => $getqtypo->id, 'idmasterfwd' => $insert, 'po_nomor' => $getqtypo->pono, 'qty_allocation' => $getqtypo->qtypo, 'statusforwarder' => 'full_allocated', 'aktif' => 'Y', 'created_at' => date('Y-m-d H:i:s')]);
             } else {
                 $insertdatafwd = fwd::insert(['idpo' => $getqtypo->id, 'idmasterfwd' => $insert, 'po_nomor' => $getqtypo->pono, 'qty_allocation' => $getqtypo->qtypo, 'statusforwarder' => 'full_allocated', 'aktif' => 'Y', 'created_at' => date('Y-m-d H:i:s')]);

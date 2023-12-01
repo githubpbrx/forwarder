@@ -33,13 +33,18 @@ class MappingRate extends Controller
      */
     public function index()
     {
+        $periodeawal = Carbon::now()->startOfMonth()->toDateString();
+        $periodeakhir = Carbon::now()->endOfMonth()->toDateString();
+        $periode[] = date('d M Y', strtotime($periodeawal)) . ' - ' . date('d M Y', strtotime($periodeakhir));
+        // dd($periode);
         $data = [
             'title'     => 'List Mapping Rate FCL',
-            'menu'      => 'mappingratefcl'
+            'menu'      => 'mappingratefcl',
+            'periode'   => $periode
         ];
 
         LogActivity::addToLog('Web Forwarder :: Logistik : Access Menu Mapping Rate FCL', $this->micro);
-        return view('transaksi::mappingratefcl', $data);
+        return view('transaksi::mappingrate.mappingratefcl', $data);
     }
 
     /**
@@ -48,25 +53,13 @@ class MappingRate extends Controller
      */
     public function listmapping()
     {
-        $data = modelmappingratefcl::with(['country', 'polcity', 'podcity', 'shipping'])->where('aktif', 'Y')->select('id', 'id_country', 'id_polcity', 'id_podcity', 'id_shippingline', 'periodeawal', 'periodeakhir', 'expired_date')->get();
+        $data = modelmappingratefcl::where('aktif', 'Y')->select('periodeawal', 'periodeakhir', 'expired_date')->groupby('periodeawal')->groupby('periodeakhir')->get();
         // dd($data);
         return DataTables::of($data)
             ->addIndexColumn()
-            ->addColumn('namecountry', function ($data) {
-                return $data->country->country;
-            })
-            ->addColumn('namepolcity', function ($data) {
-                return $data->polcity->city;
-            })
-            ->addColumn('namepodcity', function ($data) {
-                return $data->podcity->city;
-            })
-            ->addColumn('nameshipping', function ($data) {
-                return $data->shipping->name;
-            })
             ->addColumn('periode', function ($data) {
-                $awal = $data->periodeawal ? Carbon::parse($data->periodeawal)->format('d M') : '';
-                $akhir = $data->periodeakhir ? Carbon::parse($data->periodeakhir)->format('d M') : '';
+                $awal = $data->periodeawal ? Carbon::parse($data->periodeawal)->format('d M Y') : '';
+                $akhir = $data->periodeakhir ? Carbon::parse($data->periodeakhir)->format('d M Y') : '';
                 return $awal . ' - ' . $akhir;
             })
             ->addColumn('expireddate', function ($data) {
@@ -76,59 +69,17 @@ class MappingRate extends Controller
             ->addColumn('action', function ($data) {
                 $button = '';
 
-                $button .= '<a href="#" data-tooltip="tooltip" data-id="' . encrypt($data->id) . '" id="editdata" title="Edit Data"><i class="fa fa-edit fa-lg text-orange actiona"></i></a>';
+                $button .= '<a href="#" data-tooltip="tooltip" data-id="' . encrypt($data->periodeawal) . '" id="infodata" title="Info Data"><i class="fa fa-info fa-lg text-info actiona"></i></a>';
+                $button .= '&nbsp;&nbsp;';
+                $button .= '<a href="#" data-tooltip="tooltip" data-id="' . encrypt($data->periodeawal) . '" id="editdata" title="Edit Data"><i class="fa fa-edit fa-lg text-orange actiona"></i></a>';
                 $button .= '&nbsp;';
-                $button .= '<a href="#" data-id="' . encrypt($data->id) . '" id="delbtn" data-tooltip="tooltip" title="Delete Data"><i class="fa fa-trash fa-lg text-red actiona"></i></a>';
+                $button .= '<a href="#" data-id="' . encrypt($data->periodeawal) . '" id="delbtn" data-tooltip="tooltip" title="Delete Data"><i class="fa fa-trash fa-lg text-red actiona"></i></a>';
 
                 return $button;
             })
             ->make(true);
 
         // return view('master::create');
-    }
-
-    public function getcountry(Request $request)
-    {
-        if (!$request->ajax()) return;
-        $po = country::selectRaw(' id, country');
-
-        if ($request->has('q')) {
-            $search = $request->q;
-            $po = $po->whereRaw(' (country like "%' . $search . '%") ');
-        }
-
-        $po = $po->where('aktif', 'Y')->paginate(10, $request->page);
-        return response()->json($po);
-    }
-
-    public function getpolcity(Request $request)
-    {
-        $idcountry = $request->idcountry;
-
-        $datapolcity = pol_city::where('id_country', $idcountry)->where('aktif', 'Y')->get(['id', 'id_country', 'city']);
-        // dd($datapolcity);
-
-        return response()->json($datapolcity);
-    }
-
-    public function getpodcity(Request $request)
-    {
-        $idpolcity = $request->idpol;
-
-        $datapodcity = pod_city::where('id_polcity', $idpolcity)->where('aktif', 'Y')->get(['id', 'id_polcity', 'city']);
-        // dd($datapodcity);
-
-        return response()->json($datapodcity);
-    }
-
-    public function getshipping(Request $request)
-    {
-        $idpodcity = $request->idpod;
-
-        $dataship = shippingline::where('id_podcity', $idpodcity)->where('aktif', 'Y')->get(['id', 'id_podcity', 'name']);
-        // dd($dataship);
-
-        return response()->json($dataship);
     }
 
     /**
@@ -139,46 +90,55 @@ class MappingRate extends Controller
     public function add(Request $request)
     {
         // dd($request);
-        $idcountry = $request->idcountry;
-        $idpolcity = $request->idpol;
-        $idpodcity   = $request->idpod;
-        $idshipping   = $request->idship;
         $periodeawal = Carbon::now()->startOfMonth()->toDateString();
         $periodeakhir = Carbon::now()->endOfMonth()->toDateString();
         $expireddate = $request->setdate;
 
-        if ($idcountry == '' || $idcountry == null || $idpolcity == '' || $idpolcity == null || $idpodcity == '' || $idpodcity == null || $idshipping == '' || $idshipping == null || $expireddate == '' || $expireddate == null) {
+        if ($expireddate == '' || $expireddate == null) {
             $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'Some Column is Empty, please input data'];
             return response()->json($status, 200);
         }
 
-        $cekship = modelmappingratefcl::where('id_country', $idcountry)->where('id_polcity', $idpolcity)->where('id_podcity', $idpodcity)->where('id_shippingline', $idshipping)->where('aktif', 'Y')->first();
+        $cekship = modelmappingratefcl::where('periodeawal', $periodeawal)->where('periodeakhir', $periodeakhir)->where('aktif', 'Y')->first();
         if ($cekship != null) {
             $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'Mapping is available, please check again'];
             return response()->json($status, 200);
         }
 
-        $saved = modelmappingratefcl::insert([
-            'id_country'      => $idcountry,
-            'id_polcity'      => $idpolcity,
-            'id_podcity'      => $idpodcity,
-            'id_shippingline' => $idshipping,
-            'periodeawal'     => $periodeawal,
-            'periodeakhir'    => $periodeakhir,
-            'expired_date'    => $expireddate,
-            'aktif'           => 'Y',
-            'created_at'      => date('Y-m-d H:i:s'),
-            'created_by'      => Session::get('session')['user_nik']
-        ]);
+        try {
+            $getship = shippingline::where('aktif', 'Y')->get();
+            foreach ($getship as $key => $val) {
+                modelmappingratefcl::insert([
+                    'id_country'      => $val->id_country,
+                    'id_polcity'      => $val->id_polcity,
+                    'id_podcity'      => $val->id_podcity,
+                    'id_shippingline' => $val->id,
+                    'periodeawal'     => $periodeawal,
+                    'periodeakhir'    => $periodeakhir,
+                    'expired_date'    => $expireddate,
+                    'aktif'           => 'Y',
+                    'created_at'      => date('Y-m-d H:i:s'),
+                    'created_by'      => Session::get('session')['user_nik']
+                ]);
+            }
 
-        if ($saved) {
             LogActivity::addToLog('Web Forwarder :: Logistik : Save Mapping Rate FCL', $this->micro);
             $status = ['title' => 'Success', 'status' => 'success', 'message' => 'Data Successfully Saved'];
             return response()->json($status, 200);
-        } else {
-            $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'Data Failed Saved'];
+        } catch (\Exception $e) {
+            $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'Data Failed Saved "' . $e . '" '];
             return response()->json($status, 200);
         }
+    }
+
+    public function info(Request $request)
+    {
+        $periodeawal = decrypt($request->id);
+
+        $getdata = modelmappingratefcl::with(['country', 'polcity', 'podcity', 'shipping'])->where('aktif', 'Y')->select('id', 'id_country', 'id_polcity', 'id_podcity', 'id_shippingline', 'periodeawal', 'periodeakhir', 'expired_date')->where('periodeawal', $periodeawal)->get();
+
+        $form = view('transaksi::mappingrate.modalinfo', ['data' => $getdata]);
+        return $form->render();
     }
 
     /**
@@ -189,9 +149,10 @@ class MappingRate extends Controller
     public function edit(Request $request)
     {
         $id = decrypt($request->id);
-        $data = modelmappingratefcl::with(['country', 'polcity', 'podcity', 'shipping'])->where('id', $id)->where('aktif', 'Y')->first();
+        // dd($id);
+        // $data = modelmappingratefcl::with(['country', 'polcity', 'podcity', 'shipping'])->where('id', $id)->where('aktif', 'Y')->first();
 
-        return response()->json(['status' => 200, 'data' => $data, 'message' => 'Berhasil']);
+        return response()->json(['status' => 200, 'data' => $id, 'message' => 'Berhasil']);
         // return view('master::edit');
     }
 
@@ -205,28 +166,20 @@ class MappingRate extends Controller
     {
         // dd($request);
         $id        = $request->id;
-        $idcountry = $request->idcountry;
-        $idpolcity = $request->idpol;
-        $idpodcity = $request->idpod;
-        $idshipping = $request->idship;
         $expireddate = $request->setdate;
 
-        if ($idcountry == '' || $idcountry == null || $idpolcity == '' || $idpolcity == null || $idpodcity == '' || $idpodcity == null || $idshipping == '' || $idshipping == null || $expireddate == '' || $expireddate == null) {
+        if ($expireddate == '' || $expireddate == null) {
             $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'Some Column is Empty, please input data'];
             return response()->json($status, 200);
         }
 
-        $cekship = modelmappingratefcl::where('id', '!=', $id)->where('id_country', $idcountry)->where('id_polcity', $idpolcity)->where('id_podcity', $idpodcity)->where('id_shippingline', $idshipping)->where('aktif', 'Y')->first();
-        if ($cekship != null) {
-            $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'Shipping Line is available, please check again'];
-            return response()->json($status, 200);
-        }
+        // $cekship = modelmappingratefcl::where('id', '!=', $id)->where('id_country', $idcountry)->where('id_polcity', $idpolcity)->where('id_podcity', $idpodcity)->where('id_shippingline', $idshipping)->where('aktif', 'Y')->first();
+        // if ($cekship != null) {
+        //     $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'Shipping Line is available, please check again'];
+        //     return response()->json($status, 200);
+        // }
 
-        $updateship = modelmappingratefcl::where('id', $request->id)->update([
-            'id_country'      => $idcountry,
-            'id_polcity'      => $idpolcity,
-            'id_podcity'      => $idpodcity,
-            'id_shippingline' => $idshipping,
+        $updateship = modelmappingratefcl::where('periodeawal', $id)->where('aktif', 'Y')->update([
             'expired_date'    => $expireddate,
             'aktif'           => 'Y',
             'updated_at'      => date('Y-m-d H:i:s'),
@@ -234,7 +187,7 @@ class MappingRate extends Controller
         ]);
 
         if ($updateship) {
-            LogActivity::addToLog('Web Forwarder :: Logistik : Update Mapping Line', $this->micro);
+            LogActivity::addToLog('Web Forwarder :: Logistik : Update Mapping Rate', $this->micro);
             $status = ['title' => 'Success', 'status' => 'success', 'message' => 'Data Successfully Updated'];
             return response()->json($status, 200);
         } else {
@@ -252,7 +205,7 @@ class MappingRate extends Controller
     {
         $id = decrypt($id);
 
-        $delete = modelmappingratefcl::where('id', $id)->update([
+        $delete = modelmappingratefcl::where('periodeawal', $id)->where('aktif', 'Y')->update([
             'aktif'       => 'N',
             'updated_at'  => date('Y-m-d H:i:s'),
             'updated_by'  => Session::get('session')['user_nik']

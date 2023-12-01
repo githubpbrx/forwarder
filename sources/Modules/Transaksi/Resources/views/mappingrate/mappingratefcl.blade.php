@@ -11,14 +11,14 @@
                     <button class="btn btn-primary pull-right" id="adddata">Add Data</button>
                 </div>
                 <div class="card-body">
-                    <table id="serverside" class="table table-bordered table-striped">
+                    <table id="serverside" class="table table-bordered table-striped" width="100%">
                         <thead>
                             <tr>
                                 <th>#</th>
-                                <th>Country</th>
+                                {{-- <th>Country</th>
                                 <th>POL City</th>
                                 <th>POD City</th>
-                                <th>Shipping Line</th>
+                                <th>Shipping Line</th> --}}
                                 <th>Periode</th>
                                 <th>Expired Date</th>
                                 <th>Action</th>
@@ -44,7 +44,7 @@
                     <form action="#" class="form-horizontal">
                         <input type="hidden" id="idku">
                         {{ csrf_field() }}
-                        <div class="col-auto">
+                        {{-- <div class="col-auto">
                             <div class="form-group">
                                 <label class="control-label">Name Country</label>
                                 <select class="form-control select2" name="country" id="country">
@@ -75,6 +75,17 @@
                                     <option value=""></option>
                                 </select>
                             </div>
+                        </div> --}}
+                        <div class="col-auto" id="periodeku">
+                            <div class="form-group">
+                                <label class="control-label">Periode</label>
+                                <select class="form-control select2" style="width: 100%;" name="periode" id="periode">
+                                    <option value=""></option>
+                                    @foreach ($periode as $per)
+                                        <option value="{{ $per }}">{{ $per }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
                         </div>
                         <div class="col-auto">
                             <div class="form-group">
@@ -87,6 +98,25 @@
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Cancel</button>
                     <button type="button" class="btn btn-primary pull-left" id="submit">Submit</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="modalinfo">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title"><span id="modaltitle">Data Mapping Rate FCL</span></h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div id="modalinfomapping"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Cancel</button>
                 </div>
             </div>
         </div>
@@ -117,22 +147,6 @@
                         searchable: false
                     },
                     {
-                        data: 'namecountry',
-                        name: 'namecountry'
-                    },
-                    {
-                        data: 'namepolcity',
-                        name: 'namepolcity'
-                    },
-                    {
-                        data: 'namepodcity',
-                        name: 'namepodcity'
-                    },
-                    {
-                        data: 'nameshipping',
-                        name: 'nameshipping'
-                    },
-                    {
                         data: 'periode',
                         name: 'periode'
                     },
@@ -158,7 +172,6 @@
                     show: true,
                     backdrop: 'static'
                 });
-
                 $('#idku').val('');
                 $('#country').empty();
                 $("#polcity").empty().prop('disabled', true);
@@ -166,130 +179,9 @@
                 $('#shipping').empty().prop('disabled', true);
                 $('#setdate').val('');
                 $('#modaltitle').html('Add Data Mapping Rate FCL');
+                $('#periodeku').removeClass('d-none');
             });
 
-            $('#country').select2({
-                placeholder: '-- Choose Country --',
-                ajax: {
-                    url: "{!! route('getcountry') !!}",
-                    dataType: 'json',
-                    delay: 500,
-                    type: 'post',
-                    data: function(params) {
-                        var query = {
-                            q: params.term,
-                            page: params.page || 1,
-                            _token: $('meta[name=csrf-token]').attr('content')
-                        }
-                        return query;
-                    },
-                    processResults: function(data, params) {
-                        return {
-                            results: $.map(data.data, function(item) {
-                                return {
-                                    text: item.country,
-                                    id: item.id,
-                                    selected: true,
-                                }
-                            }),
-                            pagination: {
-                                more: data.to < data.total
-                            }
-                        };
-                    },
-                    cache: true
-                }
-            });
-
-            $('#country').change(function(e) {
-                let idcountry = $(this).val();
-                $.ajax({
-                    type: "POST",
-                    url: "{!! route('getpolcity') !!}",
-                    data: {
-                        _token: $('meta[name=csrf-token]').attr('content'),
-                        idcountry: idcountry,
-                    },
-                    dataType: "JSON",
-                    success: function(data) {
-                        let local = localStorage.getItem("action");
-                        $("#polcity").empty().prop('disabled', true);
-                        let html = '<option selected disabled>-- Choose POL City --</option>'
-                        for (i = 0; i < data.length; i++) {
-                            html += '<option value="' + data[i].id + '">' + data[i]
-                                .city + '</option>'
-                        }
-                        $("#polcity").html(html).select2();
-                        $("#polcity").prop('disabled', false);
-
-                        if (local) {
-                            pol_city(data);
-                        }
-                    }
-                });
-            });
-
-            $('#polcity').change(function(e) {
-                let idpol = $(this).val();
-                $.ajax({
-                    type: "POST",
-                    url: "{!! route('getpodcity') !!}",
-                    data: {
-                        _token: $('meta[name=csrf-token]').attr('content'),
-                        idpol: idpol,
-                    },
-                    dataType: "JSON",
-                    success: function(data) {
-                        let local = localStorage.getItem("action");
-                        $("#podcity").empty().prop('disabled', true);
-                        let html = '<option selected disabled>-- Choose POD City --</option>'
-                        for (i = 0; i < data.length; i++) {
-                            html += '<option value="' + data[i].id + '">' + data[i]
-                                .city + '</option>'
-                        }
-                        $("#podcity").html(html).select2();
-                        $("#podcity").prop('disabled', false);
-
-                        if (local) {
-                            pod_city(data);
-                        }
-                    }
-                });
-            });
-
-            $('#podcity').change(function(e) {
-                let idpod = $(this).val();
-                $.ajax({
-                    type: "POST",
-                    url: "{!! route('getshipping') !!}",
-                    data: {
-                        _token: $('meta[name=csrf-token]').attr('content'),
-                        idpod: idpod,
-                    },
-                    dataType: "JSON",
-                    success: function(data) {
-                        let local = localStorage.getItem("action");
-                        $("#shipping").empty().prop('disabled', true);
-                        let html =
-                            '<option selected disabled>-- Choose Shipping Line --</option>'
-                        for (i = 0; i < data.length; i++) {
-                            html += '<option value="' + data[i].id + '">' + data[i]
-                                .name + '</option>'
-                        }
-                        $("#shipping").html(html).select2();
-                        $("#shipping").prop('disabled', false);
-
-                        if (local) {
-                            shippingline(data);
-                        }
-                        localStorage.clear();
-                    }
-                });
-            });
-
-            var eidpolcity;
-            var eidpodcity;
-            var eidshipping;
             $('body').on('click', '#editdata', function() {
                 $('#modalmapping').modal({
                     show: true,
@@ -305,53 +197,15 @@
                         id: idku,
                     },
                 }).done(function(data) {
-                    localStorage.setItem("action", "edit");
                     let dataku = data.data;
-                    $('#idku').val(dataku.id);
-                    $('#country').empty().html('<option value="' + dataku.id_country + '">' + dataku
-                        .country.country + '</option>').val(dataku.id_country).trigger("change");
-                    eidpodcity = dataku.id_podcity;
-                    eidshipping = dataku.id_shippingline;
-                    eidpolcity = dataku.id_polcity;
-                    $('#setdate').val(dataku.expired_date);
-                    $('#modaltitle').html('Edit Data Shipping Line');
+                    $('#idku').val(dataku);
+                    $('#modaltitle').html('Edit Data Mapping Rate FCL');
+                    $('#periodeku').addClass('d-none');
                 })
             });
 
-            function pol_city(dataku) {
-                $('#polcity').empty();
-                for (let l = 0; l < dataku.length; l++) {
-                    $('#polcity').append('<option value="' + dataku[l].id + '">' + dataku[l]
-                        .city + '</option>');
-                }
-                $('#polcity').val(eidpolcity).trigger("change");
-
-            }
-
-            function pod_city(dataku) {
-                $('#podcity').empty();
-                for (let l = 0; l < dataku.length; l++) {
-                    $('#podcity').append('<option value="' + dataku[l].id + '">' + dataku[l]
-                        .city + '</option>');
-                }
-                $('#podcity').val(eidpodcity).trigger("change");
-            }
-
-            function shippingline(dataku) {
-                $('#shipping').empty();
-                for (let l = 0; l < dataku.length; l++) {
-                    $('#shipping').append('<option value="' + dataku[l].id + '">' + dataku[l]
-                        .name + '</option>');
-                }
-                $('#shipping').val(eidshipping).trigger("change");
-            }
-
             $('#submit').click(function() {
                 let id = $('#idku').val();
-                let country = $('#country').val();
-                let polcity = $('#polcity').val();
-                let podcity = $('#podcity').val();
-                let shipping = $('#shipping').val();
                 let setdate = $('#setdate').val();
 
                 $.ajax({
@@ -362,11 +216,21 @@
                     data: {
                         _token: $('meta[name=csrf-token]').attr('content'),
                         id: id,
-                        idcountry: country,
-                        idpol: polcity,
-                        idpod: podcity,
-                        idship: shipping,
                         setdate: setdate,
+                    },
+                    beforeSend: function() {
+                        Swal.fire({
+                            title: 'Inserting Data ...',
+                            html: 'Please wait',
+                            allowEscapeKey: false,
+                            allowOutsideClick: false,
+                            showCancelButton: false,
+                            showConfirmButton: false,
+                            backdrop: true,
+                            onOpen: () => {
+                                Swal.showLoading()
+                            }
+                        })
                     },
                     success: function(response) {
                         Swal.fire({
@@ -375,7 +239,9 @@
                             type: (response.status != 'error') ? 'success' : 'error'
                         }).then((result) => {
                             $('#modalmapping').modal('hide');
-                            oTable.ajax.reload();
+                            // oTable.ajax.reload();
+                            location.reload();
+                            Swal.close();
                         });
                         return;
                     },
@@ -404,6 +270,20 @@
                             type: "GET",
                             url: "{!! url('transaksi/mappingratefcl/deletemappingratefcl') !!}" + "/" + idku,
                             dataType: "JSON",
+                            beforeSend: function() {
+                                Swal.fire({
+                                    title: 'Deleting Data ...',
+                                    html: 'Please wait',
+                                    allowEscapeKey: false,
+                                    allowOutsideClick: false,
+                                    showCancelButton: false,
+                                    showConfirmButton: false,
+                                    backdrop: true,
+                                    onOpen: () => {
+                                        Swal.showLoading()
+                                    }
+                                })
+                            },
                             success: function(response) {
                                 Swal.fire({
                                     title: response.title,
@@ -412,6 +292,7 @@
                                         'success' : 'error'
                                 }).then(() => {
                                     oTable.ajax.reload();
+                                    Swal.close();
                                 })
                             },
                             error: function(xhr, status, error) {
@@ -426,6 +307,32 @@
                         return false;
                     }
                 })
+            });
+
+            $('body').on('click', '#infodata', function() {
+                console.log('klik :>> ', 'klik');
+                $('#modalinfo').modal({
+                    show: true,
+                    backdrop: 'static'
+                });
+                let idku = $(this).attr('data-id');
+                $.ajax({
+                    url: "{!! route('mappingratefcl_info') !!}",
+                    type: 'POST',
+                    // dataType: 'json',
+                    data: {
+                        _token: $('meta[name=csrf-token]').attr('content'),
+                        id: idku,
+                    },
+                }).done(function(data) {
+                    console.log('data :>> ', data);
+                    $('#modalinfomapping').html(data);
+                })
+            });
+
+            $("#periode").select2({
+                placeholder: "Choose Periode",
+                dropdownAutoWidth: true
             });
         });
     </script>

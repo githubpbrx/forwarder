@@ -74,6 +74,7 @@ Route::prefix('transaksi')->group(function () {
         Route::post('/getpodcity', 'MappingRate@getpodcity')->name('getpodcity');
         Route::post('/getshipping', 'MappingRate@getshipping')->name('getshipping');
         Route::post('/mappingrateedit', 'MappingRate@edit')->name('mappingratefcl_edit');
+        Route::post('/mappingrateinfo', 'MappingRate@info')->name('mappingratefcl_info');
         Route::post('/updatemappingrate', 'MappingRate@update')->name('mappingratefcl_update');
         Route::get('/deletemappingratefcl/{id}', 'MappingRate@destroy')->name('mappingratefcl_delete');
     });
