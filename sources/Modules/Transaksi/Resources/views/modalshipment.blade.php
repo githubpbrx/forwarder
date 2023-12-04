@@ -442,7 +442,6 @@
     $('#etdfix').datepicker({
         changeYear: true,
         changeMonth: true,
-        // minDate: -14,
         dateFormat: "yy-m-dd",
         yearRange: "-100:+20",
     });
@@ -450,7 +449,6 @@
     $('#etafix').datepicker({
         changeYear: true,
         changeMonth: true,
-        // minDate: -14,
         dateFormat: "yy-m-dd",
         yearRange: "-100:+20",
     });

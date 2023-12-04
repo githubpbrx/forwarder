@@ -1,5 +1,7 @@
 <?php
 
+use Illuminate\Support\Facades\Route;
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -58,5 +60,47 @@ Route::prefix('master')->group(function () {
         Route::post('/podedit', 'MasterPOD@edit')->name('masterpod_edit');
         Route::post('/updatepod', 'MasterPOD@update')->name('masterpod_update');
         Route::get('/deletepod/{id}', 'MasterPOD@destroy')->name('masterpod_delete');
+    });
+
+    Route::group(['prefix' => 'country'], function () {
+        Route::get('/', 'MasterCountry@index')->name('mastercountry');
+        Route::get('/listcountry', 'MasterCountry@listcountry')->name('list_country');
+        Route::post('/countryadd', 'MasterCountry@add')->name('mastercountry_add');
+        Route::post('/countryedit', 'MasterCountry@edit')->name('mastercountry_edit');
+        Route::post('/updatecountry', 'MasterCountry@update')->name('mastercountry_update');
+        Route::get('/deletecountry/{id}', 'MasterCountry@destroy')->name('mastercountry_delete');
+    });
+
+    Route::group(['prefix' => 'polcity'], function () {
+        Route::get('/', 'MasterPOL_City@index')->name('masterpolcity');
+        Route::get('/listpolcity', 'MasterPOL_City@listpolcity')->name('list_polcity');
+        Route::post('/polcityadd', 'MasterPOL_City@add')->name('masterpolcity_add');
+        Route::post('/getcountry', 'MasterPOL_City@getcountry')->name('getcountry');
+        Route::post('/polcityedit', 'MasterPOL_City@edit')->name('masterpolcity_edit');
+        Route::post('/updatepolcity', 'MasterPOL_City@update')->name('masterpolcity_update');
+        Route::get('/deletepolcity/{id}', 'MasterPOL_City@destroy')->name('masterpolcity_delete');
+    });
+
+    Route::group(['prefix' => 'podcity'], function () {
+        Route::get('/', 'MasterPOD_City@index')->name('masterpodcity');
+        Route::get('/listpodcity', 'MasterPOD_City@listpodcity')->name('list_podcity');
+        Route::post('/podcityadd', 'MasterPOD_City@add')->name('masterpodcity_add');
+        Route::post('/getcountry', 'MasterPOD_City@getcountry')->name('getcountry');
+        Route::post('/getpolcity', 'MasterPOD_City@getpolcity')->name('getpolcity');
+        Route::post('/podcityedit', 'MasterPOD_City@edit')->name('masterpodcity_edit');
+        Route::post('/updatepodcity', 'MasterPOD_City@update')->name('masterpodcity_update');
+        Route::get('/deletepodcity/{id}', 'MasterPOD_City@destroy')->name('masterpodcity_delete');
+    });
+
+    Route::group(['prefix' => 'shipping'], function () {
+        Route::get('/', 'MasterShippingLine@index')->name('mastershipping');
+        Route::get('/listshipping', 'MasterShippingLine@listshipping')->name('list_shipping');
+        Route::post('/shippingadd', 'MasterShippingLine@add')->name('mastershipping_add');
+        Route::post('/getcountry', 'MasterShippingLine@getcountry')->name('getcountry');
+        Route::post('/getpolcity', 'MasterShippingLine@getpolcity')->name('getpolcity');
+        Route::post('/getpodcity', 'MasterShippingLine@getpodcity')->name('getpodcity');
+        Route::post('/shippingedit', 'MasterShippingLine@edit')->name('mastershipping_edit');
+        Route::post('/updateshipping', 'MasterShippingLine@update')->name('mastershipping_update');
+        Route::get('/deleteshipping/{id}', 'MasterShippingLine@destroy')->name('mastershipping_delete');
     });
 });

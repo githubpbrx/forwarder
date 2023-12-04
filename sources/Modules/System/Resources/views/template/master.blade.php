@@ -33,6 +33,12 @@
     @yield('link_href')
     <!-- Theme style -->
     <link rel="stylesheet" href="{{ asset('public/adminlte/dist/css/adminlte.min.css') }}">
+    {{-- fixedcolumn --}}
+    <link rel="stylesheet"
+        href="{{ asset('public/adminlte/plugins/datatables-fixedcolumns/css/fixedColumns.bootstrap4.min.css') }}">
+    {{-- buttons --}}
+    <link rel="stylesheet"
+        href="{{ asset('public/adminlte/plugins/datatables-buttons/css/buttons.bootstrap4.min.css') }}">
 </head>
 
 <body class="hold-transition sidebar-mini layout-fixed layout-navbar-fixed">
@@ -107,11 +113,20 @@
     @yield('script_src')
     <!-- AdminLTE App -->
     <script src="{{ asset('public/adminlte/dist/js/adminlte.js') }}"></script>
+    {{-- fixedcolumn --}}
+    <script src="{{ asset('public/adminlte/plugins/datatables-fixedcolumns/js/dataTables.fixedColumns.min.js') }}">
+    </script>
+    {{-- buttons --}}
+    <script src="{{ asset('public/adminlte/plugins/datatables-buttons/js/dataTables.buttons.min.js') }}"></script>
+    <script src="{{ asset('public/adminlte/plugins/datatables-buttons/js/buttons.html5.min.js') }}"></script>
+    <script src="{{ asset('public/adminlte/plugins/datatables-buttons/js/buttons.bootstrap4.min.js') }}"></script>
+    <script src="{{ asset('public/adminlte/plugins/jszip/jszip.min.js') }}"></script>
 
-    <script>
-        function spin(id) {
-            $('#' + id).html('<span class="dropdown-header"><i class="fas fa-sync fa-spin"></i></span>');
-        }
+    <script src="{{ asset('public/adminlte/plugins/datatables-fixedcolumns/js/fixedColumns.bootstrap4.min.js') }}">
+        < script >
+            function spin(id) {
+                $('#' + id).html('<span class="dropdown-header"><i class="fas fa-sync fa-spin"></i></span>');
+            }
 
         function toast(alert, desc) {
             const Toast = Swal.mixin({

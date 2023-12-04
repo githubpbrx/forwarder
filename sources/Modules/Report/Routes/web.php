@@ -1,5 +1,7 @@
 <?php
 
+use Illuminate\Support\Facades\Route;
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -58,5 +60,25 @@ Route::prefix('report')->group(function () {
         Route::post('/getdetailshipment/', 'ReportShipment@detailshipment')->name('report_detailshipment');
         Route::get('/getexcelshipment/{id}', 'ReportShipment@excelshipment')->name('report_excelshipment');
         Route::get('/getexcelshipmentall/', 'ReportShipment@excelshipmentall')->name('report_excelshipmentall');
+    });
+
+
+    Route::group(['prefix' => 'bestratefcl'], function () {
+        Route::get('/', 'BestRateFcl@index')->name('bestratefcl');
+        Route::get('/listresult', 'BestRateFcl@listresult')->name('list_bestratefcl');
+        Route::get('/getexcel', 'BestRateFcl@getexcel')->name('getexcel');
+    });
+
+    Route::group(['prefix' => 'resultratefcladmin'], function () {
+        Route::get('/', 'ResultRateAdmin@index')->name('resultratefcladmin');
+        Route::get('/listresult', 'ResultRateAdmin@listresult')->name('list_resultratefcladmin');
+        Route::post('/getreport', 'ResultRateAdmin@getreport')->name('getreport');
+        Route::get('/getexcel/', 'ResultRateAdmin@getexcel')->name('getexcel');
+    });
+
+    Route::group(['prefix' => 'bestratefcladmin'], function () {
+        Route::get('/', 'BestRateFcl@index')->name('bestratefcladmin');
+        Route::get('/listresult', 'BestRateFcl@listresult')->name('list_bestratefcladmin');
+        Route::post('/getbestrate', 'BestRateFcl@getbestrate')->name('getbestrate');
     });
 });

@@ -27,7 +27,7 @@
                     <label class="col-sm-12 control-label">PI Number</label>
                     <div class="col-sm-12">
                         <input type="text" class="form-control" id="nomorpo" name="nomorpo"
-                            value=" {{ implode(', ', $listpi) }}" readonly>
+                            value=" {{ $listpi[0] }}" readonly>
                     </div>
                 </div>
             </div>
@@ -36,7 +36,7 @@
                     <label class="col-sm-12 control-label">Supplier</label>
                     <div class="col-sm-12">
                         <input type="text" class="form-control" id="supplier" name="supplier"
-                            value="{{ implode(', ', $namasup) }}" readonly>
+                            value="{{ $namasup[0] }}" readonly>
                     </div>
                 </div>
             </div>
@@ -79,7 +79,7 @@
                                                     } else {
                                                         $hscode = $dat['poku']['hscode']->hscode;
                                                     }
-                                                    
+
                                                     ?>
                                                     <tr>
                                                         <td>{{ $dat->po_nomor }}</td>
@@ -338,7 +338,6 @@
         $('#datebook').datepicker({
             changeYear: true,
             changeMonth: true,
-            // minDate: -14,
             dateFormat: "yy-m-dd",
             yearRange: "-100:+20",
         });
@@ -350,7 +349,6 @@
             $('#etd').datepicker({
                 changeYear: true,
                 changeMonth: true,
-                // minDate: date1,
                 dateFormat: "yy-m-dd",
                 yearRange: "-100:+20",
             });
@@ -362,7 +360,6 @@
                 $('#eta').datepicker({
                     changeYear: true,
                     changeMonth: true,
-                    // minDate: date2,
                     dateFormat: "yy-m-dd",
                     yearRange: "-100:+20",
                 });
