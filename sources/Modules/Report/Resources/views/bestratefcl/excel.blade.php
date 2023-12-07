@@ -35,6 +35,9 @@ header('Expires: 0');
             <th rowspan="3" style="vertical-align: middle; text-align: center">
                 Shipping Line
             </th>
+            <th rowspan="2" colspan="2" style="vertical-align: middle; text-align: center">
+                Efective Date
+            </th>
             <th colspan="6" class="text-center">Best Rate</th>
         </tr>
         <tr>
@@ -42,6 +45,8 @@ header('Expires: 0');
             <th colspan="3" class="text-center">LSS/Banker</th>
         </tr>
         <tr>
+            <th class="text-center">From</th>
+            <th class="text-center">End</th>
             <th class="text-center">20'</th>
             <th class="text-center">40'</th>
             <th class="text-center">40'HC</th>
@@ -57,6 +62,8 @@ header('Expires: 0');
                 <td>{{ $item->polcity->city }}</td>
                 <td>{{ $item->podcity->city }}</td>
                 <td>{{ $item->shipping->name }}</td>
+                <td>{{ $item->periodeawal }}</td>
+                <td>{{ $item->periodeakhir }}</td>
                 <td>{{ $data[$key]['bestof_20']['bestof20'] }}
                 </td>
                 <td>{{ $data[$key]['bestof_40']['bestof40'] }}
