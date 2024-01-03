@@ -79,7 +79,11 @@
             processing: true,
             serverSide: true,
             ajax: {
-                url: '{{ url('privilege/user_access/privilegedata') }}'
+                url: '{{ url('privilege/user_access/privilegedata') }}',
+                type: 'POST',
+                'headers': {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                }
             },
 
             "fnCreatedRow": function(row, data, index) {

@@ -128,7 +128,7 @@ Route::prefix('privilege')->group(function () {
 
     Route::get('user_access', 'Privileges\privilege@index');
     Route::get('user_accessadd', 'Privileges\privilege@add')->name('user_add');
-    Route::get('user_access/privilegedata', 'Privileges\privilege@privilegedata');
+    Route::post('user_access/privilegedata', 'Privileges\privilege@privilegedata');
     Route::get('user_access/update/{privilege_id}', 'Privileges\privilege@update');
     Route::post('user_access/updateaction', 'Privileges\privilege@updateaction')->name('privilegeupdateaction');
     Route::get('user_access/resetpassword/{nik}', 'Privileges\privilege@resetpassword');
