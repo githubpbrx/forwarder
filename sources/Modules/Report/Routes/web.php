@@ -56,7 +56,7 @@ Route::prefix('report')->group(function () {
     Route::group(['prefix' => 'shipment'], function () {
         Route::get('/', 'ReportShipment@index')->name('reportreadyshipment');
         Route::post('/getpo/', 'ReportShipment@getpo')->name('report_getposhipment');
-        Route::get('search', 'ReportShipment@datatable');
+        Route::post('search', 'ReportShipment@datatable');
         Route::post('/getdetailshipment/', 'ReportShipment@detailshipment')->name('report_detailshipment');
         Route::get('/getexcelshipment/{id}', 'ReportShipment@excelshipment')->name('report_excelshipment');
         Route::get('/getexcelshipmentall/', 'ReportShipment@excelshipmentall')->name('report_excelshipmentall');
