@@ -136,6 +136,10 @@
                 serverSide: true,
                 ajax: {
                     url: "{{ url('report/alokasi/search') }}",
+                    type: 'POST',
+                    'headers': {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
                     data: function(d) {
                         d.pono = $('#datapo').val(),
                             d.idmasterfwd = $('#datafwd').val()
