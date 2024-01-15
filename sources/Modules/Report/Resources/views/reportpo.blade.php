@@ -145,6 +145,10 @@
                 serverSide: true,
                 ajax: {
                     url: "{{ url('report/po/search') }}",
+                    type: 'POST',
+                    'headers': {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
                     data: function(d) {
                         d.po = $('#datapo').val()
                     }
