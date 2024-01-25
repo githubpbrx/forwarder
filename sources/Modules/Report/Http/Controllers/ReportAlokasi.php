@@ -147,6 +147,18 @@ class ReportAlokasi extends Controller
 
                     return $confirmdate;
                 })
+                ->addColumn('dateshipment', function ($data) {
+                    $idformpo = $data['formpo']['id_formpo'];
+                    $getshipment = modelformshipment::where('idformpo', $idformpo)->where('aktif', 'Y')->pluck('created_at');
+                    $dateshipment = str_replace("[", "", str_replace("]", "", str_replace('"', "", $getshipment)));
+                    // if ($data->date_fwd) {
+                    //     $confirmdate = date("Y/m/d", strtotime($data->date_fwd));
+                    // } else {
+                    //     $confirmdate = '';
+                    // }
+
+                    return $dateshipment == '' ? '' : date("Y/m/d", strtotime($dateshipment));
+                })
                 ->addColumn('status', function ($data) {
                     if ($data->statusapproval == 'confirm') {
                         $stat = 'Confirmed';
@@ -425,7 +437,6 @@ class ReportAlokasi extends Controller
 
         return;
     }
-
     function excelalokasiall()
     {
         $getdata = modelforwarder::with(['formpo'])
@@ -440,8 +451,8 @@ class ReportAlokasi extends Controller
 
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
-        $cell = 'A4:K4';
-        $sheet->mergeCells('A2:K2');
+        $cell = 'A4:L4';
+        $sheet->mergeCells('A2:L2');
         $sheet->setCellValue('A4', 'PO');
         $sheet->getColumnDimension('A')->setAutoSize(true);
         $sheet->setCellValue('B4', 'Date');
@@ -462,12 +473,14 @@ class ReportAlokasi extends Controller
         $sheet->getColumnDimension('I')->setAutoSize(true);
         $sheet->setCellValue('J4', 'Date Confirm');
         $sheet->getColumnDimension('J')->setAutoSize(true);
-        $sheet->setCellValue('K4', 'Status');
+        $sheet->setCellValue('K4', 'Date Shipment');
         $sheet->getColumnDimension('K')->setAutoSize(true);
+        $sheet->setCellValue('L4', 'Status');
+        $sheet->getColumnDimension('L')->setAutoSize(true);
 
         $sheet->getStyle($cell)->getAlignment()->setWrapText(true);
         $sheet->getStyle($cell)->getFont()->setBold(true);
-        $sheet->getStyle('A2:K2')->getFont()->setBold(true);
+        $sheet->getStyle('A2:L2')->getFont()->setBold(true);
         $sheet->getStyle($cell)->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID);
         $sheet->getStyle($cell)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
         $sheet->getStyle($cell)->getAlignment()->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER);
@@ -516,12 +529,19 @@ class ReportAlokasi extends Controller
             } else {
                 $stat = 'Waiting';
             }
-            $sheet->setCellValue('K' . $rows, $stat);
+
+            $idformpo = $val['formpo']['id_formpo'];
+            $getshipment = modelformshipment::where('idformpo', $idformpo)->where('aktif', 'Y')->pluck('created_at');
+            $dateshipment = str_replace("[", "", str_replace("]", "", str_replace('"', "", $getshipment)));
+            $shipdate = $dateshipment == '' ? '' : date("d/m/Y", strtotime($dateshipment));
+            $sheet->setCellValue('K' . $rows, $shipdate);
+
+            $sheet->setCellValue('L' . $rows, $stat);
             $rows++;
         }
 
-        $cell = 'A4:K' . ($rows - 1);
-        $sheet->getStyle('A2:K2')->applyFromArray($styleArraytitle);
+        $cell = 'A4:L' . ($rows - 1);
+        $sheet->getStyle('A2:L2')->applyFromArray($styleArraytitle);
         $sheet->getStyle($cell)->applyFromArray($styleArray);
         $sheet->getStyle($cell)->getAlignment()->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER);
 

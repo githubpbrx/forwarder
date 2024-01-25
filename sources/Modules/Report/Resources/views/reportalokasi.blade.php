@@ -78,6 +78,9 @@
                                                 <center>Date Confirm</center>
                                             </th>
                                             <th>
+                                                <center>Date Shipment</center>
+                                            </th>
+                                            <th>
                                                 <center>Status</center>
                                             </th>
                                             <th>
@@ -187,6 +190,10 @@
                     {
                         data: 'dateconfirm',
                         name: 'dateconfirm'
+                    },
+                    {
+                        data: 'dateshipment',
+                        name: 'dateshipment'
                     },
                     {
                         data: 'status',
