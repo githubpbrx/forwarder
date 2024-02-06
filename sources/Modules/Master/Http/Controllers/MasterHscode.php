@@ -212,7 +212,7 @@ class MasterHscode extends Controller
 
         DB::beginTransaction();
         foreach ($datarows as $key => $val) {
-            $rows = $key + 1;
+            // $rows = $key + 1;
             $matcontent = $val[0];
             $hscode = $val[1];
 
@@ -226,9 +226,16 @@ class MasterHscode extends Controller
                     'created_by' => Session::get('session')['user_nik']
                 ]);
             } else {
-                DB::rollBack();
-                $status = ['title' => 'Information!', 'status' => 'error', 'message' => 'Data HS Code is Available. Please Check Your Data in Excel at row  : ' . $rows . ''];
-                return response()->json($status, 200);
+                // DB::rollBack();
+                // $status = ['title' => 'Information!', 'status' => 'error', 'message' => 'Data HS Code is Available. Please Check Your Data in Excel at row  : ' . $rows . ''];
+                // return response()->json($status, 200);
+                $insert = hscode::where('hscode', $hscode)->where('matcontent', $matcontent)->where('aktif', 'Y')->update([
+                    'hscode' => $hscode,
+                    'matcontent' => $matcontent,
+                    'aktif' => 'Y',
+                    'updated_at' => date('Y-m-d H:i:s'),
+                    'updated_by' => Session::get('session')['user_nik']
+                ]);
             }
         }
 
