@@ -33,6 +33,7 @@ Route::prefix('master')->group(function () {
         Route::post('/hscodeedit', 'MasterHscode@edit')->name('masterhscode_edit');
         Route::post('/updatehscode', 'MasterHscode@update')->name('masterhscode_update');
         Route::get('/deletehscode/{id}', 'MasterHscode@destroy')->name('masterhscode_delete');
+        Route::post('/uploadexcel', 'MasterHscode@uploadexcel')->name('masterhscode_uploadexcel');
     });
 
     Route::group(['prefix' => 'route'], function () {

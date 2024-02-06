@@ -2,16 +2,21 @@
 
 namespace Modules\Master\Http\Controllers;
 
+use Modules\System\Helpers\LogActivity;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Illuminate\Routing\Controller;
-use Session, Crypt, DB;
 use Yajra\Datatables\Datatables;
+use Illuminate\Routing\Controller;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Session;
 use Modules\Master\Models\masterhscode as hscode;
+use Modules\System\Models\modelprivilege;
+use Modules\System\Models\Privileges\modelgroup_access;
 
 class MasterHscode extends Controller
 {
     protected $ip_server;
+    protected $micro;
     public function __construct()
     {
         header("Access-Control-Allow-Origin: *");
@@ -30,7 +35,7 @@ class MasterHscode extends Controller
             'menu' => 'masterhscode'
         ];
 
-        \LogActivity::addToLog('Web Forwarder :: Logistik : Access Menu Master HsCode', $this->micro);
+        LogActivity::addToLog('Web Forwarder :: ' . $this->getprivilege() . ' : Access Menu Master HsCode', $this->micro);
         return view('master::masterhscode', $data);
     }
 
@@ -102,7 +107,7 @@ class MasterHscode extends Controller
         ]);
 
         if ($saved) {
-            \LogActivity::addToLog('Web Forwarder :: Logistik : Save Master HSCode', $this->micro);
+            LogActivity::addToLog('Web Forwarder :: ' . $this->getprivilege() . ' : Save Master HSCode', $this->micro);
             $status = ['title' => 'Success', 'status' => 'success', 'message' => 'Data Successfully Saved'];
             return response()->json($status, 200);
         } else {
@@ -160,7 +165,7 @@ class MasterHscode extends Controller
         ]);
 
         if ($updatehscode) {
-            \LogActivity::addToLog('Web Forwarder :: Logistik : Update Master HSCode', $this->micro);
+            LogActivity::addToLog('Web Forwarder :: ' . $this->getprivilege() . ' : Update Master HSCode', $this->micro);
             $status = ['title' => 'Success', 'status' => 'success', 'message' => 'Data Successfully Updated'];
             return response()->json($status, 200);
         } else {
@@ -185,12 +190,68 @@ class MasterHscode extends Controller
         ]);
 
         if ($delete) {
-            \LogActivity::addToLog('Web Forwarder :: Logistik : Delete Master HS Code', $this->micro);
+            LogActivity::addToLog('Web Forwarder :: ' . $this->getprivilege() . ' : Delete Master HS Code', $this->micro);
             $status = ['title' => 'Success', 'status' => 'success', 'message' => 'Data Successfully Deleted'];
             return response()->json($status, 200);
         } else {
             $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'Data Failed Deleted'];
             return response()->json($status, 200);
         }
+    }
+
+    function uploadexcel(Request $request)
+    {
+        $target_dir = basename($_FILES['excel']['name']);
+        move_uploaded_file($_FILES['excel']['tmp_name'], $target_dir);
+        $reader = new \PhpOffice\PhpSpreadsheet\Reader\Xlsx();
+        $reader->setReadDataOnly(true);
+        $sheet = $reader->load($target_dir);
+        $worksheet = $sheet->getActiveSheet();
+        $datarows = $worksheet->toArray();
+        unset($datarows[0]);
+
+        DB::beginTransaction();
+        foreach ($datarows as $key => $val) {
+            $rows = $key + 1;
+            $matcontent = $val[0];
+            $hscode = $val[1];
+
+            $check = hscode::where('matcontent', $matcontent)->where('hscode', $hscode)->where('aktif', 'Y')->exists();
+            if (empty($check)) {
+                $insert = hscode::insert([
+                    'hscode' => $hscode,
+                    'matcontent' => $matcontent,
+                    'aktif' => 'Y',
+                    'created_at' => date('Y-m-d H:i:s'),
+                    'created_by' => Session::get('session')['user_nik']
+                ]);
+            } else {
+                DB::rollBack();
+                $status = ['title' => 'Information!', 'status' => 'error', 'message' => 'Data HS Code is Available. Please Check Your Data in Excel at row  : ' . $rows . ''];
+                return response()->json($status, 200);
+            }
+        }
+
+        if ($insert) {
+            DB::commit();
+            LogActivity::addToLog('Web Forwarder :: ' . $this->getprivilege() . ' : Import Excel HS Code', $this->micro);
+            $status = ['title' => 'Success', 'status' => 'success', 'message' => 'Data Successfully Saved'];
+            return response()->json($status, 200);
+        } else {
+            DB::rollBack();
+            $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'Data Failed Saved'];
+            return response()->json($status, 200);
+        }
+    }
+
+    function getprivilege()
+    {
+        $nik = Session::get('session')['user_nik'];
+
+        $getpriv = modelprivilege::where('privilege_user_nik', $nik)->where('privilege_aktif', 'Y')->first(['privilege_group_access_id']);
+        $getgroupacccess = modelgroup_access::where('group_access_id', $getpriv->privilege_group_access_id)->first(['group_access_name']);
+        $getname = $getgroupacccess->group_access_name;
+
+        return $getname;
     }
 }
