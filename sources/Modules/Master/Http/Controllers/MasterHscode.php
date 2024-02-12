@@ -209,13 +209,29 @@ class MasterHscode extends Controller
         $worksheet = $sheet->getActiveSheet();
         $datarows = $worksheet->toArray();
         unset($datarows[0]);
-
+        foreach ($datarows as $key => $data) {
+            $dud[] = array_filter($data, function ($value) {
+                return !is_null($value) && $value !== '' && $value !== 'NULL';
+            });
+        }
+        $rows = array_filter($dud, function ($value) {
+            return count($value) != 0;
+        });
+        // dd(count($rows));
+        // $ch = array_chunk($datarows, count($datarows));
+        // if ($datarows[0] != '') {
+        //     dd(count($datarows));
+        // }
+        // dd('lewat');
+        // set_time_limit(0);
+        ini_set('max_execution_time', 0);
         DB::beginTransaction();
-        foreach ($datarows as $key => $val) {
+        // dd($datarows);
+        foreach ($rows as $key => $val) {
             // $rows = $key + 1;
+            // dd($val);
             $matcontent = $val[0];
             $hscode = $val[1];
-
             $check = hscode::where('matcontent', $matcontent)->where('hscode', $hscode)->where('aktif', 'Y')->exists();
             if (empty($check)) {
                 $insert = hscode::insert([
