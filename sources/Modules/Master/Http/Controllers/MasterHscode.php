@@ -201,14 +201,14 @@ class MasterHscode extends Controller
 
     function uploadexcel(Request $request)
     {
-        $target_dir = basename($_FILES['excel']['name']);
-        move_uploaded_file($_FILES['excel']['tmp_name'], $target_dir);
+        $file = $request->file('excel');
+        $path = $file->getPathname();
+
         $reader = new \PhpOffice\PhpSpreadsheet\Reader\Xlsx();
-        $reader->setReadDataOnly(true);
-        $sheet = $reader->load($target_dir);
-        $worksheet = $sheet->getActiveSheet();
-        $datarows = $worksheet->toArray();
+        $spreadsheet = $reader->load($path);
+        $datarows = $spreadsheet->getActiveSheet()->toArray();
         unset($datarows[0]);
+
         foreach ($datarows as $key => $data) {
             $dud[] = array_filter($data, function ($value) {
                 return !is_null($value) && $value !== '' && $value !== 'NULL';
@@ -217,21 +217,15 @@ class MasterHscode extends Controller
         $rows = array_filter($dud, function ($value) {
             return count($value) != 0;
         });
-        // dd(count($rows));
-        // $ch = array_chunk($datarows, count($datarows));
-        // if ($datarows[0] != '') {
-        //     dd(count($datarows));
-        // }
-        // dd('lewat');
-        // set_time_limit(0);
+
         ini_set('max_execution_time', 0);
         DB::beginTransaction();
-        // dd($datarows);
+        // dd($rows);
         foreach ($rows as $key => $val) {
             // $rows = $key + 1;
             // dd($val);
             $matcontent = $val[0];
-            $hscode = $val[1];
+            $hscode = $val[1] ?? '';
             $check = hscode::where('matcontent', $matcontent)->where('hscode', $hscode)->where('aktif', 'Y')->exists();
             if (empty($check)) {
                 $insert = hscode::insert([
