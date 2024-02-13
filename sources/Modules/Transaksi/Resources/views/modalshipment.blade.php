@@ -703,7 +703,7 @@
         let hscode = $("input[name='inputhscode[]']")
             .map(function() {
                 if ($(this).val() == '') {
-                    return;
+                    return '';
                 } else {
                     return $(this).val();
                 }

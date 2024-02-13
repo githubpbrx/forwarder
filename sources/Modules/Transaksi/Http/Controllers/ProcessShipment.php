@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Modules\Transaksi\Models\mastersupplier;
+use Modules\System\Helpers\LogActivity;
 use Modules\Transaksi\Models\masterhscode;
 use Modules\Transaksi\Models\modelpo;
 use Modules\Transaksi\Models\modelcontainer;
@@ -22,6 +23,7 @@ use Modules\Transaksi\Models\masterportofdestination;
 
 class ProcessShipment extends Controller
 {
+    protected $micro;
     public function __construct()
     {
         header("Access-Control-Allow-Origin: *");
@@ -41,7 +43,7 @@ class ProcessShipment extends Controller
             'box'   => '',
         );
 
-        \LogActivity::addToLog('Web Forwarder :: Forwarder : Access Menu Process Shipment', $this->micro);
+        LogActivity::addToLog('Web Forwarder :: Forwarder : Access Menu Process Shipment', $this->micro);
         return view('transaksi::process_shipment', $data);
     }
 
@@ -236,7 +238,7 @@ class ProcessShipment extends Controller
             'datapo' => $mydatapo
         );
 
-        \LogActivity::addToLog('Web Forwarder :: Forwarder : Input Data Process Shipment', $this->micro);
+        LogActivity::addToLog('Web Forwarder :: Forwarder : Input Data Process Shipment', $this->micro);
         // return response()->json(['status' => 200, 'data' => $data, 'message' => 'Berhasil']);
         $form = view('transaksi::modalshipment', ['data' => $data]);
         return $form->render();
@@ -292,7 +294,7 @@ class ProcessShipment extends Controller
         $decodeweight = json_decode($request->dataweight);
         $decodematcontent = json_decode($request->datamatcontent);
         $decodehscode = json_decode($request->datahscode);
-        // dd($request);
+        // dd($decodematcontent, $decodehscode);
         // DB::beginTransaction();
         try {
             //code...
@@ -435,11 +437,10 @@ class ProcessShipment extends Controller
             }
 
             foreach ($decodematcontent as $keymat => $valmat) {
+                // dd($decodehscode[1]);
                 $cekhs = masterhscode::where('matcontent', $valmat)->where('aktif', 'Y')->first();
                 if ($cekhs) {
-                    if ($decodehscode != []) {
-                        // dd('masuk2');
-
+                    if ($cekhs->hscode != $decodehscode[$keymat]) {
                         $simpan = masterhscode::where('matcontent', $valmat)->update([
                             'hscode'      => $decodehscode[$keymat],
                             'matcontent'  => $valmat,
@@ -456,14 +457,9 @@ class ProcessShipment extends Controller
                         'created_by'  => Session::get('session')['user_nik']
                     ]);
                 }
-                // if ($simpan) {
-                //     $sukses[] = "OK";
-                // } else {
-                //     $gagal[] = "OK";
-                // }
             }
             DB::commit();
-            \LogActivity::addToLog('Web Forwarder :: Forwarder : Insert Shipment Process by Forwarder', $this->micro);
+            LogActivity::addToLog('Web Forwarder :: Forwarder : Insert Shipment Process by Forwarder', $this->micro);
             $status = ['title' => 'Success', 'status' => 'success', 'message' => 'Data Successfully Saved'];
             return response()->json($status, 200);
         } catch (\Exception $e) {
