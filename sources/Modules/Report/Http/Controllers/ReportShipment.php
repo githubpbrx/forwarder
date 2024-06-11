@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
 use Yajra\DataTables\DataTables;
+use Modules\System\Helpers\LogActivity;
 use Session, Crypt, DB, Mail;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
@@ -33,7 +34,7 @@ class ReportShipment extends Controller
             'box'   => '',
         );
 
-        \LogActivity::addToLog('Web Forwarder :: Logistik : Access Menu Ready Shipment', $this->micro);
+        LogActivity::addToLog('Web Forwarder :: Logistik : Access Menu Ready Shipment', $this->micro);
         return view('report::reportshipment', $data);
     }
 
@@ -50,6 +51,7 @@ class ReportShipment extends Controller
                     ->join('mastersupplier', 'mastersupplier.id', 'po.vendor')
                     ->where('formpo.aktif', 'Y')->where('masterforwarder.aktif', 'Y')->where('formshipment.aktif', 'Y')
                     ->where('mastersupplier.aktif', 'Y')->where('forwarder.aktif', 'Y')
+                    ->where('masterforwarder.kurir', NULL)
                     ->selectRaw(' formshipment.*, formpo.kode_booking, po.id, po.pono, po.matcontents, po.qtypo, po.statusalokasi, po.statusconfirm, po.podate, SUM(po.price * po.qtypo) as amount, po.curr, masterforwarder.name, mastersupplier.nama, forwarder.date_fwd')
                     ->groupby('po.pono')->groupby('formshipment.noinv')
                     ->get();
@@ -62,6 +64,7 @@ class ReportShipment extends Controller
                     ->where('formpo.aktif', 'Y')->where('masterforwarder.aktif', 'Y')->where('formshipment.aktif', 'Y')
                     ->where('mastersupplier.aktif', 'Y')->where('forwarder.aktif', 'Y')
                     ->where('po.pono', $request->po)
+                    ->where('masterforwarder.kurir', NULL)
                     ->selectRaw(' formshipment.*, formpo.kode_booking, po.id, po.pono, po.matcontents, po.qtypo, po.statusalokasi, po.statusconfirm, po.podate, SUM(po.price * po.qtypo) as amount, po.curr, masterforwarder.name, mastersupplier.nama, forwarder.date_fwd')
                     ->groupby('po.pono')->groupby('formshipment.noinv')
                     ->get();
@@ -118,6 +121,7 @@ class ReportShipment extends Controller
         $po = modelformshipment::join('formpo', 'formpo.id_formpo', 'formshipment.idformpo')
             ->join('po', 'po.id', 'formpo.idpo')
             ->join('masterforwarder', 'masterforwarder.id', 'formpo.idmasterfwd')
+            ->where('masterforwarder.kurir', NULL)
             ->where('formpo.aktif', 'Y')->where('masterforwarder.aktif', 'Y')->where('formshipment.aktif', 'Y')
             ->selectRaw(' po.pono ');
 
@@ -147,6 +151,7 @@ class ReportShipment extends Controller
             ->where('formshipment.noinv', $request->id)
             ->where('formshipment.aktif', 'Y')->where('formpo.aktif', 'Y')->where('masterforwarder.aktif', 'Y')->where('mastersupplier.aktif', 'Y')
             ->where('masterhscode.aktif', 'Y')->where('masterportofloading.aktif', 'Y')->where('masterportofdestination.aktif', 'Y')->where('masterroute.aktif', 'Y')
+            ->where('masterforwarder.kurir', NULL)
             ->selectRaw(' formshipment.*, po.pono, po.matcontents, po.itemdesc, po.qtypo, po.colorcode, po.size, po.style, po.plant, formpo.kode_booking, formpo.date_booking , masterforwarder.name, mastersupplier.nama, masterhscode.hscode, masterroute.route_code, masterroute.route_desc, masterportofloading.code_port as loadingcode, masterportofloading.name_port as loadingname, masterportofdestination.code_port as destinationcode, masterportofdestination.name_port as destinationname')
             ->get();
         // dd($data);
@@ -157,6 +162,7 @@ class ReportShipment extends Controller
             ->join('mastersupplier', 'mastersupplier.id', 'po.vendor')
             ->where('formshipment.noinv', $request->id)
             ->where('formshipment.aktif', 'Y')->where('formpo.aktif', 'Y')->where('masterforwarder.aktif', 'Y')->where('mastersupplier.aktif', 'Y')
+            ->where('masterforwarder.kurir', NULL)
             ->selectRaw(' formshipment.id_shipment, formshipment.created_at, formshipment.updated_at ')
             ->latest('id_shipment')->first();
         // dd($getdate);
@@ -182,6 +188,7 @@ class ReportShipment extends Controller
             ->where('formshipment.noinv', $id)
             ->where('formshipment.aktif', 'Y')->where('formpo.aktif', 'Y')->where('masterforwarder.aktif', 'Y')->where('mastersupplier.aktif', 'Y')
             ->where('masterhscode.aktif', 'Y')->where('masterportofloading.aktif', 'Y')->where('masterportofdestination.aktif', 'Y')->where('masterroute.aktif', 'Y')
+            ->where('masterforwarder.kurir', NULL)
             ->selectRaw(' formshipment.*, po.pono, po.matcontents, po.itemdesc, po.qtypo, po.style, po.plant, po.colorcode, po.size, formpo.kode_booking, formpo.date_booking, masterforwarder.name, mastersupplier.nama, masterhscode.hscode, masterroute.route_code, masterroute.route_desc, masterportofloading.code_port as loadingcode, masterportofloading.name_port as loadingname, masterportofdestination.code_port as destinationcode, masterportofdestination.name_port as destinationname')
             ->get();
 
@@ -408,6 +415,7 @@ class ReportShipment extends Controller
             ->join('formpo', 'formpo.idforwarder', 'forwarder.id_forwarder')
             ->join('masterforwarder', 'masterforwarder.id', 'formpo.idmasterfwd')
             ->where('forwarder.aktif', 'Y')->where('formpo.aktif', 'Y')->where('masterforwarder.aktif', 'Y')
+            ->where('masterforwarder.kurir', NULL)
             ->selectRaw(' po.id, po.pono, po.qtypo, po.statusalokasi, po.statusconfirm, forwarder.qty_allocation, formpo.noinv, masterforwarder.name ')
             ->get();
         // dd($getdata);
