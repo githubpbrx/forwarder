@@ -25,6 +25,6 @@ class modelinputratefcl extends Model
 
     public function masterfwd(): HasOne
     {
-        return $this->hasOne(masterforwarder::class, 'id', 'id_forwarder')->where('aktif', 'Y');
+        return $this->hasOne(masterforwarder::class, 'id', 'id_forwarder')->where('kurir', NULL)->where('aktif', 'Y');
     }
 }

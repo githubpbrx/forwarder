@@ -49,6 +49,7 @@ class ReportAlokasi extends Controller
                     ->join('masterforwarder', 'masterforwarder.id', 'forwarder.idmasterfwd')
                     ->where('po_nomor', $request->pono)
                     ->where('idmasterfwd', $request->idmasterfwd)
+                    ->where('masterforwarder.kurir', NULL)
                     ->selectRaw(' forwarder.*,  po.pono, po.podate, po.shipmode, po.curr, po.vendor, po.price, po.qtypo, SUM(po.price * po.qtypo) as amount, po.pideldate, mastersupplier.nama, masterforwarder.name')
                     ->where('forwarder.aktif', 'Y')->where('mastersupplier.aktif', 'Y')->where('masterforwarder.aktif', 'Y')
                     ->groupby('forwarder.po_nomor')->groupby('forwarder.idmasterfwd')
@@ -59,6 +60,7 @@ class ReportAlokasi extends Controller
                     ->join('mastersupplier', 'mastersupplier.id', 'po.vendor')
                     ->join('masterforwarder', 'masterforwarder.id', 'forwarder.idmasterfwd')
                     ->where('po_nomor', $request->pono)
+                    ->where('masterforwarder.kurir', NULL)
                     ->selectRaw(' forwarder.*,  po.pono, po.podate, po.shipmode, po.curr, po.vendor, po.price, po.qtypo, SUM(po.price * po.qtypo) as amount, po.pideldate, mastersupplier.nama, masterforwarder.name')
                     ->where('forwarder.aktif', 'Y')->where('mastersupplier.aktif', 'Y')->where('masterforwarder.aktif', 'Y')
                     ->groupby('forwarder.po_nomor')->groupby('forwarder.idmasterfwd')
@@ -69,6 +71,7 @@ class ReportAlokasi extends Controller
                     ->join('mastersupplier', 'mastersupplier.id', 'po.vendor')
                     ->join('masterforwarder', 'masterforwarder.id', 'forwarder.idmasterfwd')
                     ->where('idmasterfwd', $request->idmasterfwd)
+                    ->where('masterforwarder.kurir', NULL)
                     ->selectRaw(' forwarder.*,  po.pono, po.podate, po.shipmode, po.curr, po.vendor, po.price, po.qtypo, SUM(po.price * po.qtypo) as amount, po.pideldate, mastersupplier.nama, masterforwarder.name')
                     ->where('forwarder.aktif', 'Y')->where('mastersupplier.aktif', 'Y')->where('masterforwarder.aktif', 'Y')
                     ->groupby('forwarder.po_nomor')->groupby('forwarder.idmasterfwd')
@@ -79,6 +82,7 @@ class ReportAlokasi extends Controller
                     ->join('mastersupplier', 'mastersupplier.id', 'po.vendor')
                     ->join('masterforwarder', 'masterforwarder.id', 'forwarder.idmasterfwd')
                     ->selectRaw(' forwarder.*,  po.pono, po.podate, po.shipmode, po.curr, po.vendor, po.price, po.qtypo, SUM(po.price * po.qtypo) as amount, po.pideldate, mastersupplier.nama, masterforwarder.name')
+                    ->where('masterforwarder.kurir', NULL)
                     ->where('forwarder.aktif', 'Y')->where('mastersupplier.aktif', 'Y')->where('masterforwarder.aktif', 'Y')
                     ->groupby('forwarder.po_nomor')->groupby('forwarder.idmasterfwd')
                     ->get();
@@ -213,6 +217,7 @@ class ReportAlokasi extends Controller
 
         if (!$request->ajax()) return;
         $po = modelforwarder::join('masterforwarder', 'masterforwarder.id', 'forwarder.idmasterfwd')
+            ->where('masterforwarder.kurir', NULL)
             ->where('forwarder.aktif', 'Y')
             ->where('masterforwarder.aktif', 'Y')
             ->selectRaw(' masterforwarder.id, masterforwarder.name ');
@@ -258,6 +263,7 @@ class ReportAlokasi extends Controller
             ->join('masterforwarder', 'masterforwarder.id', 'forwarder.idmasterfwd')
             ->where('forwarder.po_nomor', $request->id)
             ->where('forwarder.idmasterfwd', $request->idmasterfwd)
+            ->where('masterforwarder.kurir', NULL)
             ->selectRaw(' forwarder.*, po.pono, po.matcontents, po.itemdesc, po.qtypo, po.colorcode, po.size, po.style, po.plant, masterforwarder.name, mastersupplier.nama, masterhscode.hscode ')
             ->where('forwarder.aktif', 'Y')->where('masterforwarder.aktif', 'Y')->where('mastersupplier.aktif', 'Y')->where('masterhscode.aktif', 'Y')
             ->get();
@@ -277,6 +283,7 @@ class ReportAlokasi extends Controller
             ->where('formpo.kode_booking', $id)
             ->where('formpo.aktif', 'Y')->where('masterforwarder.aktif', 'Y')->where('mastersupplier.aktif', 'Y')
             ->where('masterhscode.aktif', 'Y')
+            ->where('masterforwarder.kurir', NULL)
             ->selectRaw(' formpo.*, po.pono, po.matcontents, po.itemdesc, po.qtypo, po.style, po.plant, po.colorcode, po.size, masterforwarder.name, mastersupplier.nama, masterhscode.hscode ')
             ->get();
 
@@ -444,6 +451,7 @@ class ReportAlokasi extends Controller
             ->join('mastersupplier', 'mastersupplier.id', 'po.vendor')
             ->join('masterforwarder', 'masterforwarder.id', 'forwarder.idmasterfwd')
             ->selectRaw(' forwarder.*,  po.pono, po.podate, po.pideldate, po.shipmode, po.curr, po.vendor, po.price, po.qtypo, SUM(po.price * po.qtypo) as amount, mastersupplier.nama, masterforwarder.name')
+            ->where('masterforwarder.kurir', NULL)
             ->where('forwarder.aktif', 'Y')->where('mastersupplier.aktif', 'Y')->where('masterforwarder.aktif', 'Y')
             ->groupby('forwarder.po_nomor')->groupby('forwarder.idmasterfwd')
             ->get();
