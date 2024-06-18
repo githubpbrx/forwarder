@@ -39,6 +39,8 @@
     {{-- buttons --}}
     <link rel="stylesheet"
         href="{{ asset('public/adminlte/plugins/datatables-buttons/css/buttons.bootstrap4.min.css') }}">
+    {{-- HighCharts --}}
+    {{-- <link rel="stylesheet" href="{{ asset('public/adminlte/plugins/highcharts/highcharts.min.css') }}"> --}}
 </head>
 
 <body class="hold-transition sidebar-mini layout-fixed layout-navbar-fixed">
@@ -121,6 +123,8 @@
     <script src="{{ asset('public/adminlte/plugins/datatables-buttons/js/buttons.html5.min.js') }}"></script>
     <script src="{{ asset('public/adminlte/plugins/datatables-buttons/js/buttons.bootstrap4.min.js') }}"></script>
     <script src="{{ asset('public/adminlte/plugins/jszip/jszip.min.js') }}"></script>
+    {{-- HighCharts --}}
+    <script src="{{ asset('public/adminlte/plugins/highcharts/highcharts.js') }}"></script>
 
     <script src="{{ asset('public/adminlte/plugins/datatables-fixedcolumns/js/fixedColumns.bootstrap4.min.js') }}">
         < script >

@@ -126,6 +126,32 @@ class login extends Controller
         }
     }
 
+    public function loginadmin()
+    {
+        // dd(Hash::make('password123'));
+        if (Session::has('session')) {
+            Session::flash('alert', 'sweetAlert("info", "Already login")');
+            return redirect('dashboard');
+        } else {
+            $this->checkTimeChance();
+            $system = modelsystem::find(1);
+
+            $data_notify = array(
+                'stat' => $system->system_login_notify,
+                'desc' => $system->system_login_description,
+            );
+
+            $data = array(
+                'title' => 'Login',
+            );
+            if ($system->system_login_notify == 1) {
+                Session::flash('notify', $data_notify);
+            }
+            // dd(session()->all());
+            return view('system::login/login_formadmin', $data);
+        }
+    }
+
     public function loginaction(Request $post)
     {
         $nik_en     = $this->enkripsi($post->nik);

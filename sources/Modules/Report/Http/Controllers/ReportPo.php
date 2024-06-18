@@ -3,19 +3,17 @@
 namespace Modules\Report\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
 use Yajra\DataTables\DataTables;
-use Session, Crypt, DB, Mail;
-use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
-
-use Modules\Report\Models\modelprivilege;
+use Modules\System\Helpers\LogActivity;
 use Modules\Report\Models\modelpo;
+use Modules\Report\Models\mastersupplier;
 
 class ReportPo extends Controller
 {
+    protected $micro;
     public function __construct()
     {
         header("Access-Control-Allow-Origin: *");
@@ -31,37 +29,62 @@ class ReportPo extends Controller
             'box'   => '',
         );
 
-        \LogActivity::addToLog('Web Forwarder :: Logistik : Access Menu Outstanding PO', $this->micro);
-        return view('report::reportpo', $data);
+        LogActivity::addToLog('Web Forwarder :: Logistik : Access Menu Outstanding PO', $this->micro);
+        return view('report::outstandingpo.reportpo', $data);
+    }
+
+    public function getchart(Request $request)
+    {
+        $where = '';
+        if ($request->supplier != NULL) {
+            $imp = implode("','", $request->supplier);
+            $where .= " and mastersupplier.id IN ('" . $imp . "')";
+        }
+        if ($request->periode != NULL) {
+            $periode = explode(" - ", $request->periode);
+            $where .= ' and (po.podate BETWEEN "' . $periode[0] . '" AND "' . $periode[1] . '")';
+        }
+        if ($request->po != NULL) {
+            $where .= ' and po.pono="' . $request->po . '"';
+        }
+        $data = mastersupplier::leftJoin('po', 'po.vendor', 'mastersupplier.id')
+            ->selectRaw(" mastersupplier.id, mastersupplier.nama, COUNT(distinct(po.pono)) as jml")
+            ->whereRaw('mastersupplier.aktif="Y" ' . $where . ' ')
+            ->groupBy('mastersupplier.id')
+            ->orderBy('mastersupplier.nama', 'asc')
+            ->get();
+
+        return view('report::outstandingpo.chartpo', [
+            'data' => $data,
+        ]);
     }
 
     public function datatable(Request $request)
     {
         if ($request->ajax()) {
-            if ($request->po == null) {
-                $data = modelpo::join('mastersupplier', 'mastersupplier.id', 'po.vendor')
-                    ->where(function ($var) {
-                        $var->where('po.statusconfirm', '!=', 'confirm')->orWhere('po.statusconfirm', null);
-                    })
-                    ->where('mastersupplier.aktif', 'Y')
-                    ->selectRaw(' po.id, po.pono, po.matcontents, po.podate, sum(po.price * po.qtypo) as amount, po.curr, po.shipmode, mastersupplier.nama ')
-                    ->groupby('po.pono')
-                    ->orderby('po.podate', 'DESC')
-                    ->get();
-            } else {
-                $data = modelpo::join('mastersupplier', 'mastersupplier.id', 'po.vendor')
-                    ->where('po.pono', $request->po)
-                    ->where(function ($var) {
-                        $var->where('po.statusconfirm', '!=', 'confirm')->orWhere('po.statusconfirm', null);
-                    })
-                    ->where('mastersupplier.aktif', 'Y')
-                    ->selectRaw(' po.id, po.pono, po.matcontents, po.podate, sum(po.price * po.qtypo) as amount, po.curr, po.shipmode, mastersupplier.nama ')
-                    ->groupby('po.pono')
-                    ->orderby('po.podate', 'DESC')
-                    ->get();
+            $where = '';
+            if ($request->supplier != NULL) {
+                $imp = implode("','", $request->supplier);
+                $where .= " and mastersupplier.id IN ('" . $imp . "')";
+            }
+            if ($request->periode != NULL) {
+                $periode = explode(" - ", $request->periode);
+                $where .= ' and (po.podate BETWEEN "' . $periode[0] . '" AND "' . $periode[1] . '")';
+            }
+            if ($request->po != NULL) {
+                $where .= ' and po.pono="' . $request->po . '"';
             }
 
-            // dd($data);
+            $data = modelpo::join('mastersupplier', 'mastersupplier.id', 'po.vendor')
+                ->where(function ($var) {
+                    $var->where('po.statusconfirm', '!=', 'confirm')->orWhere('po.statusconfirm', null);
+                })
+                ->whereRaw(' mastersupplier.aktif="Y" ' . $where . '')
+                ->selectRaw(' po.id, po.pono, po.matcontents, po.podate, sum(po.price * po.qtypo) as amount, po.curr, po.shipmode, po.statusconfirm, mastersupplier.nama ')
+                ->groupby('po.pono')
+                ->orderby('po.podate', 'DESC')
+                ->get();
+
             return DataTables::of($data)
                 ->addIndexColumn()
                 ->addColumn('po', function ($data) {
@@ -76,41 +99,19 @@ class ReportPo extends Controller
                 ->addColumn('supplier', function ($data) {
                     return $data->nama;
                 })
-                // ->addColumn('allocation', function ($data) {
-                //     if ($data->statusalokasi == 'full_allocated') {
-                //         $statuspo = 'Full Allocated';
-                //     } elseif ($data->statusalokasi == 'partial_allocated') {
-                //         $statuspo = 'Partial Allocation';
-                //     } else {
-                //         $statuspo = 'Waiting';
-                //     }
-
-                //     return $statuspo;
-                // })
-                // ->addColumn('status', function ($data) {
-                //     if ($data->statusconfirm == 'confirm') {
-                //         $status = 'Confirmed';
-                //     } elseif ($data->statusconfirm == 'reject') {
-                //         $status = 'Rejected';
-                //     } else {
-                //         $status = 'Unprocessed';
-                //     }
-
-                //     return $status;
-                // })
+                ->addColumn('status', function ($data) {
+                    return ($data->statusconfirm == null) ? 'not proccessed' : $data->statusconfirm;
+                })
                 ->addColumn('action', function ($data) {
                     $button = '';
 
-                    $button .= '<a href="#" data-id="' . $data->pono . '" id="detailpo"><i class="fa fa-info-circle"></i></a>';
-                    $button .= '&nbsp';
-                    // $button .= '<a href="' . url('report/po/getexcelpo', ['id' => $data->id]) . '" data-id="#"><i class="fa fa-file-excel text-success"></i></a>';
+                    $button .= '<center><a href="#" data-id="' . $data->pono . '" id="detailpo"><i class="fa fa-info-circle"></i></a></center>';
 
                     return $button;
                 })
                 ->rawColumns(['action'])
                 ->make(true);
         }
-        // return view('transaksi::create');
     }
 
     public function getpo(Request $request)
@@ -119,7 +120,7 @@ class ReportPo extends Controller
         header("Access-Control-Allow-Headers: *");
 
         if (!$request->ajax()) return;
-        $po = modelpo::select('pono')->where('statusconfirm', '!=', 'confirm')->orWhere('statusconfirm', null);
+        $po = modelpo::select('pono');
 
         if ($request->has('q')) {
             $search = $request->q;
@@ -131,19 +132,32 @@ class ReportPo extends Controller
         return response()->json($po);
     }
 
+    public function getsupplier(Request $request)
+    {
+        header("Access-Control-Allow-Origin: *");
+        header("Access-Control-Allow-Headers: *");
+
+        if (!$request->ajax()) return;
+        $po = mastersupplier::select('id', 'nama')->where('aktif', 'Y');
+
+        if ($request->has('q')) {
+            $search = $request->q;
+            $po = $po->whereRaw(' (nama like "%' . $search . '%") ');
+        }
+
+        $po = $po->orderby('nama', 'asc')->groupby('nama')->paginate(10, $request->page);
+
+        return response()->json($po);
+    }
+
     public function detailpo(Request $request)
     {
-        // dd($request);
-
         $datapo = modelpo::join('mastersupplier', 'mastersupplier.id', 'po.vendor')
             ->where('po.pono', $request->id)
             ->selectRaw(' po.pono, po.matcontents, po.itemdesc, po.colorcode, po.size, po.qtypo, po.statusconfirm, mastersupplier.nama')
             ->get();
-        // dd($datapo);
 
         return response()->json(['status' => 200, 'data' => $datapo, 'message' => 'Berhasil']);
-        // $form = view('report::modalreportalokasi', ['data' => $datapo]);
-        // return $form->render();
     }
 
     function excelpo($id)
@@ -152,7 +166,6 @@ class ReportPo extends Controller
             ->where('po.id', $id)
             ->selectRaw(' po.*, mastersupplier.nama')
             ->first();
-        // dd($getdata);
 
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
@@ -236,7 +249,6 @@ class ReportPo extends Controller
 
     function excelpoall()
     {
-        // $getdata = modelpo::get();
         $getdatasum = modelpo::where('statusconfirm', '!=', 'confirm')->orWhereNull('statusconfirm')
             ->selectRaw(' id, pono, sum(price * qtypo) as amount, curr')
             ->groupby('pono')
@@ -247,7 +259,6 @@ class ReportPo extends Controller
             ->where('po.statusconfirm', '!=', 'confirm')->orWhereNull('po.statusconfirm')
             ->selectRaw(' po.id, po.pono, po.matcontents, po.colorcode, po.size , po.podate, mastersupplier.nama ')
             ->get();
-        // dd($getdatasum, $getdata);
 
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
@@ -294,22 +305,6 @@ class ReportPo extends Controller
         ];
 
         $sheet->setCellValue('A' . '2', strtoupper('Data PO'));
-        // for ($i = 0; $i < count($getdata); $i++) {
-        //     for ($a = $i + 1; $a > $i; $a--) {
-        //         if ($getdata[$i]->pono ==  $getdata[$a]->pono) {
-        //             $sheet->mergeCells('A' . $rows . ':' . 'A' . $rows + [$a]);
-        //             $sheet->setCellValue('A' . $rows, $getdata[$i]->pono);
-        //         } else {
-        //             $sheet->setCellValue('A' . $rows, $getdata[$i]->pono);
-        //         }
-        //     }
-        // $sheet->setCellValue('B' . $rows, $value->matcontents);
-        // $sheet->setCellValue('C' . $rows, $value->colorcode);
-        // $sheet->setCellValue('D' . $rows, $value->size);
-        // $sheet->setCellValue('E' . $rows, $value->amount . ' ' . $value->curr);
-        // $sheet->setCellValue('F' . $rows, $value->nama);
-        //     $rows++;
-        // }
         foreach ($getdatasum as $key => $value) {
             $sheet->setCellValue('A' . $rows, $value->pono);
             $sheet->setCellValue('B' . $rows, $value->matcontents);

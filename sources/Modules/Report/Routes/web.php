@@ -19,6 +19,8 @@ Route::prefix('report')->group(function () {
     Route::group(['prefix' => 'po'], function () {
         Route::get('/', 'ReportPo@index')->name('reportpo');
         Route::post('/getpo/', 'ReportPo@getpo')->name('report_getpo');
+        Route::post('/getsupplier/', 'ReportPo@getsupplier')->name('report_getsupplier');
+        Route::post('/getchart/', 'ReportPo@getchart')->name('report_getchart');
         Route::post('search', 'ReportPo@datatable');
         Route::post('/getdetailpo/', 'ReportPo@detailpo')->name('report_detailpo');
         Route::get('/getexcelpo/{id}', 'ReportPo@excelpo')->name('report_excelpo');

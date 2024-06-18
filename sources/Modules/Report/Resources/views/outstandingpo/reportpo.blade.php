@@ -6,67 +6,88 @@
 
 @section('content')
     <div class="row" style="font-size: 10pt;">
-        <div class="col-lg-12">
-            <div class="card card-primary">
+        <div class="col-12">
+            <div class="card card-outline card-primary">
                 <div class="row">
                     <div class="col-md-12">
-                        <div id="fullscreen-container" class="card-body" style="overflow-y: auto;">
-                            <div class="row justify-content-between col-md-12 ">
-                                <div class="row col-md-6">
-                                    <div class="col-md-4">
-                                        <label class="control-label">Choose PO :</label>
-                                        <div class="col-sm-12">
-                                            <select class="select2" style="width: 100%;" name="datapo" id="datapo">
-                                                <option value=""></option>
-                                            </select>
+                        <div class="card-body" style="overflow-y: auto;">
+                            <div class="row">
+                                <div>
+                                    <label class="control-label">PO :</label>
+                                    <select class="select2" style="width: 100%;" name="datapo" id="datapo">
+                                        <option value=""></option>
+                                    </select>
+                                </div>
+                                <div class="ml-2">
+                                    <label class="control-label">Supplier :</label>
+                                    <select class="select2" style="width: 100%;" name="datasupp" id="datasupp"
+                                        multiple="multiple">
+                                        <option value=""></option>
+                                    </select>
+                                </div>
+                                <div class="ml-2">
+                                    <label class="control-label">Periode :</label>
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text">
+                                                <i class="far fa-calendar-alt"></i>
+                                            </span>
                                         </div>
+                                        <input type="text" id="periode" class="form-control float-right"
+                                            autocomplete="off">
                                     </div>
-                                    <div class="col-md-3">
-                                        <label class="control-label"> &nbsp; </label>
-                                        <div class="col-sm-12">
-                                            <a href="#" type="button" id="search"
-                                                class="btn btn-info form-control" data-value="klik">Search</a>
+                                </div>
+                                <div class="ml-2">
+                                    <label class="control-label">&nbsp;</label>
+                                    <a href="#" type="button" id="search" class="btn btn-info form-control"
+                                        data-value="klik">Search</a>
+                                </div>
+                            </div>
+                            <div class="row mt-3 mb-2">
+                                <div class="col-12">
+                                    <div class="card">
+                                        <div class="card-body overflow-auto">
+                                            <div id="mychartpo"></div>
                                         </div>
                                     </div>
                                 </div>
-                                {{-- <div class="col-md-2">
-                                    <label class="control-label"> &nbsp; </label>
-                                    <a href="{{ url('report/po/getexcelpoall') }}" type="button"
-                                        class="btn btn-warning form-control">Download Excel</a>
-                                </div> --}}
                             </div>
-                            <br>
-                            <div class="table-responsive">
-                                <table id="dataTables" class="table table-bordered table-striped table-hover"
-                                    style="width:100%">
-                                    <thead>
-                                        <tr>
-                                            <th>
-                                                <center>NO</center>
-                                            </th>
-                                            <th>
-                                                <center>PO</center>
-                                            </th>
-                                            <th>
-                                                <center>Date</center>
-                                            </th>
-                                            <th>
-                                                <center>Amount</center>
-                                            </th>
-                                            <th>
-                                                <center>Supplier</center>
-                                            </th>
-                                            <th>
-                                                <center>Shipmode</center>
-                                            </th>
-                                            <th>
-                                                <center>Action</center>
-                                            </th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                    </tbody>
-                                </table>
+                            <div class="row">
+                                <div class="table-responsive">
+                                    <table id="dataTables" class="table table-bordered table-striped table-hover"
+                                        style="width:100%">
+                                        <thead>
+                                            <tr>
+                                                <th>
+                                                    <center>NO</center>
+                                                </th>
+                                                <th>
+                                                    <center>PO</center>
+                                                </th>
+                                                <th>
+                                                    <center>Date</center>
+                                                </th>
+                                                <th>
+                                                    <center>Amount</center>
+                                                </th>
+                                                <th>
+                                                    <center>Supplier</center>
+                                                </th>
+                                                <th>
+                                                    <center>Shipmode</center>
+                                                </th>
+                                                <th>
+                                                    <center>Status</center>
+                                                </th>
+                                                <th>
+                                                    <center>Action</center>
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                        </tbody>
+                                    </table>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -138,6 +159,34 @@
                 }
             });
 
+            $('#periode').daterangepicker({
+                autoUpdateInput: false,
+                locale: {
+                    cancelLabel: 'Clear'
+                }
+            });
+
+            $('#periode').on('apply.daterangepicker', function(ev, picker) {
+                $(this).val(picker.startDate.format('YYYY-MM-DD') + ' - ' + picker.endDate.format(
+                    'YYYY-MM-DD'));
+            });
+
+            $('#periode').on('cancel.daterangepicker', function(ev, picker) {
+                $(this).val('');
+            });
+
+            $.ajax({
+                type: "POST",
+                url: "{!! route('report_getchart') !!}",
+                beforeSend: function(response) {
+                    $('#mychartpo').html(
+                        '<h6 class="text-center mt-5"><span class="fa-stack text-info"><i class="fas fa-circle fa-stack-2x"></i><i class="fas fa-hourglass-half fa-spin fa-stack-1x fa-inverse"></i></span> Please wait! Checking Chart PO...</h6>'
+                    );
+                },
+                success: function(response) {
+                    $('#mychartpo').html(response);
+                }
+            });
 
             var tabel = $('#dataTables').DataTable({
                 order: [],
@@ -150,7 +199,9 @@
                         'X-CSRF-TOKEN': '{{ csrf_token() }}'
                     },
                     data: function(d) {
-                        d.po = $('#datapo').val()
+                        d.po = $('#datapo').val(),
+                            d.supplier = $('#datasupp').val(),
+                            d.periode = $('#periode').val()
                     }
                 },
                 columns: [{
@@ -176,6 +227,10 @@
                         name: 'shipmode'
                     },
                     {
+                        data: 'status',
+                        name: 'status'
+                    },
+                    {
                         data: 'action',
                         name: 'action'
                     },
@@ -198,6 +253,23 @@
 
             $('#search').click(function(e) {
                 tabel.draw();
+                $.ajax({
+                    type: "POST",
+                    url: "{!! route('report_getchart') !!}",
+                    data: {
+                        po: $('#datapo').val(),
+                        supplier: $('#datasupp').val(),
+                        periode: $('#periode').val()
+                    },
+                    beforeSend: function(response) {
+                        $('#mychartpo').html(
+                            '<h6 class="text-center mt-5"><span class="fa-stack text-info"><i class="fas fa-circle fa-stack-2x"></i><i class="fas fa-hourglass-half fa-spin fa-stack-1x fa-inverse"></i></span> Please wait! Checking Chart PO...</h6>'
+                        );
+                    },
+                    success: function(response) {
+                        $('#mychartpo').html(response);
+                    }
+                });
                 // table.ajax.reload();
             });
 
@@ -234,6 +306,39 @@
                 }
             });
 
+            $('#datasupp').select2({
+                placeholder: '-- Choose Supplier --',
+                ajax: {
+                    url: "{!! url('report/po/getsupplier') !!}",
+                    dataType: 'json',
+                    delay: 500,
+                    type: 'post',
+                    data: function(params) {
+                        var query = {
+                            q: params.term,
+                            page: params.page || 1,
+                            _token: $('meta[name=csrf-token]').attr('content')
+                        }
+                        return query;
+                    },
+                    processResults: function(data, params) {
+                        return {
+                            results: $.map(data.data, function(item) {
+                                return {
+                                    text: item.nama,
+                                    id: item.id,
+                                    selected: true,
+                                }
+                            }),
+                            pagination: {
+                                more: data.to < data.total
+                            }
+                        };
+                    },
+                    cache: true
+                }
+            });
+
             $('body').on('click', '#detailpo', function() {
                 $('#detailpomodal').modal({
                     show: true,
@@ -249,7 +354,6 @@
                         id: idku,
                     },
                 }).done(function(data) {
-                    console.log('dataku :>> ', data.data);
                     let datapo = data.data;
 
                     $('#formdetailpo').empty();

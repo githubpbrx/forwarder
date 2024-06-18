@@ -71,6 +71,10 @@ Route::prefix('')->group(function () {
     Route::get('/login2', 'login@loginitgo');
     Route::post('/loginitgoaction', 'login@loginitgoaction');
 
+    //login admin
+    Route::get('/loginadmin', 'login@loginadmin');
+    Route::post('/loginadminaction', 'login@loginadminaction');
+
     //forgot password
     Route::get('/forgotpassword', 'login@forgotpasswordstep1');
     Route::post('/forgotpassword', 'login@forgotpasswordstep2');
