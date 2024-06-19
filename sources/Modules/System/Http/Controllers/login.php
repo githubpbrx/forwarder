@@ -6,8 +6,12 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
-use Session, Crypt, DB, Mail;
+use Crypt;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Storage;
+use Modules\System\Helpers\LogActivity;
 
 use GuzzleHttp\Client;
 use Illuminate\Support\Facades\Hash;
@@ -24,6 +28,7 @@ use Modules\System\Models\modelsystem,
 class login extends Controller
 {
     protected $ip_server;
+    protected $micro;
     public function __construct()
     {
         $this->ip_server = config('api.url.ip_address');
@@ -58,7 +63,7 @@ class login extends Controller
                 $message->to($email);
             });
             return 1;
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             return 0;
         }
     }
@@ -141,8 +146,15 @@ class login extends Controller
                 'desc' => $system->system_login_description,
             );
 
+            $masterfwd = masterforwarder::join('privilege', 'privilege.privilege_user_name', 'masterforwarder.name')
+                ->select('masterforwarder.name', 'privilege.privilege_user_nik')
+                ->where('masterforwarder.aktif', 'Y')
+                ->where('privilege.privilege_aktif', 'Y')
+                ->get();
+
             $data = array(
                 'title' => 'Login',
+                'masterfwd' => $masterfwd,
             );
             if ($system->system_login_notify == 1) {
                 Session::flash('notify', $data_notify);
@@ -190,7 +202,7 @@ class login extends Controller
                             'user_nama'  => $ceklogin->privilege_user_name
                         );
                         Session::put('session', $session);
-                        \LogActivity::addToLog('Web Forwarder :: Forwarder : Success Login to Forwarder', $this->micro);
+                        LogActivity::addToLog('Web Forwarder :: Forwarder : Success Login to Forwarder', $this->micro);
                         $this->choosemenu();
                         // Session::flash('alert', 'sweetAlert("success", "Successfully Login")');
                         Session::flash('toast', 'sweetAlert("success", "Successfully Login")');
@@ -278,7 +290,7 @@ class login extends Controller
                             Session::put('session', $session);
 
                             $this->createPrivilege($this->dekripsi($login_data['a']), $this->dekripsi($login_data['b']));
-                            \LogActivity::addToLog('Web Forwarder :: Logistik : Success Login to Logistik', $this->micro);
+                            LogActivity::addToLog('Web Forwarder :: Logistik : Success Login to Logistik', $this->micro);
                             Session::flash('toast', 'sweetAlert("success", "Successfully Login")');
                             $this->choosemenu();
                             return redirect('dashboard');
@@ -345,7 +357,7 @@ class login extends Controller
                             'user_nama'  => $ceklogin->privilege_user_name
                         );
                         Session::put('session', $session);
-                        \LogActivity::addToLog('Web Forwarder :: Forwarder : Success Login to Forwarder', $this->micro);
+                        LogActivity::addToLog('Web Forwarder :: Forwarder : Success Login to Forwarder', $this->micro);
                         $this->choosemenu();
                         // Session::flash('alert', 'sweetAlert("success", "Successfully Login")');
                         Session::flash('toast', 'sweetAlert("success", "Successfully Login")');
@@ -437,7 +449,7 @@ class login extends Controller
                             Session::put('session', $session);
 
                             $this->createPrivilege($this->dekripsi($login_data['a']), $this->dekripsi($login_data['b']));
-                            \LogActivity::addToLog('Web Forwarder :: Logistik : Success Login to Logistik', $this->micro);
+                            LogActivity::addToLog('Web Forwarder :: Logistik : Success Login to Logistik', $this->micro);
                             Session::flash('toast', 'sweetAlert("success", "Successfully Login")');
                             $this->choosemenu();
                             return redirect('dashboard');
@@ -451,6 +463,115 @@ class login extends Controller
                     Session::flash('alert', 'sweetAlert("error", "Account not found", "Chance : ' . $this->loginChance() . ' time")');
                     return redirect('login2');
                 }
+            }
+        }
+    }
+
+    public function loginadminaction(Request $post)
+    {
+        // dd($post);
+        $nik_en     = $this->enkripsi($post->nik);
+        $nik        = $post->nik;
+        $password   = $post->password;
+        $fwd        = $post->masterfwd;
+
+        //cek
+        $ceklogin = modelprivilege::where('privilege_user_nik', $nik)->where('privilege_aktif', 'Y')->first();
+
+        if ($ceklogin == null) {
+            $this->loginChance();
+            Session::flash('alert', 'sweetAlert("error", "Access Denied", "Chance : ' . $this->loginChance() . ' time")');
+            return redirect('login');
+        } else {
+            if ($ceklogin->privilege_aktif == 'N') {
+                $this->loginChance();
+                Session::flash('alert', 'sweetAlert("error", "User Access Denied/User Not Found", "Chance : ' . $this->loginChance() . ' time")');
+                return redirect('login');
+            }
+
+            //get the data
+            $login_url        = 'http://' . $this->ip_server . '/api/login.php?n=' . $nik_en;
+            $login_client     = new Client();
+            $login_res        = $login_client->get($login_url);
+            $login_data_enkripsi = json_decode(base64_decode($login_res->getBody()), TRUE);
+            //decrypt the data
+            foreach ($login_data_enkripsi as $key => $data_enkripsi) {
+                $login_data[$this->dekripsi($key)] = $data_enkripsi;
+            }
+            $detail_url        = 'http://' . $this->ip_server . '/api/detail.php?n=' . $nik_en;
+            $detail_client     = new Client();
+            $detail_res        = $detail_client->get($detail_url);
+            $detail_data_enkripsi = json_decode(base64_decode($detail_res->getBody()), TRUE);
+            foreach ($detail_data_enkripsi as $key => $data_enkripsi) {
+                $detail_data[$this->dekripsi($key)] = $data_enkripsi;
+            }
+
+            if (array_key_exists('a', $login_data)) {
+                $nik_decrypt = $this->dekripsi($login_data['a']);
+                $pass = FALSE;
+
+                if (Hash::check($password, $login_data['d'])) {
+                    $pass = TRUE;
+                }
+
+                if (($nik_decrypt == $nik) && ($pass == TRUE)) {
+                    //jika password masih default
+                    if (Hash::check('password123', $login_data['d'])) {
+                        $session = array(
+                            'tmp_nik'   => $this->dekripsi($login_data['a']),
+                            'tmp_nama'  => $this->dekripsi($login_data['b']),
+                        );
+
+                        Session::put('tmp', $session);
+                        $this->createPrivilege($this->dekripsi($login_data['a']), $this->dekripsi($login_data['b']));
+                        Session::flash('alert', 'sweetAlert("info", "Please input New Password")');
+                        return redirect(url('login/newpassword'));
+                    } elseif (date('Y-m-d') >= date('Y-m-d', strtotime($this->dekripsi($login_data['j'])))) {
+                        $session = array(
+                            'user_nik'   => $this->dekripsi($login_data['a']),
+                            'user_nama'  => $this->dekripsi($login_data['b']),
+                            'user_perusahaan' => $this->dekripsi($detail_data['b']),
+                            'user_bagian'   => $this->dekripsi($detail_data['e']),
+                            'user_jabatan'  => $this->dekripsi($detail_data['f']),
+                            'user_sbu'      => $this->dekripsi($detail_data['g']),
+                        );
+                        Session::put('session', $session);
+                        // dd(session()->all());
+                        Session::flash('alert', 'sweetAlert("info", "Please input New Password !")');
+                        // return view('system::login/login_password_expired', $data);
+                        return redirect(url('login/pass_exp'));
+                    } else {
+                        $getfwd = modelprivilege::where('privilege_user_nik', $fwd)->where('privilege_aktif', 'Y')->first();
+                        $session = array(
+                            'user_nik'   => $getfwd->privilege_user_nik,
+                            'user_nama'  => $getfwd->privilege_user_name
+                        );
+
+                        Session::put('session', $session);
+                        LogActivity::addToLog('Web Forwarder :: Admin : Success Login to Admin', $this->micro);
+                        $this->choosemenu();
+                        Session::flash('toast', 'sweetAlert("success", "Successfully Login")');
+                        $priv = modelprivilege::where('privilege_user_nik', $fwd)->where('privilege_aktif', 'Y')->first();
+                        Session::put('sessionfwd', $priv->leadforwarder);
+
+                        $cocdate =  Carbon::parse($getfwd->coc_date)->subDays(1)->addYear();
+                        $now =  Carbon::now();
+                        $bool = $now->gt($cocdate);
+                        if ($bool) {
+                            Session::flash('alert', 'sweetAlert("error", "COC is Expired, Please Input Again!!")');
+                            return redirect('validasicoc');
+                        } else {
+                            return redirect('dashboard');
+                        }
+                    }
+                } else {
+                    $this->loginChance();
+                    Session::flash('alert', 'sweetAlert("error", "Username or Password wrong", "Chance : ' . $this->loginChance() . ' time")');
+                    return redirect('login');
+                }
+            } else {
+                Session::flash('alert', 'sweetAlert("error", "Account not found", "Chance : ' . $this->loginChance() . ' time")');
+                return redirect('login');
             }
         }
     }
@@ -487,7 +608,7 @@ class login extends Controller
         if ($question1 == $answer1 && $question2 == $answer2) {
             // return view('system::login/login_forgot_password', $data);
             Session::flash('alert', 'toast("success", "Yeay, Success")');
-            \LogActivity::addToLog('Web Forwarder : Process Forgot Password', $this->micro);
+            LogActivity::addToLog('Web Forwarder : Process Forgot Password', $this->micro);
             return view('system::login/login_forgot_password', $data);
         } else {
             Session::flash('alert', 'sweetAlert("error", "Wrong Answer")');
@@ -510,7 +631,7 @@ class login extends Controller
             } else {
                 try {
                     $this->apiForgotPassword($nik, $password);
-                    \LogActivity::addToLog('Web Forwarder : Success Password changed', $this->micro);
+                    LogActivity::addToLog('Web Forwarder : Success Password changed', $this->micro);
                     Session::flash('alert', 'sweetAlert("success", "Password changed, please login again")');
                 } catch (\Exception $e) {
                     Session::flash('alert', 'sweetAlert("error", ' . $e . ')');
@@ -650,7 +771,7 @@ class login extends Controller
         $param = modelsystem::first();
         $url = $param->url . 'getvalidation/' . base64_encode($cek->token) . '/' . $this->enkripsi($user) . '/' . $this->enkripsi($cek->kode);
         login::sendEmail($user, $nama, $cek->kode, $url, "Web Forwarder User Activation");
-        \LogActivity::addToLog('Web Forwarder :: Forwarder : Process Resend Email', $this->micro);
+        LogActivity::addToLog('Web Forwarder :: Forwarder : Process Resend Email', $this->micro);
         Session::flash('alert', 'sweetAlert("success", "Please check your email again")');
         return redirect()->back();
     }
@@ -688,7 +809,7 @@ class login extends Controller
                 $token = Hash::make('ittetapsemangant');
                 $kode = rand(11111, 99999);
                 $update = modelprivilege::where('privilege_user_nik', $user)->where('privilege_aktif', 'Y')->update(['kode' => $kode, 'token' => $token, 'kode_validate' => 'Y']);
-                \LogActivity::addToLog('Web Forwarder :: Forwarder : Account Activation', $this->micro);
+                LogActivity::addToLog('Web Forwarder :: Forwarder : Account Activation', $this->micro);
 
                 if ($update) {
                     // Session::flash('alert', 'sweetAlert("success", "Your user is already active")');
@@ -757,7 +878,7 @@ class login extends Controller
             'datafwd' => $masterfwd,
         );
 
-        \LogActivity::addToLog('Web Forwarder :: Forwarder : Process Input Data CoC by Forwarder', $this->micro);
+        LogActivity::addToLog('Web Forwarder :: Forwarder : Process Input Data CoC by Forwarder', $this->micro);
         return view('system::login/aktifasicoc', $data);
     }
 
@@ -796,7 +917,7 @@ class login extends Controller
 
         if ($submit && $cocupdate) {
             DB::commit();
-            \LogActivity::addToLog('Web Forwarder :: Forwarder : Insert Data Validation CoC', $this->micro);
+            LogActivity::addToLog('Web Forwarder :: Forwarder : Insert Data Validation CoC', $this->micro);
             $status = ['title' => 'Success', 'status' => 'success', 'message' => 'Data Successfully Saved'];
             return response()->json($status, 200);
         } else {
@@ -835,7 +956,7 @@ class login extends Controller
             'kycku'    => $statuskyc
         );
 
-        \LogActivity::addToLog('Web Forwarder :: Forwarder : Process Input Data KYC', $this->micro);
+        LogActivity::addToLog('Web Forwarder :: Forwarder : Process Input Data KYC', $this->micro);
         return view('system::login/aktifasikyc', $data);
     }
 
@@ -920,7 +1041,7 @@ class login extends Controller
         }
 
         if ($save1) {
-            \LogActivity::addToLog('Web Forwarde :: Forwarder : Insert Data Validation KYC ', $this->micro);
+            LogActivity::addToLog('Web Forwarde :: Forwarder : Insert Data Validation KYC ', $this->micro);
             $status = ['title' => 'Success', 'status' => 'success', 'message' => 'Data Successfully Saved'];
             return response()->json($status, 200);
         } else {
@@ -944,7 +1065,7 @@ class login extends Controller
         $param = modelsystem::first();
         $url = $param->url . 'getvalidation/' . base64_encode($cek->token) . '/' . $this->enkripsi($user) . '/' . $this->enkripsi($cek->kode);
         login::sendEmail($user, $nama, $cek->kode, $url, "Web Forwarder User Activation");
-        \LogActivity::addToLog('Web Forwarder : Send Email to Finance', $this->micro);
+        LogActivity::addToLog('Web Forwarder : Send Email to Finance', $this->micro);
         Session::flash('alert', 'sweetAlert("success", "Please check your email again")');
         return redirect()->back();
     }
@@ -983,7 +1104,7 @@ class login extends Controller
             return redirect(url('login/pass_exp'));
         } else {
             $this->apiForgotPassword($nik, $newpass);
-            \LogActivity::addToLog('Web Forwarder : Success Save Password Expired', $this->micro);
+            LogActivity::addToLog('Web Forwarder : Success Save Password Expired', $this->micro);
             Session::flash('alert', 'sweetAlert("success", "Please Login with New Password !")');
             return redirect('login');
         }
@@ -1140,7 +1261,7 @@ class login extends Controller
     public function logout()
     {
         $this->middleware('checklogin');
-        \LogActivity::addToLog('Forwarder : Logout', $this->micro);
+        LogActivity::addToLog('Forwarder : Logout', $this->micro);
         Session::flush();
         return redirect('login')->with('alert', 'You are logout');
     }
