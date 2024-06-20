@@ -19,6 +19,7 @@ use Modules\Report\Models\modelformshipment;
 
 class ReportShipment extends Controller
 {
+    protected $micro;
     public function __construct()
     {
         header("Access-Control-Allow-Origin: *");
@@ -35,42 +36,71 @@ class ReportShipment extends Controller
         );
 
         LogActivity::addToLog('Web Forwarder :: Logistik : Access Menu Ready Shipment', $this->micro);
-        return view('report::reportshipment', $data);
+        return view('report::readyshipment.reportshipment', $data);
+    }
+
+    public function getchartshipment(Request $request)
+    {
+        $where = '';
+        if ($request->pono != NULL) {
+            $where .= ' AND po.pono="' . $request->pono . '"';
+        }
+        if ($request->idmasterfwd != NULL) {
+            $where .= ' AND formpo.idmasterfwd=' . $request->idmasterfwd . ' ';
+        }
+        if ($request->idsupplier != NULL) {
+            $imp = implode("','", $request->idsupplier);
+            $where .= " AND po.vendor IN ('" . $imp . "')";
+        }
+        if ($request->periode != NULL) {
+            $periode = explode(" - ", $request->periode);
+            $where .= ' AND (po.pideldate BETWEEN "' . $periode[0] . '" AND "' . $periode[1] . '")';
+        }
+
+        $data = modelformshipment::join('formpo', 'formpo.id_formpo', 'formshipment.idformpo')
+            ->join('po', 'po.id', 'formpo.idpo')
+            ->join('masterforwarder', 'masterforwarder.id', 'formpo.idmasterfwd')
+            ->join('mastersupplier', 'mastersupplier.id', 'po.vendor')
+            ->selectRaw(' mastersupplier.id, mastersupplier.nama, COUNT(distinct(po.pono)) as jml')
+            ->whereRaw(' formpo.aktif="Y" AND mastersupplier.aktif="Y" AND masterforwarder.aktif="Y" AND formshipment.aktif="Y" AND masterforwarder.kurir IS NULL ' . $where . ' ')
+            ->groupby('mastersupplier.id')
+            ->get();
+
+        return view('report::readyshipment.chartshipment', [
+            'data' => $data,
+        ]);
     }
 
     public function datatable(Request $request)
     {
         if ($request->ajax()) {
-            // dd($request);
-
-            if ($request->po == null) {
-                $data = modelformshipment::join('formpo', 'formpo.id_formpo', 'formshipment.idformpo')
-                    ->join('forwarder', 'forwarder.id_forwarder', 'formpo.idforwarder')
-                    ->join('po', 'po.id', 'formpo.idpo')
-                    ->join('masterforwarder', 'masterforwarder.id', 'formpo.idmasterfwd')
-                    ->join('mastersupplier', 'mastersupplier.id', 'po.vendor')
-                    ->where('formpo.aktif', 'Y')->where('masterforwarder.aktif', 'Y')->where('formshipment.aktif', 'Y')
-                    ->where('mastersupplier.aktif', 'Y')->where('forwarder.aktif', 'Y')
-                    ->where('masterforwarder.kurir', NULL)
-                    ->selectRaw(' formshipment.*, formpo.kode_booking, po.id, po.pono, po.matcontents, po.qtypo, po.statusalokasi, po.statusconfirm, po.podate, SUM(po.price * po.qtypo) as amount, po.curr, masterforwarder.name, mastersupplier.nama, forwarder.date_fwd')
-                    ->groupby('po.pono')->groupby('formshipment.noinv')
-                    ->get();
-            } else {
-                $data = modelformshipment::join('formpo', 'formpo.id_formpo', 'formshipment.idformpo')
-                    ->join('forwarder', 'forwarder.id_forwarder', 'formpo.idforwarder')
-                    ->join('po', 'po.id', 'formpo.idpo')
-                    ->join('masterforwarder', 'masterforwarder.id', 'formpo.idmasterfwd')
-                    ->join('mastersupplier', 'mastersupplier.id', 'po.vendor')
-                    ->where('formpo.aktif', 'Y')->where('masterforwarder.aktif', 'Y')->where('formshipment.aktif', 'Y')
-                    ->where('mastersupplier.aktif', 'Y')->where('forwarder.aktif', 'Y')
-                    ->where('po.pono', $request->po)
-                    ->where('masterforwarder.kurir', NULL)
-                    ->selectRaw(' formshipment.*, formpo.kode_booking, po.id, po.pono, po.matcontents, po.qtypo, po.statusalokasi, po.statusconfirm, po.podate, SUM(po.price * po.qtypo) as amount, po.curr, masterforwarder.name, mastersupplier.nama, forwarder.date_fwd')
-                    ->groupby('po.pono')->groupby('formshipment.noinv')
-                    ->get();
+            $where = '';
+            if ($request->pono != NULL) {
+                $where .= ' AND po.pono="' . $request->pono . '"';
+            }
+            if ($request->idmasterfwd != NULL) {
+                $where .= ' AND formpo.idmasterfwd=' . $request->idmasterfwd . ' ';
+            }
+            if ($request->idsupplier != NULL) {
+                $imp = implode("','", $request->idsupplier);
+                $where .= " AND po.vendor IN ('" . $imp . "')";
+            }
+            if ($request->periode != NULL) {
+                $periode = explode(" - ", $request->periode);
+                $where .= ' AND (po.pideldate BETWEEN "' . $periode[0] . '" AND "' . $periode[1] . '")';
             }
 
-            // dd($data);
+            $data = modelformshipment::join('formpo', 'formpo.id_formpo', 'formshipment.idformpo')
+                ->join('forwarder', 'forwarder.id_forwarder', 'formpo.idforwarder')
+                ->join('po', 'po.id', 'formpo.idpo')
+                ->join('masterforwarder', 'masterforwarder.id', 'formpo.idmasterfwd')
+                ->join('mastersupplier', 'mastersupplier.id', 'po.vendor')
+                ->whereRaw(' formpo.aktif="Y" AND forwarder.aktif="Y" AND mastersupplier.aktif="Y" AND masterforwarder.aktif="Y" AND formshipment.aktif="Y" AND masterforwarder.kurir IS NULL ' . $where . ' ')
+                ->selectRaw(' formshipment.*, formpo.kode_booking, po.id, po.pono, po.matcontents, po.qtypo, po.statusalokasi, po.statusconfirm, po.podate, SUM(po.price * po.qtypo) as amount, po.curr, masterforwarder.name, mastersupplier.nama, forwarder.date_fwd')
+                ->groupby('po.pono')->groupby('formshipment.noinv')
+                ->get();
+
+
             return DataTables::of($data)
                 ->addIndexColumn()
                 ->addColumn('po', function ($data) {
@@ -102,7 +132,7 @@ class ReportShipment extends Controller
 
                     $process    .= '<a href="#" data-id="' . $data->noinv . '" id="detailshipment"><i class="fa fa-info-circle"></i></a>';
                     $process    .= '&nbsp';
-                    $process    .= '<a href="' . url('report/shipment/getexcelshipment', ['id' => $data->noinv]) . '"><i class="fa fa-file-excel text-success"></i></a>';
+                    $process    .= '<a target="_BLANK" href="' . url('report/shipment/getexcelshipment', ['id' => $data->noinv]) . '"><i class="fa fa-file-excel text-success"></i></a>';
 
                     return $process;
                 })
@@ -135,10 +165,55 @@ class ReportShipment extends Controller
         return response()->json($po);
     }
 
+    public function getfwd(Request $request)
+    {
+        header("Access-Control-Allow-Origin: *");
+        header("Access-Control-Allow-Headers: *");
+
+        if (!$request->ajax()) return;
+        $po = modelformshipment::join('formpo', 'formpo.id_formpo', 'formshipment.idformpo')
+            ->join('masterforwarder', 'masterforwarder.id', 'formpo.idmasterfwd')
+            ->where('masterforwarder.kurir', NULL)
+            ->where('formpo.aktif', 'Y')->where('masterforwarder.aktif', 'Y')->where('formshipment.aktif', 'Y')
+            ->selectRaw(' masterforwarder.id, masterforwarder.name ');
+
+        if ($request->has('q')) {
+            $search = $request->q;
+            $po = $po->whereRaw(' masterforwarder.name like "%' . $search . '%" ');
+        }
+
+        $po = $po->orderby('masterforwarder.name', 'asc')->groupby('formpo.idmasterfwd')->paginate(10, $request->page);
+
+        return response()->json($po);
+    }
+
+    public function getsupp(Request $request)
+    {
+        header("Access-Control-Allow-Origin: *");
+        header("Access-Control-Allow-Headers: *");
+
+        if (!$request->ajax()) return;
+        $po = modelformshipment::join('formpo', 'formpo.id_formpo', 'formshipment.idformpo')
+            ->join('po', 'po.id', 'formpo.idpo')
+            ->join('masterforwarder', 'masterforwarder.id', 'formpo.idmasterfwd')
+            ->join('mastersupplier', 'mastersupplier.id', 'po.vendor')
+            ->where('masterforwarder.kurir', NULL)
+            ->where('formpo.aktif', 'Y')->where('masterforwarder.aktif', 'Y')->where('formshipment.aktif', 'Y')
+            ->where('mastersupplier.aktif', 'Y')
+            ->selectRaw(' mastersupplier.id, mastersupplier.nama ');
+
+        if ($request->has('q')) {
+            $search = $request->q;
+            $po = $po->whereRaw(' mastersupplier.nama like "%' . $search . '%" ');
+        }
+
+        $po = $po->orderby('mastersupplier.nama', 'asc')->groupby('po.vendor')->paginate(10, $request->page);
+
+        return response()->json($po);
+    }
+
     function detailshipment(Request $request)
     {
-        // dd($request);
-
         $data = modelformshipment::join('formpo', 'formpo.id_formpo', 'formshipment.idformpo')
             ->join('masterroute', 'masterroute.id_route', 'formpo.idroute')
             ->join('masterportofloading', 'masterportofloading.id_portloading', 'formshipment.idportloading')
@@ -168,9 +243,8 @@ class ReportShipment extends Controller
         // dd($getdate);
 
         $getfcl = modelcontainership::where('noinv', $data[0]->noinv)->groupby('volume')->groupby('weight')->where('aktif', 'Y')->get();
-        // dd($getfcl);
-        // return response()->json(['status' => 200, 'data' => $data, 'message' => 'Berhasil']);
-        $form = view('report::modalreportshipment', ['data' => $data, 'dateku' => $getdate, 'datafcl' => $getfcl]);
+
+        $form = view('report::readyshipment.modalreportshipment', ['data' => $data, 'dateku' => $getdate, 'datafcl' => $getfcl]);
         return $form->render();
     }
 
@@ -206,8 +280,13 @@ class ReportShipment extends Controller
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
 
-        $sheet->mergeCells('A2:M2');
-        $sheet->getStyle('A2:M2')->getFont()->setBold(true);
+        if ($getdata[0]->shipmode == 'fcl') {
+            $sheet->mergeCells('A2:O2');
+            $sheet->getStyle('A2:O2')->getFont()->setBold(true);
+        } else {
+            $sheet->mergeCells('A2:M2');
+            $sheet->getStyle('A2:M2')->getFont()->setBold(true);
+        }
 
         //single header
         $sheet->setCellValue('A4', 'Invoice');
