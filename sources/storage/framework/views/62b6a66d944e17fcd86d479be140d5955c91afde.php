@@ -1,11 +1,9 @@
-@extends('system::template/master')
-@section('title', $title)
-@section('link_href')
+<?php $__env->startSection('title', $title); ?>
+<?php $__env->startSection('link_href'); ?>
 
-@endsection
+<?php $__env->stopSection(); ?>
 
-@section('content')
-
+<?php $__env->startSection('content'); ?>
     <div class="row" style="font-size: 10pt;">
         <div class="col-lg-12">
             <div class="card card-primary">
@@ -14,15 +12,9 @@
                         <div id="fullscreen-container" class="card-body" style="overflow-y: auto;">
                             <div class="row justify-content-between col-md-12 ">
                                 <div class="row col-md-6">
-                                    <div class="col-md-4">
+                                    <div class="col-md-6">
                                         <label class="control-label">Choose PO :</label>
                                         <select class="select2" style="width: 100%;" name="datapo" id="datapo">
-                                            <option value=""></option>
-                                        </select>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <label class="control-label">Choose Forwarder:</label>
-                                        <select class="select2" style="width: 100%;" name="datafwd" id="datafwd">
                                             <option value=""></option>
                                         </select>
                                     </div>
@@ -31,11 +23,6 @@
                                         <a href="#" type="button" id="search" class="btn btn-info form-control"
                                             data-value="klik">Search</a>
                                     </div>
-                                </div>
-                                <div class="col-md-2">
-                                    <label class="control-label"> &nbsp; </label>
-                                    <a href="{{ url('report/alokasi/getexcelalokasiall') }}" type="button"
-                                        class="btn btn-warning form-control">Download Excel</a>
                                 </div>
                             </div>
                             <br>
@@ -51,37 +38,25 @@
                                                 <center>PO</center>
                                             </th>
                                             <th>
-                                                <center>Date</center>
-                                            </th>
-                                            <th>
-                                                <center>Amount</center>
-                                            </th>
-                                            <th>
                                                 <center>Supplier</center>
-                                            </th>
-                                            <th>
-                                                <center>Shipmode</center>
                                             </th>
                                             <th>
                                                 <center>Forwarder</center>
                                             </th>
                                             <th>
-                                                <center>Date Allocation</center>
+                                                <center>Code Booking</center>
                                             </th>
                                             <th>
-                                                <center>PI Delivery</center>
+                                                <center>Invoice</center>
                                             </th>
                                             <th>
-                                                <center>Date Booking</center>
+                                                <center>ATD</center>
                                             </th>
                                             <th>
-                                                <center>Date Confirm</center>
+                                                <center>ATA</center>
                                             </th>
                                             <th>
-                                                <center>Date Shipment</center>
-                                            </th>
-                                            <th>
-                                                <center>Status</center>
+                                                <center>BL Number</center>
                                             </th>
                                             <th>
                                                 <center>Action</center>
@@ -99,12 +74,12 @@
         </div>
     </div>
 
-    {{-- ----------------- modal content ----------------- --}}
+    
     <div class="modal fade" id="detailall">
         <div class="modal-dialog" style="max-width: 80%;">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h4 class="modal-title"><span id="modaltitle">Detail Report Ready Allocation</span></h4>
+                    <h4 class="modal-title"><span id="modaltitle">Detail Report Ready Shipment</span></h4>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -118,13 +93,13 @@
             </div>
         </div>
     </div>
-    {{-- ----------------- /.modal content ----------------- --}}
-@endsection
+    
+<?php $__env->stopSection(); ?>
 
-@section('script_src')
-@endsection
+<?php $__env->startSection('script_src'); ?>
+<?php $__env->stopSection(); ?>
 
-@section('script')
+<?php $__env->startSection('script'); ?>
     <script type="text/javascript">
         $(document).ready(function() {
             $.ajaxSetup({
@@ -138,14 +113,13 @@
                 processing: true,
                 serverSide: true,
                 ajax: {
-                    url: "{{ url('report/alokasi/search') }}",
+                    url: "<?php echo e(url('report/shipment/search')); ?>",
                     type: 'POST',
                     'headers': {
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                        'X-CSRF-TOKEN': '<?php echo e(csrf_token()); ?>'
                     },
                     data: function(d) {
-                        d.pono = $('#datapo').val(),
-                            d.idmasterfwd = $('#datafwd').val()
+                        d.po = $('#datapo').val()
                     }
                 },
                 columns: [{
@@ -156,48 +130,32 @@
                         name: 'po'
                     },
                     {
-                        data: 'date',
-                        name: 'date'
-                    },
-                    {
-                        data: 'amount',
-                        name: 'amount'
-                    },
-                    {
                         data: 'supplier',
                         name: 'supplier'
-                    },
-                    {
-                        data: 'shipmode',
-                        name: 'shipmode'
                     },
                     {
                         data: 'forwarder',
                         name: 'forwarder'
                     },
                     {
-                        data: 'dateallocation',
-                        name: 'dateallocation'
+                        data: 'codebook',
+                        name: 'codebook'
                     },
                     {
-                        data: 'pidelivery',
-                        name: 'pidelivery'
+                        data: 'invoice',
+                        name: 'invoice'
                     },
                     {
-                        data: 'datebook',
-                        name: 'datebook'
+                        data: 'atd',
+                        name: 'atd'
                     },
                     {
-                        data: 'dateconfirm',
-                        name: 'dateconfirm'
+                        data: 'ata',
+                        name: 'ata'
                     },
                     {
-                        data: 'dateshipment',
-                        name: 'dateshipment'
-                    },
-                    {
-                        data: 'status',
-                        name: 'status'
+                        data: 'blnumber',
+                        name: 'blnumber'
                     },
                     {
                         data: 'action',
@@ -228,7 +186,7 @@
             $('#datapo').select2({
                 placeholder: '-- Choose PO --',
                 ajax: {
-                    url: "{!! route('report_getpoalokasi') !!}",
+                    url: "<?php echo route('report_getposhipment'); ?>",
                     dataType: 'json',
                     delay: 500,
                     type: 'post',
@@ -245,8 +203,8 @@
 
                             results: $.map(data.data, function(item) {
                                 return {
-                                    text: item.po_nomor,
-                                    id: item.po_nomor,
+                                    text: item.pono,
+                                    id: item.pono,
                                     selected: true,
                                 }
                             }),
@@ -259,60 +217,50 @@
                 }
             });
 
-            $('#datafwd').select2({
-                placeholder: '-- Choose Forwarder --',
-                ajax: {
-                    url: "{!! route('report_getfwdalokasi') !!}",
-                    dataType: 'json',
-                    delay: 500,
-                    type: 'post',
-                    data: function(params) {
-                        var query = {
-                            q: params.term,
-                            page: params.page || 1,
-                            _token: $('meta[name=csrf-token]').attr('content')
-                        }
-                        return query;
-                    },
-                    processResults: function(data, params) {
-                        return {
-
-                            results: $.map(data.data, function(item) {
-                                return {
-                                    text: item.name,
-                                    id: item.id,
-                                    selected: true,
-                                }
-                            }),
-                            pagination: {
-                                more: data.to < data.total
-                            }
-                        };
-                    },
-                    cache: true
-                }
-            });
-
-            $('body').on('click', '#detailalokasi', function() {
+            var namefile;
+            $('body').on('click', '#detailshipment', function() {
                 $('#detailall').modal({
                     show: true,
                     backdrop: 'static'
                 });
                 let idku = $(this).attr('data-id');
-                let idmasterfwd = $(this).attr('data-idfwd');
                 $.ajax({
-                    url: "{!! route('report_detailalokasi') !!}",
+                    url: "<?php echo route('report_detailshipment'); ?>",
                     type: 'POST',
                     // dataType: 'json',
                     data: {
                         _token: $('meta[name=csrf-token]').attr('content'),
                         id: idku,
-                        idmasterfwd: idmasterfwd
                     },
                 }).done(function(data) {
                     $('#formdetail').html(data);
+                    // console.log('data :>> ', data.data);
+                    // let dataku = data.data;
+
+                    // namefile = dataku.file_bl;
+
+                    // $('#nomorpo').val(dataku.pono);
+                    // $('#material').val(dataku.matcontents);
+                    // $('#matdesc').val(dataku.itemdesc);
+                    // $('#qtypo').val(dataku.qtypo);
+                    // $('#supplier').val(dataku.nama);
+                    // $('#style').val(dataku.style);
+                    // $('#plant').val(dataku.plant);
+                    // $('#forwarder').val(dataku.name);
+                    // $('#booking').val(dataku.kode_booking);
+                    // $('#qtyship').val(dataku.qty_shipment);
+                    // $('#invoice').val(dataku.noinv);
+                    // $('#etd').val(dataku.etdfix);
+                    // $('#eta').val(dataku.etafix);
+                    // $('#shipmode').val(dataku.shipmode);
+                    // $('#subshipmode').val(dataku.subshipmode);
+                    // $('#nobl').val(dataku.nomor_bl);
+                    // $('#vessel').val(dataku.vessel);
+                    // $('#filebl').val(dataku.file_bl);
                 })
             });
         });
     </script>
-@endsection
+<?php $__env->stopSection(); ?>
+
+<?php echo $__env->make('system::template/master', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH D:\laragon\www\forwarder\sources\Modules/Report\Resources/views/reportshipment.blade.php ENDPATH**/ ?>
