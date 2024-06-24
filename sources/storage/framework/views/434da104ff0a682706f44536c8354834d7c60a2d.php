@@ -1,66 +1,61 @@
 <?php $__env->startSection('title', $title); ?>
 <?php $__env->startSection('link_href'); ?>
     <link href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/themes/smoothness/jquery-ui.css" rel="stylesheet" />
+    
+    
 <?php $__env->stopSection(); ?>
 
 <?php $__env->startSection('content'); ?>
-    <div class="row" style="font-size: 10pt;">
-        <div class="col-12">
-            <div class="card">
-                <div class="row">
-                    <div class="col-md-12">
-                        <div class="card-body">
-                            <div class="row mb-2">
-                                <div>
-                                    <label class="control-label">Choose PI Delivery Date :</label>
-                                    <input type="text" class="form-control" id="selectdate" name="selectdate"
-                                        autocomplete="off">
-                                </div>
-                                <div class="ml-2">
-                                    <label class="control-label"> &nbsp; </label>
-                                    <a href="#" type="button" id="search" class="btn btn-info form-control"
-                                        data-value="klik">Search</a>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="table-responsive">
-                                    <table id="serverside" class="table table-bordered table-striped" style="width:100%">
-                                        <thead>
-                                            <tr>
-                                                <th>
-                                                    <center><input type="checkbox" name="checkall" id="checkall"></center>
-                                                </th>
-                                                <th>
-                                                    <center>PO Number</center>
-                                                </th>
-                                                <th>
-                                                    <center>PI Number</center>
-                                                </th>
-                                                <th>
-                                                    <center>PI Delivery</center>
-                                                </th>
-                                                <th>
-                                                    <center>Supplier</center>
-                                                </th>
-                                                <th>
-                                                    <center>Company</center>
-                                                </th>
-                                            </tr>
-                                        </thead>
-                                    </table>
-                                </div>
-                            </div>
-                            <a href="<?php echo e(route('dashcam')); ?>" type="button" class="btn btn-primary">Back</a>
-                            <button type="button" class="btn btn-info" id="btnprocess">Process</button>
-                        </div>
+    <div class="card" style="font-size: 10pt;">
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-3">
+                    <label class="control-label">Choose PI Delivery Date :</label>
+                    <div class="col-sm-12">
+                        
+                        <input type="text" class="form-control" id="selectdate" name="selectdate" autocomplete="off">
+                    </div>
+                </div>
+                <div class="col-md-1">
+                    <label class="control-label"> &nbsp; </label>
+                    <div class="col-sm-12">
+                        <a href="#" type="button" id="search" class="btn btn-info form-control"
+                            data-value="klik">Search</a>
                     </div>
                 </div>
             </div>
+            <br>
+            
+            <table id="serverside" class="table table-bordered table-striped">
+                <thead>
+                    <tr>
+                        <th>
+                            <center><input type="checkbox" name="checkall" id="checkall"></center>
+                        </th>
+                        <th>
+                            <center>PO Number</center>
+                        </th>
+                        <th>
+                            <center>PI Number</center>
+                        </th>
+                        <th>
+                            <center>PI Delivery</center>
+                        </th>
+                        <th>
+                            <center>Supplier</center>
+                        </th>
+                    </tr>
+                </thead>
+            </table>
+            <a href="<?php echo e(route('dashcam')); ?>" type="button" class="btn btn-primary">Back</a>
+            <button type="button" class="btn btn-info" id="btnprocess">Process</button>
+            
         </div>
     </div>
+
     
     <div class="modal fade" id="formulir_po">
-        <div class="modal-dialog" style="max-width: 80%">
+        <div class="modal-dialog modal-xl">
             <div class="modal-content">
                 <div class="modal-header">
                     <h4 class="modal-title"><span id="modaltitle">Booking Detail</span></h4>
@@ -73,12 +68,12 @@
         </div>
     </div>
     
-
-    <?php echo $__env->make('loading', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
 <?php $__env->stopSection(); ?>
 
 <?php $__env->startSection('script'); ?>
     <script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js"></script>
+    \
+    
     <script type="text/javascript">
         $(document).ready(function() {
             $.ajaxSetup({
@@ -101,7 +96,7 @@
                 processing: true,
                 serverSide: true,
                 ajax: {
-                    url: "<?php echo e(url('listpo')); ?>",
+                    url: "<?php echo e(url('listpotimeout')); ?>",
                     data: function(d) {
                         d.pidate = $('#selectdate').val()
                     }
@@ -110,29 +105,7 @@
                         data: 'cekbok',
                         name: 'cekbok',
                         orderable: false,
-                        orderable: false,
-                        // data: 'select-checkbox',
-                        // className: 'select-checkbox',
-                        // targets: 0
-                        // 'targets': 0,
-                        // 'checkboxes': {
-                        //     'selectRow': true,
-                        //     'selectCallback': function(cellNodes, isSelected) {
-                        //         console.log('isSelected :>> ', isSelected);
-                        //         var rowData = oTable.row($(cellNodes[0]).parent()).data();
-                        //         // console.log('rowID :>> ', rowData);
-                        //         //var rowPk = cellNodes.settings().rowId;
-                        //         var rowID = rowData['action']; // rowData[rowPk];
-
-                        //         if (isSelected === false) {
-                        //             delete repo[rowID];
-                        //         }
-
-                        //         if (isSelected === true) {
-                        //             repo[rowID] = rowData;
-                        //         }
-                        //     },
-                        // }
+                        orderable: false
                     },
                     {
                         data: 'listpo',
@@ -150,10 +123,6 @@
                         data: 'supplier',
                         name: 'supplier'
                     },
-                    {
-                        data: 'company',
-                        name: 'company'
-                    },
                     // {
                     //     data: 'action',
                     //     name: 'action',
@@ -161,13 +130,6 @@
                     //     searchable: false
                     // },
                 ],
-                // select: {
-                //     style: 'multi',
-                //     selector: 'td:first-child'
-                // },
-                // 'order': [
-                //     [1, 'asc']
-                // ]
             });
 
             $('#serverside').on('draw.dt', function() {
@@ -220,8 +182,7 @@
                     let data = oTable.data();
 
                     for (let index = 0; index < Number(lengthtable); index++) {
-                        let mydatapo = data[index]['id'] + '/' + data[index]['pino'];
-                        multi_id.push(mydatapo);
+                        multi_id.push(data[index]['pino']);
                     }
                 } else {
                     $('input[type="checkbox"]').prop('checked', false);
@@ -251,8 +212,6 @@
             });
 
             $('#btnprocess').click(function(e) {
-                $("#loading").show();
-
                 let data;
                 if (singleid.length == 0) {
                     data = multi_id;
@@ -275,32 +234,66 @@
                             dataku: data,
                         },
                         // dataType: "json",
-                        beforeSend: function(param) {
-                            Swal.fire({
-                                title: 'Please Wait .......',
-                                // html: '',
-                                allowEscapeKey: false,
-                                allowOutsideClick: false,
-                                showCancelButton: false,
-                                showConfirmButton: false,
-                                onOpen: () => {
-                                    swal.showLoading();
-                                }
-                            })
-                        },
                         success: function(response) {
                             $('#formulir_po').modal({
                                 show: true,
                                 backdrop: 'static'
                             });
                             $('#bodymodaldetail').html(response);
-                            swal.close();
                         }
                     });
                 }
+            });
+
+            var length;
+            $('body').on('click', '#formpo', function() {
+                // $('#formulir_po').modal({
+                //     show: true,
+                //     backdrop: 'static'
+                // });
+
+                let idku = $(this).attr('data-id');
+                console.log('idku :>> ', idku);
+                $.ajax({
+                    url: "<?php echo route('form_po'); ?>",
+                    type: 'POST',
+                    dataType: 'json',
+                    data: {
+                        _token: $('meta[name=csrf-token]').attr('content'),
+                        id: idku,
+                    },
+                }).done(function(data) {
+                    let poku = data.data.datapo;
+                    // let forwarderku = data.data.dataforwarder;
+                    // console.log('forwarderku :>> ', forwarderku);
+                    console.log('poku :>> ', poku);
+
+                    length = poku.length;
+                    $('#detailitem').empty();
+
+                    html =
+                        '<table border="0" style="width:100%"><tr><th>Material</th><th>Material Description</th><th>HS Code</th><th>Color Code</th><th>Size</th><th>Quantity Item</th><th>Status</th></tr>';
+                    for (let index = 0; index < poku.length; index++) {
+                        html +=
+                            '<tr><td>' + poku[index].matcontents + '</td><td>' + poku[index]
+                            .itemdesc + '</td><td>' + 'kosong' + '</td><td>' +
+                            poku[index].colorcode + '</td><td>' + poku[index].size + '</td><td>' +
+                            poku[index].qtypo + '</td><td>' + poku[index].statusforwarder +
+                            '</td><td><input type="hidden" id="idall-' + index + '" data-id="' +
+                            poku[index].id + '" data-idfwd="' + poku[index].id_forwarder +
+                            '" data-idmasterfwd="' + poku[index].idmasterfwd +
+                            '"></td></tr>';
+                    }
+
+                    html += "</table>";
+                    $('#detailitem').html(html);
+
+                    $('#nomorpo').val(poku[0].pono);
+                    $('#supplier').val(poku[0].nama);
+                })
             });
         });
     </script>
 <?php $__env->stopSection(); ?>
 
-<?php echo $__env->make('system::template/master', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH D:\laragon\www\forwarder\sources\Modules/System\Resources/views/dashboard/listpo.blade.php ENDPATH**/ ?>
+<?php echo $__env->make('system::template/master', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH D:\laragon\www\forwarder\sources\Modules/System\Resources/views/dashboard/listpotimeout.blade.php ENDPATH**/ ?>

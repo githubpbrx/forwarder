@@ -49,7 +49,7 @@
                 <?php $__currentLoopData = $data; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $key => $item): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                     <div class="card card-default">
                         <div class="card-header">
-                            <h3 class="card-title"><?php echo e($item[0]['poku']->pino); ?></h3>
+                            <h3 class="card-title"><?php echo e($item[0]->pino); ?></h3>
                             <div class="card-tools">
                                 <button type="button" class="btn btn-tool" data-card-widget="collapse">
                                     <i class="fas fa-minus"></i>
@@ -60,8 +60,12 @@
                             <div class="row">
                                 <div class="col-12">
                                     <div class="form-group">
-                                        <table border="1" width="100%">
+                                        <table border="1" width="100%" style="text-align:center">
                                             <thead>
+                                                <th style="text-align:center"><input type="checkbox"
+                                                        class="checkall-<?php echo e($key); ?>"
+                                                        style="height:18px;width:18px" checked>
+                                                </th>
                                                 <th>PO Nomor</th>
                                                 <th>Material</th>
                                                 <th>Material Description</th>
@@ -69,30 +73,56 @@
                                                 <th>Color</th>
                                                 <th>Size</th>
                                                 <th>Qty PO</th>
-                                                <th>Status</th>
+                                                <th>Balance Qty</th>
+                                                <th>Qty Booking</th>
                                             </thead>
                                             <tbody>
                                                 <?php $__currentLoopData = $item; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $key2 => $dat): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                                     <?php
-                                                    // dd($dat['poku']->matcontents);
-                                                    if ($dat['poku']['hscode'] == null) {
+                                                    if ($dat->hscode == null) {
                                                         $hscode = '';
                                                     } else {
-                                                        $hscode = $dat['poku']['hscode']->hscode;
+                                                        $hscode = $dat->hscode;
                                                     }
-
+                                                    
+                                                    $qtybook = 0;
+                                                    if ($dat->qtybook != null) {
+                                                        $qtybook = $dat->qtybook;
+                                                    }
+                                                    
+                                                    if ($dat['withformpo'] == null) {
+                                                        $remain = $dat->qtypo;
+                                                    } elseif ($qtybook == $dat->qtypo) {
+                                                        $remain = 0;
+                                                    } else {
+                                                        $remain = $dat->qtypo - $qtybook;
+                                                    }
+                                                    
                                                     ?>
                                                     <tr>
+                                                        <td>
+                                                            <input type="checkbox"
+                                                                class="check-<?php echo e($key); ?><?php echo e($key2); ?>"
+                                                                style="height:18px;width:18px" checked>
+                                                        </td>
                                                         <td><?php echo e($dat->po_nomor); ?></td>
-                                                        <td data-name="mat[]"><?php echo e($dat['poku']->matcontents); ?></td>
-                                                        <td><?php echo e($dat['poku']->itemdesc); ?></td>
+                                                        <td data-name="mat[]"><?php echo e($dat->matcontents); ?></td>
+                                                        <td><?php echo e($dat->itemdesc); ?></td>
                                                         <td> <input type="text" class="form-control"
                                                                 value="<?php echo e($hscode); ?>" id="inputhscode[]"
-                                                                name="inputhscode[]" autocomplete="off"></td>
-                                                        <td><?php echo e($dat['poku']->colorcode); ?></td>
-                                                        <td><?php echo e($dat['poku']->size); ?></td>
-                                                        <td><?php echo e($dat['poku']->qtypo); ?></td>
-                                                        <td><?php echo e($dat->statusforwarder); ?></td>
+                                                                name="inputhscode[]" autocomplete="off">
+                                                        </td>
+                                                        <td><?php echo e($dat->colorcode); ?></td>
+                                                        <td><?php echo e($dat->size); ?></td>
+                                                        <td><?php echo e($dat->qtypo); ?></td>
+                                                        <td><?php echo e($remain); ?></td>
+                                                        <td>
+                                                            <input type="number" min="0"
+                                                                id="qtybook-<?php echo e($key); ?><?php echo e($key2); ?>"
+                                                                name="qtybook"
+                                                                class="form-control cekinput-<?php echo e($key); ?><?php echo e($key2); ?>"
+                                                                data-remain="<?php echo e($remain); ?>">
+                                                        </td>
                                                     </tr>
                                                 <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                             </tbody>
@@ -103,7 +133,6 @@
                         </div>
                     </div>
                 <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-
             </div>
         </div>
         <hr style="width: 100%; color: rgb(192, 192, 192); height: 0.5px; background-color:rgb(192, 192, 192);" />
@@ -138,7 +167,8 @@
                 <div class="form-group">
                     <label class="col-sm-12 control-label">ETA (Estimated Time Arrival)<code>*</code></label>
                     <div class="col-sm-12">
-                        <input type="text" class="form-control" id="eta" name="eta" autocomplete="off">
+                        <input type="text" class="form-control" id="eta" name="eta"
+                            autocomplete="off">
                     </div>
                 </div>
             </div>
@@ -332,6 +362,47 @@
         //Initialize Select2 Elements
         $('.select2').select2();
 
+        for (let index = 0; index < dataku.length; index++) {
+            for (let index2 = 0; index2 < dataku[index].length; index2++) {
+                $('.checkall-' + index).change(function(e) {
+                    if (this.checked) {
+                        $('.check-' + index + index2).prop('checked', true);
+                        $('.cekinput-' + index + index2).prop('disabled', false);
+                    } else {
+                        $('.check-' + index + index2).prop('checked', false);
+                        $('.cekinput-' + index + index2).prop('disabled', true);
+
+                    }
+                });
+            }
+        }
+
+        for (let index = 0; index < dataku.length; index++) {
+            for (let index2 = 0; index2 < dataku[index].length; index2++) {
+                $('.check-' + index + index2).change(function(e) {
+                    if (this.checked) {
+                        $('.cekinput-' + index + index2).prop('disabled', false);
+                    } else {
+                        $('.cekinput-' + index + index2).prop('disabled', true);
+                    }
+                });
+            }
+        }
+
+        // memvalidasi inputan supaya tidak bisa lebih dari balance
+        for (let index = 0; index < dataku.length; index++) {
+            for (let index2 = 0; index2 < dataku[index].length; index2++) {
+                $('.cekinput-' + index + index2).keyup(function(e) {
+                    let valinput = $('.cekinput-' + index + index2).val();
+                    let rem = $('.cekinput-' + index + index2).attr('data-remain');
+
+                    if (Number(valinput) >= Number(rem)) {
+                        $('.cekinput-' + index + index2).val(rem);
+                    }
+                });
+            }
+        }
+
         $('#etd').prop('disabled', true);
         $('#eta').prop('disabled', true);
         $('#datebook').datepicker({
@@ -372,8 +443,6 @@
 
         $('#shipmode').on('change', function() {
             let mode = $(this).val();
-            console.log('training :>> ', mode);
-            console.log('object :>> ', 'klik');
             if (mode == 'fcl') {
                 $('#datafcl').show()
                 $('#datalcl').hide()
@@ -413,7 +482,6 @@
                     return query;
                 },
                 processResults: function(data, params) {
-                    console.log('data :>> ', data);
                     return {
                         results: $.map(data.data, function(item) {
                             return {
@@ -447,7 +515,6 @@
                     return query;
                 },
                 processResults: function(data, params) {
-                    console.log('data :>> ', data);
                     return {
                         results: $.map(data.data, function(item) {
                             return {
@@ -481,7 +548,6 @@
                     return query;
                 },
                 processResults: function(data, params) {
-                    console.log('data :>> ', data);
                     return {
                         results: $.map(data.data, function(item) {
                             return {
@@ -530,89 +596,59 @@
             var arraysave = [];
             for (let index = 0; index < dataku.length; index++) {
                 for (let index2 = 0; index2 < dataku[index].length; index2++) {
-                    let val = {
-                        'idforwarder': dataku[index][index2].id_forwarder,
-                        'idpo': dataku[index][index2].idpo,
-                        'idmasterfwd': dataku[index][index2].idmasterfwd,
-                        'pono': dataku[index][index2].po_nomor,
-                    };
-                    arraysave.push(val)
+                    var cekdisabled = $('.cekinput-' + index + index2).prop('disabled');
+                    let val = $('.cekinput-' + index + index2).val();
+
+                    if (!cekdisabled) {
+                        let data = {
+                            'idforwarder': dataku[index][index2].id_forwarder,
+                            'idpo': dataku[index][index2].idpo,
+                            'idmasterfwd': dataku[index][index2].idmasterfwd,
+                            'pono': dataku[index][index2].po_nomor,
+                            'qtybook': val,
+                        };
+
+                        arraysave.push(data)
+                    }
                 }
             }
 
-
             if (nobook == null || nobook == '') {
                 notifalert('Nomor Booking');
-                $('#btnsubmit').html('Submit')
-                $('#btnsubmit').prop('disabled', false)
             } else if (datebook == null || datebook == '') {
                 notifalert('Date Booking');
-                $('#btnsubmit').html('Submit')
-                $('#btnsubmit').prop('disabled', false)
             } else if (myetd == null || myetd == '') {
                 notifalert('ETD (Estimated Time Departure)');
-                $('#btnsubmit').html('Submit')
-                $('#btnsubmit').prop('disabled', false)
             } else if (myeta == null || myeta == '') {
                 notifalert('ETA (Estimated Time Arrival)');
-                $('#btnsubmit').html('Submit')
-                $('#btnsubmit').prop('disabled', false)
             } else if (mode == null || mode == '') {
                 notifalert('Ship Mode');
-                $('#btnsubmit').html('Submit')
-                $('#btnsubmit').prop('disabled', false)
             } else if (mode == 'fcl' && myfcl == '') {
                 notifalert('FCL');
-                $('#btnsubmit').html('Submit')
-                $('#btnsubmit').prop('disabled', false)
             } else if (mode == 'fcl' && myweight == '') {
                 notifalert('Weight');
-                $('#btnsubmit').html('Submit')
-                $('#btnsubmit').prop('disabled', false)
             } else if (mode == 'fcl' && fclvol == '') {
                 notifalert('Volume');
-                $('#btnsubmit').html('Submit')
-                $('#btnsubmit').prop('disabled', false)
             } else if (mode == 'lcl' && mylcl == '') {
                 notifalert('LCL');
-                $('#btnsubmit').html('Submit')
-                $('#btnsubmit').prop('disabled', false)
             } else if (mode == 'lcl' && lclweight == '') {
                 notifalert('LCL Weight');
-                $('#btnsubmit').html('Submit')
-                $('#btnsubmit').prop('disabled', false)
             } else if (mode == 'air' && myair == '') {
                 notifalert('AIR');
-                $('#btnsubmit').html('Submit')
-                $('#btnsubmit').prop('disabled', false)
             } else if (mode == 'air' && airweight == '') {
                 notifalert('AIR Weight');
-                $('#btnsubmit').html('Submit')
-                $('#btnsubmit').prop('disabled', false)
             } else if (mode == 'cfscy' && cfscyvol == '') {
                 notifalert('CSF/CY Volume');
-                $('#btnsubmit').html('Submit')
-                $('#btnsubmit').prop('disabled', false)
             } else if (mode == 'cfscy' && cfscyweight == '') {
                 notifalert('CSF/CY Weight');
-                $('#btnsubmit').html('Submit')
-                $('#btnsubmit').prop('disabled', false)
             } else if (myroute == null || myroute == '') {
                 notifalert('Route');
-                $('#btnsubmit').html('Submit')
-                $('#btnsubmit').prop('disabled', false)
             } else if (portloading == null || portloading == '') {
                 notifalert('Port Of Loading');
-                $('#btnsubmit').html('Submit')
-                $('#btnsubmit').prop('disabled', false)
             } else if (portdestination == null || portdestination == '') {
                 notifalert('Port Of Destination');
-                $('#btnsubmit').html('Submit')
-                $('#btnsubmit').prop('disabled', false)
             } else if (package == null || package == '') {
                 notifalert('Package');
-                $('#btnsubmit').html('Submit')
-                $('#btnsubmit').prop('disabled', false)
             } else {
                 $.ajax({
                     type: "post",
@@ -642,8 +678,20 @@
                         'package': package
                     },
                     dataType: "json",
+                    beforeSend: function(param) {
+                        Swal.fire({
+                            title: 'Saving ...',
+                            html: 'Please Wait Data Was Saving',
+                            allowEscapeKey: false,
+                            allowOutsideClick: false,
+                            showCancelButton: false,
+                            showConfirmButton: false,
+                            onOpen: () => {
+                                swal.showLoading();
+                            }
+                        })
+                    },
                     success: function(response) {
-                        console.log('response :>> ', response);
                         Swal.fire({
                             title: response.title,
                             text: response.message,
@@ -654,6 +702,7 @@
                                 ''
                             $('#btnsubmit').html('Submit')
                             $('#btnsubmit').prop('disabled', false)
+                            swal.close();
                         });
                         return;
                     },
@@ -663,6 +712,9 @@
                             text: 'Check Your Data',
                             type: 'error'
                         });
+                        $('#btnsubmit').html('Submit')
+                        $('#btnsubmit').prop('disabled', false)
+                        swal.close();
                         return;
                     }
                 });
@@ -675,6 +727,8 @@
                 text: params + ' Can not be empty',
                 type: 'warning'
             });
+            $('#btnsubmit').html('Submit')
+            $('#btnsubmit').prop('disabled', false)
             return;
         }
     });

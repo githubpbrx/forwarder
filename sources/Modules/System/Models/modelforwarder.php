@@ -8,8 +8,6 @@ class modelforwarder extends Model
 {
     protected $table = 'forwarder';
     protected $primaryKey = 'id_forwarder';
-    const CREATED_AT = 'created_at';
-    const UPDATED_AT = 'updated_at';
     protected $guarded = [];
 
     public function poku()
@@ -20,5 +18,10 @@ class modelforwarder extends Model
     public function privilege()
     {
         return $this->hasOne('Modules\System\Models\modelprivilege', 'idforwarder', 'idmasterfwd')->where('privilege_aktif', 'Y');
+    }
+
+    public function withformpo()
+    {
+        return $this->hasOne('Modules\Transaksi\Models\modelformpo', 'idforwarder', 'id_forwarder')->where('aktif', 'Y');
     }
 }
