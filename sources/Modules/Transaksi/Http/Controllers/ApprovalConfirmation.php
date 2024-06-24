@@ -187,7 +187,7 @@ class ApprovalConfirmation extends Controller
             ->addColumn('action', function ($data) {
                 $button = '';
 
-                $button = '<a href="#" data-id="' . $data->pideldate . '" id="prosesapproval"><i data-tooltip="tooltip" title="Proses Approval" class="fa fa-arrow-circle-right fa-lg text-green"></i></a>';
+                $button = '<center><a href="#" data-id="' . $data->pideldate . '" id="prosesapproval"><i data-tooltip="tooltip" title="Proses Approval" class="fa fa-arrow-circle-right fa-lg text-green"></i></a></center>';
 
                 return $button;
             })
@@ -210,7 +210,7 @@ class ApprovalConfirmation extends Controller
             ->where('po.pideldate', $request->id)
             ->where('formpo.statusformpo', 'waiting')
             ->where('privilege.leadforwarder', '1')
-            ->selectRaw(' po.id, po.pono, po.matcontents, po.itemdesc, po.qtypo, po.colorcode, po.size, po.statusalokasi, po.pino, forwarder.qty_allocation, forwarder.statusforwarder, forwarder.id_forwarder, formpo.id_formpo, formpo.kode_booking, formpo.date_booking, formpo.etd, formpo.eta, formpo.shipmode, formpo.subshipmode, formpo.created_by, masterforwarder.name, privilege.privilege_user_name, privilege.privilege_user_nik, mastersupplier.nama, masterhscode.hscode, masterroute.route_code, masterroute.route_desc')
+            ->selectRaw(' po.id, po.pono, po.matcontents, po.itemdesc, po.qtypo, po.colorcode, po.size, po.statusalokasi, po.pino, forwarder.statusbooking, forwarder.id_forwarder, formpo.id_formpo, formpo.kode_booking, formpo.qty_booking, formpo.date_booking, formpo.etd, formpo.eta, formpo.shipmode, formpo.subshipmode, formpo.created_by, masterforwarder.name, privilege.privilege_user_name, privilege.privilege_user_nik, mastersupplier.nama, masterhscode.hscode, masterroute.route_code, masterroute.route_desc')
             ->get();
         // dd($dataku);
 
@@ -299,11 +299,11 @@ class ApprovalConfirmation extends Controller
             if (empty($gagal)) {
                 DB::commit();
                 LogActivity::addToLog('Web Forwarder :: Logistik : Approval Confirmed', $this->micro);
-                $status = ['title' => 'Success', 'status' => 'success', 'message' => 'Data Successfully Saved'];
+                $status = ['title' => 'Success', 'status' => 'success', 'message' => 'Data Successfully Confirmed'];
                 return response()->json($status, 200);
             } else {
                 DB::rollback();
-                $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'Data Failed Saved'];
+                $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'Data Failed Confirmed'];
                 return response()->json($status, 200);
             }
         } else {
@@ -344,11 +344,11 @@ class ApprovalConfirmation extends Controller
             if (empty($gagal)) {
                 DB::commit();
                 LogActivity::addToLog('Web Forwarder :: Logistik : Approval Rejected', $this->micro);
-                $status = ['title' => 'Success', 'status' => 'success', 'message' => 'Data Successfully Saved'];
+                $status = ['title' => 'Success', 'status' => 'success', 'message' => 'Data Successfully Rejected'];
                 return response()->json($status, 200);
             } else {
                 DB::rollback();
-                $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'Data Failed Saved'];
+                $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'Data Failed Rejected'];
                 return response()->json($status, 200);
             }
         }

@@ -4,11 +4,11 @@
 @endsection
 
 @section('content')
-    <style>
+    {{-- <style>
         input:read-only {
             background-color: transparent !important;
         }
-    </style>
+    </style> --}}
 
     <div class="row" style="font-size: 10pt;">
         <div class="col-lg-12">
@@ -53,8 +53,7 @@
                             <div class="col-md-4">
                                 <label class="col-sm-12 control-label">PO Number</label>
                                 <div class="col-sm-12">
-                                    <input type="text" class="form-control" id="nomorpo" name="nomorpo"
-                                        style="background-color: transparent" readonly>
+                                    <input type="text" class="form-control" id="nomorpo" name="nomorpo" readonly>
                                 </div>
                             </div>
                             <div class="col-md-4">
@@ -127,8 +126,7 @@
                                 <div class="form-group">
                                     <label class="col-sm-12 control-label">Forwarder</label>
                                     <div class="col-sm-12">
-                                        <input type="text" class="form-control" id="forwarder" name="forwarder"
-                                            readonly>
+                                        <input type="text" class="form-control" id="forwarder" name="forwarder" readonly>
                                     </div>
                                 </div>
                             </div>
@@ -212,28 +210,12 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-md-6">
+                            <div class="col-md-6 mt-5">
                                 <div class="form-group">
-                                    <br>
-                                    <br>
-                                    {{-- <div class="row">
-                                        <div class="col-md-6">
-                                            <div class="form-group">
-                                                <div class="col-sm-12"> --}}
                                     <button type="button" class="btnapproval btnconfirm btn btn-success"
                                         data-value="confirm">Confirm</button>
-                                    {{-- </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <div class="form-group">
-                                                <div class="col-sm-12"> --}}
                                     <button type="button" class="btnapproval btn btn-danger"
                                         data-value="reject">Reject</button>
-                                    {{-- </div>
-                                            </div>
-                                        </div>
-                                    </div> --}}
                                 </div>
                             </div>
                         </div>
@@ -336,9 +318,12 @@
                         _token: $('meta[name=csrf-token]').attr('content'),
                         id: idku,
                     },
-                    beforeSend: function(xhr) {
+                    beforeSend: function(param) {
                         Swal.fire({
-                            html: "Please Wait",
+                            title: 'Please Wait .......',
+                            // html: '',
+                            allowEscapeKey: false,
+                            allowOutsideClick: false,
                             showCancelButton: false,
                             showConfirmButton: false,
                             onOpen: () => {
@@ -356,17 +341,21 @@
                     $('#datashipmode').empty();
 
                     html =
-                        '<table border="1" style="width:100%"><tr><th>PO Number</th><th>Material</th><th>Material Description</th><th>HS Code</th><th>Color</th><th>Size</th><th>Qty PO</th><th>Qty Book</th><th>Status</th></tr>';
+                        '<table border="1" style="width:100%; text-align:center"><tr><th>PO Number</th><th>Material</th><th>Material Description</th><th>HS Code</th><th>Color</th><th>Size</th><th>Qty PO</th><th>Qty Book</th><th>Status</th></tr>';
                     for (let index = 0; index < mydata.length; index++) {
+                        let myhs = '';
+                        if (mydata[index].hscode) {
+                            myhs = mydata[index].hscode;
+                        }
+
                         html +=
                             '<tr><td>' + mydata[index].pono + '</td><td>' + mydata[index]
                             .matcontents + '</td><td>' + mydata[index]
-                            .itemdesc + '</td><td>' + mydata[index]
-                            .hscode + '</td><td>' + mydata[index]
+                            .itemdesc + '</td><td>' + myhs + '</td><td>' + mydata[index]
                             .colorcode + '</td><td>' + mydata[index]
                             .size + '</td><td>' +
-                            mydata[index].qtypo + '</td><td>' + mydata[index].qty_allocation +
-                            '</td><td>' + mydata[index].statusforwarder +
+                            mydata[index].qtypo + '</td><td>' + mydata[index].qty_booking +
+                            '</td><td>' + mydata[index].statusbooking +
                             '</td><td><input type="hidden" id="dataid-' + index + '" data-idpo="' +
                             mydata[index].id + '" data-idfwd="' + mydata[index].id_forwarder +
                             '" data-idformpo="' +
@@ -489,9 +478,6 @@
 
             $('#submittolak').click(function(e) {
                 let tolak = $('#tolak_alasan').val();
-                // let idpo = $('#dataid').attr('data-idpo');
-                // let idfwd = $('#dataid').attr('data-idfwd');
-                // let idformpo = $('#dataid').attr('data-idformpo');
 
                 var arrayku = [];
                 for (let index = 0; index < Number(length); index++) {
@@ -517,11 +503,17 @@
                         dataType: 'json',
                         data: {
                             _token: $('meta[name=csrf-token]').attr('content'),
-                            // idpo: idpo,
-                            // idfwd: idfwd,
-                            // idformpo: idformpo,
                             dataid: arrayku,
                             tolak: tolak
+                        },
+                        beforeSend: function(xhr) {
+                            Swal.fire({
+                                title: "Please Wait ...",
+                                html: "Data Will Be Reject",
+                                showCancelButton: false,
+                                showConfirmButton: false
+                            })
+                            Swal.showLoading()
                         },
                         success: function(response) {
                             Swal.fire({
@@ -529,9 +521,7 @@
                                 text: response.message,
                                 type: (response.status != 'error') ? 'success' : 'error'
                             }).then((result) => {
-                                // $('#modal_tolak').modal('hide');
-                                // $('#approvalfwd').modal('hide');
-                                // table.ajax.reload();
+                                Swal.close();
                                 (response.status == 'success') ? window.location
                                     .replace("{{ route('page_approval') }}"):
                                     ''
@@ -563,10 +553,6 @@
                         if (result.dismiss == 'cancel') {
                             return;
                         } else {
-                            // let idpo = $('#dataid').attr('data-idpo');
-                            // let idfwd = $('#dataid').attr('data-idfwd');
-                            // let idformpo = $('#dataid').attr('data-idformpo');
-
                             var arrayku = [];
                             for (let index = 0; index < Number(length); index++) {
                                 let data = {
@@ -583,30 +569,24 @@
                                 dataType: 'json',
                                 data: {
                                     _token: $('meta[name=csrf-token]').attr('content'),
-                                    // idpo: idpo,
-                                    // idfwd: idfwd,
-                                    // idformpo: idformpo,
                                     dataid: arrayku,
                                 },
                                 beforeSend: function(xhr) {
                                     Swal.fire({
-                                        title: "Loading...",
-                                        html: "Please Wait",
+                                        title: "Please Wait ...",
+                                        html: "Data Will Be Confirm",
                                         showCancelButton: false,
                                         showConfirmButton: false
                                     })
                                     Swal.showLoading()
                                 },
                                 success: function(response) {
-                                    console.log('response :>> ', response);
                                     Swal.fire({
                                         title: response.title,
                                         text: response.message,
                                         type: (response.status != 'error') ? 'success' :
                                             'error'
                                     }).then((result) => {
-                                        // $('#approvalfwd').modal('hide');
-                                        // table.ajax.reload();
                                         Swal.close();
                                         (response.status == 'success') ? window.location
                                             .replace("{{ route('page_approval') }}"):
