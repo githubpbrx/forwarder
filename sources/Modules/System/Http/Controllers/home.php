@@ -164,15 +164,15 @@ class home extends Controller
             ->get();
 
         $grouplogistik = modelgroup_access::where('group_access_name', 'Logistik')->select('group_access_id')->first();
-        $getprivilege = privilege::where('privilege_user_nik', Session::get('session')['user_nik'])->where('privilege_group_access_id', $grouplogistik->group_access_id)->where('privilege_aktif', 'Y')->get();
+        $getprivilege = privilege::where('privilege_user_nik', Session::get('session')['user_nik'])->where('privilege_group_access_id', $grouplogistik->group_access_id)->where('privilege_aktif', 'Y')->get(['privilege_id']);
         if (count($getprivilege) >= 1) {
             $dataapproval = formpo::join('po', 'po.id', 'formpo.idpo')
-                // ->join('privilege', 'privilege.idforwarder', 'formpo.idmasterfwd')
-                // ->where('privilege.privilege_group_access_id', $grouplogistik->group_access_id)
+                ->join('masterforwarder', 'masterforwarder.id', 'formpo.idmasterfwd')
+                ->join('forwarder', 'forwarder.id_forwarder', 'formpo.idforwarder')
                 ->where('formpo.statusformpo', 'waiting')
-                ->where('formpo.aktif', 'Y')
+                ->where('formpo.aktif', 'Y')->where('masterforwarder.aktif', 'Y')->where('forwarder.aktif', 'Y')
                 ->groupby('po.pideldate')
-                ->get();
+                ->get(['formpo.id_formpo']);
         } else {
             $dataapproval = [];
         }
@@ -182,7 +182,7 @@ class home extends Controller
             $datauserfwd = privilege::where('privilege_aktif', 'N')
                 ->where('status', 'waiting')
                 ->where('deleted_at', null)
-                ->get();
+                ->get(['privilege_id']);
         } else {
             $datauserfwd = [];
         }
@@ -755,10 +755,9 @@ class home extends Controller
                 ->leftjoin('masterhscode', 'masterhscode.matcontent', 'po.matcontents')
                 ->where('po.pino', $datapino)
                 ->where('privilege.privilege_user_nik', Session::get('session')['user_nik'])
-                ->where(function ($kus) {
-                    $kus->where('forwarder.statusapproval', null)->orWhere('forwarder.statusapproval', 'reject')->orWhere('forwarder.statusbooking', NULL)->orWhere('forwarder.statusbooking', 'partial_booking');
-                })
-                // ->where('forwarder.statusallocation', null)
+                // ->where(function ($kus) {
+                //     $kus->where('forwarder.statusapproval', null)->orWhere('forwarder.statusapproval', 'reject')->orWhere('forwarder.statusbooking', NULL)->orWhere('forwarder.statusbooking', 'partial_booking');
+                // })
                 ->where('forwarder.aktif', 'Y')
                 ->where(function ($hs) {
                     $hs->where('masterhscode.aktif', null)->orWhere('masterhscode.aktif', 'N')->orWhere('masterhscode.aktif', 'Y');
@@ -778,10 +777,9 @@ class home extends Controller
             ->join('mastersupplier', 'mastersupplier.id', 'po.vendor')
             ->whereIn('po.pino', $pino)
             ->where('privilege.privilege_user_nik', Session::get('session')['user_nik'])
-            ->where(function ($kus) {
-                $kus->where('forwarder.statusapproval', null)->orWhere('forwarder.statusapproval', 'reject')->orWhere('forwarder.statusbooking', NULL)->orWhere('forwarder.statusbooking', 'partial_booking');
-            })
-            // ->where('forwarder.statusallocation', null)
+            // ->where(function ($kus) {
+            //     $kus->where('forwarder.statusapproval', null)->orWhere('forwarder.statusapproval', 'reject')->orWhere('forwarder.statusbooking', NULL)->orWhere('forwarder.statusbooking', 'partial_booking');
+            // })
             ->where('forwarder.aktif', 'Y')->where('privilege.privilege_aktif', 'Y')->where('mastersupplier.aktif', 'Y')
             ->selectRaw(' forwarder.*, po.id, po.pono, po.matcontents, po.itemdesc, po.colorcode, po.size, po.qtypo, po.pino, mastersupplier.nama')
             ->groupby('po.pono')
@@ -903,7 +901,6 @@ class home extends Controller
 
     public function saveformpo(Request $request)
     {
-        // dd($request);
         DB::beginTransaction();
 
         if ($request->shipmode == 'fcl') {
@@ -1016,7 +1013,6 @@ class home extends Controller
                 $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'Please contact the supplier for the pino input validation process'];
                 return response()->json($status, 200);
             }
-            // dd($cekpino);
 
             $cekformpo = formpo::where('idpo', $val['idpo'])->where('idforwarder', $val['idforwarder'])->where('idmasterfwd', $val['idmasterfwd'])->where('statusformpo', 'reject')->where('aktif', 'Y')->pluck('id_formpo');
             if (count($cekformpo) > 0) {
@@ -1027,13 +1023,41 @@ class home extends Controller
                 ]);
             }
 
-            $save1 = formpo::insert([
+            $cekpo = po::where('id', $val['idpo'])->first();
+            $save1 = false;
+            if ($cekpo != null) {
+                if ($cekpo->statusconfirm != 'waiting') {
+                    $save1 = po::where('id', $val['idpo'])->update([
+                        'statusconfirm' => 'waiting',
+                        'updated_at'    => date('Y-m-d H:i:s'),
+                    ]);
+                } else {
+                    $save1 = true;
+                }
+            }
+
+            // $getqtybooking[] = formpo::where('idpo', $val['idpo'])->where('idforwarder', $val['idforwarder'])->where('idmasterfwd', $val['idmasterfwd'])->where('statusformpo', '!=', 'reject')->selectRaw(' id_formpo, sum(qty_booking) as totalbooking ')->where('aktif', 'Y')->first();
+            if ($cekpo->qtypo == $val['qtybook']) {
+                $statbook = 'full_booking';
+            } else {
+                $statbook = 'partial_booking';
+            }
+
+            $save2 = forwarder::where('id_forwarder', $val['idforwarder'])->update([
+                'statusapproval' => 'waiting',
+                'statusbooking'  => $statbook,
+                'updated_at'     => date('Y-m-d H:i:s'),
+                'updated_by'     => Session::get('session')['user_nik']
+            ]);
+
+            $save3 = formpo::insert([
                 'idpo'              => $val['idpo'],
                 'idmasterfwd'       => $val['idmasterfwd'],
                 'idforwarder'       => $val['idforwarder'],
                 'idroute'           => $request->route,
                 'idportloading'     => $request->portloading,
                 'idportdestination' => $request->portdestination,
+                'status_booking'    => $statbook,
                 'qty_booking'       => $val['qtybook'],
                 'kode_booking'      => strtoupper($request->nobooking),
                 'date_booking'      => $request->datebooking,
@@ -1048,34 +1072,7 @@ class home extends Controller
                 'created_by'        => Session::get('session')['user_nik']
             ]);
 
-            $cekpo = po::where('id', $val['idpo'])->first();
-            $save2 = false;
-            if ($cekpo != null) {
-                if ($cekpo->statusconfirm != 'waiting') {
-                    $save2 = po::where('id', $val['idpo'])->update([
-                        'statusconfirm' => 'waiting',
-                        'updated_at'    => date('Y-m-d H:i:s'),
-                    ]);
-                } else {
-                    $save2 = true;
-                }
-            }
-
-            $getqtybooking = formpo::where('idpo', $val['idpo'])->where('idforwarder', $val['idforwarder'])->where('idmasterfwd', $val['idmasterfwd'])->where('statusformpo', '!=', 'reject')->selectRaw(' sum(qty_booking) as totalbooking ')->where('aktif', 'Y')->first();
-            if ($cekpo->qtypo == $getqtybooking->totalbooking) {
-                $statbook = 'full_booking';
-            } else {
-                $statbook = 'partial_booking';
-            }
-
-            $save3 = forwarder::where('id_forwarder', $val['idforwarder'])->update([
-                'statusapproval' => 'waiting',
-                'statusbooking'  => $statbook,
-                'updated_at'     => date('Y-m-d H:i:s'),
-                'updated_by'     => Session::get('session')['user_nik']
-            ]);
-
-            $save3 = ($save3 == 1) ? true : $save3;
+            $save2 = ($save2 == 1) ? true : $save2;
             if ($save1) {
                 $sukses[] = "OK frompo 1";
             } else {
@@ -1097,12 +1094,12 @@ class home extends Controller
 
         if (empty($gagal)) {
             DB::commit();
-            LogActivity::addToLog('Web Forwarder :: Forwarder : Insert Data Approval PO by Forwarder', $this->micro);
-            $status = ['title' => 'Success', 'status' => 'success', 'message' => 'Data Successfully Saved'];
+            LogActivity::addToLog('Web Forwarder :: Forwarder : Insert Data Booking PO by Forwarder', $this->micro);
+            $status = ['title' => 'Success', 'status' => 'success', 'message' => 'Data Successfully Booking'];
             return response()->json($status, 200);
         } else {
             DB::rollback();
-            $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'Data Failed Saved'];
+            $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'Data Failed Booking'];
             return response()->json($status, 200);
         }
     }

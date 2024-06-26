@@ -153,9 +153,10 @@ class ApprovalConfirmation extends Controller
     {
         $data = formpo::join('privilege', 'privilege.idforwarder', 'formpo.idmasterfwd')
             ->join('po', 'po.id', 'formpo.idpo')
-            // ->where('privilege.nikfinance', Session::get('session')['user_nik'])
+            ->join('masterforwarder', 'masterforwarder.id', 'formpo.idmasterfwd')
+            ->join('forwarder', 'forwarder.id_forwarder', 'formpo.idforwarder')
             ->where('formpo.statusformpo', 'waiting')
-            ->where('formpo.aktif', 'Y')
+            ->where('privilege.privilege_aktif', 'Y')->where('formpo.aktif', 'Y')->where('masterforwarder.aktif', 'Y')->where('forwarder.aktif', 'Y')
             ->groupby('po.pideldate')
             ->get();
         // dd($data);
@@ -191,7 +192,6 @@ class ApprovalConfirmation extends Controller
 
                 return $button;
             })
-            // ->rawColumns(['poku', 'date', 'material', 'status', 'action'])
             // ->rawColumns(['status'])
             ->make(true);
     }

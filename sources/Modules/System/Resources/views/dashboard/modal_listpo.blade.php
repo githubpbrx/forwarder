@@ -91,10 +91,16 @@
                                                     
                                                     if ($dat['withformpo'] == null) {
                                                         $remain = $dat->qtypo;
+                                                        $block = '';
+                                                        $ceked = 'checked';
                                                     } elseif ($qtybook == $dat->qtypo) {
                                                         $remain = 0;
+                                                        $block = 'disabled';
+                                                        $ceked = '';
                                                     } else {
                                                         $remain = $dat->qtypo - $qtybook;
+                                                        $block = '';
+                                                        $ceked = 'checked';
                                                     }
                                                     
                                                     ?>
@@ -102,7 +108,8 @@
                                                         <td>
                                                             <input type="checkbox"
                                                                 class="check-{{ $key }}{{ $key2 }}"
-                                                                style="height:18px;width:18px" checked>
+                                                                style="height:18px;width:18px"
+                                                                {{ $block }}{{ $ceked }}>
                                                         </td>
                                                         <td>{{ $dat->po_nomor }}</td>
                                                         <td data-name="mat[]">{{ $dat->matcontents }}</td>
@@ -119,8 +126,8 @@
                                                             <input type="number" min="0"
                                                                 id="qtybook-{{ $key }}{{ $key2 }}"
                                                                 name="qtybook"
-                                                                class="form-control cekinput-{{ $key }}{{ $key2 }}"
-                                                                data-remain="{{ $remain }}">
+                                                                class="form-control trigerinput cekinput-{{ $key }}{{ $key2 }}"
+                                                                data-remain="{{ $remain }}" {{ $block }}>
                                                         </td>
                                                     </tr>
                                                 @endforeach
@@ -366,13 +373,20 @@
         for (let index = 0; index < dataku.length; index++) {
             for (let index2 = 0; index2 < dataku[index].length; index2++) {
                 $('.checkall-' + index).change(function(e) {
+                    let getqty = dataku[index][index2];
                     if (this.checked) {
-                        $('.check-' + index + index2).prop('checked', true);
-                        $('.cekinput-' + index + index2).prop('disabled', false);
+                        if (getqty['qtybook'] == getqty['qtypo']) {
+                            $('.check-' + index + index2).prop('checked', false);
+                            $('.cekinput-' + index + index2).prop('disabled', true);
+                            $('.cekinput-' + index + index2).val('');
+                        } else {
+                            $('.check-' + index + index2).prop('checked', true);
+                            $('.cekinput-' + index + index2).prop('disabled', false);
+                        }
                     } else {
                         $('.check-' + index + index2).prop('checked', false);
+                        $('.cekinput-' + index + index2).val('');
                         $('.cekinput-' + index + index2).prop('disabled', true);
-
                     }
                 });
             }
@@ -384,6 +398,7 @@
                     if (this.checked) {
                         $('.cekinput-' + index + index2).prop('disabled', false);
                     } else {
+                        $('.cekinput-' + index + index2).val('');
                         $('.cekinput-' + index + index2).prop('disabled', true);
                     }
                 });
@@ -600,7 +615,7 @@
                     var cekdisabled = $('.cekinput-' + index + index2).prop('disabled');
                     let val = $('.cekinput-' + index + index2).val();
 
-                    if (!cekdisabled) {
+                    if (!cekdisabled && val != 0) {
                         let data = {
                             'idforwarder': dataku[index][index2].id_forwarder,
                             'idpo': dataku[index][index2].idpo,
@@ -715,7 +730,6 @@
                         });
                         $('#btnsubmit').html('Submit')
                         $('#btnsubmit').prop('disabled', false)
-                        swal.close();
                         return;
                     }
                 });
