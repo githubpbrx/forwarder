@@ -46,6 +46,9 @@
                                                 <th>
                                                     <center>Company</center>
                                                 </th>
+                                                <th>
+                                                    <center>Status</center>
+                                                </th>
                                             </tr>
                                         </thead>
                                     </table>
@@ -154,6 +157,10 @@
                     {
                         data: 'company',
                         name: 'company'
+                    },
+                    {
+                        data: 'status',
+                        name: 'status'
                     },
                     // {
                     //     data: 'action',

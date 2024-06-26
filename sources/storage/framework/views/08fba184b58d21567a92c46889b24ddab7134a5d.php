@@ -41,6 +41,11 @@
                                     <a href="#" type="button" id="search" class="btn btn-info form-control"
                                         data-value="klik">Search</a>
                                 </div>
+                                <div class="ml-auto">
+                                    <label class="control-label">&nbsp;</label>
+                                    <a href="<?php echo e(url('report/po/getexcelpoall')); ?>" type="button"
+                                        class="btn btn-warning form-control" target="_BLANK">Download Excel</a>
+                                </div>
                             </div>
                             <div class="row mt-3 mb-2">
                                 <div class="col-12">

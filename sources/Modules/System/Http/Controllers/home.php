@@ -355,7 +355,7 @@ class home extends Controller
                     $kus->where('forwarder.statusapproval', null)->orWhere('forwarder.statusapproval', 'reject')->orWhere('forwarder.statusbooking', NULL)->orWhere('forwarder.statusbooking', 'partial_booking');
                 })
                 ->whereRaw('forwarder.aktif="Y" AND privilege.privilege_aktif="Y" AND mastersupplier.aktif="Y" ' . $where . ' ')
-                ->selectRaw(' forwarder.statusforwarder, forwarder.statusapproval, po.id, po.pono, sum(po.qtypo) as qtypoku, po.itemdesc, po.pino, po.pideldate, po.company, mastersupplier.nama, sum(formpo.qty_booking) as qtybook ')
+                ->selectRaw(' forwarder.statusforwarder, forwarder.statusapproval, forwarder.statusbooking, po.id, po.pono, sum(po.qtypo) as qtypoku, po.itemdesc, po.pino, po.pideldate, po.company, mastersupplier.nama, sum(formpo.qty_booking) as qtybook ')
                 ->groupby('po.pino')
                 ->get();
 
@@ -401,6 +401,14 @@ class home extends Controller
                         $company = $query->company;
                     }
                     return  $company;
+                })
+                ->addColumn('status', function ($query) {
+                    if ($query->statusbooking == 'partial_booking') {
+                        $stat = 'Partial Booking';
+                    } else {
+                        $stat = 'Not Processed';
+                    }
+                    return  $stat;
                 })
                 // ->addColumn('statusalokasi', function ($query) {
                 //     if ($query->statusforwarder == 'full_allocated') {
