@@ -322,7 +322,7 @@
                 @if (RoleAccess::whereMenu(13) > 0)
                     <li class="nav-item">
                         <a href="{{ route('process_shipment') }}"
-                            class="nav-link {{ request()->is('transaksi/shipmentprocess*') ? 'active' : '' }}">
+                            class="nav-link {{ request()->is('transaksi/outstandingshipment*') ? 'active' : '' }}">
                             <i class="fa fa-share nav-icon"></i>
                             <p>Outstanding Shipment</p>
                         </a>

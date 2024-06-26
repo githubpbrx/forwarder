@@ -1,7 +1,8 @@
 <div class="modal-body" style="font-size: 10pt;">
     <form action="#" class="form-horizontal" enctype="multipart/form-data">
-        {{ csrf_field() }}
-        {{-- {{ dd($data['dataku'][0]) }} --}}
+        <?php echo e(csrf_field()); ?>
+
+        
         <?php
         $nopo = [];
         $nopi = [];
@@ -18,7 +19,7 @@
                     <label class="col-sm-12 control-label">PO Number</label>
                     <div class="col-sm-12">
                         <input type="text" class="form-control" id="nomorpo" name="nomorpo"
-                            value="{{ implode(', ', $nopo) }}" readonly>
+                            value="<?php echo e(implode(', ', $nopo)); ?>" readonly>
                     </div>
                 </div>
             </div>
@@ -27,7 +28,7 @@
                     <label class="col-sm-12 control-label">PI Number</label>
                     <div class="col-sm-12">
                         <input type="text" class="form-control" id="nomorpo" name="nomorpo"
-                            value="{{ implode(', ', $nopi) }}" readonly>
+                            value="<?php echo e(implode(', ', $nopi)); ?>" readonly>
                     </div>
                 </div>
             </div>
@@ -36,14 +37,14 @@
                     <label class="col-sm-12 control-label">Supplier</label>
                     <div class="col-sm-12">
                         <input type="text" class="form-control" id="supplier" name="supplier"
-                            value="{{ implode(', ', $supname) }}" readonly>
+                            value="<?php echo e(implode(', ', $supname)); ?>" readonly>
                     </div>
                 </div>
             </div>
         </div>
         <hr style="width: 100%; color: rgb(192, 192, 192); height: 0.5px; background-color:rgb(192, 192, 192);" />
         <div class="row">
-            <table border="1" width="100%">
+            <table border="1" width="100%" style="text-align: center">
                 <thead>
                     <th><input type="checkbox" class="checkall" style="height:18px;width:18px" checked>
                     </th>
@@ -57,7 +58,7 @@
                     <th>Qty Ship</th>
                 </thead>
                 <tbody>
-                    @foreach ($data['dataku'] as $key => $item)
+                    <?php $__currentLoopData = $data['dataku']; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $key => $item): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                         <?php
                         if ($item->qtyship == null) {
                             $remain = $item['withpo']->qtypo;
@@ -84,21 +85,21 @@
                         
                         ?>
                         <tr>
-                            <td><input type="checkbox" id="check-{{ $key }}" style="height:18px;width:18px"
-                                    {{ $block }}{{ $ceked }}></td>
-                            <td data-name="mat[]">{{ $item['withpo']->matcontents }}</td>
-                            <td>{{ $item['withpo']->itemdesc }}</td>
-                            <td> <input type="text" class="form-control" value="{{ $hscode }}"
+                            <td><input type="checkbox" id="check-<?php echo e($key); ?>" style="height:18px;width:18px"
+                                    <?php echo e($block); ?><?php echo e($ceked); ?>></td>
+                            <td data-name="mat[]"><?php echo e($item['withpo']->matcontents); ?></td>
+                            <td><?php echo e($item['withpo']->itemdesc); ?></td>
+                            <td> <input type="text" class="form-control" value="<?php echo e($hscode); ?>"
                                     id="inputhscode[]" name="inputhscode[]" autocomplete="off"></td>
-                            <td>{{ $item['withpo']->colorcode }}</td>
-                            <td>{{ $item['withpo']->size }}</td>
-                            <td>{{ $item['withpo']->qtypo }}</td>
-                            <td>{{ $remain }}</td>
+                            <td><?php echo e($item['withpo']->colorcode); ?></td>
+                            <td><?php echo e($item['withpo']->size); ?></td>
+                            <td><?php echo e($item['withpo']->qtypo); ?></td>
+                            <td><?php echo e($remain); ?></td>
                             <td><input type="number" min="0"
-                                    class="form-control trigerinput cekinput-{{ $key }}" id="qty_allocation"
-                                    name="qty_allocation" value="{{ $inputalok }}" {{ $block }}></td>
+                                    class="form-control trigerinput cekinput-<?php echo e($key); ?>" id="qty_allocation"
+                                    name="qty_allocation" value="<?php echo e($inputalok); ?>" <?php echo e($block); ?>></td>
                         </tr>
-                    @endforeach
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                 </tbody>
             </table>
         </div>
@@ -109,7 +110,7 @@
                     <label class="col-sm-12 control-label">Booking Number</label>
                     <div class="col-sm-12">
                         <input type="text" class="form-control" id="nobook" name="nobook"
-                            value="{{ $data['dataku'][0]->kode_booking }}" readonly>
+                            value="<?php echo e($data['dataku'][0]->kode_booking); ?>" readonly>
                     </div>
                 </div>
             </div>
@@ -118,7 +119,7 @@
                     <label class="col-sm-12 control-label">Date Booking</label>
                     <div class="col-sm-12">
                         <input type="text" class="form-control" id="datebook" name="datebook"
-                            value="{{ $data['dataku'][0]->date_booking }}" readonly>
+                            value="<?php echo e($data['dataku'][0]->date_booking); ?>" readonly>
                     </div>
                 </div>
             </div>
@@ -127,7 +128,7 @@
                     <label class="col-sm-12 control-label">ETD (Estimated Time Departure)</label>
                     <div class="col-sm-12">
                         <input type="text" class="form-control" id="etd" name="etd"
-                            value="{{ $data['dataku'][0]->etd }}" readonly>
+                            value="<?php echo e($data['dataku'][0]->etd); ?>" readonly>
                     </div>
                 </div>
             </div>
@@ -138,7 +139,7 @@
                     <label class="col-sm-12 control-label">ETA (Estimated Time Arrival)</label>
                     <div class="col-sm-12">
                         <input type="text" class="form-control" id="eta" name="eta"
-                            value="{{ $data['dataku'][0]->eta }}" readonly>
+                            value="<?php echo e($data['dataku'][0]->eta); ?>" readonly>
                     </div>
                 </div>
             </div>
@@ -147,7 +148,7 @@
                     <label class="col-sm-12 control-label">Route</label>
                     <div class="col-sm-12">
                         <input type="text" class="form-control" id="route" name="route"
-                            value="{{ $data['dataku'][0]['withroute']->route_desc }}" readonly>
+                            value="<?php echo e($data['dataku'][0]['withroute']->route_desc); ?>" readonly>
                     </div>
                 </div>
             </div>
@@ -337,7 +338,7 @@
                     <label class="col-sm-12 control-label">Package</label>
                     <div class="col-sm-12">
                         <input type="text" class="form-control" id="package" name="package"
-                            value="{{ $data['dataku'][0]->package }}" autocomplete="off">
+                            value="<?php echo e($data['dataku'][0]->package); ?>" autocomplete="off">
                     </div>
                 </div>
             </div>
@@ -405,7 +406,7 @@
                     <label class="col-sm-12 control-label">ATD (Actual Time Departure)<code>*</code></label>
                     <div class="col-sm-12">
                         <input type="text" class="form-control" id="etdfix" name="etdfix"
-                            value="{{ $data['dataku'][0]->etd }}" autocomplete="off">
+                            value="<?php echo e($data['dataku'][0]->etd); ?>" autocomplete="off">
                     </div>
                 </div>
             </div>
@@ -414,7 +415,7 @@
                     <label class="col-sm-12 control-label">ATA (Actual Time Arrival)<code>*</code></label>
                     <div class="col-sm-12">
                         <input type="text" class="form-control" id="etafix" name="etafix"
-                            value="{{ $data['dataku'][0]->eta }}" autocomplete="off">
+                            value="<?php echo e($data['dataku'][0]->eta); ?>" autocomplete="off">
                     </div>
                 </div>
             </div>
@@ -428,7 +429,7 @@
 
 <script type="text/javascript">
     var current = 1;
-    var dataku = @JSON($data['dataku']);
+    var dataku = <?php echo json_encode($data['dataku'], 15, 512) ?>;
 
     var radsplit = dataku[0].subshipmode.split("-")
     var cekrad = radsplit[0];
@@ -616,7 +617,7 @@
     $('#portloading').select2({
         placeholder: '-- Choose Port Of Loading --',
         ajax: {
-            url: "{!! route('getportloading') !!}",
+            url: "<?php echo route('getportloading'); ?>",
             dataType: 'json',
             delay: 500,
             type: 'post',
@@ -654,7 +655,7 @@
     $('#portdestination').select2({
         placeholder: '-- Choose Port Of Destination --',
         ajax: {
-            url: "{!! route('getportdestination') !!}",
+            url: "<?php echo route('getportdestination'); ?>",
             dataType: 'json',
             delay: 500,
             type: 'post',
@@ -826,7 +827,7 @@
         } else {
             $.ajax({
                 type: "post",
-                url: "{{ route('saveshipmentprocess') }}",
+                url: "<?php echo e(route('saveshipmentprocess')); ?>",
                 processData: false,
                 contentType: false,
                 data: form_data,
@@ -838,7 +839,7 @@
                         type: (response.status != 'error') ? 'success' : 'error'
                     }).then((result) => {
                         (response.status == 'success') ? window.location
-                            .replace("{{ route('process_shipment') }}"):
+                            .replace("<?php echo e(route('process_shipment')); ?>"):
                             ''
                     });
                     return;
@@ -864,3 +865,4 @@
         return;
     }
 </script>
+<?php /**PATH D:\laragon\www\forwarder\sources\Modules/Transaksi\Resources/views/modalshipment.blade.php ENDPATH**/ ?>

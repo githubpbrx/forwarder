@@ -1,36 +1,45 @@
-<?php $__env->startSection('title', $title); ?>
-<?php $__env->startSection('link_href'); ?>
+@extends('system::template/master')
+@section('title', $title)
+@section('link_href')
     <link href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/themes/smoothness/jquery-ui.css" rel="stylesheet" />
-<?php $__env->stopSection(); ?>
+@endsection
 
-<?php $__env->startSection('content'); ?>
-    <div class="card" style="font-size: 10pt;">
-        <div class="card-body">
-            <table id="serverside" class="table table-bordered table-striped">
-                <thead>
-                    <tr>
-                        <th>
-                            <center>List PO#</center>
-                        </th>
-                        <th>
-                            <center>Booking Number</center>
-                        </th>
-                        <th>
-                            <center>Quantity PO</center>
-                        </th>
-                        <th>
-                            <center>Status</center>
-                        </th>
-                        <th>
-                            <center>Action</center>
-                        </th>
-                    </tr>
-                </thead>
-            </table>
+@section('content')
+    <div class="row">
+        <div class="col-12">
+            <div class="card" style="font-size: 10pt;">
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table id="serverside" class="table table-bordered table-striped">
+                            <thead>
+                                <tr>
+                                    <th>
+                                        <center>List PO#</center>
+                                    </th>
+                                    <th>
+                                        <center>Booking Number</center>
+                                    </th>
+                                    <th>
+                                        <center>Quantity PO</center>
+                                    </th>
+                                    <th>
+                                        <center>Quantity Booking</center>
+                                    </th>
+                                    <th>
+                                        <center>Status</center>
+                                    </th>
+                                    <th>
+                                        <center>Action</center>
+                                    </th>
+                                </tr>
+                            </thead>
+                        </table>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
-
-    
+    {{-- ----------------- modal content ----------------- --}}
     <div class="modal fade" id="updateshipment">
         <div class="modal-dialog modal-xl">
             <div class="modal-content">
@@ -44,10 +53,10 @@
             </div>
         </div>
     </div>
-    
-<?php $__env->stopSection(); ?>
+    {{-- ----------------- /.modal content ----------------- --}}
+@endsection
 
-<?php $__env->startSection('script'); ?>
+@section('script')
     <script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js"></script>
     <script type="text/javascript">
         $(document).ready(function() {
@@ -62,7 +71,7 @@
                 processing: true,
                 serverSide: true,
                 ajax: {
-                    url: "<?php echo e(route('list_shipmentprocess')); ?>"
+                    url: "{{ route('list_shipmentprocess') }}"
                 },
                 columns: [{
                         data: 'listpo',
@@ -75,6 +84,10 @@
                     {
                         data: 'qtypo',
                         name: 'qtypo'
+                    },
+                    {
+                        data: 'qtybooking',
+                        name: 'qtybooking'
                     },
                     {
                         data: 'status',
@@ -97,7 +110,7 @@
             $('body').on('click', '#updateship', function() {
                 let idku = $(this).attr('data-id');
                 $.ajax({
-                    url: "<?php echo route('form_shipmentprocess'); ?>",
+                    url: "{!! route('form_shipmentprocess') !!}",
                     type: 'POST',
                     // dataType: 'json',
                     data: {
@@ -129,6 +142,4 @@
             });
         });
     </script>
-<?php $__env->stopSection(); ?>
-
-<?php echo $__env->make('system::template/master', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH D:\laragon\www\forwarder\sources\Modules/Transaksi\Resources/views/process_shipment.blade.php ENDPATH**/ ?>
+@endsection

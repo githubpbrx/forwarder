@@ -304,7 +304,7 @@
                 <?php if(RoleAccess::whereMenu(13) > 0): ?>
                     <li class="nav-item">
                         <a href="<?php echo e(route('process_shipment')); ?>"
-                            class="nav-link <?php echo e(request()->is('transaksi/shipmentprocess*') ? 'active' : ''); ?>">
+                            class="nav-link <?php echo e(request()->is('transaksi/outstandingshipment*') ? 'active' : ''); ?>">
                             <i class="fa fa-share nav-icon"></i>
                             <p>Outstanding Shipment</p>
                         </a>

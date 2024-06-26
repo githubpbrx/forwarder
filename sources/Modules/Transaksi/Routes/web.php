@@ -49,13 +49,13 @@ Route::prefix('transaksi')->group(function () {
         // Route::get('listapproval', 'DataShipment@listapproval')->name('list_approval');
     });
 
-    Route::group(['prefix' => 'shipmentprocess'], function () {
-        Route::get('/', 'ProcessShipment@index')->name('process_shipment');
-        Route::get('/listshipmentprocess', 'ProcessShipment@listshipmentprocess')->name('list_shipmentprocess');
-        Route::post('/formshipmentprocess', 'ProcessShipment@formshipment')->name('form_shipmentprocess');
-        Route::post('/saveshipmentprocess', 'ProcessShipment@saveshipment')->name('saveshipmentprocess');
-        Route::post('/getportloading', 'ProcessShipment@getportloading')->name('getportloading');
-        Route::post('/getportdestination', 'ProcessShipment@getportdestination')->name('getportdestination');
+    Route::group(['prefix' => 'outstandingshipment'], function () {
+        Route::get('/', 'OutstandingShipment@index')->name('process_shipment');
+        Route::get('/listshipmentprocess', 'OutstandingShipment@listshipmentprocess')->name('list_shipmentprocess');
+        Route::post('/formshipmentprocess', 'OutstandingShipment@formshipment')->name('form_shipmentprocess');
+        Route::post('/saveshipmentprocess', 'OutstandingShipment@saveshipment')->name('saveshipmentprocess');
+        Route::post('/getportloading', 'OutstandingShipment@getportloading')->name('getportloading');
+        Route::post('/getportdestination', 'OutstandingShipment@getportdestination')->name('getportdestination');
     });
 
     Route::group(['prefix' => 'updatebooking'], function () {

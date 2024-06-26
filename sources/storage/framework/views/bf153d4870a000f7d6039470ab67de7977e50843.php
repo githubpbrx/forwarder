@@ -4,32 +4,40 @@
 <?php $__env->stopSection(); ?>
 
 <?php $__env->startSection('content'); ?>
-    <div class="card" style="font-size: 10pt;">
-        <div class="card-body">
-            <table id="serverside" class="table table-bordered table-striped">
-                <thead>
-                    <tr>
-                        <th>
-                            <center>List PO#</center>
-                        </th>
-                        <th>
-                            <center>Booking Number</center>
-                        </th>
-                        <th>
-                            <center>Quantity PO</center>
-                        </th>
-                        <th>
-                            <center>Status</center>
-                        </th>
-                        <th>
-                            <center>Action</center>
-                        </th>
-                    </tr>
-                </thead>
-            </table>
+    <div class="row">
+        <div class="col-12">
+            <div class="card" style="font-size: 10pt;">
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table id="serverside" class="table table-bordered table-striped">
+                            <thead>
+                                <tr>
+                                    <th>
+                                        <center>List PO#</center>
+                                    </th>
+                                    <th>
+                                        <center>Booking Number</center>
+                                    </th>
+                                    <th>
+                                        <center>Quantity PO</center>
+                                    </th>
+                                    <th>
+                                        <center>Quantity Booking</center>
+                                    </th>
+                                    <th>
+                                        <center>Status</center>
+                                    </th>
+                                    <th>
+                                        <center>Action</center>
+                                    </th>
+                                </tr>
+                            </thead>
+                        </table>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
-
     
     <div class="modal fade" id="updateshipment">
         <div class="modal-dialog modal-xl">
@@ -75,6 +83,10 @@
                     {
                         data: 'qtypo',
                         name: 'qtypo'
+                    },
+                    {
+                        data: 'qtybooking',
+                        name: 'qtybooking'
                     },
                     {
                         data: 'status',
@@ -131,4 +143,4 @@
     </script>
 <?php $__env->stopSection(); ?>
 
-<?php echo $__env->make('system::template/master', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH D:\laragon\www\forwarder\sources\Modules/Transaksi\Resources/views/process_shipment.blade.php ENDPATH**/ ?>
+<?php echo $__env->make('system::template/master', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH D:\laragon\www\forwarder\sources\Modules/Transaksi\Resources/views/outstandingshipment/process_shipment.blade.php ENDPATH**/ ?>
