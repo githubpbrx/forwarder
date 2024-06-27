@@ -3,17 +3,12 @@
 namespace Modules\Report\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
 use Yajra\DataTables\DataTables;
 use Modules\System\Helpers\LogActivity;
-use Session, Crypt, DB, Mail;
-use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
-
 use Modules\Report\Models\modelforwarder;
-use Modules\Report\Models\modelpo;
 use Modules\Report\Models\modelformpo;
 use Modules\Report\Models\modelformshipment;
 
@@ -54,7 +49,7 @@ class ReportAlokasi extends Controller
         }
         if ($request->periode != NULL) {
             $periode = explode(" - ", $request->periode);
-            $where .= ' AND (po.pideldate BETWEEN "' . $periode[0] . '" AND "' . $periode[1] . '")';
+            $where .= ' AND (forwarder.created_at BETWEEN "' . $periode[0] . '" AND "' . $periode[1] . '")';
         }
 
         $data = modelforwarder::join('po', 'po.id', 'forwarder.idpo')
@@ -86,7 +81,7 @@ class ReportAlokasi extends Controller
             }
             if ($request->periode != NULL) {
                 $periode = explode(" - ", $request->periode);
-                $where .= ' AND (po.pideldate BETWEEN "' . $periode[0] . '" AND "' . $periode[1] . '")';
+                $where .= ' AND (forwarder.created_at BETWEEN "' . $periode[0] . '" AND "' . $periode[1] . '")';
             }
 
             $data = modelforwarder::with(['formpo'])
@@ -288,26 +283,6 @@ class ReportAlokasi extends Controller
 
     function detailalokasi(Request $request)
     {
-        // dd($request);
-
-        // $data = modelformpo::join('po', 'po.id', 'formpo.idpo')
-        //     ->join('masterforwarder', 'masterforwarder.id', 'formpo.idmasterfwd')
-        //     ->join('mastersupplier', 'mastersupplier.id', 'po.vendor')
-        //     ->join('masterhscode', 'masterhscode.matcontent', 'po.matcontents')
-        //     ->where('formpo.kode_booking', $request->id)
-        //     ->where('formpo.aktif', 'Y')->where('masterforwarder.aktif', 'Y')->where('mastersupplier.aktif', 'Y')
-        //     ->where('masterhscode.aktif', 'Y')
-        //     ->selectRaw(' formpo.*, po.pono, po.matcontents, po.itemdesc, po.qtypo, po.colorcode, po.size, po.style, po.plant, masterforwarder.name, mastersupplier.nama, masterhscode.hscode ')
-        //     ->get();
-
-        // $getdate = modelformpo::join('po', 'po.id', 'formpo.idpo')
-        //     ->join('masterforwarder', 'masterforwarder.id', 'formpo.idmasterfwd')
-        //     ->join('mastersupplier', 'mastersupplier.id', 'po.vendor')
-        //     ->where('formpo.kode_booking', $request->id)
-        //     ->where('formpo.aktif', 'Y')->where('masterforwarder.aktif', 'Y')->where('mastersupplier.aktif', 'Y')
-        //     ->selectRaw(' formpo.id_formpo, formpo.created_at, formpo.updated_at ')
-        //     ->latest('id_formpo')->first();
-
         $data = modelforwarder::with(['formpo' => function ($var) {
             $var->with(['route', 'loading', 'destination']);
         }])
@@ -322,8 +297,6 @@ class ReportAlokasi extends Controller
             ->where('forwarder.aktif', 'Y')->where('masterforwarder.aktif', 'Y')->where('mastersupplier.aktif', 'Y')->where('masterhscode.aktif', 'Y')
             ->get();
 
-        // dd($data);
-        // return response()->json(['status' => 200, 'data' => $data, 'message' => 'Berhasil']);
         $form = view('report::readyallocation.modalreportalokasi', ['data' => $data]);
         return $form->render();
     }
@@ -498,18 +471,32 @@ class ReportAlokasi extends Controller
 
         return;
     }
-    function excelalokasiall()
+    function excelalokasiall(Request $request)
     {
+        $where = '';
+        if ($request->pono != NULL) {
+            $where .= ' AND po.pono="' . $request->pono . '"';
+        }
+        if ($request->idmasterfwd != NULL) {
+            $where .= ' AND forwarder.idmasterfwd=' . $request->idmasterfwd . ' ';
+        }
+        if ($request->idsupplier != NULL) {
+            $imp = implode("','", $request->idsupplier);
+            $where .= " AND po.vendor IN ('" . $imp . "')";
+        }
+        if ($request->periode != NULL) {
+            $periode = explode(" - ", $request->periode);
+            $where .= ' AND (forwarder.created_at BETWEEN "' . $periode[0] . '" AND "' . $periode[1] . '")';
+        }
+
         $getdata = modelforwarder::with(['formpo'])
             ->join('po', 'po.id', 'forwarder.idpo')
             ->join('mastersupplier', 'mastersupplier.id', 'po.vendor')
             ->join('masterforwarder', 'masterforwarder.id', 'forwarder.idmasterfwd')
-            ->selectRaw(' forwarder.*,  po.pono, po.podate, po.pideldate, po.shipmode, po.curr, po.vendor, po.price, po.qtypo, SUM(po.price * po.qtypo) as amount, mastersupplier.nama, masterforwarder.name')
-            ->where('masterforwarder.kurir', NULL)
-            ->where('forwarder.aktif', 'Y')->where('mastersupplier.aktif', 'Y')->where('masterforwarder.aktif', 'Y')
+            ->selectRaw(' forwarder.*,  po.pono, po.podate, po.shipmode, po.curr, po.vendor, po.price, po.qtypo, SUM(po.price * po.qtypo) as amount, po.pideldate, mastersupplier.nama, masterforwarder.name')
+            ->whereRaw(' forwarder.aktif="Y" AND mastersupplier.aktif="Y" AND masterforwarder.aktif="Y" AND masterforwarder.kurir IS NULL ' . $where . ' ')
             ->groupby('forwarder.po_nomor')->groupby('forwarder.idmasterfwd')
             ->get();
-        // dd($getdata);
 
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
@@ -578,7 +565,7 @@ class ReportAlokasi extends Controller
             }
             $sheet->setCellValue('E' . $rows, $ship);
             $sheet->setCellValue('F' . $rows, $val->name);
-            $sheet->setCellValue('G' . $rows, date("d/m/Y", strtotime($val->created_at)));
+            $sheet->setCellValue('G' . $rows, ($val->created_at == null) ? '' : date("d/m/Y", strtotime($val->created_at)));
             $sheet->setCellValue('H' . $rows, date("d/m/Y", strtotime($val->pideldate)));
             $sheet->setCellValue('I' . $rows, ($val['formpo'] == null) ? '' : $val['formpo']->date_booking);
             $sheet->setCellValue('J' . $rows, ($val->date_fwd == null) ? '' : date("d/m/Y", strtotime($val->date_fwd)));
@@ -628,6 +615,6 @@ class ReportAlokasi extends Controller
         header('Content-Disposition: attachment; filename="' . urlencode($fileName) . '"');
         $writer->save('php://output');
 
-        return;
+        // return;
     }
 }

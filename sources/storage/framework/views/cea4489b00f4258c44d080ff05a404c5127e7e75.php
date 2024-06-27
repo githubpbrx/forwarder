@@ -49,8 +49,8 @@
                                 </div>
                                 <div class="ml-auto">
                                     <label class="control-label">&nbsp;</label>
-                                    <a href="<?php echo e(url('report/alokasi/getexcelalokasiall')); ?>" type="button"
-                                        class="btn btn-warning form-control" target="_BLANK">Download Excel</a>
+                                    <button type="button"class="btn btn-warning form-control" id="btndownload">Download
+                                        Excel</button>
                                 </div>
                             </div>
                             <div class="row mt-3 mb-2">
@@ -179,7 +179,7 @@
                 url: "<?php echo route('report_getchartalokasi'); ?>",
                 beforeSend: function(response) {
                     $('#mychartpo').html(
-                        '<h6 class="text-center mt-5"><span class="fa-stack text-info"><i class="fas fa-circle fa-stack-2x"></i><i class="fas fa-hourglass-half fa-spin fa-stack-1x fa-inverse"></i></span> Please wait! Checking Chart PO...</h6>'
+                        '<h6 class="text-center mt-5"><span class="fa-stack text-info"><i class="fas fa-circle fa-stack-2x"></i><i class="fas fa-hourglass-half fa-spin fa-stack-1x fa-inverse"></i></span> Please wait! Checking Chart Allocation...</h6>'
                     );
                 },
                 success: function(response) {
@@ -419,6 +419,22 @@
                 }).done(function(data) {
                     $('#formdetail').html(data);
                 })
+            });
+
+            $("#btndownload").click(function(e) {
+                let datapo = $('#datapo').val();
+                let datafwd = $('#datafwd').val();
+                let datasupp = $('#datasupp').val();
+                let dataper = $('#periode').val();
+
+                var query = {
+                    'pono': datapo,
+                    'idmasterfwd': datafwd,
+                    'idsupplier': datasupp,
+                    'periode': dataper,
+                }
+                var url = "<?php echo e(url('report/alokasi/getexcelalokasiall')); ?>?" + $.param(query);
+                window.open(url, '_blank');
             });
         });
     </script>
