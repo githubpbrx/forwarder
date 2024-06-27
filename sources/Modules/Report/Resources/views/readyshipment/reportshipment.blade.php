@@ -48,6 +48,11 @@
                                     <a href="#" type="button" id="search" class="btn btn-info form-control"
                                         data-value="klik">Search</a>
                                 </div>
+                                <div class="ml-auto">
+                                    <label class="control-label">&nbsp;</label>
+                                    <button id="btndownload" class="btn btn-warning form-control" type="button">Download
+                                        Excel</button>
+                                </div>
                             </div>
                             <div class="row mt-3 mb-2">
                                 <div class="col-12">
@@ -81,6 +86,9 @@
                                                 </th>
                                                 <th>
                                                     <center>Invoice</center>
+                                                </th>
+                                                <th>
+                                                    <center>Date Submit</center>
                                                 </th>
                                                 <th>
                                                     <center>ATD</center>
@@ -210,6 +218,10 @@
                     {
                         data: 'invoice',
                         name: 'invoice'
+                    },
+                    {
+                        data: 'datesubmit',
+                        name: 'datesubmit'
                     },
                     {
                         data: 'atd',
@@ -382,6 +394,22 @@
                 }).done(function(data) {
                     $('#formdetail').html(data);
                 })
+            });
+
+            $("#btndownload").click(function(e) {
+                let datapo = $('#datapo').val();
+                let datafwd = $('#datafwd').val();
+                let datasupp = $('#datasupp').val();
+                let dataper = $('#periode').val();
+
+                var query = {
+                    'pono': datapo,
+                    'idmasterfwd': datafwd,
+                    'idsupplier': datasupp,
+                    'periode': dataper,
+                }
+                var url = "{{ url('report/shipment/getexcelshipmentall') }}?" + $.param(query);
+                window.open(url, '_blank');
             });
         });
     </script>

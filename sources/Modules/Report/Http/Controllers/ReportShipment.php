@@ -3,18 +3,13 @@
 namespace Modules\Report\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
 use Yajra\DataTables\DataTables;
 use Modules\System\Helpers\LogActivity;
-use Session, Crypt, DB, Mail;
-use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
-
 use Modules\Report\Models\modelcontainership;
 use Modules\Report\Models\modelpo;
-use Modules\Report\Models\modelformpo;
 use Modules\Report\Models\modelformshipment;
 
 class ReportShipment extends Controller
@@ -54,7 +49,7 @@ class ReportShipment extends Controller
         }
         if ($request->periode != NULL) {
             $periode = explode(" - ", $request->periode);
-            $where .= ' AND (po.pideldate BETWEEN "' . $periode[0] . '" AND "' . $periode[1] . '")';
+            $where .= ' AND (formshipment.etdfix BETWEEN "' . $periode[0] . '" AND "' . $periode[1] . '")';
         }
 
         $data = modelformshipment::join('formpo', 'formpo.id_formpo', 'formshipment.idformpo')
@@ -87,7 +82,7 @@ class ReportShipment extends Controller
             }
             if ($request->periode != NULL) {
                 $periode = explode(" - ", $request->periode);
-                $where .= ' AND (po.pideldate BETWEEN "' . $periode[0] . '" AND "' . $periode[1] . '")';
+                $where .= ' AND (formshipment.etdfix BETWEEN "' . $periode[0] . '" AND "' . $periode[1] . '")';
             }
 
             $data = modelformshipment::join('formpo', 'formpo.id_formpo', 'formshipment.idformpo')
@@ -99,7 +94,6 @@ class ReportShipment extends Controller
                 ->selectRaw(' formshipment.*, formpo.kode_booking, po.id, po.pono, po.matcontents, po.qtypo, po.statusalokasi, po.statusconfirm, po.podate, SUM(po.price * po.qtypo) as amount, po.curr, masterforwarder.name, mastersupplier.nama, forwarder.date_fwd')
                 ->groupby('po.pono')->groupby('formshipment.noinv')
                 ->get();
-
 
             return DataTables::of($data)
                 ->addIndexColumn()
@@ -117,6 +111,9 @@ class ReportShipment extends Controller
                 })
                 ->addColumn('invoice', function ($data) {
                     return $data->noinv;
+                })
+                ->addColumn('datesubmit', function ($data) {
+                    return ($data->created_at == NULL) ? '' : date("Y/m/d", strtotime($data->created_at));
                 })
                 ->addColumn('atd', function ($data) {
                     return $data->etdfix;
@@ -295,7 +292,7 @@ class ReportShipment extends Controller
         $sheet->setCellValue('A7', 'Supplier');
         $sheet->getStyle('A4:A7')->getFont()->setBold(true);
         $sheet->setCellValue('C4', 'Forwarder');
-        $sheet->setCellValue('C5', 'Input Data');
+        $sheet->setCellValue('C5', 'Date Submit');
         $sheet->setCellValue('C6', 'Update Data');
         $sheet->getStyle('C4:C6')->getFont()->setBold(true);
 
@@ -488,39 +485,60 @@ class ReportShipment extends Controller
         return;
     }
 
-    function excelshipmentall()
+    function excelshipmentall(Request $request)
     {
-        $getdata = modelpo::join('forwarder', 'forwarder.idpo', 'po.id')
-            ->join('formpo', 'formpo.idforwarder', 'forwarder.id_forwarder')
+        $where = '';
+        if ($request->pono != NULL) {
+            $where .= ' AND po.pono="' . $request->pono . '"';
+        }
+        if ($request->idmasterfwd != NULL) {
+            $where .= ' AND formpo.idmasterfwd=' . $request->idmasterfwd . ' ';
+        }
+        if ($request->idsupplier != NULL) {
+            $imp = implode("','", $request->idsupplier);
+            $where .= " AND po.vendor IN ('" . $imp . "')";
+        }
+        if ($request->periode != NULL) {
+            $periode = explode(" - ", $request->periode);
+            $where .= ' AND (formshipment.etdfix BETWEEN "' . $periode[0] . '" AND "' . $periode[1] . '")';
+        }
+
+        $getdata = modelformshipment::join('formpo', 'formpo.id_formpo', 'formshipment.idformpo')
+            ->join('forwarder', 'forwarder.id_forwarder', 'formpo.idforwarder')
+            ->join('po', 'po.id', 'formpo.idpo')
             ->join('masterforwarder', 'masterforwarder.id', 'formpo.idmasterfwd')
-            ->where('forwarder.aktif', 'Y')->where('formpo.aktif', 'Y')->where('masterforwarder.aktif', 'Y')
-            ->where('masterforwarder.kurir', NULL)
-            ->selectRaw(' po.id, po.pono, po.qtypo, po.statusalokasi, po.statusconfirm, forwarder.qty_allocation, formpo.noinv, masterforwarder.name ')
+            ->join('mastersupplier', 'mastersupplier.id', 'po.vendor')
+            ->whereRaw(' formpo.aktif="Y" AND forwarder.aktif="Y" AND mastersupplier.aktif="Y" AND masterforwarder.aktif="Y" AND formshipment.aktif="Y" AND masterforwarder.kurir IS NULL ' . $where . ' ')
+            ->selectRaw(' formshipment.*, formpo.kode_booking, po.id, po.pono, po.matcontents, po.qtypo, po.statusalokasi, po.statusconfirm, po.podate, SUM(po.price * po.qtypo) as amount, po.curr, masterforwarder.name, mastersupplier.nama, forwarder.date_fwd')
+            ->groupby('po.pono')->groupby('formshipment.noinv')
             ->get();
-        // dd($getdata);
 
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
-        $cell = 'A4:G4';
-        $sheet->mergeCells('A2:G2');
+        $cell = 'A4:I4';
+        $sheet->mergeCells('A2:I2');
         $sheet->setCellValue('A4', 'PO');
         $sheet->getColumnDimension('A')->setWidth(20);
-        $sheet->setCellValue('B4', 'Quantity PO');
+        $sheet->setCellValue('B4', 'Supplier');
         $sheet->getColumnDimension('B')->setWidth(15);
-        $sheet->setCellValue('C4', 'Quantity Allocation');
+        $sheet->setCellValue('C4', 'Forwarder');
         $sheet->getColumnDimension('C')->setWidth(15);
-        $sheet->setCellValue('D4', 'Invoice');
+        $sheet->setCellValue('D4', 'Code Booking');
         $sheet->getColumnDimension('D')->setWidth(15);
-        $sheet->setCellValue('E4', 'Forwarder');
+        $sheet->setCellValue('E4', 'Invoice');
         $sheet->getColumnDimension('E')->setWidth(20);
-        $sheet->setCellValue('F4', 'Status Allocation');
+        $sheet->setCellValue('F4', 'Date Submit');
         $sheet->getColumnDimension('F')->setWidth(20);
-        $sheet->setCellValue('G4', 'Status Confirm');
+        $sheet->setCellValue('G4', 'ATD');
         $sheet->getColumnDimension('G')->setWidth(20);
+        $sheet->setCellValue('H4', 'ATA');
+        $sheet->getColumnDimension('H')->setWidth(20);
+        $sheet->setCellValue('I4', 'BL Number');
+        $sheet->getColumnDimension('I')->setWidth(20);
 
         $sheet->getStyle($cell)->getAlignment()->setWrapText(true);
         $sheet->getStyle($cell)->getFont()->setBold(true);
-        $sheet->getStyle('A2:G2')->getFont()->setBold(true);
+        $sheet->getStyle('A2:I2')->getFont()->setBold(true);
         $sheet->getStyle($cell)->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID);
         $sheet->getStyle($cell)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
         $sheet->getStyle($cell)->getAlignment()->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER);
@@ -542,31 +560,33 @@ class ReportShipment extends Controller
             ],
         ];
 
-        $sheet->setCellValue('A' . '2', strtoupper('Data Allocation'));
+        $sheet->setCellValue('A' . '2', strtoupper('Data Report Shipment'));
 
         foreach ($getdata as $key => $val) {
             $sheet->setCellValue('A' . $rows, $val->pono);
-            $sheet->setCellValue('B' . $rows, $val->qtypo);
-            $sheet->setCellValue('C' . $rows, $val->qty_allocation);
-            $sheet->setCellValue('D' . $rows, $val->noinv);
-            $sheet->setCellValue('E' . $rows, $val->name);
-            $sheet->setCellValue('F' . $rows, $val->statusalokasi);
-            $sheet->setCellValue('G' . $rows, $val->statusconfirm);
+            $sheet->setCellValue('B' . $rows, $val->nama);
+            $sheet->setCellValue('C' . $rows, $val->name);
+            $sheet->setCellValue('D' . $rows, $val->kode_booking);
+            $sheet->setCellValue('E' . $rows, $val->noinv);
+            $sheet->setCellValue('F' . $rows, ($val->created_at == NULL) ? '' : date("Y/m/d", strtotime($val->created_at)));
+            $sheet->setCellValue('G' . $rows, $val->etdfix);
+            $sheet->setCellValue('H' . $rows, $val->etafix);
+            $sheet->setCellValue('I' . $rows, $val->nomor_bl);
             $rows++;
         }
 
-        $cell = 'A4:G' . ($rows - 1);
-        $sheet->getStyle('A2:G2')->applyFromArray($styleArraytitle);
+        $cell = 'A4:I' . ($rows - 1);
+        $sheet->getStyle('A2:I2')->applyFromArray($styleArraytitle);
         $sheet->getStyle($cell)->applyFromArray($styleArray);
         $sheet->getStyle($cell)->getAlignment()->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER);
 
-        $fileName = "Report_Allocation_All.xlsx";
+        $fileName = "Report_Shipment_All.xlsx";
 
         $writer = new Xlsx($spreadsheet);
         header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
         header('Content-Disposition: attachment; filename="' . urlencode($fileName) . '"');
         $writer->save('php://output');
 
-        return;
+        // return;
     }
 }
