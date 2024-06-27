@@ -1044,8 +1044,10 @@ class home extends Controller
                 }
             }
 
-            // $getqtybooking[] = formpo::where('idpo', $val['idpo'])->where('idforwarder', $val['idforwarder'])->where('idmasterfwd', $val['idmasterfwd'])->where('statusformpo', '!=', 'reject')->selectRaw(' id_formpo, sum(qty_booking) as totalbooking ')->where('aktif', 'Y')->first();
-            if ($cekpo->qtypo == $val['qtybook']) {
+            $getqtybooking = formpo::where('idpo', $val['idpo'])->where('idforwarder', $val['idforwarder'])->where('idmasterfwd', $val['idmasterfwd'])->where('statusformpo', '!=', 'reject')->selectRaw('sum(qty_booking) as totalbooking ')->where('aktif', 'Y')->first();
+            $totbook = $getqtybooking->totalbooking == NULL ? 0 : $getqtybooking->totalbooking;
+            $jmlbook = $val['qtybook'] + $totbook;
+            if ($cekpo->qtypo == $val['qtybook'] || $cekpo->qtypo == $jmlbook) {
                 $statbook = 'full_booking';
             } else {
                 $statbook = 'partial_booking';
