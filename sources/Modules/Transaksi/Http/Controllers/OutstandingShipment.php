@@ -55,14 +55,6 @@ class OutstandingShipment extends Controller
             ->groupby('formpo.kode_booking')
             ->selectRaw(' formpo.*, sum(formpo.qty_booking) as qtybook, po.id, po.pono, po.matcontents, po.colorcode, po.size, sum(po.qtypo) as qtypoall, po.qtypo')
             ->get();
-
-        // $query = modelformpo::where('idforwarder', 292)
-        //     ->where('idpo', 12586)
-        //     ->where('idmasterfwd', 53)
-        //     ->where('statusformpo', 'confirm')
-        //     ->where('aktif', 'Y')
-        //     ->selectRaw(' sum(qty_booking) as qtybook')
-        //     ->first();
         // dd($query);
         return Datatables::of($query)
             ->addIndexColumn()
@@ -88,7 +80,7 @@ class OutstandingShipment extends Controller
                 return  $query->qtybook;
             })
             ->addColumn('status', function ($query) {
-                if ($query->status_booking == 'full_booking') {
+                if ($query->qtypoall == $query->qtybook) {
                     return 'Full Booking';
                 } else {
                     return  'Partial Booking';
@@ -229,7 +221,7 @@ class OutstandingShipment extends Controller
                 $rep = str_replace('.', '', $cekpo->qtypo);
                 $qtypo = (float)$rep;
 
-                $cekqtybook = modelformpo::where('idforwarder', $val->idfwd)->where('idpo', $val->idpo)->where('idmasterfwd', $val->idmasterfwd)->where('aktif', 'Y')->selectRaw(' sum(qty_booking) as qtybook ')->first();
+                $cekqtybook = modelformpo::where('idforwarder', $val->idfwd)->where('idpo', $val->idpo)->where('idmasterfwd', $val->idmasterfwd)->where('aktif', 'Y')->selectRaw(' sum(qty_booking) as qtybook ')->groupBy('kode_booking')->first();
 
                 if ($cekqtybook->qtybook == $qtypo) {
                     $status = 'full_shipment';
