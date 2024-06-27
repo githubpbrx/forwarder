@@ -47,7 +47,8 @@
     $jumlah = [];
     $nama = [];
     foreach ($data as $key => $val) {
-        array_push($nama, $val->nama);
+        $replace = str_replace("'", '', $val->nama);
+        array_push($nama, $replace);
         array_push($jumlah, $val->jml);
     }
 @endphp

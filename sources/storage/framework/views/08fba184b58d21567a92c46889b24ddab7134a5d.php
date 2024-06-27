@@ -43,8 +43,8 @@
                                 </div>
                                 <div class="ml-auto">
                                     <label class="control-label">&nbsp;</label>
-                                    <a href="<?php echo e(url('report/po/getexcelpoall')); ?>" type="button"
-                                        class="btn btn-warning form-control" target="_BLANK">Download Excel</a>
+                                    <button type="button" class="btn btn-warning form-control" id="btndownload">Download
+                                        Excel</button>
                                 </div>
                             </div>
                             <div class="row mt-3 mb-2">
@@ -398,6 +398,20 @@
                     // $('#style').val(datapo.style);
                     // $('#buyer').val(datapo.buyer);
                 })
+            });
+
+            $("#btndownload").click(function(e) {
+                let datapo = $('#datapo').val();
+                let datasupp = $('#datasupp').val();
+                let dataper = $('#periode').val();
+
+                var query = {
+                    'po': datapo,
+                    'supplier': datasupp,
+                    'periode': dataper,
+                }
+                var url = "<?php echo e(url('report/po/getexcelpoall')); ?>?" + $.param(query);
+                window.open(url, '_blank');
             });
         });
     </script>

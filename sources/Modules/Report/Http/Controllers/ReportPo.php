@@ -99,6 +99,9 @@ class ReportPo extends Controller
                 ->addColumn('supplier', function ($data) {
                     return $data->nama;
                 })
+                ->addColumn('shipmode', function ($data) {
+                    return $data->shipmode;
+                })
                 ->addColumn('status', function ($data) {
                     return ($data->statusconfirm == null) ? 'not proccessed' : $data->statusconfirm;
                 })
@@ -247,17 +250,29 @@ class ReportPo extends Controller
         return;
     }
 
-    function excelpoall()
+    function excelpoall(Request $request)
     {
-        $getdatasum = modelpo::where('statusconfirm', '!=', 'confirm')->orWhereNull('statusconfirm')
-            ->selectRaw(' id, pono, sum(price * qtypo) as amount, curr')
-            ->groupby('pono')
-            ->get();
+        $where = '';
+        if ($request->supplier != NULL) {
+            $imp = implode("','", $request->supplier);
+            $where .= " and mastersupplier.id IN ('" . $imp . "')";
+        }
+        if ($request->periode != NULL) {
+            $periode = explode(" - ", $request->periode);
+            $where .= ' and (po.podate BETWEEN "' . $periode[0] . '" AND "' . $periode[1] . '")';
+        }
+        if ($request->po != NULL) {
+            $where .= ' and po.pono="' . $request->po . '"';
+        }
 
-        $getdata = modelpo::join('mastersupplier', 'mastersupplier.id', 'po.vendor')
-            ->where('mastersupplier.aktif', 'Y')
-            ->where('po.statusconfirm', '!=', 'confirm')->orWhereNull('po.statusconfirm')
-            ->selectRaw(' po.id, po.pono, po.matcontents, po.colorcode, po.size , po.podate, mastersupplier.nama ')
+        $data = modelpo::join('mastersupplier', 'mastersupplier.id', 'po.vendor')
+            ->where(function ($var) {
+                $var->where('po.statusconfirm', '!=', 'confirm')->orWhere('po.statusconfirm', null);
+            })
+            ->whereRaw(' mastersupplier.aktif="Y" ' . $where . '')
+            ->selectRaw(' po.id, po.pono, po.matcontents, po.podate, sum(po.price * po.qtypo) as amount, po.curr, po.shipmode, po.statusconfirm, mastersupplier.nama ')
+            ->groupby('po.pono')
+            ->orderby('po.podate', 'DESC')
             ->get();
 
         $spreadsheet = new Spreadsheet();
@@ -267,15 +282,15 @@ class ReportPo extends Controller
         $sheet->mergeCells('A2:F2');
         $sheet->setCellValue('A4', 'PO');
         $sheet->getColumnDimension('A')->setAutoSize(true);
-        $sheet->setCellValue('B4', 'Material');
+        $sheet->setCellValue('B4', 'Date');
         $sheet->getColumnDimension('B')->setAutoSize(true);
-        $sheet->setCellValue('C4', 'Color');
+        $sheet->setCellValue('C4', 'Amount');
         $sheet->getColumnDimension('C')->setAutoSize(true);
-        $sheet->setCellValue('D4', 'Size');
+        $sheet->setCellValue('D4', 'Supplier');
         $sheet->getColumnDimension('D')->setAutoSize(true);
-        $sheet->setCellValue('E4', 'Amount');
+        $sheet->setCellValue('E4', 'Shipmode');
         $sheet->getColumnDimension('E')->setAutoSize(true);
-        $sheet->setCellValue('F4', 'Supplier');
+        $sheet->setCellValue('F4', 'Status');
         $sheet->getColumnDimension('F')->setAutoSize(true);
         $sheet->getStyle($cell)->getAlignment()->setWrapText(true);
         $sheet->getStyle($cell)->getFont()->setBold(true);
@@ -304,14 +319,14 @@ class ReportPo extends Controller
             ],
         ];
 
-        $sheet->setCellValue('A' . '2', strtoupper('Data PO'));
-        foreach ($getdatasum as $key => $value) {
+        $sheet->setCellValue('A' . '2', strtoupper('Data Outstanding PO'));
+        foreach ($data as $key => $value) {
             $sheet->setCellValue('A' . $rows, $value->pono);
-            $sheet->setCellValue('B' . $rows, $value->matcontents);
-            $sheet->setCellValue('C' . $rows, $value->colorcode);
-            $sheet->setCellValue('D' . $rows, $value->size);
-            $sheet->setCellValue('E' . $rows, $value->amount . ' ' . $value->curr);
-            $sheet->setCellValue('F' . $rows, $value->nama);
+            $sheet->setCellValue('B' . $rows, date("Y/m/d", strtotime($value->podate)));
+            $sheet->setCellValue('C' . $rows, $value->amount . ' ' . $value->curr);
+            $sheet->setCellValue('D' . $rows, $value->nama);
+            $sheet->setCellValue('E' . $rows, $value->shipmode);
+            $sheet->setCellValue('F' . $rows, ($value->statusconfirm == null) ? 'not proccessed' : $value->statusconfirm);
             $rows++;
         }
 
@@ -320,13 +335,12 @@ class ReportPo extends Controller
         $sheet->getStyle($cell)->applyFromArray($styleArray);
         $sheet->getStyle($cell)->getAlignment()->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER);
 
-        $fileName = "Data_PO.xlsx";
+        $fileName = "Data_Outstanding_PO.xlsx";
 
         $writer = new Xlsx($spreadsheet);
         header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
         header('Content-Disposition: attachment; filename="' . urlencode($fileName) . '"');
         $writer->save('php://output');
-
-        return;
+        // return;
     }
 }

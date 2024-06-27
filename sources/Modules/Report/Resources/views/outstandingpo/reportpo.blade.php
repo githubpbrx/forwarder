@@ -42,6 +42,11 @@
                                     <a href="#" type="button" id="search" class="btn btn-info form-control"
                                         data-value="klik">Search</a>
                                 </div>
+                                <div class="ml-auto">
+                                    <label class="control-label">&nbsp;</label>
+                                    <button type="button" class="btn btn-warning form-control" id="btndownload">Download
+                                        Excel</button>
+                                </div>
                             </div>
                             <div class="row mt-3 mb-2">
                                 <div class="col-12">
@@ -393,6 +398,20 @@
                     // $('#style').val(datapo.style);
                     // $('#buyer').val(datapo.buyer);
                 })
+            });
+
+            $("#btndownload").click(function(e) {
+                let datapo = $('#datapo').val();
+                let datasupp = $('#datasupp').val();
+                let dataper = $('#periode').val();
+
+                var query = {
+                    'po': datapo,
+                    'supplier': datasupp,
+                    'periode': dataper,
+                }
+                var url = "{{ url('report/po/getexcelpoall') }}?" + $.param(query);
+                window.open(url, '_blank');
             });
         });
     </script>
