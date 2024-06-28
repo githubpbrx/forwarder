@@ -55,13 +55,13 @@
                                                             $remain = $val['withformpo']['withpo']->qtypo - $data['remaining'][$key2][0]->qtyshipment;
                                                         }
                                                     }
-
+                                                    
                                                     if ($val['withformpo']['withpo']['hscode'] == null) {
                                                         $hscode = 'empty';
                                                     } else {
                                                         $hscode = $val['withformpo']['withpo']['hscode']->hscode;
                                                     }
-
+                                                    
                                                     $idpo = $val['withformpo']->idpo;
                                                     ?>
                                                     <tr>

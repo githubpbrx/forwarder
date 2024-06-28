@@ -41,12 +41,10 @@ Route::prefix('transaksi')->group(function () {
     });
 
     Route::group(['prefix' => 'shipment'], function () {
-        Route::get('/', 'DataShipment@index')->name('datashipment');
-        Route::get('/listshipment', 'DataShipment@listshipment')->name('list_shipment');
-        Route::post('/getshipment', 'DataShipment@getdatashipment')->name('getdatashipment');
-        Route::post('/updateshipment/', 'DataShipment@updateshipment')->name('updateshipment');
-        // Route::post('statusapproval/{approval}', 'DataShipment@statusapproval')->name('approvalstatus');
-        // Route::get('listapproval', 'DataShipment@listapproval')->name('list_approval');
+        Route::get('/', 'UpdateShipment@index')->name('datashipment');
+        Route::get('/listshipment', 'UpdateShipment@listshipment')->name('list_shipment');
+        Route::post('/getshipment', 'UpdateShipment@getdatashipment')->name('getdatashipment');
+        Route::post('/updateshipment/', 'UpdateShipment@updateshipment')->name('updateshipment');
     });
 
     Route::group(['prefix' => 'outstandingshipment'], function () {

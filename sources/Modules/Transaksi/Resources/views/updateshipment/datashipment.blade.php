@@ -97,10 +97,6 @@
             var idformpo;
             var length;
             $('body').on('click', '#detailbtn', function() {
-                $('#detailshipment').modal({
-                    show: true,
-                    backdrop: 'static'
-                });
                 let idku = $(this).attr('data-id');
                 $.ajax({
                     url: "{!! route('getdatashipment') !!}",
@@ -110,66 +106,28 @@
                         _token: $('meta[name=csrf-token]').attr('content'),
                         id: idku,
                     },
-                }).done(function(data) {
-                    $('#modalupdateshipment').html(data);
-                    // console.log('datakuh :>> ', data);
-                    // let mydata = data.data.shipment;
-                    // let myremain = data.data.remaining;
-                    // console.log('mydata :>> ', mydata);
-                    // console.log('myremain :>> ', myremain);
-                    // idshipment = mydata.id_shipment;
-                    // idformpo = mydata.idformpo;
-                    // length = mydata.length;
-                    // $('#detailitem').empty();
-
-                    // html =
-                    //     '<table border="0" style="width:100%"><tr><th style="text-align:center"><input type="checkbox" class="checkall" style="height:18px;width:18px" checked></th><th>Material</th><th>BL Number</th><th>Color Code</th><th>Size</th><th>Qty Item</th><th>Remaining Qty</th><th>Qty Shipment</th></tr>';
-                    // for (let index = 0; index < mydata.length; index++) {
-                    //     let remain;
-                    //     let block;
-                    //     // let qtyshipment = (mydata[index].qty_shipment==[]) ? '0' : mydata[index].qty_shipment;
-
-                    //     if (myremain[index][0].qtyshipment == null) {
-                    //         remain = mydata[index].qtypo;
-                    //         block = 'disabled';
-                    //     } else if (myremain[index][0].qtyshipment == mydata[index].qtypo) {
-                    //         remain = '0';
-                    //         block = 'disabled';
-                    //     } else {
-                    //         remain = mydata[index].qtypo - myremain[index][0].qtyshipment;
-                    //         block = 'disabled';
-                    //     }
-
-                    //     html +=
-                    //         '<tr><td style="text-align:center"><input type="checkbox" class="check-' +
-                    //         index + '" style="height:18px;width:18px" checked></td><td>' +
-                    //         mydata[index]
-                    //         .matcontents + '</td><td>' + mydata[index].nomor_bl + '</td><td>' +
-                    //         mydata[index].colorcode + '</td><td>' + mydata[index].size +
-                    //         '</td><td>' + mydata[index].qtypo + '</td><td>' + remain +
-                    //         '</td><td><input type="number" min="0" id="qtyship" name="qtyship" value="' +
-                    //         mydata[index].qty_shipment +
-                    //         '" class="form-control trigerinput cekinput-' +
-                    //         index + '" data-idformshipment="' + mydata[index].id_shipment +
-                    //         '"  data-idformpo="' + mydata[index].id_formpo +
-                    //         '"></td></tr>';
-                    // }
-                    // html += "</table>";
-                    // $('#detailitem').html(html);
-                    // checkqtyall();
-
-                    // idpo = mydata[].id;
-                    // idformpo = databook.id_formpo;
-                    // usernik = privilege.privilege_user_nik;
-                    // usernama = privilege.privilege_user_name;
-                    // tglpengajuan = databook.created_at;
-
-                    // $('#invoice').val(mydata[0].noinv);
-                    // $('#etd').val(mydata[0].etdfix);
-                    // $('#eta').val(mydata[0].etafix);
-                    // $('#nobl').val(mydata[0].nomor_bl);
-                    // $('#vessel').val(mydata[0].vessel);
-                })
+                    beforeSend: function(param) {
+                        Swal.fire({
+                            title: 'Please Wait .......',
+                            // html: '',
+                            allowEscapeKey: false,
+                            allowOutsideClick: false,
+                            showCancelButton: false,
+                            showConfirmButton: false,
+                            onOpen: () => {
+                                swal.showLoading();
+                            }
+                        })
+                    },
+                    success: function(data) {
+                        $('#detailshipment').modal({
+                            show: true,
+                            backdrop: 'static'
+                        });
+                        $('#modalupdateshipment').html(data);
+                        swal.close();
+                    }
+                });
             });
 
         });
