@@ -18,18 +18,30 @@
                         <div class="row">
                             <div class="col-12">
                                 <div class="form-group">
-                                    <table border="1" width="100%">
+                                    <table border="1" style="width: 100%; text-align: center">
                                         <thead>
+                                            <th><input type="checkbox" style="height:18px;width:18px" class="checkall"
+                                                    checked></th>
                                             <th>Material</th>
                                             <th>Material Desc</th>
                                             <th>Hs Code</th>
                                             <th>Color</th>
                                             <th>Size</th>
                                             <th>Qty PO</th>
+                                            <th>Qty Balance</th>
+                                            <th>Qty Booking</th>
                                         </thead>
                                         <tbody>
-                                            @foreach ($data['booking'] as $key2 => $val)
+                                            @foreach ($data['booking'] as $key => $val)
                                                 <?php
+                                                // $totbok = $val->qty_booking + $val->qty_booking;
+                                                // dd($data['remaining'][$key]->jmlbook);
+                                                if ($data['remaining'][$key]->jmlbook == $val['withpo']->qtypo) {
+                                                    $remain = 0;
+                                                } else {
+                                                    $remain = $val['withpo']->qtypo - $data['remaining'][$key]->jmlbook;
+                                                }
+                                                
                                                 if ($val['withpo']['hscode'] == null) {
                                                     $hscode = 'empty';
                                                 } else {
@@ -39,6 +51,10 @@
                                                 $idpo = $val->idpo;
                                                 ?>
                                                 <tr>
+                                                    <td>
+                                                        <input type="checkbox" class="check-{{ $key }}"
+                                                            style="height:18px;width:18px" checked>
+                                                    </td>
                                                     <td data-name="mat[]">{{ $val['withpo']->matcontents }}</td>
                                                     <td>{{ $val['withpo']->itemdesc }}</td>
                                                     <td> <input type="text" class="form-control"
@@ -47,13 +63,18 @@
                                                     <td>{{ $val['withpo']->colorcode }}</td>
                                                     <td>{{ $val['withpo']->size }}</td>
                                                     <td>{{ $val['withpo']->qtypo }}</td>
+                                                    <td>{{ $remain }}</td>
+                                                    <td><input type="number" min="0"
+                                                            id="qtybook-{{ $key }}"
+                                                            class="form-control trigerinput cekinput-{{ $key }}"
+                                                            value="{{ $val->qty_booking }}">
+                                                    </td>
                                                 </tr>
                                             @endforeach
                                         </tbody>
                                     </table>
                                     <hr
                                         style="width: 100%; color: rgb(192, 192, 192); height: 0.5px; background-color:rgb(192, 192, 192);" />
-
                                     <div class="row">
                                         <div class="col-md-6">
                                             <div class="form-group">
@@ -327,6 +348,44 @@
 
     submit();
 
+    for (let index = 0; index < dataku.length; index++) {
+        $('.checkall').change(function(e) {
+            if (this.checked) {
+                $('.check-' + index).prop('checked', true);
+                $('.cekinput-' + index).prop('disabled', false);
+            } else {
+                $('.check-' + index).prop('checked', false);
+                $('.cekinput-' + index).prop('disabled', true);
+            }
+        });
+    }
+
+    for (let index = 0; index < dataku.length; index++) {
+        $('.check-' + index).change(function(e) {
+            if (this.checked) {
+                console.log('objectsijine :>> ', 'isChecked');
+                $('.cekinput-' + index).prop('disabled', false);
+                // }
+            } else {
+                console.log('objectsijine :>> ', 'notChecked');
+                // $('.cekinput-' + index).val('');
+                $('.cekinput-' + index).prop('disabled', true);
+            }
+        });
+    }
+
+    // memvalidasi inputan supaya tidak bisa lebih dari balance
+    for (let index = 0; index < dataku.length; index++) {
+        $('.cekinput-' + index).keyup(function(e) {
+            let valinput = $('.cekinput-' + index).val();
+            let rem = $('.cekinput-' + index).attr('data-remain');
+
+            if (Number(valinput) >= Number(rem)) {
+                $('.cekinput-' + index).val(rem);
+            }
+        });
+    }
+
     $('#datebook').datepicker({
         changeYear: true,
         changeMonth: true,
@@ -551,30 +610,18 @@
 
     function submit() {
         $('#btnupdate').click(function(e) {
-            let matcontent = $("td[data-name='mat[]']")
-                .map(function() {
-                    if ($(this).html() == '') {
-                        return;
-                    } else {
-                        return $(this).html();
-                    }
-                }).get();
-            let hscode = $("input[name='edithscode[]']")
-                .map(function() {
-                    if ($(this).val() == '') {
-                        return;
-                    } else {
-                        return $(this).val();
-                    }
-                }).get();
+            var matcontent = $('td[data-name^=mat]').map(function() {
+                return $(this).html();
+            }).get();
+            var hscode = $('input[name^=edithscode]').map(function() {
+                return $(this).val();
+            }).get();
             let nobook_old = dataku[0].kode_booking;
             let nobook = $('#nobook').val();
             let datebook = $('#datebook').val();
             let myetd = $('#etd').val();
             let myeta = $('#eta').val();
             let shipmode = $('#shipmode').val();
-            let invoice = $('#invoice').val();
-            let vessel = $('#vessel').val();
             let myfcl = $('#fclku').val();
             let myweight = $('#fclweight').val();
             let fclvol = $('#fclvol').val();
@@ -588,6 +635,25 @@
             let portloading = $('#portloading').val();
             let portdestination = $('#portdestination').val();
             let package = $('#package').val();
+
+            var arrayku = [];
+            for (let index = 0; index < dataku.length; index++) {
+                var cekdisabled = $('.cekinput-' + index).prop('disabled');
+                let val = $('.cekinput-' + index).val();
+
+                if (!cekdisabled) {
+                    let data = {
+                        'idformpo': dataku[index]['id_formpo'],
+                        'idpo': dataku[index]['idpo'],
+                        'idforwarder': dataku[index]['idforwarder'],
+                        'idmasterfwd': dataku[index]['idmasterfwd'],
+                        'kodebooking': dataku[index]['kode_booking'],
+                        'value': val,
+                    };
+                    arrayku.push(data);
+                }
+
+            }
 
             if (nobook == null || nobook == '') {
                 notifalert('Nomor Booking');
@@ -667,11 +733,12 @@
                     url: "{{ route('updatebooking') }}",
                     data: {
                         _token: $('meta[name=csrf-token]').attr('content'),
+                        'dataid': arrayku,
+                        'matcontent': matcontent,
                         'hscode': hscode,
                         'nobook_old': nobook_old,
                         'nobooking': nobook,
                         'datebooking': datebook,
-                        'matcontent': matcontent,
                         'etd': myetd,
                         'eta': myeta,
                         'shipmode': mode,
@@ -690,12 +757,26 @@
                         'package': package
                     },
                     dataType: "json",
+                    beforeSend: function(param) {
+                        Swal.fire({
+                            title: 'Updating ...',
+                            html: 'Please Wait Data Booking Will Be Updating',
+                            allowEscapeKey: false,
+                            allowOutsideClick: false,
+                            showCancelButton: false,
+                            showConfirmButton: false,
+                            onOpen: () => {
+                                swal.showLoading();
+                            }
+                        })
+                    },
                     success: function(response) {
                         Swal.fire({
                             title: response.title,
                             text: response.message,
                             type: (response.status != 'error') ? 'success' : 'error'
                         }).then((result) => {
+                            swal.close();
                             (response.status == 'success') ? window.location
                                 .replace("{{ route('dataupdatebooking') }}"):
                                 ''

@@ -1,10 +1,9 @@
-@extends('system::template/master')
-@section('title', $title)
-@section('link_href')
+<?php $__env->startSection('title', $title); ?>
+<?php $__env->startSection('link_href'); ?>
     <link href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/themes/smoothness/jquery-ui.css" rel="stylesheet" />
-@endsection
+<?php $__env->stopSection(); ?>
 
-@section('content')
+<?php $__env->startSection('content'); ?>
     <div class="row" style="font-size: 10pt;">
         <div class="col-lg-12">
             <div class="card card-primary">
@@ -29,7 +28,7 @@
         </div>
     </div>
 
-    {{-- Modal Detail Shipment --}}
+    
     <div class="modal fade" id="detailupdatebooking">
         <div class="modal-dialog modal-xl">
             <div class="modal-content">
@@ -43,12 +42,12 @@
             </div>
         </div>
     </div>
-@endsection
+<?php $__env->stopSection(); ?>
 
-@section('script_src')
-@endsection
+<?php $__env->startSection('script_src'); ?>
+<?php $__env->stopSection(); ?>
 
-@section('script')
+<?php $__env->startSection('script'); ?>
     <script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js"></script>
     <script type="text/javascript">
         $(document).ready(function() {
@@ -63,7 +62,7 @@
                 processing: true,
                 serverSide: true,
                 ajax: {
-                    url: "{{ route('list_booking') }}"
+                    url: "<?php echo e(route('list_booking')); ?>"
                 },
                 columns: [{
                         data: 'pono',
@@ -90,24 +89,44 @@
             var idformpo;
             var length;
             $('body').on('click', '#editbtn', function() {
-                $('#detailupdatebooking').modal({
-                    show: true,
-                    backdrop: 'static'
-                });
-                let idku = $(this).attr('data-id');
+                let kodebook = $(this).attr('data-kodebooking');
+                let idforwarder = $(this).attr('data-idforwarder');
+                console.log('idforwarder :>> ', idforwarder);
                 $.ajax({
-                    url: "{!! route('getdatabooking') !!}",
+                    url: "<?php echo route('getdatabooking'); ?>",
                     type: 'POST',
                     // dataType: 'json',
                     data: {
                         _token: $('meta[name=csrf-token]').attr('content'),
-                        id: idku,
+                        kodebook: kodebook,
+                        idforwarder: idforwarder,
                     },
-                }).done(function(data) {
-                    $('#modalupdatebooking').html(data);
+                    beforeSend: function(param) {
+                        Swal.fire({
+                            title: 'Please Wait .......',
+                            // html: '',
+                            allowEscapeKey: false,
+                            allowOutsideClick: false,
+                            showCancelButton: false,
+                            showConfirmButton: false,
+                            onOpen: () => {
+                                swal.showLoading();
+                            }
+                        })
+                    },
+                    success: function(data) {
+                        $('#detailupdatebooking').modal({
+                            show: true,
+                            backdrop: 'static'
+                        });
+                        $('#modalupdatebooking').html(data);
+                        swal.close();
+                    }
                 })
             });
 
         });
     </script>
-@endsection
+<?php $__env->stopSection(); ?>
+
+<?php echo $__env->make('system::template/master', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH D:\laragon\www\forwarder\sources\Modules/Transaksi\Resources/views/updatebooking/dataupdatebooking.blade.php ENDPATH**/ ?>
