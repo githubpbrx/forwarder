@@ -157,7 +157,7 @@ class ApprovalConfirmation extends Controller
             ->join('forwarder', 'forwarder.id_forwarder', 'formpo.idforwarder')
             ->where('formpo.statusformpo', 'waiting')
             ->where('privilege.privilege_aktif', 'Y')->where('formpo.aktif', 'Y')->where('masterforwarder.aktif', 'Y')->where('forwarder.aktif', 'Y')
-            ->groupby('po.pideldate')
+            ->groupby('formpo.kode_booking')
             ->get();
         // dd($data);
         return DataTables::of($data)
@@ -165,10 +165,13 @@ class ApprovalConfirmation extends Controller
             ->addColumn('nomorpo', function ($data) {
                 $datapo = formpo::join('privilege', 'privilege.idforwarder', 'formpo.idmasterfwd')
                     ->join('po', 'po.id', 'formpo.idpo')
-                    ->where('po.pideldate', $data->pideldate)
-                    // ->where('privilege.nikfinance', Session::get('session')['user_nik'])
+                    ->join('masterforwarder', 'masterforwarder.id', 'formpo.idmasterfwd')
+                    ->join('forwarder', 'forwarder.id_forwarder', 'formpo.idforwarder')
+                    // ->where('po.pideldate', $data->pideldate)
+                    ->where('formpo.kode_booking', $data->kode_booking)
                     ->where('formpo.statusformpo', 'waiting')
-                    ->where('formpo.aktif', 'Y')
+                    ->where('formpo.aktif', 'Y')->where('privilege.privilege_aktif', 'Y')->where('masterforwarder.aktif', 'Y')
+                    ->where('forwarder.aktif', 'Y')
                     ->groupby('po.pono')
                     ->pluck('po.pono');
                 // dd($datapo);
@@ -177,9 +180,13 @@ class ApprovalConfirmation extends Controller
             ->addColumn('nobooking', function ($data) {
                 $databook = formpo::join('privilege', 'privilege.idforwarder', 'formpo.idmasterfwd')
                     ->join('po', 'po.id', 'formpo.idpo')
-                    ->where('po.pideldate', $data->pideldate)
+                    ->join('masterforwarder', 'masterforwarder.id', 'formpo.idmasterfwd')
+                    ->join('forwarder', 'forwarder.id_forwarder', 'formpo.idforwarder')
+                    // ->where('po.pideldate', $data->pideldate)
+                    ->where('formpo.kode_booking', $data->kode_booking)
                     ->where('formpo.statusformpo', 'waiting')
-                    ->where('formpo.aktif', 'Y')
+                    ->where('formpo.aktif', 'Y')->where('privilege.privilege_aktif', 'Y')->where('masterforwarder.aktif', 'Y')
+                    ->where('forwarder.aktif', 'Y')
                     ->groupby('po.pono')
                     ->pluck('formpo.kode_booking');
                 // return $data->kode_booking;
@@ -188,7 +195,7 @@ class ApprovalConfirmation extends Controller
             ->addColumn('action', function ($data) {
                 $button = '';
 
-                $button = '<center><a href="#" data-id="' . $data->pideldate . '" id="prosesapproval"><i data-tooltip="tooltip" title="Proses Approval" class="fa fa-arrow-circle-right fa-lg text-green"></i></a></center>';
+                $button = '<center><a href="#" data-id="' . $data->kode_booking . '" id="prosesapproval"><i data-tooltip="tooltip" title="Proses Approval" class="fa fa-arrow-circle-right fa-lg text-green"></i></a></center>';
 
                 return $button;
             })
@@ -207,7 +214,7 @@ class ApprovalConfirmation extends Controller
             ->join('mastersupplier', 'mastersupplier.id', 'po.vendor')->where('mastersupplier.aktif', 'Y')
             ->join('masterhscode', 'masterhscode.matcontent', 'po.matcontents')->where('masterhscode.aktif', 'Y')
             ->join('masterroute', 'masterroute.id_route', 'formpo.idroute')->where('masterroute.aktif', 'Y')
-            ->where('po.pideldate', $request->id)
+            ->where('formpo.kode_booking', $request->id)
             ->where('formpo.statusformpo', 'waiting')
             ->where('privilege.leadforwarder', '1')
             ->selectRaw(' po.id, po.pono, po.matcontents, po.itemdesc, po.qtypo, po.colorcode, po.size, po.statusalokasi, po.pino, forwarder.statusbooking, forwarder.id_forwarder, formpo.id_formpo, formpo.kode_booking, formpo.qty_booking, formpo.date_booking, formpo.etd, formpo.eta, formpo.shipmode, formpo.subshipmode, formpo.created_by, masterforwarder.name, privilege.privilege_user_name, privilege.privilege_user_nik, mastersupplier.nama, masterhscode.hscode, masterroute.route_code, masterroute.route_desc')
@@ -221,7 +228,7 @@ class ApprovalConfirmation extends Controller
             ->join('masterportofdestination', 'masterportofdestination.id_portdestination', 'formpo.idportdestination')->where('masterportofdestination.aktif', 'Y')
             ->join('privilege', 'privilege.idforwarder', 'formpo.idmasterfwd')->where('privilege_aktif', 'Y')
             ->join('mastersupplier', 'mastersupplier.id', 'po.vendor')->where('mastersupplier.aktif', 'Y')
-            ->where('po.pideldate', $request->id)
+            ->where('formpo.kode_booking', $request->id)
             ->where('formpo.statusformpo', 'waiting')
             ->groupby('po.pono')
             // ->where('privilege.nikfinance', Session::get('session')['user_nik'])
