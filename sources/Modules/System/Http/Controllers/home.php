@@ -9,6 +9,7 @@ use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Storage;
+use Modules\Report\Models\modelformpo;
 use Modules\System\Helpers\LogActivity;
 
 use Modules\System\Models\masterhscode;
@@ -121,7 +122,7 @@ class home extends Controller
             ->where('formpo.aktif', 'Y')
             ->where('mastersupplier.aktif', 'Y')
             ->where('masterhscode.aktif', 'Y')
-            ->selectRaw(' po.pono, po.matcontents, po.itemdesc, po.qtypo, po.colorcode, po.size, po.pino, formpo.kode_booking, formpo.date_booking, formpo.etd, formpo.eta, formpo.shipmode, formpo.subshipmode, formpo.ket_tolak, mastersupplier.nama, masterhscode.hscode ')
+            ->selectRaw(' po.pono, po.matcontents, po.itemdesc, po.qtypo, po.colorcode, po.size, po.pino, formpo.kode_booking, formpo.qty_booking, formpo.date_booking, formpo.etd, formpo.eta, formpo.shipmode, formpo.subshipmode, formpo.ket_tolak, mastersupplier.nama, masterhscode.hscode ')
             ->get();
 
         //cek untuk notif shipment
@@ -355,7 +356,7 @@ class home extends Controller
                     $kus->where('forwarder.statusapproval', null)->orWhere('forwarder.statusapproval', 'reject')->orWhere('forwarder.statusbooking', NULL)->orWhere('forwarder.statusbooking', 'partial_booking');
                 })
                 ->whereRaw('forwarder.aktif="Y" AND privilege.privilege_aktif="Y" AND mastersupplier.aktif="Y" ' . $where . ' ')
-                ->selectRaw(' forwarder.statusforwarder, forwarder.statusapproval, forwarder.statusbooking, po.id, po.pono, sum(po.qtypo) as qtypoku, po.itemdesc, po.pino, po.pideldate, po.company, mastersupplier.nama, sum(formpo.qty_booking) as qtybook ')
+                ->selectRaw(' forwarder.id_forwarder, forwarder.statusforwarder, forwarder.statusapproval, forwarder.statusbooking, po.id, po.pono, sum(po.qtypo) as qtypoku, po.itemdesc, po.pino, po.pideldate, po.company, mastersupplier.nama, sum(formpo.qty_booking) as qtybook ')
                 ->groupby('po.pino')
                 ->get();
 
@@ -403,8 +404,12 @@ class home extends Controller
                     return  $company;
                 })
                 ->addColumn('status', function ($query) {
-                    if ($query->statusbooking == 'partial_booking') {
+                    if ($query->statusbooking == 'partial_booking' && $query->statusapproval != 'reject') {
                         $stat = 'Partial Booking';
+                    } elseif ($query->qtypo != $query->qtybook && $query->statusapproval == 'reject') {
+                        $stat = 'Partial Booking';
+                    } elseif ($query->statusapproval == 'reject') {
+                        $stat = 'Not Processed';
                     } else {
                         $stat = 'Not Processed';
                     }
@@ -1009,6 +1014,13 @@ class home extends Controller
             if ($request->package == '' && $request->package == null) {
                 DB::rollback();
                 $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'Package is required, please input Package'];
+                return response()->json($status, 200);
+            }
+
+            $cekdoublebooking = forwarder::where('id_forwarder', $val['idforwarder'])->where('statusapproval', 'waiting')->where('aktif', 'Y')->first();
+            if ($cekdoublebooking) {
+                DB::rollback();
+                $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'Previous booking data has been submitted to Logistics, Please resubmit after receiving approval for the previous booking'];
                 return response()->json($status, 200);
             }
 

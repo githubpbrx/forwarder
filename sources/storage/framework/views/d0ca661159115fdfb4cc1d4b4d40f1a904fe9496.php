@@ -453,7 +453,7 @@
                 });
 
                 html =
-                    '<table border="1" style="width:100%"><tr><th>PO Number</th><th>Material</th><th>Material Desc</th><th>HS Code</th><th>Color</th><th>Size</th><th>Qty Item</th></tr>';
+                    '<table border="1" style="width:100%"><tr><th>PO Number</th><th>Material</th><th>Material Desc</th><th>HS Code</th><th>Color</th><th>Size</th><th>Qty Item</th><th>Qty Booking</th></tr>';
                 for (let index = 0; index < tabelreject.length; index++) {
 
                     html +=
@@ -461,6 +461,7 @@
                         .matcontents + '</td><td>' + tabelreject[index].itemdesc + '</td><td>' +
                         tabelreject[index].hscode + '</td><td>' + tabelreject[index].colorcode +
                         '</td><td>' + tabelreject[index].size + '</td><td>' + tabelreject[index].qtypo +
+                        '</td><td>' + tabelreject[index].qty_booking +
                         '</td></tr>';
                 }
 
