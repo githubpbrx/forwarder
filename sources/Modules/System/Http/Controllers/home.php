@@ -4,6 +4,7 @@ namespace Modules\System\Http\Controllers;
 
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Modules\System\Models\modelforwarder;
 use Yajra\Datatables\Datatables;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\DB;
@@ -23,6 +24,7 @@ use Modules\Transaksi\Models\modelinputratefcl;
 use Modules\System\Models\modelformpo as formpo;
 use Modules\Transaksi\Models\modelmappingratefcl;
 use Modules\System\Models\masterportofdestination;
+use Modules\System\Models\modelformpo as ModelsModelformpo;
 use Modules\System\Models\modelforwarder as forwarder;
 use Modules\System\Models\modelprivilege as privilege;
 use Modules\System\Models\Privileges\modelgroup_access;
@@ -356,7 +358,7 @@ class home extends Controller
                     $kus->where('forwarder.statusapproval', null)->orWhere('forwarder.statusapproval', 'reject')->orWhere('forwarder.statusbooking', NULL)->orWhere('forwarder.statusbooking', 'partial_booking');
                 })
                 ->whereRaw('forwarder.aktif="Y" AND privilege.privilege_aktif="Y" AND mastersupplier.aktif="Y" ' . $where . ' ')
-                ->selectRaw(' forwarder.id_forwarder, forwarder.statusforwarder, forwarder.statusapproval, forwarder.statusbooking, po.id, po.pono, sum(po.qtypo) as qtypoku, po.itemdesc, po.pino, po.pideldate, po.company, mastersupplier.nama, sum(formpo.qty_booking) as qtybook ')
+                ->selectRaw(' forwarder.idpo, forwarder.statusforwarder, forwarder.statusapproval, forwarder.statusbooking, po.id, po.pono, sum(po.qtypo) as qtypoku, po.itemdesc, po.pino, po.pideldate, po.company, mastersupplier.nama, sum(formpo.qty_booking) as qtybook ')
                 ->groupby('po.pino')
                 ->get();
 
@@ -404,9 +406,18 @@ class home extends Controller
                     return  $company;
                 })
                 ->addColumn('status', function ($query) {
+                    $cekfwd = modelforwarder::where('po_nomor', $query->pono)->where('aktif', 'Y')->count();
+                    $cekfwdnull = modelforwarder::where('po_nomor', $query->pono)->where('statusapproval', NULL)->where('aktif', 'Y')->count();
+                    // dd($cekfwd, $cekfwdnull, $query->qtypo != $query->qtybook);
                     if ($query->statusbooking == 'partial_booking' && $query->statusapproval != 'reject') {
                         $stat = 'Partial Booking';
+                    } elseif ($query->statusbooking == 'full_booking' && $query->statusapproval != 'reject') {
+                        $stat = 'Not Processed';
+                    } elseif ($cekfwd != $cekfwdnull && $query->statusapproval == 'reject') {
+                        $stat = 'Not Processed';
                     } elseif ($query->qtypo != $query->qtybook && $query->statusapproval == 'reject') {
+                        $stat = 'Partial Booking';
+                    } elseif ($cekfwd != $cekfwdnull) {
                         $stat = 'Partial Booking';
                     } elseif ($query->statusapproval == 'reject') {
                         $stat = 'Not Processed';
@@ -926,9 +937,15 @@ class home extends Controller
             $submode = $request->cfscyvol . 'M3' . '-' . $request->cfscyweight . 'KG';
         }
 
+        $cekdoublebooking = forwarder::where('idmasterfwd', $request->dataid[0]['idmasterfwd'])->where('po_nomor', $request->dataid[0]['pono'])->where('statusapproval', 'waiting')->where('aktif', 'Y')->count();
+        if ($cekdoublebooking > 0) {
+            DB::rollback();
+            $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'Previous booking data has been submitted to Logistics, Please resubmit after receiving approval for the previous booking'];
+            return response()->json($status, 200);
+        }
+
         $val_matcontent = $request->matcontent;
         $val_hscode = $request->hscode;
-
         foreach ($val_matcontent as $key => $hs) {
             $cekhs = masterhscode::where('matcontent', $hs)->where('aktif', 'Y')->first();
 
@@ -1014,13 +1031,6 @@ class home extends Controller
             if ($request->package == '' && $request->package == null) {
                 DB::rollback();
                 $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'Package is required, please input Package'];
-                return response()->json($status, 200);
-            }
-
-            $cekdoublebooking = forwarder::where('id_forwarder', $val['idforwarder'])->where('statusapproval', 'waiting')->where('aktif', 'Y')->first();
-            if ($cekdoublebooking) {
-                DB::rollback();
-                $status = ['title' => 'Failed!', 'status' => 'error', 'message' => 'Previous booking data has been submitted to Logistics, Please resubmit after receiving approval for the previous booking'];
                 return response()->json($status, 200);
             }
 
