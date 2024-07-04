@@ -19,4 +19,9 @@ class modelpo extends Model
     {
         return $this->hasOne('Modules\Report\Models\masterhscode', 'matcontent', 'matcontents')->where('aktif', 'Y');
     }
+
+    public function postatus()
+    {
+        return $this->hasOne('Modules\Report\Models\modelpo', 'pono', 'pono');
+    }
 }

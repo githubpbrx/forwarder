@@ -75,16 +75,18 @@ class ReportPo extends Controller
                 $where .= ' and po.pono="' . $request->po . '"';
             }
 
-            $data = modelpo::join('mastersupplier', 'mastersupplier.id', 'po.vendor')
-                ->where(function ($var) {
-                    $var->where('po.statusconfirm', '!=', 'confirm')->orWhere('po.statusconfirm', null);
-                })
+            $data = modelpo::with(['postatus'])->join('mastersupplier', 'mastersupplier.id', 'po.vendor')
+                // ->where(function ($var) {
+                //     $var->where('po.statusconfirm', '!=', 'confirm')->orWhere('po.statusconfirm', null);
+                // })
                 ->whereRaw(' mastersupplier.aktif="Y" ' . $where . '')
                 ->selectRaw(' po.id, po.pono, po.matcontents, po.podate, sum(po.price * po.qtypo) as amount, po.curr, po.shipmode, po.statusconfirm, mastersupplier.nama ')
                 ->groupby('po.pono')
                 ->orderby('po.podate', 'DESC')
+                // ->skip(2000)
+                // ->take(1000)
+                ->limit(1000)
                 ->get();
-
             return DataTables::of($data)
                 ->addIndexColumn()
                 ->addColumn('po', function ($data) {
@@ -103,7 +105,34 @@ class ReportPo extends Controller
                     return $data->shipmode;
                 })
                 ->addColumn('status', function ($data) {
-                    return ($data->statusconfirm == null) ? 'not proccessed' : $data->statusconfirm;
+                    // return 'test';
+
+                    $dt = $data->postatus->pluck('statusconfirm');
+                    $col = collect($dt);
+                    $arr = $col->toArray();
+                    $uq = array_unique($arr);
+                    if (count($uq) == 1) {
+                        if ($uq[0] == null) {
+                            return 'Un Processed';
+                        }
+                        return $uq[0];
+                    } else {
+                        return 'On Going';
+                    }
+
+                    // dd(count($dt), $col, $arr, array_unique($arr), $dt);
+                    // $getstats = modelpo::where('pono', $data->pono)->first(['statusconfirm']);
+                    // // dd($getstats);
+                    // if ($getstats->statusconfirm == 'confirm') {
+                    //     $stats = 'On Going';
+                    // } elseif ($getstats->statusconfirm == 'reject') {
+                    //     $stats = 'Rejected';
+                    // }
+                    // else {
+                    //     $stats = 'Not Proccessed';
+                    // }
+
+                    // return ($data->statusconfirm == null) ? 'not proccessed' : $data->statusconfirm;
                 })
                 ->addColumn('action', function ($data) {
                     $button = '';
