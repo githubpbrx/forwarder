@@ -12,6 +12,12 @@
                         <div class="card-body" style="overflow-y: auto;">
                             <div class="row mb-2">
                                 <div>
+                                    <label class="control-label">PI :</label>
+                                    <select class="select2" style="width: 100%;" name="datapi" id="datapi">
+                                        <option value=""></option>
+                                    </select>
+                                </div>
+                                <div class="ml-2">
                                     <label class="control-label">PO :</label>
                                     <select class="select2" style="width: 100%;" name="datapo" id="datapo">
                                         <option value=""></option>
@@ -70,6 +76,9 @@
                                             <tr>
                                                 <th>
                                                     <center>NO</center>
+                                                </th>
+                                                <th>
+                                                    <center>PI</center>
                                                 </th>
                                                 <th>
                                                     <center>PO</center>
@@ -198,7 +207,8 @@
                         'X-CSRF-TOKEN': '<?php echo e(csrf_token()); ?>'
                     },
                     data: function(d) {
-                        d.pono = $('#datapo').val(),
+                        d.pino = $('#datapi').val(),
+                            d.pono = $('#datapo').val(),
                             d.idmasterfwd = $('#datafwd').val(),
                             d.idsupplier = $('#datasupp').val(),
                             d.periode = $('#periode').val()
@@ -206,6 +216,10 @@
                 },
                 columns: [{
                         data: 'DT_RowIndex'
+                    },
+                    {
+                        data: 'pi',
+                        name: 'pi'
                     },
                     {
                         data: 'po',
@@ -282,6 +296,7 @@
                     type: "POST",
                     url: "<?php echo route('report_getchartalokasi'); ?>",
                     data: {
+                        pino: $('#datapi').val(),
                         pono: $('#datapo').val(),
                         idmasterfwd: $('#datafwd').val(),
                         idsupplier: $('#datasupp').val(),
@@ -297,6 +312,40 @@
                     }
                 });
                 // table.ajax.reload();
+            });
+
+            $('#datapi').select2({
+                placeholder: '-- Choose PI --',
+                ajax: {
+                    url: "<?php echo route('report_getpialokasi'); ?>",
+                    dataType: 'json',
+                    delay: 500,
+                    type: 'post',
+                    data: function(params) {
+                        var query = {
+                            q: params.term,
+                            page: params.page || 1,
+                            _token: $('meta[name=csrf-token]').attr('content')
+                        }
+                        return query;
+                    },
+                    processResults: function(data, params) {
+                        return {
+
+                            results: $.map(data.data, function(item) {
+                                return {
+                                    text: item.pino,
+                                    id: item.pino,
+                                    selected: true,
+                                }
+                            }),
+                            pagination: {
+                                more: data.to < data.total
+                            }
+                        };
+                    },
+                    cache: true
+                }
             });
 
             $('#datapo').select2({
@@ -437,12 +486,14 @@
             });
 
             $("#btndownload").click(function(e) {
+                let datapi = $('#datapi').val();
                 let datapo = $('#datapo').val();
                 let datafwd = $('#datafwd').val();
                 let datasupp = $('#datasupp').val();
                 let dataper = $('#periode').val();
 
                 var query = {
+                    'pino': datapi,
                     'pono': datapo,
                     'idmasterfwd': datafwd,
                     'idsupplier': datasupp,
