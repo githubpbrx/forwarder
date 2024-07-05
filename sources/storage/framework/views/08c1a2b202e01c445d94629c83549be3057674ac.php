@@ -16,19 +16,19 @@
         <div class="row">
             <div class="col-md-4">
                 <div class="form-group">
-                    <label class="col-sm-12 control-label">PO Number</label>
+                    <label class="col-sm-12 control-label">PI Number</label>
                     <div class="col-sm-12">
                         <input type="text" class="form-control" id="nomorpo" name="nomorpo"
-                            value=" <?php echo e(implode(', ', $listpo)); ?>" readonly>
+                            value=" <?php echo e($listpi[0]); ?>" readonly>
                     </div>
                 </div>
             </div>
             <div class="col-md-4">
                 <div class="form-group">
-                    <label class="col-sm-12 control-label">PI Number</label>
+                    <label class="col-sm-12 control-label">PO Number</label>
                     <div class="col-sm-12">
                         <input type="text" class="form-control" id="nomorpo" name="nomorpo"
-                            value=" <?php echo e($listpi[0]); ?>" readonly>
+                            value=" <?php echo e(implode(', ', $listpo)); ?>" readonly>
                     </div>
                 </div>
             </div>

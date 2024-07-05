@@ -370,6 +370,9 @@ class home extends Controller
                     $cekbox = '<center><input type="checkbox" name="mycekbok" id="mycekbok" value=" ' . $query->id . '/' . $query->pino . '" ></center>';
                     return  $cekbox;
                 })
+                ->addColumn('pinomor', function ($query) {
+                    return $query->pino;
+                })
                 ->addColumn('listpo', function ($query) {
                     $mypo = forwarder::join('po', 'po.id', 'forwarder.idpo')
                         ->join('privilege', 'privilege.idforwarder', 'forwarder.idmasterfwd')
@@ -386,9 +389,6 @@ class home extends Controller
                         ->pluck('pono');
 
                     return  str_replace("]", "", str_replace("[", "", str_replace('"', "", $mypo)));
-                })
-                ->addColumn('pinomor', function ($query) {
-                    return $query->pino;
                 })
                 ->addColumn('pidel', function ($query) {
                     return  $query->pideldate;

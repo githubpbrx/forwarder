@@ -31,10 +31,10 @@
                                                     <center><input type="checkbox" name="checkall" id="checkall"></center>
                                                 </th>
                                                 <th>
-                                                    <center>PO Number</center>
+                                                    <center>PI Number</center>
                                                 </th>
                                                 <th>
-                                                    <center>PI Number</center>
+                                                    <center>PO Number</center>
                                                 </th>
                                                 <th>
                                                     <center>PI Delivery</center>
@@ -138,12 +138,12 @@
                         // }
                     },
                     {
-                        data: 'listpo',
-                        name: 'listpo'
-                    },
-                    {
                         data: 'pinomor',
                         name: 'pinomor'
+                    },
+                    {
+                        data: 'listpo',
+                        name: 'listpo'
                     },
                     {
                         data: 'pidel',
