@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Yajra\DataTables\DataTables;
 use Modules\System\Helpers\LogActivity;
+use Illuminate\Support\Facades\DB;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use Modules\Report\Models\modelforwarder;
@@ -88,7 +89,7 @@ class ReportAlokasi extends Controller
                 ->join('po', 'po.id', 'forwarder.idpo')
                 ->join('mastersupplier', 'mastersupplier.id', 'po.vendor')
                 ->join('masterforwarder', 'masterforwarder.id', 'forwarder.idmasterfwd')
-                ->selectRaw(' forwarder.*,  po.pono, po.podate, po.shipmode, po.curr, po.vendor, po.price, po.qtypo, SUM(po.price * po.qtypo) as amount, po.pideldate, mastersupplier.nama, masterforwarder.name')
+                ->selectRaw(' forwarder.*, po.id, po.pono, po.podate, po.shipmode, po.curr, po.vendor, po.price, po.qtypo, SUM(po.price * po.qtypo) as amount, po.pideldate, mastersupplier.nama, masterforwarder.name')
                 ->whereRaw(' forwarder.aktif="Y" AND mastersupplier.aktif="Y" AND masterforwarder.aktif="Y" AND masterforwarder.kurir IS NULL ' . $where . ' ')
                 ->groupby('forwarder.po_nomor')->groupby('forwarder.idmasterfwd')
                 ->get();
@@ -200,7 +201,7 @@ class ReportAlokasi extends Controller
                 ->addColumn('action', function ($data) {
                     $process    = '';
 
-                    $process    .= '<center><a href="#" data-id="' . $data->po_nomor . '" data-idfwd="' . $data->idmasterfwd . '" id="detailalokasi"><i class="fa fa-info-circle"></i></a></center>';
+                    $process    .= '<center><a href="#" data-id="' . $data->po_nomor . '" data-idmasterfwd="' . $data->idmasterfwd . '" id="detailalokasi"><i class="fa fa-info-circle"></i></a></center>';
                     // $process    .= '&nbsp';
                     // $process    .= '<a href="' . url('report/alokasi/getexcelalokasi', ['id' => $data->po_nomor]) . '"><i class="fa fa-file-excel text-success"></i></a>';
 
@@ -297,7 +298,49 @@ class ReportAlokasi extends Controller
             ->where('forwarder.aktif', 'Y')->where('masterforwarder.aktif', 'Y')->where('mastersupplier.aktif', 'Y')->where('masterhscode.aktif', 'Y')
             ->get();
 
-        $form = view('report::readyallocation.modalreportalokasi', ['data' => $data]);
+        $getbook = modelforwarder::join('po', 'po.id', 'forwarder.idpo')
+            ->join('mastersupplier', 'mastersupplier.id', 'po.vendor')
+            ->join('masterhscode', 'masterhscode.matcontent', 'po.matcontents')
+            ->join('masterforwarder', 'masterforwarder.id', 'forwarder.idmasterfwd')
+            ->join('formpo', 'formpo.idforwarder', 'forwarder.id_forwarder')
+            ->join('masterroute', 'masterroute.id_route', 'formpo.idroute')
+            ->join('masterportofloading', 'masterportofloading.id_portloading', 'formpo.idportloading')
+            ->join('masterportofdestination', 'masterportofdestination.id_portdestination', 'formpo.idportdestination')
+            ->where('forwarder.po_nomor', $request->id)
+            ->where('forwarder.idmasterfwd', $request->idmasterfwd)
+            ->where('masterforwarder.kurir', NULL)
+            ->selectRaw(' forwarder.*, po.pono, po.matcontents, po.itemdesc, po.qtypo, po.colorcode, po.size, po.style, po.plant, masterforwarder.name, mastersupplier.nama, masterhscode.hscode, formpo.kode_booking, formpo.date_booking, formpo.etd, formpo.eta, formpo.shipmode, formpo.subshipmode, formpo.package, formpo.created_at, formpo.updated_at, masterroute.route_code, masterroute.route_desc, masterportofloading.code_port, masterportofloading.name_port, masterportofdestination.code_port, masterportofdestination.name_port ')
+            ->where('forwarder.aktif', 'Y')->where('masterforwarder.aktif', 'Y')->where('mastersupplier.aktif', 'Y')->where('masterhscode.aktif', 'Y')->where('formpo.aktif', 'Y')->where('masterroute.aktif', 'Y')->where('masterportofloading.aktif', 'Y')->where('masterportofdestination.aktif', 'Y')
+            ->groupBy('kode_booking')
+            ->get();
+
+        $getperbook = [];
+        foreach ($getbook as $key1 => $val1) {
+            $getpb = modelformpo::join('po', 'po.id', 'formpo.idpo')
+                ->join('masterhscode', 'masterhscode.matcontent', 'po.matcontents')
+                ->where('po.pono', $request->id)
+                ->where('formpo.idmasterfwd', $val1->idmasterfwd)
+                ->where('formpo.kode_booking', $val1->kode_booking)
+                ->where('formpo.aktif', 'Y')->where('masterhscode.aktif', 'Y')
+                ->selectRaw(' po.matcontents, po.itemdesc, po.qtypo, po.colorcode, po.size, masterhscode.hscode, formpo.qty_booking')
+                ->get();
+            array_push($getperbook, $getpb);
+        }
+        // dd($getperbook);
+        $getdata = modelforwarder::withCount(['formpo as qtybook' => function ($var) {
+            $var->select(DB::raw('sum(qty_booking)'));
+        }])
+            ->join('po', 'po.id', 'forwarder.idpo')
+            ->join('masterhscode', 'masterhscode.matcontent', 'po.matcontents')
+            ->where('forwarder.po_nomor', $request->id)
+            ->where('forwarder.idmasterfwd', $request->idmasterfwd)
+            ->where('forwarder.aktif', 'Y')->where('masterhscode.aktif', 'Y')
+            ->selectRaw(' forwarder.id_forwarder, forwarder.po_nomor, forwarder.idmasterfwd, po.matcontents, po.itemdesc, po.qtypo, po.colorcode, po.size, masterhscode.hscode')
+            ->get();
+
+        // dd($getdata);
+
+        $form = view('report::readyallocation.modalreportalokasi', ['data' => $getdata, 'getbooking' => $getbook, 'getperbooking' => $getperbook]);
         return $form->render();
     }
 

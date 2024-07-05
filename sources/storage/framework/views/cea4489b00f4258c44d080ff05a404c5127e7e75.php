@@ -401,12 +401,8 @@
             });
 
             $('body').on('click', '#detailalokasi', function() {
-                $('#detailall').modal({
-                    show: true,
-                    backdrop: 'static'
-                });
                 let idku = $(this).attr('data-id');
-                let idmasterfwd = $(this).attr('data-idfwd');
+                let idmasterfwd = $(this).attr('data-idmasterfwd');
                 $.ajax({
                     url: "<?php echo route('report_detailalokasi'); ?>",
                     type: 'POST',
@@ -416,9 +412,28 @@
                         id: idku,
                         idmasterfwd: idmasterfwd
                     },
-                }).done(function(data) {
-                    $('#formdetail').html(data);
-                })
+                    beforeSend: function(param) {
+                        Swal.fire({
+                            title: 'Please Wait .......',
+                            // html: '',
+                            allowEscapeKey: false,
+                            allowOutsideClick: false,
+                            showCancelButton: false,
+                            showConfirmButton: false,
+                            onOpen: () => {
+                                swal.showLoading();
+                            }
+                        })
+                    },
+                    success: function(data) {
+                        $('#detailall').modal({
+                            show: true,
+                            backdrop: 'static'
+                        });
+                        $('#formdetail').html(data);
+                        swal.close();
+                    }
+                });
             });
 
             $("#btndownload").click(function(e) {
