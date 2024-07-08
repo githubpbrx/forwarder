@@ -57,11 +57,10 @@ class ReportAlokasi extends Controller
         }
 
         $data = modelforwarder::join('po', 'po.id', 'forwarder.idpo')
-            ->join('mastersupplier', 'mastersupplier.id', 'po.vendor')
             ->join('masterforwarder', 'masterforwarder.id', 'forwarder.idmasterfwd')
-            ->selectRaw(' mastersupplier.id, mastersupplier.nama, COUNT(distinct(po.pono)) as jml')
-            ->whereRaw(' forwarder.aktif="Y" AND mastersupplier.aktif="Y" AND masterforwarder.aktif="Y" AND masterforwarder.kurir IS NULL ' . $where . ' ')
-            ->groupby('mastersupplier.id')
+            ->selectRaw(' masterforwarder.id, masterforwarder.name, COUNT(distinct(po.pono)) as jml')
+            ->whereRaw(' forwarder.aktif="Y" AND masterforwarder.aktif="Y" AND masterforwarder.kurir IS NULL ' . $where . ' ')
+            ->groupby('masterforwarder.id')
             ->get();
 
         return view('report::readyallocation.chartalokasi', [
@@ -342,10 +341,12 @@ class ReportAlokasi extends Controller
             ->where('forwarder.po_nomor', $request->id)
             ->where('forwarder.idmasterfwd', $request->idmasterfwd)
             ->where('masterforwarder.kurir', NULL)
-            ->selectRaw(' forwarder.*, po.pono, po.matcontents, po.itemdesc, po.qtypo, po.colorcode, po.size, po.style, po.plant, masterforwarder.name, mastersupplier.nama, masterhscode.hscode, formpo.kode_booking, formpo.date_booking, formpo.etd, formpo.eta, formpo.shipmode, formpo.subshipmode, formpo.package, formpo.created_at, formpo.updated_at, masterroute.route_code, masterroute.route_desc, masterportofloading.code_port, masterportofloading.name_port, masterportofdestination.code_port, masterportofdestination.name_port ')
+            ->selectRaw(' forwarder.*, po.pono, po.pino, po.matcontents, po.itemdesc, po.qtypo, po.colorcode, po.size, po.style, po.plant, masterforwarder.name, mastersupplier.nama, masterhscode.hscode, formpo.kode_booking, formpo.date_booking, formpo.etd, formpo.eta, formpo.shipmode, formpo.subshipmode, formpo.package, formpo.created_at, formpo.updated_at, masterroute.route_code, masterroute.route_desc, masterportofloading.code_port as codeportpol, masterportofloading.name_port as nameportpol, masterportofdestination.code_port as codeportpod, masterportofdestination.name_port as nameportpod ')
             ->where('forwarder.aktif', 'Y')->where('masterforwarder.aktif', 'Y')->where('mastersupplier.aktif', 'Y')->where('masterhscode.aktif', 'Y')->where('formpo.aktif', 'Y')->where('masterroute.aktif', 'Y')->where('masterportofloading.aktif', 'Y')->where('masterportofdestination.aktif', 'Y')
-            ->groupBy('kode_booking')
+            ->orderBy('formpo.created_at', 'ASC')
+            ->groupBy('formpo.kode_booking')
             ->get();
+        // dd($getbook);
 
         $getperbook = [];
         foreach ($getbook as $key1 => $val1) {

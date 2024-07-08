@@ -28,10 +28,13 @@
         <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
     </table>
     <hr style="width: 100%; height: 0.5px; background-color:rgb(192, 192, 192);" />
+    <?php
+        $jmlpi = 1;
+    ?>
     <?php $__currentLoopData = $getbooking; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $key => $item): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
         <div class="card card-default">
             <div class="card-header">
-                <h3 class="card-title"><?php echo e($item->kode_booking); ?></h3>
+                <h3 class="card-title"><?php echo e($item->pino); ?>-<?php echo e($jmlpi++); ?> <?php echo e($item->kode_booking); ?></h3>
                 <div class="card-tools">
                     <button type="button" class="btn btn-tool" data-card-widget="collapse">
                         <i class="fas fa-minus"></i>
@@ -97,7 +100,7 @@
                             <label class="col-sm-12 control-label">Port Of Loading</label>
                             <div class="col-sm-12">
                                 <input type="text" class="form-control"
-                                    value="<?php echo e($item->code_port . ' ~ ' . $item->name_port); ?>" readonly>
+                                    value="<?php echo e($item->codeportpol . ' ~ ' . $item->nameportpol); ?>" readonly>
                             </div>
                         </div>
                     </div>
@@ -106,7 +109,7 @@
                             <label class="col-sm-12 control-label">Port Of Destination</label>
                             <div class="col-sm-12">
                                 <input type="text" class="form-control"
-                                    value="<?php echo e($item->code_port . ' ~ ' . $item->name_port); ?>" readonly>
+                                    value="<?php echo e($item->codeportpod . ' ~ ' . $item->nameportpod); ?>" readonly>
                             </div>
                         </div>
                     </div>
@@ -143,7 +146,7 @@
                             <label class="col-sm-12 control-label">Input Data</label>
                             <div class="col-sm-12">
                                 <input type="text" class="form-control"
-                                    value="<?php echo e(date('d F Y', strtotime($item->created_at))); ?>" readonly>
+                                    value="<?php echo e(date('d F Y H:i:s', strtotime($item->created_at))); ?>" readonly>
                             </div>
                         </div>
                     </div>

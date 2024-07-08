@@ -47,7 +47,7 @@
     $jumlah = [];
     $nama = [];
     foreach ($data as $key => $val) {
-        $replace = str_replace("'", '', $val->nama);
+        $replace = str_replace("'", '', $val->name);
         array_push($nama, $replace);
         array_push($jumlah, $val->jml);
     }
@@ -58,6 +58,7 @@
 </figure>
 
 <script>
+    var textToDisplay = ['First', 'Second', 'some text', 'fourth'];
     Highcharts.chart('container', {
         chart: {
             type: 'column',
@@ -111,13 +112,21 @@
                     }
                 },
                 threshold: null
+            },
+            column: {
+                dataLabels: {
+                    enabled: true,
+                    formatter: function() {
+                        return this.point.y;
+                    }
+                }
             }
         },
         credits: {
             enabled: false
         },
         series: [{
-            name: 'Supplier',
+            name: 'Forwarder',
             data: [<?php echo implode(',', $jumlah); ?>]
         }]
     });
