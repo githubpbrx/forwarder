@@ -1,11 +1,19 @@
 <form action="#" class="form-horizontal">
     {{ csrf_field() }}
+    @php
+        $nopo = [];
+        $namasup = [];
+        foreach ($datapo as $key => $value) {
+            array_push($nopo, $value->pono);
+            array_push($namasup, $value->nama);
+        }
+    @endphp
     <div class="row">
         <div class="col-md-3">
             <div class="form-group">
                 <label class="col-sm-12 control-label">PO</label>
                 <div class="col-sm-12">
-                    <input type="text" class="form-control" value="{{ $data[0]->pono }}" readonly>
+                    <input type="text" class="form-control" value="{{ implode(', ', $nopo) }}" readonly>
                 </div>
             </div>
         </div>
@@ -13,7 +21,7 @@
             <div class="form-group">
                 <label class="col-sm-12 control-label">Supplier</label>
                 <div class="col-sm-12">
-                    <input type="text" class="form-control" value="{{ $data[0]->nama }}" readonly>
+                    <input type="text" class="form-control" value="{{ implode(', ', $namasup) }}" readonly>
                 </div>
             </div>
         </div>

@@ -13,8 +13,8 @@
                         <div class="card-body" style="overflow-y: auto;">
                             <div class="row mb-2">
                                 <div>
-                                    <label class="control-label">PO :</label>
-                                    <select class="select2" style="width: 100%;" name="datapo" id="datapo">
+                                    <label class="control-label">BL :</label>
+                                    <select class="select2" style="width: 100%;" name="databl" id="databl">
                                         <option value=""></option>
                                     </select>
                                 </div>
@@ -54,15 +54,6 @@
                                         Excel</button>
                                 </div>
                             </div>
-                            <div class="row mt-3 mb-2">
-                                <div class="col-12">
-                                    <div class="card">
-                                        <div class="card-body overflow-auto">
-                                            <div id="mychartpo"></div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
                             <div class="row">
                                 <div class="table-responsive">
                                     <table id="dataTables" class="table table-bordered table-striped table-hover"
@@ -73,13 +64,7 @@
                                                     <center>NO</center>
                                                 </th>
                                                 <th>
-                                                    <center>PO</center>
-                                                </th>
-                                                <th>
-                                                    <center>Supplier</center>
-                                                </th>
-                                                <th>
-                                                    <center>Forwarder</center>
+                                                    <center>BL Number</center>
                                                 </th>
                                                 <th>
                                                     <center>Code Booking</center>
@@ -88,16 +73,16 @@
                                                     <center>Invoice</center>
                                                 </th>
                                                 <th>
-                                                    <center>Date Submit</center>
+                                                    <center>Forwarder</center>
+                                                </th>
+                                                <th>
+                                                    <center>Supplier</center>
                                                 </th>
                                                 <th>
                                                     <center>ATD</center>
                                                 </th>
                                                 <th>
                                                     <center>ATA</center>
-                                                </th>
-                                                <th>
-                                                    <center>BL Number</center>
                                                 </th>
                                                 <th>
                                                     <center>Action</center>
@@ -166,19 +151,6 @@
                 $(this).val('');
             });
 
-            $.ajax({
-                type: "POST",
-                url: "{!! route('report_getchartshipment') !!}",
-                beforeSend: function(response) {
-                    $('#mychartpo').html(
-                        '<h6 class="text-center mt-5"><span class="fa-stack text-info"><i class="fas fa-circle fa-stack-2x"></i><i class="fas fa-hourglass-half fa-spin fa-stack-1x fa-inverse"></i></span> Please wait! Checking Chart Shipment...</h6>'
-                    );
-                },
-                success: function(response) {
-                    $('#mychartpo').html(response);
-                }
-            });
-
             var tabel = $('#dataTables').DataTable({
                 order: [],
                 processing: true,
@@ -190,7 +162,7 @@
                         'X-CSRF-TOKEN': '{{ csrf_token() }}'
                     },
                     data: function(d) {
-                        d.pono = $('#datapo').val(),
+                        d.blno = $('#databl').val(),
                             d.idmasterfwd = $('#datafwd').val(),
                             d.idsupplier = $('#datasupp').val(),
                             d.periode = $('#periode').val()
@@ -200,16 +172,8 @@
                         data: 'DT_RowIndex'
                     },
                     {
-                        data: 'po',
-                        name: 'po'
-                    },
-                    {
-                        data: 'supplier',
-                        name: 'supplier'
-                    },
-                    {
-                        data: 'forwarder',
-                        name: 'forwarder'
+                        data: 'blnumber',
+                        name: 'blnumber'
                     },
                     {
                         data: 'codebook',
@@ -220,8 +184,12 @@
                         name: 'invoice'
                     },
                     {
-                        data: 'datesubmit',
-                        name: 'datesubmit'
+                        data: 'forwarder',
+                        name: 'forwarder'
+                    },
+                    {
+                        data: 'supplier',
+                        name: 'supplier'
                     },
                     {
                         data: 'atd',
@@ -230,10 +198,6 @@
                     {
                         data: 'ata',
                         name: 'ata'
-                    },
-                    {
-                        data: 'blnumber',
-                        name: 'blnumber'
                     },
                     {
                         data: 'action',
@@ -258,31 +222,13 @@
 
             $('#search').click(function(e) {
                 tabel.draw();
-                $.ajax({
-                    type: "POST",
-                    url: "{!! route('report_getchartshipment') !!}",
-                    data: {
-                        pono: $('#datapo').val(),
-                        idmasterfwd: $('#datafwd').val(),
-                        idsupplier: $('#datasupp').val(),
-                        periode: $('#periode').val()
-                    },
-                    beforeSend: function(response) {
-                        $('#mychartpo').html(
-                            '<h6 class="text-center mt-5"><span class="fa-stack text-info"><i class="fas fa-circle fa-stack-2x"></i><i class="fas fa-hourglass-half fa-spin fa-stack-1x fa-inverse"></i></span> Please wait! Checking Chart Shipment...</h6>'
-                        );
-                    },
-                    success: function(response) {
-                        $('#mychartpo').html(response);
-                    }
-                });
                 // table.ajax.reload();
             });
 
-            $('#datapo').select2({
-                placeholder: '-- Choose PO --',
+            $('#databl').select2({
+                placeholder: '-- Choose BL --',
                 ajax: {
-                    url: "{!! route('report_getposhipment') !!}",
+                    url: "{!! route('report_getblshipment') !!}",
                     dataType: 'json',
                     delay: 500,
                     type: 'post',
@@ -298,8 +244,8 @@
                         return {
                             results: $.map(data.data, function(item) {
                                 return {
-                                    text: item.pono,
-                                    id: item.pono,
+                                    text: item.nomor_bl,
+                                    id: item.nomor_bl,
                                     selected: true,
                                 }
                             }),
@@ -379,10 +325,6 @@
             });
 
             $('body').on('click', '#detailshipment', function() {
-                $('#detailall').modal({
-                    show: true,
-                    backdrop: 'static'
-                });
                 let idku = $(this).attr('data-id');
                 $.ajax({
                     url: "{!! route('report_detailshipment') !!}",
@@ -391,8 +333,27 @@
                         _token: $('meta[name=csrf-token]').attr('content'),
                         id: idku,
                     },
-                }).done(function(data) {
-                    $('#formdetail').html(data);
+                    beforeSend: function(param) {
+                        Swal.fire({
+                            title: 'Please Wait .......',
+                            // html: '',
+                            allowEscapeKey: false,
+                            allowOutsideClick: false,
+                            showCancelButton: false,
+                            showConfirmButton: false,
+                            onOpen: () => {
+                                swal.showLoading();
+                            }
+                        })
+                    },
+                    success: function(data) {
+                        $('#detailall').modal({
+                            show: true,
+                            backdrop: 'static'
+                        });
+                        $('#formdetail').html(data);
+                        swal.close();
+                    }
                 })
             });
 
