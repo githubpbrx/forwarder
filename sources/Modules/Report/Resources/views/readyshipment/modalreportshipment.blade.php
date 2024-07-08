@@ -1,14 +1,24 @@
 <form action="#" class="form-horizontal">
     {{ csrf_field() }}
     @php
+        $nopi = [];
         $nopo = [];
         $namasup = [];
         foreach ($datapo as $key => $value) {
+            array_push($nopi, $value->pino);
             array_push($nopo, $value->pono);
             array_push($namasup, $value->nama);
         }
     @endphp
     <div class="row">
+        <div class="col-md-3">
+            <div class="form-group">
+                <label class="col-sm-12 control-label">PI</label>
+                <div class="col-sm-12">
+                    <input type="text" class="form-control" value="{{ implode(', ', $nopi) }}" readonly>
+                </div>
+            </div>
+        </div>
         <div class="col-md-3">
             <div class="form-group">
                 <label class="col-sm-12 control-label">PO</label>
@@ -33,6 +43,8 @@
                 </div>
             </div>
         </div>
+    </div>
+    <div class="row">
         <div class="col-md-3">
             <div class="form-group">
                 <label class="col-sm-12 control-label">Code Booking</label>
@@ -41,8 +53,6 @@
                 </div>
             </div>
         </div>
-    </div>
-    <div class="row">
         <div class="col-md-3">
             <div class="form-group">
                 <label class="col-sm-12 control-label">Date Booking</label>
@@ -70,6 +80,8 @@
                 </div>
             </div>
         </div>
+    </div>
+    <div class="row">
         <div class="col-md-3">
             <div class="form-group">
                 <label class="col-sm-12 control-label">Port Of Destination</label>
@@ -79,8 +91,6 @@
                 </div>
             </div>
         </div>
-    </div>
-    <div class="row">
         <div class="col-md-3">
             <div class="form-group">
                 <label class="col-sm-12 control-label">Package</label>
@@ -106,6 +116,8 @@
                 </div>
             </div>
         </div>
+    </div>
+    <div class="row">
         <div class="col-md-3">
             <div class="form-group">
                 <label class="col-sm-12 control-label">ATA</label>
@@ -115,13 +127,40 @@
                 </div>
             </div>
         </div>
-    </div>
-    <div class="row">
         <div class="col-md-3">
             <div class="form-group">
                 <label class="col-sm-12 control-label">BL Number</label>
                 <div class="col-sm-12">
                     <input type="text" class="form-control" value="{{ $data[0]->nomor_bl }}" readonly>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="form-group">
+                <label class="col-sm-12 control-label">Input Data</label>
+                <div class="col-sm-12">
+                    <input type="text" class="form-control"
+                        value="{{ date('d F Y H:i:s', strtotime($dateku->created_at)) }}" readonly>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="form-group">
+                <label class="col-sm-12 control-label">Update Data</label>
+                <div class="col-sm-12">
+                    <input type="text" class="form-control"
+                        value="{{ $dateku->updated_at == null ? '' : date('d F Y H:i:s', strtotime($dateku->updated_at)) }}"
+                        readonly>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-3">
+            <div class="form-group">
+                <label class="col-sm-12 control-label">Vessel</label>
+                <div class="col-sm-12">
+                    <input type="text" class="form-control" value="{{ $data[0]->vessel }}" readonly>
                 </div>
             </div>
         </div>
@@ -239,35 +278,6 @@
                             </div>
                         @endif
                     </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-md-3">
-            <div class="form-group">
-                <label class="col-sm-12 control-label">Vessel</label>
-                <div class="col-sm-12">
-                    <input type="text" class="form-control" value="{{ $data[0]->vessel }}" readonly>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="form-group">
-                <label class="col-sm-12 control-label">Input Data</label>
-                <div class="col-sm-12">
-                    <input type="text" class="form-control"
-                        value="{{ date('d F Y H:i:s', strtotime($dateku->created_at)) }}" readonly>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="form-group">
-                <label class="col-sm-12 control-label">Update Data</label>
-                <div class="col-sm-12">
-                    <input type="text" class="form-control"
-                        value="{{ $dateku->updated_at == null ? '' : date('d F Y H:i:s', strtotime($dateku->updated_at)) }}"
-                        readonly>
                 </div>
             </div>
         </div>

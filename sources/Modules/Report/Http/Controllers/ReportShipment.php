@@ -218,7 +218,7 @@ class ReportShipment extends Controller
             ->where('formshipment.aktif', 'Y')->where('formpo.aktif', 'Y')->where('masterforwarder.aktif', 'Y')->where('mastersupplier.aktif', 'Y')
             ->where('masterforwarder.kurir', NULL)
             ->groupBy('po.pono')
-            ->selectRaw('po.pono, mastersupplier.nama')
+            ->selectRaw('po.pono, po.pino, mastersupplier.nama')
             ->get();
         // dd($getdatapo);
         $getfcl = modelcontainership::where('noinv', $data[0]->noinv)->groupby('volume')->groupby('weight')->where('aktif', 'Y')->get();
@@ -262,7 +262,7 @@ class ReportShipment extends Controller
             ->where('formshipment.aktif', 'Y')->where('formpo.aktif', 'Y')->where('masterforwarder.aktif', 'Y')->where('mastersupplier.aktif', 'Y')
             ->where('masterforwarder.kurir', NULL)
             ->groupBy('po.pono')
-            ->selectRaw('po.pono, mastersupplier.nama')
+            ->selectRaw('po.pono, po.pino, mastersupplier.nama')
             ->get();
 
         $getfcl = modelcontainership::where('noinv', $getdata[0]->noinv)->groupby('volume')->groupby('weight')->where('aktif', 'Y')->get();
@@ -281,13 +281,14 @@ class ReportShipment extends Controller
         //single header
         $sheet->setCellValue('A4', 'Invoice');
         $sheet->setCellValue('A5', 'Invoice Date');
-        $sheet->setCellValue('A6', 'PO');
-        $sheet->setCellValue('A7', 'Supplier');
+        $sheet->setCellValue('A6', 'PI');
+        $sheet->setCellValue('A7', 'PO');
         $sheet->getStyle('A4:A7')->getFont()->setBold(true);
-        $sheet->setCellValue('C4', 'Forwarder');
-        $sheet->setCellValue('C5', 'Date Submit');
-        $sheet->setCellValue('C6', 'Update Data');
-        $sheet->getStyle('C4:C6')->getFont()->setBold(true);
+        $sheet->setCellValue('C4', 'Supplier');
+        $sheet->setCellValue('C5', 'Forwarder');
+        $sheet->setCellValue('C6', 'Date Submit');
+        $sheet->setCellValue('C7', 'Update Data');
+        $sheet->getStyle('C4:C7')->getFont()->setBold(true);
 
         //for header
         $cellheader = 'A9:O9';
@@ -388,24 +389,27 @@ class ReportShipment extends Controller
         $sheet->setCellValue('A' . '2', strtoupper('Detail Ready Shipment'));
 
         //single header
+        $nopi = [];
         $nopo = [];
         $namasup = [];
         foreach ($getdatapo as $key => $val) {
+            array_push($nopi, $val->pino);
             array_push($nopo, $val->pono);
             array_push($namasup, $val->nama);
         }
         $sheet->setCellValue('B' . '4', ':' . $getdata[0]->noinv);
         $sheet->setCellValue('B' . '5', ':' . date('d F Y H:i:s', strtotime($getdata[0]->created_at)));
-        $sheet->setCellValue('B' . '6', ':' . implode(", ", $nopo));
-        $sheet->setCellValue('B' . '7', ':' . implode(", ", $namasup));
-        $sheet->setCellValue('D' . '4', ':' . $getdata[0]->name);
-        $sheet->setCellValue('D' . '5', ':' . date('d F Y H:i:s', strtotime($getdate->created_at)));
+        $sheet->setCellValue('B' . '6', ':' . implode(", ", $nopi));
+        $sheet->setCellValue('B' . '7', ':' . implode(", ", $nopo));
+        $sheet->setCellValue('D' . '4', ':' . implode(", ", $namasup));
+        $sheet->setCellValue('D' . '5', ':' . $getdata[0]->name);
+        $sheet->setCellValue('D' . '6', ':' . date('d F Y H:i:s', strtotime($getdate->created_at)));
         if ($getdate->updated_at == null) {
             $stat = '';
         } else {
             $stat = date('d F Y H:i:s', strtotime($getdate->updated_at));
         }
-        $sheet->setCellValue('D' . '6', ':' . $stat);
+        $sheet->setCellValue('D' . '7', ':' . $stat);
 
         //header
         $sheet->setCellValue('A' . $header, $getdata[0]->kode_booking);
