@@ -33,32 +33,6 @@ class ReportPo extends Controller
         return view('report::outstandingpo.reportpo', $data);
     }
 
-    public function getchart(Request $request)
-    {
-        $where = '';
-        if ($request->supplier != NULL) {
-            $imp = implode("','", $request->supplier);
-            $where .= " and mastersupplier.id IN ('" . $imp . "')";
-        }
-        if ($request->periode != NULL) {
-            $periode = explode(" - ", $request->periode);
-            $where .= ' and (po.podate BETWEEN "' . $periode[0] . '" AND "' . $periode[1] . '")';
-        }
-        if ($request->po != NULL) {
-            $where .= ' and po.pono="' . $request->po . '"';
-        }
-        $data = mastersupplier::leftJoin('po', 'po.vendor', 'mastersupplier.id')
-            ->selectRaw(" mastersupplier.id, mastersupplier.nama, COUNT(distinct(po.pono)) as jml")
-            ->whereRaw('mastersupplier.aktif="Y" ' . $where . ' ')
-            ->groupBy('mastersupplier.id')
-            ->orderBy('mastersupplier.nama', 'asc')
-            ->get();
-
-        return view('report::outstandingpo.chartpo', [
-            'data' => $data,
-        ]);
-    }
-
     public function datatable(Request $request)
     {
         if ($request->ajax()) {
@@ -83,10 +57,8 @@ class ReportPo extends Controller
                 ->selectRaw(' po.id, po.pono, po.matcontents, po.podate, sum(po.price * po.qtypo) as amount, po.curr, po.shipmode, po.statusconfirm, mastersupplier.nama ')
                 ->groupby('po.pono')
                 ->orderby('po.podate', 'DESC')
-                // ->skip(2000)
-                // ->take(1000)
-                ->limit(1000)
                 ->get();
+
             return DataTables::of($data)
                 ->addIndexColumn()
                 ->addColumn('po', function ($data) {
@@ -101,38 +73,23 @@ class ReportPo extends Controller
                 ->addColumn('supplier', function ($data) {
                     return $data->nama;
                 })
-                ->addColumn('shipmode', function ($data) {
-                    return $data->shipmode;
-                })
                 ->addColumn('status', function ($data) {
-                    // return 'test';
-
-                    $dt = $data->postatus->pluck('statusconfirm');
-                    $col = collect($dt);
-                    $arr = $col->toArray();
-                    $uq = array_unique($arr);
-                    if (count($uq) == 1) {
-                        if ($uq[0] == null) {
-                            return 'Un Processed';
-                        }
-                        return $uq[0];
+                    if ($data->postatus == null) {
+                        return '';
                     } else {
-                        return 'On Going';
+                        $dt = $data->postatus->pluck('statusconfirm');
+                        $col = collect($dt);
+                        $arr = $col->toArray();
+                        $uq = array_unique($arr);
+                        if (count($uq) == 1) {
+                            if ($uq[0] == null) {
+                                return 'Un Processed';
+                            }
+                            return $uq[0];
+                        } else {
+                            return 'On Going';
+                        }
                     }
-
-                    // dd(count($dt), $col, $arr, array_unique($arr), $dt);
-                    // $getstats = modelpo::where('pono', $data->pono)->first(['statusconfirm']);
-                    // // dd($getstats);
-                    // if ($getstats->statusconfirm == 'confirm') {
-                    //     $stats = 'On Going';
-                    // } elseif ($getstats->statusconfirm == 'reject') {
-                    //     $stats = 'Rejected';
-                    // }
-                    // else {
-                    //     $stats = 'Not Proccessed';
-                    // }
-
-                    // return ($data->statusconfirm == null) ? 'not proccessed' : $data->statusconfirm;
                 })
                 ->addColumn('action', function ($data) {
                     $button = '';
@@ -189,7 +146,9 @@ class ReportPo extends Controller
             ->selectRaw(' po.pono, po.matcontents, po.itemdesc, po.colorcode, po.size, po.qtypo, po.statusconfirm, mastersupplier.nama')
             ->get();
 
-        return response()->json(['status' => 200, 'data' => $datapo, 'message' => 'Berhasil']);
+        // return response()->json(['status' => 200, 'data' => $datapo, 'message' => 'Berhasil']);
+        $form = view('report::outstandingpo.modalreportpo', ['data' => $datapo]);
+        return $form->render();
     }
 
     function excelpo($id)
@@ -294,10 +253,10 @@ class ReportPo extends Controller
             $where .= ' and po.pono="' . $request->po . '"';
         }
 
-        $data = modelpo::join('mastersupplier', 'mastersupplier.id', 'po.vendor')
-            ->where(function ($var) {
-                $var->where('po.statusconfirm', '!=', 'confirm')->orWhere('po.statusconfirm', null);
-            })
+        $data = modelpo::with(['postatus'])->join('mastersupplier', 'mastersupplier.id', 'po.vendor')
+            // ->where(function ($var) {
+            //     $var->where('po.statusconfirm', '!=', 'confirm')->orWhere('po.statusconfirm', null);
+            // })
             ->whereRaw(' mastersupplier.aktif="Y" ' . $where . '')
             ->selectRaw(' po.id, po.pono, po.matcontents, po.podate, sum(po.price * po.qtypo) as amount, po.curr, po.shipmode, po.statusconfirm, mastersupplier.nama ')
             ->groupby('po.pono')
@@ -307,8 +266,8 @@ class ReportPo extends Controller
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
 
-        $cell = 'A4:F4';
-        $sheet->mergeCells('A2:F2');
+        $cell = 'A4:E4';
+        $sheet->mergeCells('A2:E2');
         $sheet->setCellValue('A4', 'PO');
         $sheet->getColumnDimension('A')->setAutoSize(true);
         $sheet->setCellValue('B4', 'Date');
@@ -317,13 +276,11 @@ class ReportPo extends Controller
         $sheet->getColumnDimension('C')->setAutoSize(true);
         $sheet->setCellValue('D4', 'Supplier');
         $sheet->getColumnDimension('D')->setAutoSize(true);
-        $sheet->setCellValue('E4', 'Shipmode');
+        $sheet->setCellValue('E4', 'Status');
         $sheet->getColumnDimension('E')->setAutoSize(true);
-        $sheet->setCellValue('F4', 'Status');
-        $sheet->getColumnDimension('F')->setAutoSize(true);
         $sheet->getStyle($cell)->getAlignment()->setWrapText(true);
         $sheet->getStyle($cell)->getFont()->setBold(true);
-        $sheet->getStyle('A2:F2')->getFont()->setBold(true);
+        $sheet->getStyle('A2:E2')->getFont()->setBold(true);
         $sheet->getStyle($cell)->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID);
         $sheet->getStyle($cell)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
         $sheet->getStyle($cell)->getAlignment()->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER);
@@ -350,17 +307,34 @@ class ReportPo extends Controller
 
         $sheet->setCellValue('A' . '2', strtoupper('Data Outstanding PO'));
         foreach ($data as $key => $value) {
+            if ($value->postatus == null) {
+                $stat = '';
+            } else {
+                $dt = $value->postatus->pluck('statusconfirm');
+                $col = collect($dt);
+                $arr = $col->toArray();
+                $uq = array_unique($arr);
+                if (count($uq) == 1) {
+                    if ($uq[0] == null) {
+                        $stat = 'Un Processed';
+                    } else {
+                        $stat = $uq[0];
+                    }
+                } else {
+                    $stat = 'On Going';
+                }
+            }
+
             $sheet->setCellValue('A' . $rows, $value->pono);
             $sheet->setCellValue('B' . $rows, date("Y/m/d", strtotime($value->podate)));
             $sheet->setCellValue('C' . $rows, $value->amount . ' ' . $value->curr);
             $sheet->setCellValue('D' . $rows, $value->nama);
-            $sheet->setCellValue('E' . $rows, $value->shipmode);
-            $sheet->setCellValue('F' . $rows, ($value->statusconfirm == null) ? 'not proccessed' : $value->statusconfirm);
+            $sheet->setCellValue('E' . $rows, $stat);
             $rows++;
         }
 
-        $cell = 'A4:F' . ($rows - 1);
-        $sheet->getStyle('A2:F2')->applyFromArray($styleArraytitle);
+        $cell = 'A4:E' . ($rows - 1);
+        $sheet->getStyle('A2:E2')->applyFromArray($styleArraytitle);
         $sheet->getStyle($cell)->applyFromArray($styleArray);
         $sheet->getStyle($cell)->getAlignment()->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER);
 

@@ -48,16 +48,7 @@
                                         Excel</button>
                                 </div>
                             </div>
-                            <div class="row mt-3 mb-2">
-                                <div class="col-12">
-                                    <div class="card">
-                                        <div class="card-body overflow-auto">
-                                            <div id="mychartpo"></div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="row">
+                            <div class="row mt-3">
                                 <div class="table-responsive">
                                     <table id="dataTables" class="table table-bordered table-striped table-hover"
                                         style="width:100%">
@@ -77,9 +68,6 @@
                                                 </th>
                                                 <th>
                                                     <center>Supplier</center>
-                                                </th>
-                                                <th>
-                                                    <center>Shipmode</center>
                                                 </th>
                                                 <th>
                                                     <center>Status</center>
@@ -112,36 +100,7 @@
                     </button>
                 </div>
                 <div class="modal-body" style="font-size: 10pt;">
-                    <form action="#" class="form-horizontal">
-                        {{ csrf_field() }}
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label class="col-sm-12 control-label">PO</label>
-                                    <div class="col-sm-12">
-                                        <input type="text" class="form-control" id="nomorpo" name="nomorpo" readonly>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label class="col-sm-12 control-label">Supplier</label>
-                                    <div class="col-sm-12">
-                                        <input type="text" class="form-control" id="supplier" name="supplier" readonly>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <hr
-                            style="width: 100%; color: rgb(192, 192, 192); height: 0.5px; background-color:rgb(192, 192, 192);" />
-                        <div class="row">
-                            <div class="col-md-12">
-                                <div id="formdetailpo"></div>
-                            </div>
-                        </div>
-                        <hr
-                            style="width: 100%; color: rgb(192, 192, 192); height: 0.5px; background-color:rgb(192, 192, 192);" />
-                    </form>
+                    <div id="formdetailpo"></div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Cancel</button>
@@ -180,19 +139,6 @@
                 $(this).val('');
             });
 
-            $.ajax({
-                type: "POST",
-                url: "{!! route('report_getchart') !!}",
-                beforeSend: function(response) {
-                    $('#mychartpo').html(
-                        '<h6 class="text-center mt-5"><span class="fa-stack text-info"><i class="fas fa-circle fa-stack-2x"></i><i class="fas fa-hourglass-half fa-spin fa-stack-1x fa-inverse"></i></span> Please wait! Checking Chart PO...</h6>'
-                    );
-                },
-                success: function(response) {
-                    $('#mychartpo').html(response);
-                }
-            });
-
             var tabel = $('#dataTables').DataTable({
                 order: [],
                 processing: true,
@@ -228,10 +174,6 @@
                         name: 'supplier'
                     },
                     {
-                        data: 'shipmode',
-                        name: 'shipmode'
-                    },
-                    {
                         data: 'status',
                         name: 'status'
                     },
@@ -258,23 +200,6 @@
 
             $('#search').click(function(e) {
                 tabel.draw();
-                $.ajax({
-                    type: "POST",
-                    url: "{!! route('report_getchart') !!}",
-                    data: {
-                        po: $('#datapo').val(),
-                        supplier: $('#datasupp').val(),
-                        periode: $('#periode').val()
-                    },
-                    beforeSend: function(response) {
-                        $('#mychartpo').html(
-                            '<h6 class="text-center mt-5"><span class="fa-stack text-info"><i class="fas fa-circle fa-stack-2x"></i><i class="fas fa-hourglass-half fa-spin fa-stack-1x fa-inverse"></i></span> Please wait! Checking Chart PO...</h6>'
-                        );
-                    },
-                    success: function(response) {
-                        $('#mychartpo').html(response);
-                    }
-                });
                 // table.ajax.reload();
             });
 
@@ -345,58 +270,38 @@
             });
 
             $('body').on('click', '#detailpo', function() {
-                $('#detailpomodal').modal({
-                    show: true,
-                    backdrop: 'static'
-                });
                 let idku = $(this).attr('data-id');
+                console.log('idku :>> ', idku);
                 $.ajax({
                     url: "{!! route('report_detailpo') !!}",
                     type: 'POST',
-                    dataType: 'json',
+                    // dataType: 'json',
                     data: {
                         _token: $('meta[name=csrf-token]').attr('content'),
                         id: idku,
                     },
-                }).done(function(data) {
-                    let datapo = data.data;
-
-                    $('#formdetailpo').empty();
-
-                    html =
-                        '<table border="1" style="width:100%"><tr><th>Material</th><th>Material Desc</th><th>Color</th><th>Size</th><th>Qty PO</th><th>Status</th></tr>';
-                    for (let index = 0; index < datapo.length; index++) {
-                        let status;
-                        if (datapo[index].statusconfirm == 'confirm') {
-                            status = 'Confirmed';
-                        } else if (datapo[index].statusconfirm == 'reject') {
-                            status = 'Rejected';
-                        } else {
-                            status = 'Unprocessed';
-                        }
-
-                        html +=
-                            '<tr><td>' + datapo[index].matcontents + '</td><td>' + datapo[index]
-                            .itemdesc + '</td><td>' + datapo[index].colorcode +
-                            '</td><td>' + datapo[index].size + '</td><td>' + datapo[index].qtypo +
-                            '</td><td>' + status +
-                            '</td></tr>';
+                    beforeSend: function(param) {
+                        Swal.fire({
+                            title: 'Please Wait .......',
+                            // html: '',
+                            allowEscapeKey: false,
+                            allowOutsideClick: false,
+                            showCancelButton: false,
+                            showConfirmButton: false,
+                            onOpen: () => {
+                                swal.showLoading();
+                            }
+                        })
+                    },
+                    success: function(data) {
+                        console.log('data :>> ', data);
+                        $('#detailpomodal').modal({
+                            show: true,
+                            backdrop: 'static'
+                        });
+                        $('#formdetailpo').html(data);
+                        swal.close();
                     }
-
-                    html += "</table>";
-                    $('#formdetailpo').html(html);
-
-                    $('#nomorpo').val(datapo[0].pono);
-                    // $('#material').val(datapo.matcontents);
-                    // $('#matdesc').val(datapo.itemdesc);
-                    // $('#qtypo').val(datapo.qtypo);
-                    // let curr = datapo.curr;
-                    // let pr = datapo.price;
-                    // $('#price').val(pr + ' ' + curr);
-                    $('#supplier').val(datapo[0].nama);
-                    // $('#plant').val(datapo.plant);
-                    // $('#style').val(datapo.style);
-                    // $('#buyer').val(datapo.buyer);
                 })
             });
 

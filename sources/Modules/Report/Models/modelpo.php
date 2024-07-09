@@ -22,6 +22,6 @@ class modelpo extends Model
 
     public function postatus()
     {
-        return $this->hasOne('Modules\Report\Models\modelpo', 'pono', 'pono');
+        return $this->hasMany('Modules\Report\Models\modelpo', 'pono', 'pono');
     }
 }
