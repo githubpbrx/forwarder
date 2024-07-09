@@ -77,8 +77,6 @@
         </div>
     </div>
     {{-- ----------------- /.modal content ----------------- --}}
-
-    @include('loading')
 @endsection
 
 @section('script')
@@ -259,8 +257,6 @@
             });
 
             $('#btnprocess').click(function(e) {
-                $("#loading").show();
-
                 let data;
                 if (singleid.length == 0) {
                     data = multi_id;
