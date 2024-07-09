@@ -76,8 +76,6 @@
         </div>
     </div>
     
-
-    <?php echo $__env->make('loading', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
 <?php $__env->stopSection(); ?>
 
 <?php $__env->startSection('script'); ?>
@@ -258,8 +256,6 @@
             });
 
             $('#btnprocess').click(function(e) {
-                $("#loading").show();
-
                 let data;
                 if (singleid.length == 0) {
                     data = multi_id;

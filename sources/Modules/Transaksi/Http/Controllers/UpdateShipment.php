@@ -174,7 +174,7 @@ class UpdateShipment extends Controller
             if ($filebl != null) {
                 $originalNamebl = str_replace(' ', '_', $filebl->getClientOriginalName());
                 $fileNamebl = time() . '_' . $originalNamebl;
-                Storage::disk('local')->put($fileNamebl, file_get_contents($request->file));
+                Storage::disk('local')->put($fileNamebl, file_get_contents($filebl));
             } else {
                 $namefilebl = modelformshipment::where('id_shipment', $val->idshipment)->where('aktif', 'Y')->first();
                 $fileNamebl = $namefilebl->file_bl;
@@ -184,7 +184,7 @@ class UpdateShipment extends Controller
             if ($fileinv != null) {
                 $originalNameinv = str_replace(' ', '_', $fileinv->getClientOriginalName());
                 $fileNameinv = time() . '_' . $originalNameinv;
-                Storage::disk('local')->put($fileNameinv, file_get_contents($request->file));
+                Storage::disk('local')->put($fileNameinv, file_get_contents($fileinv));
             } else {
                 $namefileinv = modelformshipment::where('id_shipment', $val->idshipment)->where('aktif', 'Y')->first();
                 $fileNameinv = $namefileinv->file_invoice;
@@ -194,7 +194,7 @@ class UpdateShipment extends Controller
             if ($filepack != null) {
                 $originalNamepack = str_replace(' ', '_', $filepack->getClientOriginalName());
                 $fileNamepack = time() . '_' . $originalNamepack;
-                Storage::disk('local')->put($fileNamepack, file_get_contents($request->file));
+                Storage::disk('local')->put($fileNamepack, file_get_contents($filepack));
             } else {
                 $namefilepack = modelformshipment::where('id_shipment', $val->idshipment)->where('aktif', 'Y')->first();
                 $fileNamepack = $namefilepack->file_packinglist;
