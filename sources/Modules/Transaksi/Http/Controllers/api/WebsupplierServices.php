@@ -246,18 +246,9 @@ class WebsupplierServices extends Controller
         //     $failed['type'] = "warning";
         //     return response()->json($failed, Response::HTTP_UNPROCESSABLE_ENTITY);
         // }
-        $cekforwarder = forward::where('name', $forwarder)->where('aktif', 'Y')->first();
 
-        if ($cekforwarder == null) {
-            forward::insert(['name' => $forwarder, 'aktif' => 'Y', 'created_at' => date('Y-m-d H:i:s')]);
-            $forwarderku = forward::latest('id')->first();
-            $insert = $forwarderku->id;
-        } else {
-            $insert = $cekforwarder->id;
-        }
-
-        $cekforwarder = forward::where('name', $forwarder)->where('aktif', 'Y')->first();
-        if ($cekforwarder->kurir == 1) {
+        $cekforwarder = forward::where('name', $forwarder)->where('kurir', 1)->first();
+        if ($cekforwarder != null) {
             modellogproses::insert(['typelog' => 'prosesupdatepi', 'activity' => 'FAILED alert => DATA KURIR ', 'status' => false, 'datetime' => date('Y-m-d H:i:s'), 'from' => 'api_updatepi', 'created_at' => date('Y-m-d H:i:s')]);
             modellogproses::insert(['typelog' => 'prosesupdatepi', 'activity' => ' DATA KURIR === END PROSES => ROLLBACK ===', 'status' => false, 'datetime' => date('Y-m-d H:i:s'), 'from' => 'api_updatepi', 'created_at' => date('Y-m-d H:i:s')]);
             $failed['message'] = "Data Forwarder is Kurir";
@@ -266,6 +257,16 @@ class WebsupplierServices extends Controller
             $failed['type'] = "warning";
             return response()->json($failed, Response::HTTP_UNPROCESSABLE_ENTITY);
         }
+
+        $cekforwarder = forward::where('name', $forwarder)->where('aktif', 'Y')->first();
+        if ($cekforwarder == null) {
+            forward::insert(['name' => $forwarder, 'aktif' => 'Y', 'created_at' => date('Y-m-d H:i:s')]);
+            $forwarderku = forward::latest('id')->first();
+            $insert = $forwarderku->id;
+        } else {
+            $insert = $cekforwarder->id;
+        }
+
 
         $update = po::where('pono', $pono)->where('line_id', $lineid)->update(['pino' => $pino, 'pirecdate' => $pirecdate, 'pideldate' => $pideldate, 'country' => $country, 'address' => $address, 'telephone' => $telephone, 'updated_at' => date('Y-m-d H:i:s')]);
         if ($update) {
