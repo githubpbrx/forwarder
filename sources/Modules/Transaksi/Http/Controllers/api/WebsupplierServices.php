@@ -3,14 +3,10 @@
 namespace Modules\Transaksi\Http\Controllers\api;
 
 use App\Http\Controllers\Controller;
-use DateTime;
 use Illuminate\Http\Request;
-// use Exception;
-use Illuminate\Support\Facades\DB;
-// use Illuminate\Support\Facades\Mail;
-use Mail;
+use Illuminate\Support\Facades\Mail;
+// use Mail;
 use Carbon\Carbon;
-use Modules\Selfservice\Http\Controllers\CutiController;
 use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Support\Facades\Hash;
 use Modules\System\Models\modelsystem;
@@ -23,6 +19,7 @@ use Modules\Transaksi\Models\modelformpo as formpo;
 use Modules\Transaksi\Models\modelformshipment as shipment;
 use Modules\Transaksi\Models\modelprivilege as privilege;
 use Modules\Transaksi\Models\modelcontainer as container;
+use Modules\Transaksi\Models\modelpo_sendemail as sendmail;
 
 class WebsupplierServices extends Controller
 {
@@ -30,6 +27,8 @@ class WebsupplierServices extends Controller
      * Display a listing of the resource.
      * @return Response
      */
+    protected $token;
+    protected $baseurl;
     public function __construct()
     {
         header("Access-Control-Allow-Origin: *");
@@ -170,11 +169,10 @@ class WebsupplierServices extends Controller
                 $message->to($email);
             });
             return 1;
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             return 0;
         }
     }
-
 
     public function updatepi(Request $req)
     {
@@ -267,7 +265,6 @@ class WebsupplierServices extends Controller
             $insert = $cekforwarder->id;
         }
 
-
         $update = po::where('pono', $pono)->where('line_id', $lineid)->update(['pino' => $pino, 'pirecdate' => $pirecdate, 'pideldate' => $pideldate, 'country' => $country, 'address' => $address, 'telephone' => $telephone, 'updated_at' => date('Y-m-d H:i:s')]);
         if ($update) {
             // $cekforwarder = forward::where('name', $forwarder)->where('aktif', 'Y')->first();
@@ -283,19 +280,23 @@ class WebsupplierServices extends Controller
             $cekforwarder = forward::where('name', $forwarder)->where('aktif', 'Y')->first();
 
             $getqtypo = po::where('pono', $pono)->where('line_id', $lineid)->first();
-            $cekdifwd = fwd::where('idpo', $getqtypo->id)->where('idmasterfwd', $insert)->where('po_nomor', $pono)->first();
+            $cekdifwd = fwd::where('idpo', $getqtypo->id)->where('idmasterfwd', $insert)->where('po_nomor', $pono)->where('aktif', 'Y')->first();
             if ($cekdifwd != null) {
-                $updatefwd = fwd::where('idpo', $getqtypo->id)->where('idmasterfwd', $insert)->where('po_nomor', $pono)->update(['idpo' => $getqtypo->id, 'idmasterfwd' => $insert, 'po_nomor' => $getqtypo->pono, 'qty_allocation' => $getqtypo->qtypo, 'statusforwarder' => 'full_allocated', 'aktif' => 'Y', 'created_at' => date('Y-m-d H:i:s')]);
+                $updatefwd = fwd::where('idpo', $getqtypo->id)->where('idmasterfwd', $insert)->where('po_nomor', $pono)->where('aktif', 'Y')->update(['idpo' => $getqtypo->id, 'idmasterfwd' => $insert, 'po_nomor' => $pono, 'qty_allocation' => $getqtypo->qtypo, 'statusforwarder' => 'full_allocated', 'aktif' => 'Y', 'created_at' => date('Y-m-d H:i:s')]);
             } else {
-                $insertdatafwd = fwd::insert(['idpo' => $getqtypo->id, 'idmasterfwd' => $insert, 'po_nomor' => $getqtypo->pono, 'qty_allocation' => $getqtypo->qtypo, 'statusforwarder' => 'full_allocated', 'aktif' => 'Y', 'created_at' => date('Y-m-d H:i:s')]);
+                $insertdatafwd = fwd::insert(['idpo' => $getqtypo->id, 'idmasterfwd' => $insert, 'po_nomor' => $pono, 'qty_allocation' => $getqtypo->qtypo, 'statusforwarder' => 'full_allocated', 'aktif' => 'Y', 'created_at' => date('Y-m-d H:i:s')]);
             }
 
             //for notif email
-            $getemail = privilege::where('idforwarder', $insert)->where('leadforwarder', 1)->where('privilege_aktif', 'Y')->first();
-            if ($getemail) {
-                $url = 'pbrx.web.id/forwarder';
-                WebsupplierServices::sendEmail($pono, $getemail->privilege_user_nik, $getemail->privilege_user_name, $url, "Notification Forwarder Get PO");
-                WebsupplierServices::sendEmail($pono, "eptepeb3@pancaprima.com", "JOHANA", $url, "Notification Forwarder Get PO");
+            $getsendemail = sendmail::where('pono', $pono)->first();
+            if ($getsendemail == NULL) {
+                $getemail = privilege::where('idforwarder', $insert)->where('leadforwarder', 1)->where('privilege_aktif', 'Y')->first();
+                if ($getemail) {
+                    $url = 'https://forwarder.panbrothers.co.id/forwarder/login';
+                    WebsupplierServices::sendEmail($pono, $getemail->privilege_user_nik, $getemail->privilege_user_name, $url, "Notification Forwarder Get PO");
+                    WebsupplierServices::sendEmail($pono, "eptepeb3@pancaprima.com", "JOHANA", $url, "Notification Forwarder Get PO");
+                    $updatesendemail = sendmail::insert(['pono' => $pono, 'sendemail' => 1, 'date_send' => date('Y-m-d H:i:s')]);
+                }
             }
 
             modellogproses::insert(['typelog' => 'prosesupdatepi', 'activity' => '=== SUCCESS UPDATE PI NUMBER ===', 'status' => true, 'datetime' => date('Y-m-d H:i:s'), 'from' => 'api_updatepi', 'created_at' => date('Y-m-d H:i:s')]);
@@ -360,7 +361,7 @@ class WebsupplierServices extends Controller
         $getuser = privilege::whereIn('idforwarder', $masterfwd)->where('privilege_aktif', 'Y')->select('privilege_user_nik', 'privilege_user_name')->get();
 
         foreach ($getuser as $key => $lue) {
-            $url = 'pbrx.web.id/forwarder';
+            $url = 'https://forwarder.panbrothers.co.id/forwarder/login';
             $this->reminderEmail($lue->privilege_user_nik, $lue->privilege_user_name, $url, "Notification Forwarder Reminder PO");
         }
 
@@ -379,7 +380,7 @@ class WebsupplierServices extends Controller
                 $message->to($email);
             });
             return 1;
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             return 0;
         }
     }
